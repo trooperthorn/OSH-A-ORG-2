@@ -29,3 +29,19 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - Small commits, version in message (vX.Y.Z: …). CI green before merge.
 - The globe engine is PORTED from A-ORG-1, not rewritten — its math survived 22 major
   versions; treat regressions against A-ORG-1 behavior as bugs.
+
+## Backlog (M1 close-out → M2 inputs)
+1. **Fat fields to runtime**: unitFull/parentUnit/tenants stay in data/sites.json only;
+   s3's fullF search rung and s4's crumb sub-labels sleep until the M2 datastore seeds
+   them. Wire the seed, then delete this line.
+2. **ASCC parent convention split** (SME hold): USARPAC/USARCENT/ARCYBER chain to COCOM
+   sites; USAREUR-AF/USAWHC chain to HQDA. Pick one rule in the M2 data pass.
+3. **Verify with sources**: 'Combined Arms Command (CAC)' naming (vs Combined Arms
+   Center) across 6 rows; USAASC in austin-t2com-hq tenants; usnorthcom-peterson's
+   263rd AAMDC tenant; camp-mujuk / camp-as-sayliyah retention (owner call).
+4. **Label density**: COCOM landmark labels crowd the CONUS view at low zoom — label
+   tiering pass (A-ORG-1's zoom-tier idiom is in the port, needs tuning).
+5. **grp metadata**: fort-buchanan (PR) and fort-wainwright-greely-alaska carry
+   grp=conus; inert on a sphere, but decide the vocabulary before any flat inset ships.
+6. Upstream A-ORG-1 fix to send back: Detroit Arsenal latitude (42.59 → 42.49) at its
+   index.html:12147.

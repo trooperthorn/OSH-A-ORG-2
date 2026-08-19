@@ -1,7 +1,7 @@
 {
  "v": 1,
  "updated": "2026-08-19",
- "src": "A-ORG-1 v22.27.1 + M1 SME verify (9 regions, 103 applied + 2 amended + 1 PM; 4 held)",
+ "src": "A-ORG-1 v22.27.1 + M1 SME verify (9 regions, 103 applied + 2 amended + 1 PM; 4 held) + final-verify fixes",
  "sites": [
   {
    "id": "335th-signal-command-east-point",
@@ -217,11 +217,8 @@
    "parentUnit": "HQDA",
    "tenants": [
     "T2COM",
-    "Army Applications Laboratory",
     "Futures & Concepts Command (FCC)",
     "Army Applications Laboratory (AAL)",
-    "INSCOM",
-    "MDW",
     "PAE Maneuver Air",
     "USAASC"
    ]
@@ -317,7 +314,7 @@
    "tenants": [
     "160th Theater Signal Brigade",
     "595th Transportation Brigade",
-    "Area Support Group – Kuwait (ASG-KU)",
+    "Area Support Group \u2013 Kuwait (ASG-KU)",
     "Operation Spartan Shield",
     "Task Force Spartan / rotational BCTs",
     "USARCENT (Forward)",
@@ -328,9 +325,9 @@
   {
    "id": "camp-as-sayliyah",
    "base": "Camp As Sayliyah",
-   "st": "QA",
+   "st": "Qatar",
    "unit": "Area Support Group-Qatar",
-   "unitFull": "Area Support Group-Qatar (ASG-Qatar) — DEACTIVATED June 10, 2021",
+   "unitFull": "Area Support Group-Qatar (ASG-Qatar) \u2014 DEACTIVATED June 10, 2021",
    "lat": 25.26,
    "lon": 51.39,
    "grp": "swa",
@@ -384,7 +381,7 @@
   {
    "id": "camp-bondsteel",
    "base": "Camp Bondsteel",
-   "st": "XK",
+   "st": "Kosovo",
    "unit": null,
    "unitFull": null,
    "lat": 42.36,
@@ -410,7 +407,7 @@
   {
    "id": "camp-buehring",
    "base": "Camp Buehring",
-   "st": "KW",
+   "st": "Kuwait",
    "unit": "Theater Aviation Task Force (Rotational CAB), Camp Buehring",
    "unitFull": "Enduring rotational Combat Aviation Brigade billet, Operation Spartan Shield, Camp Buehring, Kuwait",
    "lat": 29.7,
@@ -432,7 +429,7 @@
   {
    "id": "camp-carroll",
    "base": "Camp Carroll",
-   "st": "KR",
+   "st": "Korea",
    "unit": "Materiel Support Command-Korea (MSC-K)",
    "unitFull": null,
    "lat": 36.03,
@@ -575,7 +572,7 @@
   {
    "id": "camp-kosciuszko",
    "base": "Camp Kosciuszko",
-   "st": "PL",
+   "st": "Poland",
    "unit": "V Corps Headquarters (Forward)",
    "unitFull": null,
    "lat": 52.41,
@@ -590,7 +587,7 @@
   {
    "id": "camp-lemonnier",
    "base": "Camp Lemonnier",
-   "st": "DJ",
+   "st": "Djibouti",
    "unit": null,
    "unitFull": null,
    "lat": 11.55,
@@ -623,7 +620,7 @@
   {
    "id": "camp-mujuk",
    "base": "Camp Mujuk",
-   "st": "KR",
+   "st": "Korea",
    "unit": null,
    "unitFull": null,
    "lat": 36.03,
@@ -854,7 +851,7 @@
   },
   {
    "id": "chi-vres",
-   "base": "Chièvres",
+   "base": "Chi\u00e8vres",
    "st": "Belgium",
    "unit": "650th MI Group / Allied Command CI (ACCI)",
    "unitFull": null,
@@ -901,7 +898,7 @@
   {
    "id": "coleman-barracks",
    "base": "Coleman Barracks",
-   "st": "DE",
+   "st": "Germany",
    "unit": "Army Field Support Battalion-Mannheim",
    "unitFull": null,
    "lat": 49.56,
@@ -975,8 +972,8 @@
   },
   {
    "id": "d-lmen-aps-2-site",
-   "base": "Dülmen APS-2 Site",
-   "st": "DE",
+   "base": "D\u00fclmen APS-2 Site",
+   "st": "Germany",
    "unit": "Army Field Support Battalion-Benelux",
    "unitFull": null,
    "lat": 51.83,
@@ -985,7 +982,7 @@
    "parent": "kaiserslautern",
    "parentUnit": "21st Theater Sustainment Command",
    "tenants": [
-    "Army Field Support Battalion-Benelux (operates APS-2 sites at Zutendaal, Belgium; Dülmen, Germany; Eygelshoven, Netherlands)"
+    "Army Field Support Battalion-Benelux (operates APS-2 sites at Zutendaal, Belgium; D\u00fclmen, Germany; Eygelshoven, Netherlands)"
    ]
   },
   {
@@ -1074,7 +1071,7 @@
   {
    "id": "drawsko-pomorskie-training-area",
    "base": "Drawsko Pomorskie Training Area",
-   "st": "PL",
+   "st": "Poland",
    "unit": null,
    "unitFull": null,
    "lat": 53.53,
@@ -1185,7 +1182,7 @@
    "parent": "the-pentagon",
    "parentUnit": "HQDA",
    "tenants": [
-    "CPE ES2 — Enterprise Software & Services",
+    "CPE ES2 \u2014 Enterprise Software & Services",
     "CPE Soldier Systems",
     "Military Intelligence Readiness Command (MIRC)",
     "29th Infantry Division",
@@ -1271,7 +1268,7 @@
    "lon": -66.13,
    "grp": "conus",
    "parent": "fort-bragg",
-   "parentUnit": "USAWHC",
+   "parentUnit": "USARC",
    "tenants": [
     "1st Mission Support Command",
     "Puerto Rico Army National Guard",
@@ -1503,7 +1500,7 @@
     "U.S. Army Information Systems Engineering Command (USAISEC)",
     "Intelligence CoE (ICoE)",
     "Intelligence Future Capability Directorate",
-    "Regional Cyber Center – CONUS (RCC-C)"
+    "Regional Cyber Center \u2013 CONUS (RCC-C)"
    ]
   },
   {
@@ -1570,7 +1567,7 @@
    "parent": "fort-knox",
    "parentUnit": "V Corps",
    "tenants": [
-    "Readiness Divisions (63rd · 81st · 88th · 99th)",
+    "Readiness Divisions (63rd \u00b7 81st \u00b7 88th \u00b7 99th)",
     "U.S. Army Center for Initial Military Training (CIMT)",
     "U.S. Army Training Center & Fort Jackson",
     "Leader Training Brigade (CIMT)",
@@ -1651,7 +1648,7 @@
    "base": "Fort Leonard Wood",
    "st": "MO",
    "unit": "Maneuver Support CoE (MSCoE)",
-   "unitFull": "Portfolio Acquisition Executive (PAE) — Layered Protection & CBRN Defense",
+   "unitFull": "Portfolio Acquisition Executive (PAE) \u2014 Layered Protection & CBRN Defense",
    "lat": 37.71,
    "lon": -92.13,
    "grp": "conus",
@@ -1706,7 +1703,7 @@
    "lon": -76.74,
    "grp": "ncr",
    "parent": "fort-bragg",
-   "parentUnit": "USAWHC",
+   "parentUnit": "USARC",
    "tenants": [
     "200th Military Police Command",
     "780th Military Intelligence Brigade (Cyber)",
@@ -1736,14 +1733,14 @@
    "base": "Fort Polk",
    "st": "LA",
    "unit": "Joint Readiness Training Center (JRTC)",
-   "unitFull": "U.S. Army Garrison Fort Johnson Public Affairs Office",
+   "unitFull": "U.S. Army Garrison Fort Polk Public Affairs Office",
    "lat": 31.05,
    "lon": -93.2,
    "grp": "conus",
    "parent": "fort-leavenworth",
    "parentUnit": "Combined Arms Command (CAC)",
    "tenants": [
-    "Fort Johnson Public Affairs Office",
+    "Fort Polk Public Affairs Office",
     "3rd Mobile Brigade Combat Team (10th Mtn)",
     "46th Engineer Battalion",
     "Joint Readiness Training Center (JRTC)",
@@ -1957,7 +1954,7 @@
   },
   {
    "id": "grafenw-hr-vilseck",
-   "base": "Grafenwöhr / Vilseck",
+   "base": "Grafenw\u00f6hr / Vilseck",
    "st": "Germany",
    "unit": "7th Army Training Command (7ATC)",
    "unitFull": null,
@@ -2281,7 +2278,7 @@
   {
    "id": "k-16-air-base",
    "base": "K-16 Air Base",
-   "st": "KR",
+   "st": "Korea",
    "unit": "2nd Battalion, 2nd Aviation Regiment (2nd CAB)",
    "unitFull": null,
    "lat": 37.44,
@@ -2378,7 +2375,7 @@
   {
    "id": "landstuhl",
    "base": "Landstuhl",
-   "st": "DE",
+   "st": "Germany",
    "unit": "Landstuhl Regional Medical Center",
    "unitFull": null,
    "lat": 49.41,
@@ -2651,7 +2648,7 @@
   {
    "id": "mk-air-base",
    "base": "MK Air Base",
-   "st": "RO",
+   "st": "Romania",
    "unit": "U.S. Army Garrison Black Sea",
    "unitFull": null,
    "lat": 44.36,
@@ -3029,7 +3026,7 @@
   {
    "id": "novo-selo-training-area",
    "base": "Novo Selo Training Area",
-   "st": "BG",
+   "st": "Bulgaria",
    "unit": "U.S. Army Garrison Black Sea",
    "unitFull": null,
    "lat": 42.72,
@@ -3214,7 +3211,7 @@
    "base": "Picatinny Arsenal",
    "st": "NJ",
    "unit": "PAE Agile Sustainment & Ammo",
-   "unitFull": "Portfolio Acquisition Executive (PAE) — Agile Sustainment & Ammunition",
+   "unitFull": "Portfolio Acquisition Executive (PAE) \u2014 Agile Sustainment & Ammunition",
    "lat": 40.87,
    "lon": -74.55,
    "grp": "conus",
@@ -3266,7 +3263,7 @@
    "base": "Pohakuloa Training Area",
    "st": "HI",
    "unit": "USAG Pohakuloa",
-   "unitFull": "U.S. Army Garrison Pōhakuloa",
+   "unitFull": "U.S. Army Garrison P\u014dhakuloa",
    "lat": 19.7,
    "lon": -155.53,
    "grp": "pi",
@@ -3294,7 +3291,7 @@
   {
    "id": "powidz",
    "base": "Powidz",
-   "st": "PL",
+   "st": "Poland",
    "unit": "Army Field Support Battalion-Poland",
    "unitFull": "Army Prepositioned Stock 2 - Europe",
    "lat": 52.44,
@@ -3453,7 +3450,7 @@
   {
    "id": "rose-barracks-vilseck",
    "base": "Rose Barracks (Vilseck)",
-   "st": "DE",
+   "st": "Germany",
    "unit": "2nd Cavalry Regiment",
    "unitFull": null,
    "lat": 49.63,
@@ -3489,7 +3486,7 @@
   {
    "id": "sagami-general-depot",
    "base": "Sagami General Depot",
-   "st": "JP",
+   "st": "Japan",
    "unit": "38th Air Defense Artillery Brigade",
    "unitFull": null,
    "lat": 35.57,
@@ -3599,7 +3596,7 @@
     "409th Contracting Support Brigade",
     "52nd Air Defense Artillery Brigade",
     "Installation Management Command - Europe (IMCOM-Europe)",
-    "U.S. Army Garrisons — Europe (USAG)",
+    "U.S. Army Garrisons \u2014 Europe (USAG)",
     "United States Army Europe and Africa Band & Chorus",
     "13th Missile Defense Battery",
     "U.S. Army Garrison Poland"
@@ -3633,7 +3630,7 @@
    "parentUnit": null,
    "tenants": [
     "USARCENT",
-    "Area Support Group – Jordan (ASG-J)",
+    "Area Support Group \u2013 Jordan (ASG-J)",
     "Headquarters and Headquarters Battalion, USARCENT",
     "Task Force Sinai",
     "1st Support Battalion (Task Force Sinai)",
@@ -3833,14 +3830,14 @@
    "base": "The Pentagon",
    "st": "VA",
    "unit": "HQDA",
-   "unitFull": "Pathway for Innovation & Technology (PIT) — ASA(ALT)",
+   "unitFull": "Pathway for Innovation & Technology (PIT) \u2014 ASA(ALT)",
    "lat": 38.87,
    "lon": -77.06,
    "grp": "ncr",
    "parent": null,
    "parentUnit": null,
    "tenants": [
-    "PIT — Pathway for Innovation & Technology",
+    "PIT \u2014 Pathway for Innovation & Technology",
     "Force Development (Aviation)",
     "Force Development (Fires)",
     "Force Development (Maneuver)",
@@ -3852,7 +3849,7 @@
   },
   {
    "id": "the-pentagon-hqda-cio-g-6",
-   "base": "The Pentagon (HQDA · CIO/G-6)",
+   "base": "The Pentagon (HQDA \u00b7 CIO/G-6)",
    "st": "VA",
    "unit": null,
    "unitFull": null,
@@ -4387,7 +4384,7 @@
     "2nd Theater Signal Brigade",
     "66th MI Brigade",
     "102nd Strategic Signal Battalion",
-    "Regional Cyber Center – Europe (RCC-E)"
+    "Regional Cyber Center \u2013 Europe (RCC-E)"
    ]
   },
   {
@@ -4438,7 +4435,7 @@
   {
    "id": "yokohama-north-dock",
    "base": "Yokohama North Dock",
-   "st": "JP",
+   "st": "Japan",
    "unit": "836th Transportation Battalion",
    "unitFull": null,
    "lat": 35.46,
@@ -4468,7 +4465,7 @@
   {
    "id": "zagan-aps-2-site",
    "base": "Zagan APS-2 Site",
-   "st": "PL",
+   "st": "Poland",
    "unit": null,
    "unitFull": null,
    "lat": 51.61,
