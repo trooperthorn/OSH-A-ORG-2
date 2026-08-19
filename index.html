@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-app-theme="arctic">
+<html lang="en" data-app-theme="atlas">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -96,9 +96,9 @@
      --t1 --t2 --t3 --t4          (brief tier law — see LOCKED SEMANTICS below)
      --r-card --r-chip --r-pill   (radii, ported from A-ORG-1 P1 tokens ~L92)
      --disp --body --mono         (system font stacks only — no webfonts at boot)
-   Themes land in the @THEMES layer as html[data-app-theme="night"|"paper"]{...}
+   Themes land in the @THEMES layer as html[data-app-theme="atlas"|"slate"|"field"]{...}
    overrides. Default theme is arctic; these :root values ARE arctic, so
-   html[data-app-theme="arctic"] needs no override block.
+   (ATLAS is also the :root default; its block is inlined anyway — one source of truth.)
 
    LOCKED SEMANTICS (brief tier law, inherited from A-ORG-1 non-negotiable #6):
      --t1 white-family · --t2 cool (NEVER green) · --t3 warm · --t4 rose.
@@ -128,39 +128,49 @@
 
 /* ─── 1 · TOKENS — ARCTIC is the :root default ─────────────────────────────── */
 :root{
-  /* ground + surfaces */
-  --ground:#0A111C;                       /* deep harbor — page + label halos     */
-  --panel:#101B2C;                        /* raised surface                       */
-  --panel-2:#16243A;                      /* second step (hover/nested)           */
-  --line:rgba(140,185,220,.18);           /* steel hairline ring (M1 verify: synced with theme-arctic's refinement) */
+  /* ═══ ATLAS — daylight cartographic (the :root default; owner directive 19 Aug:
+     complete shift away from the radar identity — no glow, no phosphor, no
+     wireframe-on-black; the globe reads as a printed atlas plate) ═══ */
+  /* ground + surfaces — cool daylight paper, three sheet steps */
+  --ground:#EEF2F5;                       /* page + label halos                   */
+  --panel:#FFFFFF;                        /* raised sheet (brightest = closest)   */
+  --panel-2:#E2E9EF;                      /* second step (hover/nested) — the
+                                             darkest surface = contrast worst case*/
+  --line:rgba(16,32,48,.22);              /* ink hairline                         */
   /* ink ladder */
-  --text:#EAF8FF;                         /* ice-white ink (m5 fallback triple)   */
-  --dim:#A4BED6;                          /* secondary ink                        */
-  --faint:#7C93AB;                        /* tertiary ink / placeholders (M1 verify: 4.91:1+ on every surface — was #5C7690, failing AA) */
-  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);   /* M1 verify: viewport-fit=cover means edge chrome must respect the notch in landscape */
+  --text:#16222E;                         /* primary ink, blue-black              */
+  --dim:#405468;                          /* secondary ink                        */
+  --faint:#526578;                        /* tertiary ink / placeholders (4.91:1+ worst case) */
+  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);   /* viewport-fit=cover: edge chrome respects the notch */
   --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
-  /* voices */
-  --accent:#56C8E8;                       /* ice — live/active/selection          */
-  --accent-deep:#2E8FB5;                  /* pressed / gradient floor of accent   */
-  --accent-wash:rgba(86,200,232,.13);     /* accent fill for ON states            */
-  --signal:#E2B24E;                       /* signal gold — lineage/attention      */
-  --signal-wash:rgba(226,178,78,.14);
-  --danger:#FF6D5A;
-  --ok:#43C97F;                           /* status only — NEVER on brief data    */
-  /* brief tiers (LOCKED SEMANTICS — see header) */
-  --t1:#FFFFFF; --t2:#40E0D0; --t3:#FFDC46; --t4:#FF5FBE;
+  /* voices — cartographic blue leads; brass signals the command line */
+  --accent:#0E5FA8;                       /* map blue — live/active/selection     */
+  --accent-deep:#0A4478;                  /* pressed / gradient floor             */
+  --accent-wash:rgba(14,95,168,.10);
+  --signal:#8A5800;                       /* brass — lineage/attention            */
+  --signal-wash:rgba(138,88,0,.12);
+  --danger:#AC2418;
+  --ok:#166F3E;                           /* status only — NEVER on brief data    */
+  /* brief tiers (LOCKED SEMANTICS at their ink end: t1 white-family reads as the
+     deepest ink on paper; t2 cool NEVER green; t3 warm; t4 rose) */
+  --t1:#0D1117; --t2:#0B6484; --t3:#9A4D00; --t4:#A1246E;
   /* radii (A-ORG-1 P1 values, ported) */
   --r-card:16px; --r-chip:11px; --r-pill:999px;
   /* type (system stacks only — zero webfonts at boot) */
   --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  /* derived component tokens (glass material) — NOT part of the canonical
-     contract, but themes may override them to retune the material. */
-  --glass-hi:rgba(22,36,56,.86);          /* gradient ceiling of glass            */
-  --glass-lo:rgba(10,17,28,.94);          /* gradient floor of glass              */
-  --spec:rgba(255,255,255,.07);           /* specular top edge                    */
-  --drop:0 10px 26px -10px rgba(0,0,0,.6);/* deep soft drop                       */
+  /* derived component tokens (glass material → bright paper stock) */
+  --glass-hi:rgba(255,255,255,.93);
+  --glass-lo:rgba(236,242,247,.88);
+  --spec:rgba(255,255,255,.75);
+  --drop:0 10px 26px -12px rgba(16,32,48,.28);
+  /* world paint (the canvas reads these through _mTok) — flat cartographic mode */
+  --ocean-hi:#D9E6F2;                     /* sphere gradient ceiling              */
+  --ocean-lo:#C2D5E6;                     /* sphere gradient floor                */
+  --land:247,243,234;                     /* land fill triple (paper)             */
+  --coast:90,110,128;                     /* coast/border stroke triple           */
+  --world-glow:0;                         /* 0 = flat print · 1 = instrument glow */
 }
 
 /* ─── 2 · RESET + THE STAGE (the globe IS the page) ────────────────────────── */
@@ -412,322 +422,96 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 
 </style>
 <style>
-/* Integration inlines the theme override layer (html[data-app-theme="arctic" |
-   "night" | "paper"] — values only, never token names) over the marker line
-   below. Arctic is ALSO the :root default; its block is inlined anyway so the
-   token set has one source of truth (M1 verify: the :root/--faint drift). */
-/* ═══════════════════════════════════════════════════════════════════════════════
-   modules/theme-arctic.css — ARCTIC COMMAND (default theme, explicit block)
-   Cold precise console: deep harbor blue-black ground · ice-cyan accent ·
-   amber signal. These values ARE the s1-tokens.css :root defaults, restated
-   under the theme selector so arctic is complete even when :root drifts —
-   with two refinements (--faint, --line) documented in the math block below.
-   Contract: values only. One selector. Every canonical token. No layout.
-   LOCKED SEMANTICS (brief tier law, A-ORG-1 non-negotiable #6):
-   --t1 white-family · --t2 cool (NEVER green) · --t3 warm · --t4 rose.
-   ═══════════════════════════════════════════════════════════════════════════════ */
-html[data-app-theme="arctic"]{
-  /* ground + surfaces — the harbor at night, three steps of depth */
-  --ground:#0A111C;                       /* deep harbor — page, label halos      */
-  --panel:#101B2C;                        /* raised surface                       */
-  --panel-2:#16243A;                      /* second step (hover / nested)         */
-  --line:rgba(140,185,220,.18);           /* steel hairline (was .16 — see math)  */
-  /* ink ladder — ice-white down to steel */
-  --text:#EAF8FF;                         /* ice-white ink (m5 fallback family)   */
-  --dim:#A4BED6;                          /* secondary ink                        */
-  --faint:#7C93AB;                        /* tertiary / placeholders (REFINED —
+/* ═══ THEME LAYER — the three NON-RADAR candidates (owner directive, 19 Aug 2026:
+   "a complete shift away from this radar-esque theme"). Values only — never new
+   selectors, never token names. Every block carries the FULL token shape
+   (33 tokens incl. the world-paint set) so no theme rides on :root fallback.
+   ATLAS is also the :root default — its block is inlined so the set has one
+   source of truth. The retired radar family (arctic/night/paper) lives in git
+   history at v0.1.0. ═══ */
 
-  /* glass quartet — same values as :root (M1 verify: all three themes now carry the full 28-token shape, so no theme rides on :root fallback) */
-  --glass-hi:rgba(22,36,56,.86);
-  --glass-lo:rgba(10,17,28,.94);
-  --spec:rgba(255,255,255,.07);
-  --drop:0 10px 26px -10px rgba(0,0,0,.6);
-                                             #5C7690 failed 4.5:1, see math)      */
-  /* voices — ice leads, amber signals, red warns, green is status-only */
-  --accent:#56C8E8;                       /* ice-cyan — live / active / selection */
-  --accent-deep:#2E8FB5;                  /* pressed state / gradient floor       */
-  --accent-wash:rgba(86,200,232,.13);     /* ON-state fill (always + accent ring) */
-  --signal:#E2B24E;                       /* amber signal — lineage / attention   */
-  --signal-wash:rgba(226,178,78,.14);
-  --danger:#FF6D5A;
-  --ok:#43C97F;                           /* status affordances ONLY — never on
-                                             brief data (tier law)                */
-  /* brief tiers — LOCKED SEMANTICS, tuned for this ground */
-  --t1:#FFFFFF;                           /* L1 white-family                      */
-  --t2:#40E0D0;                           /* L2 cool turquoise (A-ORG-1 canonical
-                                             64,224,208 triple) — NEVER green     */
-  --t3:#FFDC46;                           /* L3 warm gold                         */
-  --t4:#FF5FBE;                           /* L4 rose                              */
-  /* radii — A-ORG-1 P1 tokens (~L92), identical across all themes */
-  --r-card:16px;
-  --r-chip:11px;
-  --r-pill:999px;
-  /* type — system stacks only, zero webfonts at boot */
+/* ── ATLAS — daylight cartographic. A printed map plate: paper land, soft blue
+   ocean, ink text, cartographic-blue accent, brass command line. ── */
+html[data-app-theme="atlas"]{
+  --ground:#EEF2F5; --panel:#FFFFFF; --panel-2:#E2E9EF;
+  --line:rgba(16,32,48,.22);
+  --text:#16222E; --dim:#405468; --faint:#526578;
+  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
+  --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
+  --accent:#0E5FA8; --accent-deep:#0A4478; --accent-wash:rgba(14,95,168,.10);
+  --signal:#8A5800; --signal-wash:rgba(138,88,0,.12);
+  --danger:#AC2418; --ok:#166F3E;
+  --t1:#0D1117; --t2:#0B6484; --t3:#9A4D00; --t4:#A1246E;
+  --r-card:16px; --r-chip:11px; --r-pill:999px;
   --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
+  --glass-hi:rgba(255,255,255,.93); --glass-lo:rgba(236,242,247,.88);
+  --spec:rgba(255,255,255,.75); --drop:0 10px 26px -12px rgba(16,32,48,.28);
+  --ocean-hi:#D9E6F2; --ocean-lo:#C2D5E6;
+  --land:247,243,234; --coast:90,110,128; --world-glow:0;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   CONTRAST MATH — WCAG 2.x relative luminance, ratio = (Lhi+.05)/(Llo+.05).
-   Surfaces: ground #0A111C (L .0055) · panel #101B2C (L .0108) · panel-2
-   #16243A (L .0174). Worst case for light ink is panel-2 (lightest surface).
-   TEXT PAIRS (need ≥ 4.5:1)          vs ground   vs panel   vs panel-2
-     --text   #EAF8FF                    17.45       15.94      14.37   PASS
-     --dim    #A4BED6                     9.83        8.98       8.10   PASS
-     --faint  #7C93AB  (refined)          5.96        5.45       4.91   PASS
-       · old :root #5C7690 scored 4.01 / 3.66 / 3.30 — FAILED as placeholder
-         and microlabel ink; lifted two steps up the steel ramp, hue kept.
-     --accent #56C8E8 (as link/label)     9.75        8.91       8.03   PASS
-     --signal #E2B24E (as label)          9.65        8.82       7.95   PASS
-     --danger #FF6D5A (toast/label)       6.84        6.24       5.63   PASS
-     --t1 #FFFFFF                        18.92       17.28      15.58   PASS
-     --t2 #40E0D0                        11.53       10.53       9.49   PASS
-     --t3 #FFDC46                        14.04       12.82      11.56   PASS
-     --t4 #FF5FBE                         6.88        6.28       5.66   PASS
-   CHROME PAIRS (need ≥ 3:1)
-     --accent ring/focus on any surface        8.03–9.75              PASS
-     --accent-deep pressed floor               4.24–5.15              PASS
-     --signal ring (sandbox/lineage)           7.95–9.65              PASS
-     --ok status dot                           7.35–8.92              PASS
-     --danger ring                             5.63–6.84              PASS
-   DECORATIVE (exempt, by design — not identification carriers):
-     --line @.18 composites to #212F3F on ground ≈ 1.39:1. The hairline rides
-     WITH the glass gradient + specular + drop shadow; every interactive state
-     boundary is carried by the --accent ring at ≥ 8:1. Alpha raised .16→.18
-     for a crisper console edge. Washes (.13/.14) are fills under ≥ 4.9:1 ink
-     and always pair with a passing ring — never the sole state signal.
-   ─────────────────────────────────────────────────────────────────────────────
-   DESIGN RATIONALE (6)
-   1. One cold ramp: ground→panel→panel-2 climb a single blue-steel hue, so
-      depth reads as ice thickness, not as color change — precision by economy.
-   2. Ice-cyan #56C8E8 is the lone structural voice: selection, focus, ON.
-      Amber #E2B24E is the counter-temperature interrupt — it can only mean
-      lineage/attention because nothing else on this ground is warm.
-   3. The ink ladder (17.4 → 9.8 → 6.0 on ground) steps by near-halves, so
-      three hierarchy levels survive squinting, glare, and cheap panels.
-   4. Tier law is tuned, not restated: t2 turquoise keeps A-ORG-1's canonical
-      cool triple but sits 23° of hue from the accent, and t4 rose is lifted
-      until it clears 4.5:1 on the lightest glass it can ever land on.
-   5. Green appears exactly once (--ok) and is barred from brief data, so a
-      green pixel always means "system healthy," never "tier two."
-   6. Every value passes on panel-2 — the worst surface — so no component
-      needs a theme-specific exception, and the contract stays values-only.
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   modules/theme-night.css — A-ORG-2 theme: NIGHT OPS
-   Complete value-override of the canonical token contract (s1-tokens.css §1)
-   under html[data-app-theme="night"]. Values only — no new selectors, no layout.
-
-   Lineage (A-ORG-1 index.html is source of truth):
-     · NIGHT-VISION MODE :root block (~L792-828) — near-black ground, green voice
-     · the acid --c-ascc:#39ff14 (~L815) it retired from chrome duty
-     · v14 phosphor-mint pivot --nv-neon:#5ceed2 (~L2930, "was acid #39ff14")
-   Night Ops finishes that walk: graphite ground with a green cast (not blue),
-   one mint #56d364-family accent — calmer and quieter than both ancestors.
-
-   LOCKED SEMANTICS honored (brief tier law): --t1 white-family · --t2 cool,
-   NEVER green (ice-blue here — turquoise would read green-adjacent on this
-   ground) · --t3 warm · --t4 rose. --ok is status-affordance only.
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-html[data-app-theme="night"]{
-  /* ground + surfaces — graphite, near-black with a green cast */
-  --ground:#0B0F0C;                       /* night-ops graphite                   */
-  --panel:#121A14;                        /* raised surface                       */
-  --panel-2:#18231B;                      /* second step (hover/nested)           */
-  --line:rgba(150,200,165,.15);           /* mint-steel hairline ring             */
-  /* ink ladder */
-  --text:#E8F5EA;                         /* mint-white primary ink               */
-  --dim:#A7BFAC;                          /* secondary ink                        */
-  --faint:#7C947F;                        /* tertiary ink / placeholders (M1 verify: lifted from #6F8776 — 4.17:1 on panel-2 failed AA for the text roles the base layer gives --faint) */
-  /* voices */
-  --accent:#56D364;                       /* mint — live/active/selection         */
-  --accent-deep:#2EA043;                  /* pressed / gradient floor of accent   */
-  --accent-wash:rgba(86,211,100,.13);     /* accent fill for ON states            */
-  --signal:#E3B341;                       /* signal gold — lineage/attention      */
-  --signal-wash:rgba(227,179,65,.14);
-  --danger:#FF7B66;
-  --ok:#4CC38A;                           /* status only — NEVER on brief data    */
-  /* brief tiers (LOCKED SEMANTICS — tuned for the graphite-green ground) */
-  --t1:#FFFFFF; --t2:#79C0FF; --t3:#FFD166; --t4:#FF7BAC;
-  /* radii — geometry contract, identical across themes (values restated per
-     the complete-override rule) */
+/* ── SLATE — modern product dark. Neutral graphite (no green cast), solid flat
+   land slab, indigo accent, amber command line, zero glow anywhere. ── */
+html[data-app-theme="slate"]{
+  --ground:#15171C; --panel:#1D2026; --panel-2:#252932;
+  --line:rgba(180,195,215,.16);
+  --text:#E9ECF1; --dim:#A7B0BD; --faint:#8A94A2;
+  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
+  --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
+  --accent:#8FA7FF; --accent-deep:#6E88E8; --accent-wash:rgba(143,167,255,.14);
+  --signal:#E3B45C; --signal-wash:rgba(227,180,92,.14);
+  --danger:#FF7A66; --ok:#58C08A;
+  --t1:#FFFFFF; --t2:#6FC7E8; --t3:#FFC95C; --t4:#FF8FC0;
   --r-card:16px; --r-chip:11px; --r-pill:999px;
-  /* type — system stacks only, identical across themes */
   --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  /* derived glass-material tokens (theme-overridable per s1-tokens.css) —
-     retuned so the liquid glass carries the graphite-green cast, not arctic blue */
-  --glass-hi:rgba(19,28,21,.88);          /* gradient ceiling of glass            */
-  --glass-lo:rgba(8,12,9,.94);            /* gradient floor of glass              */
-  --spec:rgba(232,245,234,.06);           /* specular top edge, mint-cast, calm   */
-  --drop:0 12px 28px -12px rgba(0,0,0,.72);
+  --glass-hi:rgba(32,36,44,.88); --glass-lo:rgba(21,23,28,.94);
+  --spec:rgba(255,255,255,.06); --drop:0 10px 26px -10px rgba(0,0,0,.6);
+  --ocean-hi:#191C22; --ocean-lo:#14161B;
+  --land:42,47,56; --coast:122,136,152; --world-glow:0;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   CONTRAST MATH — WCAG 2.x relative-luminance ratios, computed per pair.
-   Surfaces: ground #0B0F0C · panel #121A14 · panel-2 #18231B (lightest = worst
-   case). Targets: text ≥ 4.5:1 · chrome (rings, icons, pressed states) ≥ 3:1.
-
-   token        hex       on ground  on panel  on panel-2   grade      verdict
-   --text       #E8F5EA     17.17      15.78     14.42      text       PASS
-   --dim        #A7BFAC      9.83       9.03      8.26      text       PASS
-   --faint      #7C947F      5.88       5.41      4.94      text       PASS
-   --accent     #56D364     10.02       9.21      8.41      text+chrome PASS
-   --accent-deep#2EA043      5.72       5.26      4.81      chrome     PASS
-   --signal     #E3B341      9.92       9.12      8.33      text+chrome PASS
-   --danger     #FF7B66      7.61       6.99      6.39      text       PASS
-   --ok         #4CC38A      8.71       8.01      7.32      text+chrome PASS
-   --t1         #FFFFFF     19.30      17.74     16.22      text       PASS
-   --t2         #79C0FF      9.92       9.12      8.34      text       PASS
-   --t3         #FFD166     13.39      12.31     11.25      text       PASS
-   --t4         #FF7BAC      7.98       7.33      6.70      text       PASS
-   *--faint clears 4.5:1 on ground and panel; on panel-2 it is 4.17:1 — above
-    the 3:1 chrome bar for its placeholder/microlabel role, but do not set body
-    copy in --faint on --panel-2. --line is a decorative hairline (no target).
-    Washes (.13/.14 alpha) composite over dark glass; ink on washed surfaces is
-    --text, whose ratio is unchanged to two decimals at these alphas.
-
-   DESIGN RATIONALE
-   1. Ground walks A-ORG-1's blue-black #0a0e12 to a green-cast graphite, so the
-      theme reads night-ops through its surfaces, not through glowing chrome.
-   2. One accent voice: mint #56D364 — the evolution of #39ff14 via the v14
-      phosphor pivot — desaturated and darkened enough to stop buzzing.
-   3. The ink ladder is mint-tinted white, never green: legibility stays neutral
-      while the cast keeps the family resemblance to the ground.
-   4. --t2 abandons arctic turquoise for ice-blue #79C0FF because on a green
-      ground turquoise reads green — and t2 is cool, NEVER green, by law.
-   5. Warm voices (--signal, --t3) sit near A-ORG-1's depot gold so lineage and
-      attention stay amber across every theme; rose --t4 completes the ramp.
-   6. Every ratio above beats its bar with margin, so the theme survives the
-      glass material's alpha compositing without dropping below AA anywhere.
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   modules/theme-paper.css — A-ORG-2 theme: COMMAND PAPER
-   Complete value-override of the canonical token contract (s1-tokens.css §1)
-   under html[data-app-theme="paper"]. Values only — no new selectors, no layout.
-
-   Direction: light, document-native. Cool paper ground (#F2F5F8 family), ink
-   text, restrained crimson/ink accents — the register of an official command
-   paper, not a website. Built to hold OUTDOORS IN SUNLIGHT: every ink clears
-   4.5:1 on the worst surface, and edges are carried by the ink hairline (not
-   by drop shadows, which glare washes out first).
-
-   LOCKED SEMANTICS honored (brief tier law): --t1 white-family · --t2 cool,
-   NEVER green · --t3 warm · --t4 rose. On a paper ground the white-family
-   tier PRINTS at the achromatic ink end of its family (#0D1117): neutrality
-   is the semantic the law protects; luminance flips with the ground, exactly
-   as white headline ink flips to black when a slide becomes a printed page.
-   --ok is status-affordance only — never on brief data.
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-html[data-app-theme="paper"]{
-  /* ground + surfaces — cool paper, three steps of sheet depth */
-  --ground:#F2F5F8;                       /* cool paper — page + label halos      */
-  --panel:#FFFFFF;                        /* raised sheet (brightest = closest)   */
-  --panel-2:#E5EBF1;                      /* second step (hover/nested) — the
-                                             DARKEST surface = worst case below  */
-  --line:rgba(13,27,42,.24);              /* ink hairline — does the edge work
-                                             sunlight steals from shadows        */
-  /* ink ladder — near-black ink down to slate */
-  --text:#131F2B;                         /* primary ink, blue-black             */
-  --dim:#3E5468;                          /* secondary ink                       */
-  --faint:#53687A;                        /* tertiary ink / placeholders         */
-  /* voices — crimson leads (restrained), bronze signals, scarlet warns */
-  --accent:#A31D45;                       /* command-paper crimson — live/active/
-                                             selection                           */
-  --accent-deep:#7C1333;                  /* pressed / gradient floor of accent  */
-  --accent-wash:rgba(163,29,69,.10);      /* ON-state fill (always + accent ring)*/
-  --signal:#8A5800;                       /* bronze — lineage/attention (amber
-                                             family, inked down for paper)       */
-  --signal-wash:rgba(138,88,0,.12);
-  --danger:#AC2418;                       /* scarlet — red-orange lean keeps it
-                                             apart from the crimson accent       */
-  --ok:#166F3E;                           /* status only — NEVER on brief data   */
-  /* brief tiers (LOCKED SEMANTICS — tuned for the paper ground) */
-  --t1:#0D1117;                           /* L1 white-family at its ink end      */
-  --t2:#0B6484;                           /* L2 cool deep cerulean — NEVER green */
-  --t3:#9A4D00;                           /* L3 warm sienna                      */
-  --t4:#A1246E;                           /* L4 rose, magenta-leaning — ~20° of
-                                             hue from the crimson accent         */
-  /* radii — geometry contract, identical across themes (values restated per
-     the complete-override rule) */
+/* ── FIELD — warm editorial print. Bone paper, olive accent, terracotta-brass
+   command line, serif display voice; the map reads as a field-guide plate. ── */
+html[data-app-theme="field"]{
+  --ground:#F1EDE3; --panel:#FAF7EF; --panel-2:#E6E0D1;
+  --line:rgba(45,38,26,.24);
+  --text:#29231A; --dim:#57503F; --faint:#5F5742;
+  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
+  --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
+  --accent:#49573D; --accent-deep:#36422C; --accent-wash:rgba(73,87,61,.12);
+  --signal:#8A4D18; --signal-wash:rgba(138,77,24,.12);
+  --danger:#A8321E; --ok:#2F6B3E;
+  --t1:#14100A; --t2:#0F6070; --t3:#8F4A05; --t4:#99306B;
   --r-card:16px; --r-chip:11px; --r-pill:999px;
-  /* type — system stacks only, zero webfonts. Display goes to the system
-     serifs: the one document-native move type can make without a webfont.
-     Body/mono stay sans/mono for UI and readout legibility. */
   --disp:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
   --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  /* derived glass-material tokens (theme-overridable per s1-tokens.css §1) —
-     the liquid glass becomes bright paper stock; the ink hairline (--line)
-     plus a cool, tighter drop keep edges crisp when sunlight flattens depth */
-  --glass-hi:rgba(255,255,255,.93);       /* gradient ceiling of glass           */
-  --glass-lo:rgba(236,242,247,.88);       /* gradient floor of glass             */
-  --spec:rgba(255,255,255,.75);           /* specular top edge — sheet gloss     */
-  --drop:0 10px 26px -12px rgba(16,32,48,.28);
+  --glass-hi:rgba(252,249,241,.93); --glass-lo:rgba(238,232,218,.88);
+  --spec:rgba(255,255,255,.70); --drop:0 10px 26px -12px rgba(48,40,24,.28);
+  --ocean-hi:#D7E0D8; --ocean-lo:#C6D2C8;
+  --land:240,234,216; --coast:122,110,84; --world-glow:0;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   CONTRAST MATH — WCAG 2.x relative luminance, ratio = (Lhi+.05)/(Llo+.05).
-   Surfaces: ground #F2F5F8 (L .9096) · panel #FFFFFF (L 1.0000) · panel-2
-   #E5EBF1 (L .8243). Dark ink on light ground → the DARKEST surface (panel-2)
-   is the worst case; every value below is checked against all three.
-   TEXT PAIRS (need ≥ 4.5:1)          vs ground   vs panel   vs panel-2
-     --text   #131F2B                    15.25       16.69      13.89   PASS
-     --dim    #3E5468                     7.18        7.86       6.54   PASS
-     --faint  #53687A                     5.29        5.79       4.82   PASS
-     --accent #A31D45 (link/label)        6.81        7.45       6.20   PASS
-     --signal #8A5800 (label)             5.52        6.04       5.03   PASS
-     --danger #AC2418 (toast/label)       6.36        6.95       5.79   PASS
-     --ok     #166F3E (status label)      5.68        6.22       5.18   PASS
-     --t1     #0D1117                    17.30       18.92      15.76   PASS
-     --t2     #0B6484                     6.05        6.62       5.52   PASS
-     --t3     #9A4D00                     5.59        6.11       5.09   PASS
-     --t4     #A1246E                     6.41        7.02       5.84   PASS
-   CHROME PAIRS (need ≥ 3:1)
-     --accent ring/focus on any surface        6.20–7.45              PASS
-     --accent-deep pressed floor               8.75–10.51             PASS
-     --signal ring (sandbox/lineage)           5.03–6.04              PASS
-     --ok status dot                           5.18–6.22              PASS
-     --danger ring                             5.79–6.95              PASS
-   WASH COMPOSITES (fills under ink, never the sole state signal):
-     --accent-wash @.10 over panel → #F6E8EC; --text on it = 14.04:1   PASS
-     --signal-wash @.12 over panel → #F1EBE0; --text on it = 14.06:1   PASS
-   DECORATIVE (exempt, by design — not identification carriers):
-     --line @.24 composites to ≈#C5C8CC on panel ≈ 1.68:1. Same argument as
-     arctic: the hairline rides WITH the glass gradient + drop; every
-     interactive state boundary is carried by the --accent ring at ≥ 6.2:1.
-     Alpha .24 (vs arctic .18) because in sunlight the hairline, not the
-     shadow, is what still reads.
-   ─────────────────────────────────────────────────────────────────────────────
-   DESIGN RATIONALE (6)
-   1. Sunlight is the brief: light grounds beat dark ones in glare, so every
-      ink is floored at 4.5:1 on the WORST surface and edges live in the
-      hairline — the two things direct sun cannot wash out.
-   2. One cool paper ramp: ground→panel→panel-2 move only in luminance on the
-      same blue-gray cast, so depth reads as sheet stacking, not color change.
-   3. Crimson #A31D45 is the lone structural voice — the classic command-paper
-      red — and it is RESTRAINED: washes at .10/.12 keep the page ink-and-paper
-      with red reserved for what is live, selected, or focused.
-   4. Tier law survives the polarity flip by carrying HUE FAMILY, not
-      luminance: t1 is the achromatic family at its ink end, t2 is unmistakable
-      cerulean (never green), t3 sienna, t4 magenta-rose held ~20° off the
-      accent so tier-four data never impersonates selection chrome.
-   5. Green appears exactly once (--ok #166F3E), dark enough for text duty,
-      and is barred from brief data — a green mark still only means "healthy".
-   6. Display type goes to the system serif stack — the single document-native
-      gesture available at zero webfont cost — while body and mono stay
-      sans/tabular so pills, microlabels and clock readouts keep their
-      console discipline.
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
+/* ═══ CONTRAST MATH (WCAG 2.x, ratio vs ground · panel · panel-2; text needs
+   ≥4.5, chrome ≥3.0). All values machine-checked 19 Aug 2026:
+   ATLAS  text 14.3/16.1/13.2 · dim 7.0/7.8/6.4 · faint 5.3/6.0/4.9 ·
+          accent 5.8/6.5/5.3 · signal 5.4/6.0/4.9 · danger 6.2/7.0/5.7 ·
+          ok 5.5/6.2/5.1 · t1 16.8/18.9/15.4 · t2 5.9/6.6/5.4 · t3 5.4/6.1/5.0 ·
+          t4 6.2/7.0/5.7 — ALL PASS
+   SLATE  text 15.1/13.8/12.3 · dim 8.2/7.5/6.7 · faint 5.8/5.3/4.7 ·
+          accent 7.8/7.1/6.3 · signal 9.4/8.5/7.6 · danger 7.0/6.4/5.7 ·
+          ok 8.0/7.2/6.5 · t1 17.9/16.3/14.6 · t2 9.4/8.6/7.6 · t3 11.8/10.7/9.5 ·
+          t4 8.5/7.7/6.9 — ALL PASS
+   FIELD  text 13.3/14.5/11.8 · dim 6.8/7.5/6.1 · faint 6.1/6.7/5.5 ·
+          accent 6.6/7.2/5.9 · signal 5.7/6.2/5.1 · danger 5.7/6.3/5.1 ·
+          ok 5.5/6.0/4.8 · t1 16.2/17.7/14.4 · t2 6.1/6.7/5.5 · t3 5.7/6.2/5.1 ·
+          t4 6.0/6.6/5.3 — ALL PASS
+   Tier law holds in all three: t1 white-family (ink end on light grounds),
+   t2 cool NEVER green, t3 warm, t4 rose. --ok is status-only, never brief data. ═══ */
 </style>
 <!-- DEV PREVIEW ONLY — uncomment while working on the un-integrated skeleton;
      integration/ship keeps it commented (the shipped app is one file):
@@ -785,6 +569,19 @@ html[data-app-theme="paper"]{
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.1.1 • THE RADAR IS RETIRED (owner directive, 19 Aug): complete identity
+//            shift away from the radar/phosphor look. Three NEW theme candidates,
+//            all non-radar, all contrast-machine-checked, behind the same ◐
+//            switcher: ATLAS (default — daylight cartographic: paper land, soft
+//            blue ocean, ink text, map-blue accent, brass command line), SLATE
+//            (modern product dark: neutral graphite, solid flat land slab, indigo
+//            accent, zero glow), FIELD (warm editorial print: bone paper, olive +
+//            terracotta, serif display). The world painter grew a token-driven
+//            FLAT mode (--world-glow:0 · --ocean-hi/lo · --land · --coast): no
+//            atmosphere halo, near-solid land fill, quiet coast strokes — the
+//            globe reads as a printed atlas plate, not a scope. The A-ORG-1
+//            instrument look survives only as the --world-glow:1 token option;
+//            arctic/night/paper theme blocks retired to git history @ v0.1.0.
 //   v0.1.0 • M1 FOUNDATION & GLOBE — the charter's first milestone, built by a
 //            31-agent workflow (10 regional data SMEs · 6 engine porters · 4 shell ·
 //            3 themes · 3 harnesses · 5 adversarial verifiers) + a 3-agent final
@@ -802,7 +599,7 @@ html[data-app-theme="paper"]{
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.1.0';
+const APP_VERSION = 'v0.1.1';
 const APP_UPDATED = '19 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -1092,35 +889,40 @@ function drawGlobe(cv, ctx){
   // Command Paper chrome reads as a console around a scope, not a washed-out map.
   const W=(typeof _mTok==='function')?_mTok():null;
   const wAcc=(W&&W.accent)||'92,238,210';
-  (function(){
+  const wCoast=(W&&W.coast)||wAcc, wLand=(W&&W.land)||'64,178,152';
+  const wGlow=!!(W&&W.glow);
+  if(wGlow){
+    // instrument mode (token --world-glow:1) — the A-ORG-1 limb halo survives as an option
     const ag=ctx.createRadialGradient(m.cx,m.cy,m.R*0.88, m.cx,m.cy,m.R*1.20);
     ag.addColorStop(0,'rgba('+wAcc+',0)');
     ag.addColorStop(0.66,'rgba('+wAcc+',.06)');
     ag.addColorStop(0.84,'rgba('+wAcc+',.15)');
     ag.addColorStop(1,'rgba('+wAcc+',0)');
     ctx.beginPath(); ctx.arc(m.cx,m.cy,m.R*1.20,0,Math.PI*2); ctx.fillStyle=ag; ctx.fill();
-  })();
+  }
   const grad=ctx.createRadialGradient(m.cx-m.R*0.3,m.cy-m.R*0.3,m.R*0.2, m.cx,m.cy,m.R);
-  grad.addColorStop(0,'#0f1d1a'); grad.addColorStop(1,'#091110');   // v12.4: graphite sphere — the one non-token constant (see note above)
+  grad.addColorStop(0,(W&&W.oceanHi)||'#0f1d1a'); grad.addColorStop(1,(W&&W.oceanLo)||'#091110');   // ocean: theme tokens
   ctx.beginPath(); ctx.arc(m.cx,m.cy,m.R,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill();
-  ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+wAcc+',.6)'; ctx.stroke();
+  ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.6':'.4')+')'; ctx.stroke();
   // Clip all overlay drawing to the sphere disc (prevents any chord/limb artifacts).
   ctx.save();
   ctx.beginPath(); ctx.arc(m.cx,m.cy,m.R,0,Math.PI*2); ctx.clip();
-  ctx.strokeStyle='rgba('+wAcc+',.17)'; ctx.lineWidth=0.6;
+  ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.17':'.12')+')'; ctx.lineWidth=0.6;
   for(let lat=-60; lat<=60; lat+=30){ drawGlobePath(ctx,m, latRing(lat)); }
   for(let lon=-180; lon<180; lon+=30){ drawGlobePath(ctx,m, lonRing(lon)); }
-  ctx.strokeStyle='rgba('+wAcc+',1)'; ctx.lineWidth=1.4;   // v12.1: coastlines wear the accent
-  ctx.fillStyle='rgba('+wAcc+',.30)';
+  // land: flat print = near-solid paper/slab fill under a quiet coast stroke;
+  // glow = the old translucent accent wash under a bright accent line.
+  ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.85')+')'; ctx.lineWidth=(wGlow?1.4:1.0);
+  ctx.fillStyle=wGlow?('rgba('+wAcc+',.30)'):('rgba('+wLand+',.96)');
   for(const ring of GLOBE_RINGS){ drawGlobePath(ctx,m, ring, true); }
   // World COUNTRY borders — very thin, dim, global context layer.
   if(GLOBE_COUNTRY_RINGS && GLOBE_COUNTRY_RINGS.length){
-    ctx.strokeStyle='rgba('+wAcc+',.34)'; ctx.lineWidth=0.55;
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.34':'.30')+')'; ctx.lineWidth=0.55;
     for(const ring of GLOBE_COUNTRY_RINGS){ drawGlobePath(ctx,m, ring, false); }
   }
-  // US state borders — thin, light lines drawn over the land fill (no fill, no glow).
+  // US state borders — thin lines drawn over the land fill (no fill, no glow).
   if(GLOBE_STATE_RINGS && GLOBE_STATE_RINGS.length){
-    ctx.strokeStyle='rgba('+wAcc+',.62)'; ctx.lineWidth=0.8;
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.62':'.45')+')'; ctx.lineWidth=(wGlow?0.8:0.7);
     for(const ring of GLOBE_STATE_RINGS){ drawGlobePath(ctx,m, ring, false); }
   }
   // m5 owns every marker/label/link/brief overlay (A-ORG-1: drawGlobeMarkers et al).
@@ -1816,7 +1618,7 @@ function _cssRGB(c, fb){
 
 function _mTok(){
   const root=(typeof document!=='undefined')?document.documentElement:null;
-  const th=root?(root.getAttribute('data-app-theme')||'arctic'):'arctic';
+  const th=root?(root.getAttribute('data-app-theme')||'atlas'):'atlas';
   if(_mTokCache && _mTokTheme===th) return _mTokCache;
   let rd=function(){ return ''; };
   try{ if(root){ const cs=getComputedStyle(root); rd=function(n){ return (cs.getPropertyValue(n)||'').trim(); }; } }catch(_){}
@@ -1829,6 +1631,13 @@ function _mTok(){
   T.signal = _cssRGB(rd('--signal'), '255,217,130');   // lineage gold + oib amber family
   T.ground = _cssRGB(rd('--ground'), '9,17,16');       // glass interiors, label outlines
   T.body   = rd('--body') || '-apple-system,system-ui,sans-serif';
+  // world paint (the canvas globe reads the theme too — owner directive 19 Aug:
+  // the radar look is retired; glow mode survives only as a token, off by default)
+  T.oceanHi = rd('--ocean-hi') || '#0f1d1a';
+  T.oceanLo = rd('--ocean-lo') || '#091110';
+  T.land    = _cssRGB('rgb('+(rd('--land')||'')+')', null) || (rd('--land')||'').trim() || '64,178,152';
+  T.coast   = (rd('--coast')||'').trim() || T.accent;
+  T.glow    = (rd('--world-glow')||'0').trim()==='1';
   _mTokCache=T; _mTokTheme=th;
   return T;
 }
@@ -3334,7 +3143,7 @@ function bootShell(){
   // instrument; the owner picks at the M1 gate. Deliberately no persistence —
   // A-ORG-2 reads no localStorage at boot; the winning theme ships as :root.
   try{
-    var THEME_CYCLE=['arctic','night','paper'];
+    var THEME_CYCLE=['atlas','slate','field'];
     var tsb=document.querySelector('#themeSwitch button');
     var setTheme=function(t){
       document.documentElement.setAttribute('data-app-theme', t);
@@ -3343,10 +3152,10 @@ function bootShell(){
     };
     document.addEventListener('click', function(e){
       if(!e.target || !e.target.closest || !e.target.closest('#themeSwitch')) return;
-      var cur=document.documentElement.getAttribute('data-app-theme')||'arctic';
+      var cur=document.documentElement.getAttribute('data-app-theme')||'atlas';
       setTheme(THEME_CYCLE[(THEME_CYCLE.indexOf(cur)+1)%THEME_CYCLE.length]);
     });
-    setTheme('arctic');
+    setTheme('atlas');
   }catch(_){}
 
   // Version chip.
