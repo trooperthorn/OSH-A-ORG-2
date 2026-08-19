@@ -1,0 +1,23 @@
+name: app-checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Data lint (sites.json invariants)
+        run: node tools/data-lint.js
+      - name: Globe harness (projection + arcs over all sites)
+        run: node tools/harness_globe.js
+      - name: Boot smoke (full boot + probes)
+        run: node tools/smoke_runtime.js
+      - name: Ship lint (APP_VERSION ↔ CACHE + changelog)
+        run: node tools/ship-lint.js
+      - name: Dead lint (unreachable CSS/JS + size budget)
+        run: node tools/dead-lint.js
