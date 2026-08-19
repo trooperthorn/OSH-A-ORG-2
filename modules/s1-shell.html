@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" data-app-theme="arctic">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>A-ORG-2</title>
+<!-- PWA / installable-app support -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0A111C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="A-ORG-2">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<script>
+/* A-ORG-2 first-byte diagnostics (PORTED from A-ORG-1, its first <script> — the
+   diagnostics stack is load-bearing, never remove): captures every error/rejection
+   from byte one, ring-buffered at window.__errLog; the styled toast attaches later
+   and replays. __SANDBOX detects preview/iframe hosts so their boundary noise is
+   logged but not toasted, and the service worker stays unregistered there. */
+(function(){
+  window.__SANDBOX=(function(){
+    try{ if(window.top!==window) return true; }catch(_){ return true; }
+    try{ if(window.origin==='null' || location.protocol==='blob:' || location.protocol==='data:' || location.protocol==='file:') return true; }catch(_){}
+    return false;
+  })();
+  window.__errLog=[];
+  function log(kind, msg, src, line, col, stack){
+    try{
+      const hostNoise = window.__SANDBOX && kind==='err' && /^Script error\.?$/.test(String(msg||'')) && !src && !line;
+      window.__errLog.push({t:Date.now(), k:hostNoise?'host':kind, m:String(msg||'').slice(0,300), s:String(src||'').slice(0,200), l:line||0, c:col||0, st:String(stack||'').slice(0,500)});
+      if(window.__errLog.length>10) window.__errLog.shift();
+      if(hostNoise) return;   // preview-host boundary noise: logged, not toasted
+      if(window._errToast){
+        var at=(src?String(src).split('/').pop():'')||'';
+        window._errToast(msg+((at||line)?(' @ '+(at||'inline')+(line?(':'+line):'')):''));
+      }
+    }catch(_){}
+  }
+  window.addEventListener('error', function(ev){
+    var e=ev.error||{};
+    log('err', ev.message, ev.filename||e.sourceURL||'', ev.lineno||e.line||0, ev.colno||e.column||0, e.stack||'');
+  }, true);
+  window.addEventListener('unhandledrejection', function(ev){
+    var r=ev.reason||{};
+    log('rej', r.message||r, r.sourceURL||'', r.line||0, r.column||0, r.stack||'');
+  });
+})();
+</script>
+<script>
+  // Service worker registration (PORTED from A-ORG-1's v13.13.0 auto-update
+  // contract): register on load — never in a sandbox — then check for a new
+  // sw.js on load, on every return to the app, and every 20 minutes; when a new
+  // version takes control (sw.js already skipWaiting+claims) the page reloads
+  // itself once. If the user is mid-typing, the reload waits until they leave
+  // the field or background the app.
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      if(window.__SANDBOX) return;
+      navigator.serviceWorker.register('sw.js').then(function(reg){
+        var kick=function(){ try{ reg.update(); }catch(_){ } };
+        setTimeout(kick, 6000);
+        setInterval(kick, 20*60*1000);
+        document.addEventListener('visibilitychange', function(){
+          if(document.visibilityState==='visible') kick();
+        });
+      }).catch(function(){});
+      var hadCtrl=!!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', function(){
+        if(!hadCtrl){ hadCtrl=true; return; }          // first install claiming — not an update
+        if(window.__updReloading) return; window.__updReloading=true;
+        var go=function(){ try{ location.reload(); }catch(_){ } };
+        try{ if(typeof window.toast==='function') window.toast('Updating to the latest version…'); }catch(_){}
+        var ae=document.activeElement;
+        var typing=!!(ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)));
+        if(typing){
+          var done=false, fin=function(){ if(done) return; done=true; go(); };
+          document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='hidden') fin(); });
+          ae.addEventListener('blur', function(){ setTimeout(fin, 400); }, {once:true});
+        } else setTimeout(go, 650);
+      });
+    });
+  }
+</script>
+<style>
+/* Integration inlines the RAW CONTENTS of modules/s1-tokens.css over the marker
+   line below — this <style> element is the wrapper; do not add another. */
+<!-- @TOKENS -->
+</style>
+<style>
+/* Integration inlines the theme override layer (html[data-app-theme="arctic" |
+   "night" | "paper"] — values only, never token names) over the marker line
+   below. Arctic is ALSO the :root default; its block is inlined anyway so the
+   token set has one source of truth (M1 verify: the :root/--faint drift). */
+<!-- @THEMES -->
+</style>
+<!-- DEV PREVIEW ONLY — uncomment while working on the un-integrated skeleton;
+     integration/ship keeps it commented (the shipped app is one file):
+<link rel="stylesheet" href="modules/s1-tokens.css">
+-->
+</head>
+<body>
+
+<!-- THE STAGE — the globe IS the page; every other element floats over it -->
+<canvas id="globeCanvas" aria-label="Globe"></canvas>
+
+<!-- minimal top edge: search pill + theme switch -->
+<div id="searchPill" class="glass" role="search">
+  <span class="sp-ico" aria-hidden="true">⌕</span>
+  <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
+         spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
+</div>
+<div id="searchResults" class="glass" role="listbox" aria-label="Search results"></div>
+
+<!-- dossier: THE drawer (single-brain law — one drawer) -->
+<section id="dossier" class="glass card" role="dialog" aria-label="Dossier" hidden></section>
+
+<!-- stage bar: reset/back/clear pills + Globe⇄Brief seg placeholder.
+     stageModeGlobe/stageModeBrief + data-gseg names ported from A-ORG-1 ~L15831;
+     BRIEF stays a disabled placeholder until M3. back/clear stay hidden until the
+     selection/search owner wires and shows them. -->
+<nav id="stageBar" aria-label="Stage controls">
+  <button id="stageReset" class="pill glass" type="button">⌂ Reset</button>
+  <button id="stageBack" class="pill glass" type="button" hidden>‹ Back</button>
+  <button id="stageClear" class="pill glass" type="button" hidden>✕ Clear</button>
+  <button id="stageFit" class="pill glass" type="button" hidden>⊡ Fit</button>
+  <button id="zoomOutBtn" class="pill glass" type="button" aria-label="Zoom out">−</button>
+  <button id="zoomInBtn" class="pill glass" type="button" aria-label="Zoom in">＋</button>
+  <div class="seg glass" role="group" aria-label="Globe or Brief mode">
+    <button id="stageModeGlobe" class="seg-b on" data-gseg="cmd" type="button" title="Globe mode" aria-label="Globe mode">Globe</button>
+    <button id="stageModeBrief" class="seg-b" data-gseg="brief" type="button" title="Brief mode" aria-label="Brief mode" disabled>Brief</button>
+  </div>
+</nav>
+
+<!-- corner clocks (charter D4: corner clocks only, time console retired).
+     Empty until the clock owner fills them — .clock:empty stays hidden. -->
+<div id="clockTL" class="clock glass"></div>
+<div id="clockTR" class="clock glass"></div>
+<div id="clockBL" class="clock glass"></div>
+<div id="clockBR" class="clock glass"></div>
+
+<!-- M1 theme picker mount (D3: theme picked from live mockups at M1 gate).
+     The theme module owns the picker UI + binding; the shell provides the mount. -->
+<div id="themeSwitch" class="glass">
+  <button class="ts-b" type="button" aria-label="Theme">◐</button>
+</div>
+
+<!-- version chip — long-press dumps the diagnostics ring buffer -->
+<span id="verChip" class="glass"></span>
+
+<script>
+// ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.1.0 • M1 FOUNDATION SHELL: full-bleed globe stage skeleton with the contract
+//            chrome ids (#globeCanvas #searchPill #searchResults #dossier #stageBar
+//            #clockTL/TR/BL/BR #themeSwitch #verChip), arctic token layer, and the
+//            A-ORG-1 reliability spine ported intact: first-byte error capture
+//            (__errLog ring buffer + __SANDBOX detection), error toast with
+//            file:line, SW auto-update registration (sandbox-guarded), version-chip
+//            long-press diagnostics dump, GlobeState global, guarded module boot.
+//            No features yet — this is the skeleton every M1 module concatenates into.
+const APP_VERSION = 'v0.1.0';
+const APP_UPDATED = '19 August 2026';
+
+// ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
+// PORTED from A-ORG-1 ~L13906. Orientation is stored as two plain angles — yaw
+// (spin around the polar axis) and pitch (latitude tilt) — and the quaternion q is
+// rebuilt from them each drag (m3 _rebuildGlobeQ). Pitch is clamped so the globe
+// never rolls or flips. A-ORG-2 additions per contract: dirty (the render loop
+// redraws ONLY when set — globeMark()), sel (selected site id | null), baseK
+// (radius factor: 0.72 phone / 0.88 desktop; R = min(w,h)/2 * zoom * baseK).
+const GlobeState = window.GlobeState = {
+  yaw: 0, pitch: 0,
+  q: [0,0,0,1],
+  rotLon: 60, rotLat: -10, zoom: 1.5,
+  dragging:false, lastX:0, lastY:0, moved:false,
+  spin:false, raf:null,
+  dirty:false, sel:null, baseK:0.72,
+};
+
+/* Integration inlines the SITES literal (core schema: id/base/unit/lat/lon/grp/
+   parent — the fat fields stay in data/sites.json for the M2 datastore seed) and
+   then ALL module JS, in this exact order: m1-geom, m2-render, m3-input,
+   m4-camera, m5-markers, m6-mapdata (AFTER m2 so its same-origin loaders
+   hoist-win), s3-search, s4-dossier, s5-clocks — over the marker line below,
+   INSIDE this script element —
+   the target is ONE <script>, no build step. The marker line is a legal
+   sloppy-mode comment (HTML-like comment, Annex B), so this skeleton also parses
+   and runs standalone: everything below is typeof-guarded. */
+<!-- @SCRIPT -->
+
+// ─── Shell boot spine — everything below survives with zero modules present ────
+function bootShell(){
+  // Desktop radius factor (PORT of A-ORG-1 ~L22187; re-checked on resize below).
+  try{ if(window.matchMedia && matchMedia('(min-width:1100px)').matches){ GlobeState.baseK=0.88; } }catch(_){}
+
+  // Initial orientation (PORT of A-ORG-1 ~L15810 — Atlantic overview).
+  try{
+    if(!GlobeState._qInit && typeof _faceLonLatAngles==='function'){
+      _faceLonLatAngles(-40, 20); GlobeState._qInit=true;
+    }
+  }catch(_){}
+
+  // Module boot (owner: shell — per m2-render's boot-integration note). Every
+  // call is guarded: during construction a module may not be concatenated yet.
+  var cv=document.getElementById('globeCanvas');
+  if(cv){
+    try{ if(typeof setupGlobeInteraction==='function') setupGlobeInteraction(cv); }catch(_){}
+    try{ if(typeof smoothFallbackOnce==='function') smoothFallbackOnce(); }catch(_){}
+    try{ if(typeof startGlobeLoop==='function') startGlobeLoop(cv); }catch(_){}
+    try{ if(typeof loadGlobeCoastlinesHi==='function') loadGlobeCoastlinesHi(); }catch(_){}
+    try{ if(typeof loadStateBorders==='function') loadStateBorders(); }catch(_){}
+    try{ if(typeof loadCountryBorders==='function') loadCountryBorders(); }catch(_){}
+    try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
+  }
+
+  // Resize keeps the radius law honest (dirty-flag only — never a forced redraw).
+  window.addEventListener('resize', function(){
+    try{ GlobeState.baseK=(window.matchMedia && matchMedia('(min-width:1100px)').matches)?0.88:0.72; }catch(_){}
+    try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
+  });
+
+  // Stage bar: reset pill → m4's resetGlobeView (its named consumer). back/clear
+  // stay hidden and unwired here — the selection/search owner binds and shows them.
+  try{
+    var rb=document.getElementById('stageReset');
+    if(rb) rb.addEventListener('click', function(){
+      try{ if(typeof resetGlobeView==='function') resetGlobeView(); }catch(_){}
+    });
+  }catch(_){}
+
+  // Zoom pills → m4 (_wireZoomHold: tap steps, hold repeats).
+  try{
+    if(typeof _wireZoomHold==='function'){
+      _wireZoomHold(document.getElementById('zoomInBtn'), 1.35);
+      _wireZoomHold(document.getElementById('zoomOutBtn'), 1/1.35);
+    }
+  }catch(_){}
+
+  // ⊡ Fit → frame the selected family: the site, its chain up, its children.
+  // (s4 shows/hides the pill alongside #stageClear.)
+  try{
+    var fb=document.getElementById('stageFit');
+    if(fb) fb.addEventListener('click', function(){
+      try{
+        if(!GlobeState.sel || typeof fitGlobeToSites!=='function') return;
+        var fam=[GlobeState.sel];
+        if(typeof parentChainOf==='function') fam=fam.concat(parentChainOf(GlobeState.sel));
+        if(typeof childrenOf==='function') fam=fam.concat(childrenOf(GlobeState.sel));
+        fitGlobeToSites(fam);
+      }catch(_){}
+    });
+  }catch(_){}
+
+  // M1 THEME MOCKUP SWITCHER (D3): cycle the three candidates on the live
+  // instrument; the owner picks at the M1 gate. Deliberately no persistence —
+  // A-ORG-2 reads no localStorage at boot; the winning theme ships as :root.
+  try{
+    var THEME_CYCLE=['arctic','night','paper'];
+    var tsb=document.querySelector('#themeSwitch button');
+    var setTheme=function(t){
+      document.documentElement.setAttribute('data-app-theme', t);
+      if(tsb) tsb.textContent=t.charAt(0).toUpperCase()+t.slice(1);
+      try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
+    };
+    document.addEventListener('click', function(e){
+      if(!e.target || !e.target.closest || !e.target.closest('#themeSwitch')) return;
+      var cur=document.documentElement.getAttribute('data-app-theme')||'arctic';
+      setTheme(THEME_CYCLE[(THEME_CYCLE.indexOf(cur)+1)%THEME_CYCLE.length]);
+    });
+    setTheme('arctic');
+  }catch(_){}
+
+  // Version chip.
+  try{
+    var vc=document.getElementById('verChip');
+    if(vc) vc.textContent='A-ORG-2 '+APP_VERSION;
+  }catch(_){}
+
+  // DIAGNOSTICS TOAST (PORT of A-ORG-1 ~L13977): uncaught errors + rejections
+  // self-report with real details; capture lives in the first-byte head script.
+  try{
+    window._errToast=function(msg){
+      try{
+        let t=document.getElementById('errToast');
+        if(!t){ t=document.createElement('div'); t.id='errToast';
+          t.addEventListener('click',function(){ t.classList.remove('show'); });
+          document.body.appendChild(t); }
+        t.textContent='⚠ '+String(msg).slice(0,220);
+        t.classList.add('show');
+        clearTimeout(window.__errT); window.__errT=setTimeout(function(){ t.classList.remove('show'); }, 9000);
+      }catch(_){}
+    };
+    // replay anything the first-byte layer logged before the toast attached
+    try{ (window.__errLog||[]).slice(-1).forEach(function(e){ window._errToast(e.m+((e.s||e.l)?(' @ '+((e.s||'').split('/').pop()||'inline')+(e.l?(':'+e.l):'')):'')); }); }catch(_){}
+  }catch(e){}
+
+  // long-press the VERSION chip → diagnostics dump (PORT of A-ORG-1 ~L19509,
+  // retargeted from #footerVersion to #verChip — the ring buffer of errors).
+  (function(){
+    const hv=document.getElementById('verChip');
+    if(!hv) return;
+    let vt=null;
+    const dump=function(){
+      const L=window.__errLog||[];
+      const txt=L.length? L.map(function(e){ return '['+e.k+'] '+e.m+'\n  @ '+(e.s||'inline')+':'+e.l+':'+e.c+(e.st?('\n  '+e.st.split('\n').slice(0,3).join(' | ')):''); }).join('\n\n') : 'No errors captured this session.';
+      try{ prompt('Diagnostics — last '+L.length+' error(s). Copy below:', txt.slice(0,900)); }
+      catch(_){ alert(txt.slice(0,900)); }
+    };
+    hv.style.pointerEvents='auto';
+    hv.addEventListener('pointerdown', function(){ clearTimeout(vt); vt=setTimeout(dump, 700); });
+    hv.addEventListener('pointerup', function(){ clearTimeout(vt); });
+    hv.addEventListener('pointercancel', function(){ clearTimeout(vt); });
+  })();
+
+  // Sandbox banner (PORT of A-ORG-1 ~L22198): preview hosts announce themselves
+  // so host console noise is never mistaken for an A-ORG-2 defect.
+  try{
+    if(window.__SANDBOX && !document.getElementById('sbxNote')){
+      const nb=document.createElement('div'); nb.id='sbxNote';
+      nb.innerHTML='⧉ <b>Preview sandbox</b> — host console noise is expected here and does not come from A-ORG-2. Test the deployed app for real signals. <button aria-label="Dismiss">✕</button>';
+      nb.querySelector('button').addEventListener('click', function(){ nb.remove(); });
+      document.body.appendChild(nb);
+    }
+  }catch(_){}
+}
+bootShell();
+</script>
+</body>
+</html>

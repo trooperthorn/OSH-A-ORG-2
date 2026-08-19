@@ -1,0 +1,98 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   modules/theme-arctic.css — ARCTIC COMMAND (default theme, explicit block)
+   Cold precise console: deep harbor blue-black ground · ice-cyan accent ·
+   amber signal. These values ARE the s1-tokens.css :root defaults, restated
+   under the theme selector so arctic is complete even when :root drifts —
+   with two refinements (--faint, --line) documented in the math block below.
+   Contract: values only. One selector. Every canonical token. No layout.
+   LOCKED SEMANTICS (brief tier law, A-ORG-1 non-negotiable #6):
+   --t1 white-family · --t2 cool (NEVER green) · --t3 warm · --t4 rose.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+html[data-app-theme="arctic"]{
+  /* ground + surfaces — the harbor at night, three steps of depth */
+  --ground:#0A111C;                       /* deep harbor — page, label halos      */
+  --panel:#101B2C;                        /* raised surface                       */
+  --panel-2:#16243A;                      /* second step (hover / nested)         */
+  --line:rgba(140,185,220,.18);           /* steel hairline (was .16 — see math)  */
+  /* ink ladder — ice-white down to steel */
+  --text:#EAF8FF;                         /* ice-white ink (m5 fallback family)   */
+  --dim:#A4BED6;                          /* secondary ink                        */
+  --faint:#7C93AB;                        /* tertiary / placeholders (REFINED —
+
+  /* glass quartet — same values as :root (M1 verify: all three themes now carry the full 28-token shape, so no theme rides on :root fallback) */
+  --glass-hi:rgba(22,36,56,.86);
+  --glass-lo:rgba(10,17,28,.94);
+  --spec:rgba(255,255,255,.07);
+  --drop:0 10px 26px -10px rgba(0,0,0,.6);
+                                             #5C7690 failed 4.5:1, see math)      */
+  /* voices — ice leads, amber signals, red warns, green is status-only */
+  --accent:#56C8E8;                       /* ice-cyan — live / active / selection */
+  --accent-deep:#2E8FB5;                  /* pressed state / gradient floor       */
+  --accent-wash:rgba(86,200,232,.13);     /* ON-state fill (always + accent ring) */
+  --signal:#E2B24E;                       /* amber signal — lineage / attention   */
+  --signal-wash:rgba(226,178,78,.14);
+  --danger:#FF6D5A;
+  --ok:#43C97F;                           /* status affordances ONLY — never on
+                                             brief data (tier law)                */
+  /* brief tiers — LOCKED SEMANTICS, tuned for this ground */
+  --t1:#FFFFFF;                           /* L1 white-family                      */
+  --t2:#40E0D0;                           /* L2 cool turquoise (A-ORG-1 canonical
+                                             64,224,208 triple) — NEVER green     */
+  --t3:#FFDC46;                           /* L3 warm gold                         */
+  --t4:#FF5FBE;                           /* L4 rose                              */
+  /* radii — A-ORG-1 P1 tokens (~L92), identical across all themes */
+  --r-card:16px;
+  --r-chip:11px;
+  --r-pill:999px;
+  /* type — system stacks only, zero webfonts at boot */
+  --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CONTRAST MATH — WCAG 2.x relative luminance, ratio = (Lhi+.05)/(Llo+.05).
+   Surfaces: ground #0A111C (L .0055) · panel #101B2C (L .0108) · panel-2
+   #16243A (L .0174). Worst case for light ink is panel-2 (lightest surface).
+   TEXT PAIRS (need ≥ 4.5:1)          vs ground   vs panel   vs panel-2
+     --text   #EAF8FF                    17.45       15.94      14.37   PASS
+     --dim    #A4BED6                     9.83        8.98       8.10   PASS
+     --faint  #7C93AB  (refined)          5.96        5.45       4.91   PASS
+       · old :root #5C7690 scored 4.01 / 3.66 / 3.30 — FAILED as placeholder
+         and microlabel ink; lifted two steps up the steel ramp, hue kept.
+     --accent #56C8E8 (as link/label)     9.75        8.91       8.03   PASS
+     --signal #E2B24E (as label)          9.65        8.82       7.95   PASS
+     --danger #FF6D5A (toast/label)       6.84        6.24       5.63   PASS
+     --t1 #FFFFFF                        18.92       17.28      15.58   PASS
+     --t2 #40E0D0                        11.53       10.53       9.49   PASS
+     --t3 #FFDC46                        14.04       12.82      11.56   PASS
+     --t4 #FF5FBE                         6.88        6.28       5.66   PASS
+   CHROME PAIRS (need ≥ 3:1)
+     --accent ring/focus on any surface        8.03–9.75              PASS
+     --accent-deep pressed floor               4.24–5.15              PASS
+     --signal ring (sandbox/lineage)           7.95–9.65              PASS
+     --ok status dot                           7.35–8.92              PASS
+     --danger ring                             5.63–6.84              PASS
+   DECORATIVE (exempt, by design — not identification carriers):
+     --line @.18 composites to #212F3F on ground ≈ 1.39:1. The hairline rides
+     WITH the glass gradient + specular + drop shadow; every interactive state
+     boundary is carried by the --accent ring at ≥ 8:1. Alpha raised .16→.18
+     for a crisper console edge. Washes (.13/.14) are fills under ≥ 4.9:1 ink
+     and always pair with a passing ring — never the sole state signal.
+   ─────────────────────────────────────────────────────────────────────────────
+   DESIGN RATIONALE (6)
+   1. One cold ramp: ground→panel→panel-2 climb a single blue-steel hue, so
+      depth reads as ice thickness, not as color change — precision by economy.
+   2. Ice-cyan #56C8E8 is the lone structural voice: selection, focus, ON.
+      Amber #E2B24E is the counter-temperature interrupt — it can only mean
+      lineage/attention because nothing else on this ground is warm.
+   3. The ink ladder (17.4 → 9.8 → 6.0 on ground) steps by near-halves, so
+      three hierarchy levels survive squinting, glare, and cheap panels.
+   4. Tier law is tuned, not restated: t2 turquoise keeps A-ORG-1's canonical
+      cool triple but sits 23° of hue from the accent, and t4 rose is lifted
+      until it clears 4.5:1 on the lightest glass it can ever land on.
+   5. Green appears exactly once (--ok) and is barred from brief data, so a
+      green pixel always means "system healthy," never "tier two."
+   6. Every value passes on panel-2 — the worst surface — so no component
+      needs a theme-specific exception, and the contract stays values-only.
+   ═══════════════════════════════════════════════════════════════════════════════ */

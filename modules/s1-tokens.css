@@ -1,0 +1,321 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   modules/s1-tokens.css — A-ORG-2 S1: canonical tokens (ARCTIC :root defaults)
+   + the base component layer (glass recipes, chrome placement, focus, desktop).
+
+   CONTRACT (canonical token names — themes swap VALUES only, never names):
+     --ground --panel --panel-2 --line --text --dim --faint
+     --accent --accent-deep --accent-wash --signal --signal-wash --danger --ok
+     --t1 --t2 --t3 --t4          (brief tier law — see LOCKED SEMANTICS below)
+     --r-card --r-chip --r-pill   (radii, ported from A-ORG-1 P1 tokens ~L92)
+     --disp --body --mono         (system font stacks only — no webfonts at boot)
+   Themes land in the @THEMES layer as html[data-app-theme="night"|"paper"]{...}
+   overrides. Default theme is arctic; these :root values ARE arctic, so
+   html[data-app-theme="arctic"] needs no override block.
+
+   LOCKED SEMANTICS (brief tier law, inherited from A-ORG-1 non-negotiable #6):
+     --t1 white-family · --t2 cool (NEVER green) · --t3 warm · --t4 rose.
+     No green on brief data. --ok exists for status affordances only.
+
+   PORTED IDIOMS (A-ORG-1 index.html is source of truth):
+     radii --r-pill/999 --r-chip/11 --r-card/16       (~L92-95)
+     box reset + overscroll discipline                 (~L113-120)
+     liquid-glass material (gradient + hairline ring + specular top edge + deep
+     soft drop + accent under-glow), DESIGN-DOCTRINE "Material standard v13.7"
+     #errToast / #errToast.show                        (~L2108-2109, ~L2139)
+     focus-visible outline idiom                       (~L4890)
+     phone-first: desktop ONLY inside @media(min-width:1100px); hovers are
+     desktop-only; mobile gets springy :active presses; motion dies under
+     prefers-reduced-motion                            (DESIGN-DOCTRINE)
+
+   RELIABILITY CONTRACT HONORED:
+     - NO position:fixed anywhere. body is the 100dvh non-scrolling anchor and
+       all chrome floats position:absolute inside it (deviation from A-ORG-1,
+       whose #errToast/#appTabs were fixed — equivalent here because the globe
+       IS the page and body never scrolls).
+     - NO transforms on scroll containers: #searchResults and #dossier (the two
+       overflow:auto surfaces) are positioned with inset math only. The only
+       transforms below are on non-scrolling buttons (:active spring) and the
+       toast — never on anything that scrolls.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1 · TOKENS — ARCTIC is the :root default ─────────────────────────────── */
+:root{
+  /* ground + surfaces */
+  --ground:#0A111C;                       /* deep harbor — page + label halos     */
+  --panel:#101B2C;                        /* raised surface                       */
+  --panel-2:#16243A;                      /* second step (hover/nested)           */
+  --line:rgba(140,185,220,.18);           /* steel hairline ring (M1 verify: synced with theme-arctic's refinement) */
+  /* ink ladder */
+  --text:#EAF8FF;                         /* ice-white ink (m5 fallback triple)   */
+  --dim:#A4BED6;                          /* secondary ink                        */
+  --faint:#7C93AB;                        /* tertiary ink / placeholders (M1 verify: 4.91:1+ on every surface — was #5C7690, failing AA) */
+  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);   /* M1 verify: viewport-fit=cover means edge chrome must respect the notch in landscape */
+  --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
+  /* voices */
+  --accent:#56C8E8;                       /* ice — live/active/selection          */
+  --accent-deep:#2E8FB5;                  /* pressed / gradient floor of accent   */
+  --accent-wash:rgba(86,200,232,.13);     /* accent fill for ON states            */
+  --signal:#E2B24E;                       /* signal gold — lineage/attention      */
+  --signal-wash:rgba(226,178,78,.14);
+  --danger:#FF6D5A;
+  --ok:#43C97F;                           /* status only — NEVER on brief data    */
+  /* brief tiers (LOCKED SEMANTICS — see header) */
+  --t1:#FFFFFF; --t2:#40E0D0; --t3:#FFDC46; --t4:#FF5FBE;
+  /* radii (A-ORG-1 P1 values, ported) */
+  --r-card:16px; --r-chip:11px; --r-pill:999px;
+  /* type (system stacks only — zero webfonts at boot) */
+  --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
+  /* derived component tokens (glass material) — NOT part of the canonical
+     contract, but themes may override them to retune the material. */
+  --glass-hi:rgba(22,36,56,.86);          /* gradient ceiling of glass            */
+  --glass-lo:rgba(10,17,28,.94);          /* gradient floor of glass              */
+  --spec:rgba(255,255,255,.07);           /* specular top edge                    */
+  --drop:0 10px 26px -10px rgba(0,0,0,.6);/* deep soft drop                       */
+}
+
+/* ─── 2 · RESET + THE STAGE (the globe IS the page) ────────────────────────── */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{height:100%; background:var(--ground)}
+html,body{margin:0; padding:0; overscroll-behavior:none; -webkit-text-size-adjust:100%}
+body{
+  position:relative;                       /* the ONLY positioning anchor — all
+                                              chrome is absolute in here; nothing
+                                              is position:fixed (reliability)    */
+  width:100%; height:100vh; height:100dvh;
+  overflow:hidden;                         /* the page never scrolls — full-bleed */
+  background:var(--ground); color:var(--text);
+  font-family:var(--body);
+  -webkit-tap-highlight-color:transparent;
+}
+::selection{background:var(--accent-wash); color:var(--text)}
+
+/* full-bleed stage: #globeCanvas fills the viewport between a minimal top edge
+   (the search pill floats over it) and nothing. Radius law lives in globeMetrics:
+   R = min(w,h)/2 * GlobeState.zoom * GlobeState.baseK (0.72 phone / 0.88 desktop). */
+#globeCanvas{
+  position:absolute; inset:0; z-index:0;
+  width:100%; height:100%; display:block;
+  touch-action:none;                       /* canvas owns its gestures (A-ORG-1
+                                              v1.27.3 lesson — never page-scroll
+                                              mid-drag)                          */
+  background:transparent;                  /* --ground shows through             */
+}
+
+/* ─── 3 · LIQUID GLASS RECIPES (pill / chip / card / seg) ──────────────────── */
+/* Material standard: gradient + hairline ring + specular top edge + deep soft
+   drop. Search, dossier, stage bar, clocks and the theme switch all compose
+   from these three recipes — restyle the tokens, never fork the recipe. */
+.glass{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);
+  backdrop-filter:blur(14px) saturate(1.3);
+}
+.pill,.chip{
+  appearance:none; -webkit-appearance:none; border:0; margin:0;
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  color:var(--text); text-transform:uppercase;
+  user-select:none; -webkit-user-select:none; cursor:pointer;
+  transition:transform .12s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.pill{
+  min-height:44px; padding:0 16px; border-radius:var(--r-pill);
+  font:700 12px/1 var(--body); letter-spacing:.08em;
+}
+.chip{
+  min-height:38px; padding:0 12px; border-radius:var(--r-chip);
+  font:700 11px/1 var(--body); letter-spacing:.06em; color:var(--dim);
+}
+/* mobile press feel: springy :active (hovers are desktop-only, see §7) */
+.pill:active,.chip:active{transform:scale(.96)}
+.pill.on,.chip.on{
+  color:var(--text);
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo)),var(--accent-wash);
+  box-shadow:0 0 0 1px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
+}
+.card{
+  border-radius:var(--r-card); padding:14px 16px; color:var(--text);
+}
+/* segmented control (Globe ⇄ Brief placeholder on #stageBar) */
+.seg{
+  display:inline-flex; align-items:center; gap:2px;
+  padding:3px; border-radius:var(--r-pill);
+}
+.seg .seg-b{
+  appearance:none; -webkit-appearance:none; border:0; margin:0;
+  min-height:38px; padding:0 14px; border-radius:var(--r-pill);
+  background:transparent; color:var(--dim);
+  font:700 11px/1 var(--body); letter-spacing:.1em; text-transform:uppercase;
+  user-select:none; -webkit-user-select:none; cursor:pointer;
+}
+.seg .seg-b.on{
+  color:var(--text); background:var(--accent-wash);
+  box-shadow:0 0 0 1px var(--accent);
+}
+.seg .seg-b:disabled{opacity:.4; cursor:default}
+/* uppercase micro-label (doctrine: letterspaced, tabular numerals on readouts) */
+
+/* ─── 4 · CHROME PLACEMENT (all absolute — no fixed layers) ────────────────── */
+/* z ladder: stage 0 · clocks 10 · stage bar 25 · top edge 20 · results 30 ·
+   dossier 40 · errToast 120 · sbxNote 130 (A-ORG-1's toast z, kept). */
+
+/* minimal top edge: search pill + theme switch float over the globe */
+#searchPill{
+  position:absolute; z-index:20;
+  top:calc(env(safe-area-inset-top,0px) + 10px);
+  left:var(--safe-l); right:calc(var(--safe-r) + 52px);  /* right lane reserved for #themeSwitch */
+  display:flex; align-items:center; gap:8px;
+  min-height:46px; padding:0 14px; border-radius:var(--r-pill);
+}
+#searchPill .sp-ico{color:var(--faint); font-size:15px; line-height:1; flex:none}
+#searchPill input{
+  flex:1; min-width:0; background:none; border:0; outline:none; padding:0;
+  color:var(--text); font:600 14px/1.2 var(--body);
+}
+#searchPill input::placeholder{color:var(--faint)}
+#searchPill:focus-within{
+  box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
+}
+#themeSwitch{
+  position:absolute; z-index:20;
+  top:calc(env(safe-area-inset-top,0px) + 10px); right:var(--safe-r);
+  width:46px; height:46px; border-radius:var(--r-pill);
+  display:flex; align-items:center; justify-content:center;
+}
+#themeSwitch:empty{display:none}
+#themeSwitch .ts-b{
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0;
+  width:100%; height:100%; border-radius:var(--r-pill);
+  color:var(--dim); font-size:17px; line-height:1; cursor:pointer;
+  user-select:none; -webkit-user-select:none;
+}
+
+/* search results — SCROLL CONTAINER: inset math only, never transformed */
+#searchResults{
+  position:absolute; z-index:30;
+  top:calc(env(safe-area-inset-top,0px) + 64px);
+  left:var(--safe-l); right:var(--safe-r);
+  max-height:48vh; max-height:48dvh;
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  border-radius:var(--r-card); padding:4px;
+}
+#searchResults:empty{display:none}
+/* row recipe for the search owner (module fills; shell only styles) */
+#searchResults .sr-row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  width:100%; min-height:44px; padding:10px 12px;
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0;
+  border-radius:var(--r-chip); text-align:left; cursor:pointer;
+  color:var(--text); font:600 13px/1.3 var(--body);
+}
+#searchResults .sr-row + .sr-row{box-shadow:0 -1px 0 var(--line)}
+#searchResults .sr-row:active{background:var(--accent-wash)}
+#searchResults .sr-sub{color:var(--dim); font:500 11px/1.3 var(--body)}
+
+/* dossier — bottom sheet card, SCROLL CONTAINER: inset math only */
+#dossier{
+  position:absolute; z-index:40;
+  left:calc(var(--safe-l) - 4px); right:calc(var(--safe-r) - 4px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 68px);  /* clears the stage bar */
+  max-height:56vh; max-height:56dvh;
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  border-radius:var(--r-card); padding:14px 16px;
+}
+
+/* stage bar — reset/back/clear pills + Globe⇄Brief seg, bottom center */
+#stageBar{
+  position:absolute; z-index:25;
+  left:0; right:0; bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:0 12px; margin:0 auto; max-width:calc(100% - 96px);
+  pointer-events:none;                     /* corners stay live for chrome       */
+}
+#stageBar>*{pointer-events:auto}
+
+/* corner clocks — glass chips, mono + tabular numerals, readouts only.
+   TL/TR sit under the top edge; BL/BR above the stage bar. Empty = hidden
+   (the clock owner fills them; the skeleton shows no dead chrome). */
+.clock{
+  position:absolute; z-index:10; pointer-events:none;
+  padding:6px 10px; border-radius:var(--r-chip);
+  font:600 10px/1.45 var(--mono); font-variant-numeric:tabular-nums;
+  letter-spacing:.08em; color:var(--dim); text-transform:uppercase;
+  white-space:nowrap;
+}
+.clock:empty{display:none}
+#clockTL{top:calc(env(safe-area-inset-top,0px) + 66px); left:var(--safe-l)}
+#clockTR{top:calc(env(safe-area-inset-top,0px) + 66px); right:var(--safe-r)}
+#clockBL{bottom:calc(env(safe-area-inset-bottom,0px) + 66px); left:var(--safe-l)}
+#clockBR{bottom:calc(env(safe-area-inset-bottom,0px) + 66px); right:var(--safe-r)}
+
+/* version chip — long-press dumps the diagnostics ring buffer (shell script) */
+#verChip{
+  position:absolute; z-index:26;
+  right:var(--safe-r); bottom:calc(env(safe-area-inset-bottom,0px) + 4px);
+  padding:4px 8px; border-radius:var(--r-pill);
+  font:700 9px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--faint); user-select:none; -webkit-user-select:none;
+  touch-action:none; cursor:default;
+}
+
+/* ─── 5 · DIAGNOSTICS SURFACES (load-bearing — never remove) ───────────────── */
+/* A-ORG-1 #errToast (~L2108) ported verbatim except position:fixed→absolute
+   (reliability contract; body is the viewport so geometry is identical). */
+#errToast{position:absolute;left:var(--safe-l);right:var(--safe-r);bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:120;padding:10px 13px;border-radius:12px;background:rgba(40,10,10,.94);color:#ffd7d0;font:700 12px var(--body);box-shadow:0 0 0 1.4px rgba(255,110,90,.7),0 8px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s;word-break:break-word}
+#errToast.show{opacity:1;pointer-events:auto;transform:none}
+/* sandbox banner (A-ORG-1 ~L22198 idiom, arctic-voiced in signal gold) */
+#sbxNote{
+  position:absolute; z-index:130;
+  top:calc(env(safe-area-inset-top,0px) + 64px); left:var(--safe-l); right:var(--safe-r);
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px; border-radius:12px;
+  background:rgba(58,42,14,.95); color:#ffe3ad;
+  box-shadow:0 0 0 1px rgba(226,178,78,.55), 0 8px 24px rgba(0,0,0,.5);
+  font:600 11px/1.4 var(--body);
+}
+#sbxNote button{
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin-left:auto;
+  color:#ffe3ad; font:700 12px/1 var(--body); padding:6px; cursor:pointer;
+}
+
+/* ─── 6 · FOCUS + MOTION DISCIPLINE ────────────────────────────────────────── */
+/* ported focus-visible idiom (A-ORG-1 ~L4890), accent-voiced for arctic */
+button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focus-visible{
+  outline:2px solid var(--accent); outline-offset:2px}
+#searchPill input:focus-visible{outline:none}   /* the pill's focus-within ring speaks */
+/* all motion dies under prefers-reduced-motion (doctrine) */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important; animation:none!important}
+}
+
+/* ─── 7 · DESKTOP ≥1100px — ENHANCEMENTS ONLY (phone-first is sacred) ──────── */
+@media (min-width:1100px){
+  /* top edge centers; corners come free for the clocks */
+  #searchPill{left:0; right:0; width:560px; margin-inline:auto}
+  #searchResults{left:0; right:0; width:560px; margin-inline:auto;
+    top:calc(env(safe-area-inset-top,0px) + 70px); max-height:60vh; max-height:60dvh}
+  #themeSwitch{top:calc(env(safe-area-inset-top,0px) + 12px); right:24px}
+  /* clocks take the true corners */
+  #clockTL{top:calc(env(safe-area-inset-top,0px) + 18px); left:18px}
+  #clockTR{top:calc(env(safe-area-inset-top,0px) + 18px); right:18px}
+  #clockBL{bottom:calc(env(safe-area-inset-bottom,0px) + 18px); left:18px}
+  #clockBR{bottom:calc(env(safe-area-inset-bottom,0px) + 18px); right:18px}
+  #verChip{right:18px; bottom:calc(env(safe-area-inset-bottom,0px) + 52px)}
+  /* dossier becomes a right-hand panel; still a plain inset scroll container */
+  #dossier{left:auto; right:24px; width:400px;
+    top:calc(env(safe-area-inset-top,0px) + 84px); bottom:auto;
+    max-height:calc(100vh - 180px); max-height:calc(100dvh - 180px)}
+  #stageBar{bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
+  /* hovers live ONLY here */
+  .pill:hover,.chip:hover,#themeSwitch .ts-b:hover{
+    box-shadow:0 0 0 1px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
+    color:var(--text)}
+  #searchResults .sr-row:hover{background:var(--accent-wash)}
+  #globeCanvas{cursor:grab}
+  #globeCanvas:active{cursor:grabbing}
+  /* toast docks to the corner on wide screens (A-ORG-1 ~L2139) */
+  #errToast{left:auto; right:24px; max-width:520px; bottom:24px}
+}
