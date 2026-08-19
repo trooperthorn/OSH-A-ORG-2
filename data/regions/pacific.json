@@ -1,0 +1,311 @@
+{
+ "region": "pacific",
+ "sites": [
+  {
+   "id": "fort-shafter-schofield-hawaii",
+   "base": "Fort Shafter / Schofield (Hawaii)",
+   "st": "HI",
+   "unit": "USARPAC",
+   "unitFull": "U.S. Army Pacific",
+   "lat": 21.35,
+   "lon": -157.9,
+   "grp": "pi",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USARPAC",
+    "18th Medical Command (Deployment Support)",
+    "18th Theater Medical Command",
+    "18th Theater Medical Command (formerly 18th Medical Command (Deployment Support) / 18th MEDCOM (DS))",
+    "196th Infantry Brigade",
+    "3rd Multi-Domain Task Force",
+    "8th Theater Sustainment Command",
+    "94th Army Air & Missile Defense Command"
+   ]
+  },
+  {
+   "id": "camp-humphreys",
+   "base": "Camp Humphreys",
+   "st": "Korea",
+   "unit": "Eighth Army",
+   "unitFull": null,
+   "lat": 36.97,
+   "lon": 127.03,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "USARPAC",
+   "tenants": [
+    "Eighth Army",
+    "1st Signal Brigade",
+    "2nd Infantry Division / ROK-US Combined Division",
+    "35th Air Defense Artillery Brigade",
+    "411th Contracting Support Brigade",
+    "501st MI Brigade",
+    "65th Medical Brigade",
+    "837th Transportation Battalion"
+   ]
+  },
+  {
+   "id": "camp-zama",
+   "base": "Camp Zama",
+   "st": "Japan",
+   "unit": "U.S. Army Japan",
+   "unitFull": null,
+   "lat": 35.51,
+   "lon": 139.4,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "USARPAC",
+   "tenants": [
+    "U.S. Army Japan",
+    "836th Transportation Battalion",
+    "I Corps (Forward)",
+    "Japan Engineer District",
+    "1st Battalion, 1st Air Defense Artillery Regiment (Patriot) - Kadena Air Base, Japan",
+    "DEVCOM-Americas / -Atlantic / -Pacific",
+    "USAG Japan"
+   ]
+  },
+  {
+   "id": "usag-daegu",
+   "base": "USAG Daegu",
+   "st": "Korea",
+   "unit": "19th Expeditionary Sustainment Command (19th ESC)",
+   "unitFull": null,
+   "lat": 35.87,
+   "lon": 128.6,
+   "grp": "kj",
+   "parent": "camp-humphreys",
+   "parentUnit": "Eighth Army",
+   "tenants": [
+    "19th Expeditionary Sustainment Command (19th ESC)",
+    "403rd Army Field Support Brigade",
+    "541st Quartermaster Company - Field Feeding (Camp Carroll)",
+    "551st Transportation Company - Inland Cargo Transfer (Camp Carroll)",
+    "6th Ordnance Battalion (Camp Carroll)",
+    "APS-4 (Northeast Asia)",
+    "USAG Daegu",
+    "USAMMC-K"
+   ]
+  },
+  {
+   "id": "camp-casey",
+   "base": "Camp Casey",
+   "st": "Korea",
+   "unit": "USAG Yongsan-Casey",
+   "unitFull": null,
+   "lat": 37.92,
+   "lon": 127.05,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "U.S. Army Garrisons — Pacific (USAG)",
+   "tenants": [
+    "USAG Yongsan-Casey"
+   ]
+  },
+  {
+   "id": "torii-station",
+   "base": "Torii Station",
+   "st": "Japan",
+   "unit": "10th Support Group",
+   "unitFull": null,
+   "lat": 26.27,
+   "lon": 127.74,
+   "grp": "kj",
+   "parent": "camp-zama",
+   "parentUnit": "U.S. Army Japan",
+   "tenants": [
+    "10th Support Group",
+    "835th Transportation Battalion",
+    "USAG Okinawa"
+   ]
+  },
+  {
+   "id": "hawaii-national-guard",
+   "base": "Hawaii National Guard",
+   "st": "HI",
+   "unit": "Hawaii Army National Guard",
+   "unitFull": null,
+   "lat": 21.31,
+   "lon": -157.86,
+   "grp": "pi",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Hawaii Army National Guard"
+   ]
+  },
+  {
+   "id": "guam-national-guard",
+   "base": "Guam National Guard",
+   "st": "GU",
+   "unit": "Guam Army National Guard",
+   "unitFull": null,
+   "lat": 13.44,
+   "lon": 144.79,
+   "grp": "gu",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Guam Army National Guard"
+   ]
+  },
+  {
+   "id": "far-east-district",
+   "base": "Far East District",
+   "st": "Korea",
+   "unit": "Far East District",
+   "unitFull": null,
+   "lat": 36.97,
+   "lon": 127.03,
+   "grp": "kj",
+   "parent": "pacific-ocean-div-fort-shafter",
+   "parentUnit": "Pacific Ocean Division (POD)",
+   "tenants": [
+    "Far East District"
+   ]
+  },
+  {
+   "id": "japan-engineer-district",
+   "base": "Japan Engineer District",
+   "st": "Japan",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.49,
+   "lon": 139.4,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "honolulu-district",
+   "base": "Honolulu District",
+   "st": "HI",
+   "unit": "Honolulu District",
+   "unitFull": null,
+   "lat": 21.36,
+   "lon": -157.9,
+   "grp": "pi",
+   "parent": "pacific-ocean-div-fort-shafter",
+   "parentUnit": "Pacific Ocean Division (POD)",
+   "tenants": [
+    "Honolulu District"
+   ]
+  },
+  {
+   "id": "usindopacom-camp-smith",
+   "base": "USINDOPACOM (Camp Smith)",
+   "st": "HI",
+   "unit": null,
+   "unitFull": null,
+   "lat": 21.39,
+   "lon": -157.91,
+   "grp": "pi",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "pacific-ocean-div-fort-shafter",
+   "base": "Pacific Ocean Div (Fort Shafter)",
+   "st": "HI",
+   "unit": "Pacific Ocean Division (POD)",
+   "unitFull": null,
+   "lat": 21.36,
+   "lon": -157.9,
+   "grp": "pi",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Pacific Ocean Division (POD)"
+   ]
+  },
+  {
+   "id": "pohakuloa-training-area",
+   "base": "Pohakuloa Training Area",
+   "st": "HI",
+   "unit": "USAG Pohakuloa",
+   "unitFull": "U.S. Army Garrison Pōhakuloa",
+   "lat": 19.7,
+   "lon": -155.53,
+   "grp": "pi",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "U.S. Army Garrisons — Pacific (USAG)",
+   "tenants": [
+    "USAG Pohakuloa"
+   ]
+  },
+  {
+   "id": "camp-carroll",
+   "base": "Camp Carroll",
+   "st": "KR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 36.03,
+   "lon": 128.4,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "k-16-air-base",
+   "base": "K-16 Air Base",
+   "st": "KR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 37.44,
+   "lon": 127.11,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "sagami-general-depot",
+   "base": "Sagami General Depot",
+   "st": "JP",
+   "unit": "38th Air Defense Artillery Brigade",
+   "unitFull": null,
+   "lat": 35.57,
+   "lon": 139.4,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "94th Army Air & Missile Defense Command",
+   "tenants": [
+    "38th Air Defense Artillery Brigade",
+    "10th Missile Defense Battery",
+    "14th Missile Defense Battery",
+    "Headquarters and Headquarters Battery",
+    "Task Force Talon / E Battery, 3rd Air Defense Artillery Regiment (THAAD) - Andersen AFB, Guam"
+   ]
+  },
+  {
+   "id": "camp-mujuk",
+   "base": "Camp Mujuk",
+   "st": "KR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 36.03,
+   "lon": 129.36,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "yokohama-north-dock",
+   "base": "Yokohama North Dock",
+   "st": "JP",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.46,
+   "lon": 139.64,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  }
+ ]
+}

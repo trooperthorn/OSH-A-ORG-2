@@ -1,0 +1,4456 @@
+{
+ "v": 1,
+ "updated": "2026-08-19",
+ "src": "A-ORG-1 v22.27.1",
+ "sites": [
+  {
+   "id": "fort-bragg",
+   "base": "Fort Bragg",
+   "st": "NC",
+   "unit": "USAWHC",
+   "unitFull": "U.S. Army Western Hemisphere Command",
+   "lat": 35.14,
+   "lon": -79,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USARC",
+    "USASOC",
+    "USAWHC",
+    "1st Special Forces Command (Airborne)",
+    "5th Multi-Domain Task Force",
+    "John F. Kennedy Special Warfare Center & School (USAJFKSWCS)",
+    "U.S. Army Civil Affairs & PSYOP Command (USACAPOC(A))",
+    "XVIII Airborne Corps"
+   ]
+  },
+  {
+   "id": "fort-stewart",
+   "base": "Fort Stewart",
+   "st": "GA",
+   "unit": "3rd Infantry Division",
+   "unitFull": null,
+   "lat": 31.87,
+   "lon": -81.61,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "XVIII Airborne Corps",
+   "tenants": [
+    "3rd Infantry Division",
+    "14th Combat Support Hospital",
+    "188th Infantry Brigade",
+    "1st Armored Brigade Combat Team",
+    "2nd Armored Brigade Combat Team",
+    "3rd Combat Aviation Brigade",
+    "3rd Division Artillery (DIVARTY)",
+    "3rd Division Sustainment Brigade"
+   ]
+  },
+  {
+   "id": "fort-drum",
+   "base": "Fort Drum",
+   "st": "NY",
+   "unit": "10th Mountain Division",
+   "unitFull": null,
+   "lat": 44.05,
+   "lon": -75.72,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "XVIII Airborne Corps",
+   "tenants": [
+    "10th Mountain Division",
+    "Fort Drum Garrison Public Affairs",
+    "10th Combat Aviation Brigade",
+    "10th Division Artillery (DIVARTY)",
+    "10th Mountain Division Sustainment Brigade",
+    "1st Brigade Combat Team (10th Mtn)",
+    "2nd Brigade Combat Team (10th Mtn)",
+    "Headquarters and Headquarters Battalion, 10th Mountain Division"
+   ]
+  },
+  {
+   "id": "fort-campbell",
+   "base": "Fort Campbell",
+   "st": "KY",
+   "unit": "101st Airborne Division (Air Assault)",
+   "unitFull": null,
+   "lat": 36.67,
+   "lon": -87.46,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "XVIII Airborne Corps",
+   "tenants": [
+    "101st Airborne Division (Air Assault)",
+    "160th Special Operations Aviation Regiment (Airborne)",
+    "52nd Ordnance Group (EOD)",
+    "5th SFG(A) Forward",
+    "5th Special Forces Group (Airborne)",
+    "Fort Campbell Public Affairs Office",
+    "101st Airborne Division Sustainment Brigade",
+    "101st Combat Aviation Brigade"
+   ]
+  },
+  {
+   "id": "fort-knox",
+   "base": "Fort Knox",
+   "st": "KY",
+   "unit": "U.S. Army Recruiting Command (USAREC)",
+   "unitFull": null,
+   "lat": 37.89,
+   "lon": -85.96,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "T2COM",
+   "tenants": [
+    "HRC",
+    "1st Theater Sustainment Command",
+    "84th Training Command",
+    "U.S. Army Recruiting Command (USAREC)",
+    "U.S. Army Reserve Aviation Command",
+    "V Corps",
+    "Division East",
+    "Medical Recruiting Brigade"
+   ]
+  },
+  {
+   "id": "fort-hood",
+   "base": "Fort Hood",
+   "st": "TX",
+   "unit": "III Armored Corps",
+   "unitFull": null,
+   "lat": 31.13,
+   "lon": -97.78,
+   "grp": "conus",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "3rd Security Force Assistance Brigade (SFAB)",
+    "III Armored Corps",
+    "Operational Test Command (OTC)",
+    "11th Corps Signal Brigade",
+    "13th Armored Corps Sustainment Command",
+    "1st Cavalry Division",
+    "1st Medical Brigade",
+    "36th Engineer Brigade"
+   ]
+  },
+  {
+   "id": "fort-bliss",
+   "base": "Fort Bliss",
+   "st": "TX",
+   "unit": "32nd Army Air & Missile Defense Command (AAMDC)",
+   "unitFull": null,
+   "lat": 31.81,
+   "lon": -106.42,
+   "grp": "conus",
+   "parent": "usasmdc-redstone-huntsville",
+   "parentUnit": "USASMDC",
+   "tenants": [
+    "32nd Army Air & Missile Defense Command (AAMDC)",
+    "11th Air Defense Artillery Brigade",
+    "1st Armored Division",
+    "1-43 ADA",
+    "1st Armored Brigade Combat Team (1 AD)",
+    "1st Armored Division Artillery (DIVARTY)",
+    "1st Armored Division Sustainment Brigade",
+    "2-43 ADA"
+   ]
+  },
+  {
+   "id": "fort-riley",
+   "base": "Fort Riley",
+   "st": "KS",
+   "unit": "1st Infantry Division",
+   "unitFull": null,
+   "lat": 39.08,
+   "lon": -96.79,
+   "grp": "conus",
+   "parent": "fort-hood",
+   "parentUnit": "III Armored Corps",
+   "tenants": [
+    "1st Infantry Division",
+    "1st Armored Brigade Combat Team (1 ID)",
+    "1st Combat Aviation Brigade",
+    "1st Division Artillery (DIVARTY)",
+    "1st Infantry Division Sustainment Brigade",
+    "2nd Armored Brigade Combat Team (1 ID)",
+    "USAG Fort Riley",
+    "Army Field Support Battalion-Riley"
+   ]
+  },
+  {
+   "id": "fort-carson",
+   "base": "Fort Carson",
+   "st": "CO",
+   "unit": "4th Infantry Division",
+   "unitFull": null,
+   "lat": 38.74,
+   "lon": -104.79,
+   "grp": "conus",
+   "parent": "jblm",
+   "parentUnit": "I Corps",
+   "tenants": [
+    "4th Multi-Domain Task Force",
+    "10th Special Forces Group (Airborne)",
+    "4th Infantry Division",
+    "71st Ordnance Group (EOD)",
+    "Fort Carson Public Affairs Office",
+    "14th Public Affairs Detachment",
+    "1st Stryker Brigade Combat Team (4 ID)",
+    "2nd Stryker Brigade Combat Team (4 ID)"
+   ]
+  },
+  {
+   "id": "fort-leavenworth",
+   "base": "Fort Leavenworth",
+   "st": "KS",
+   "unit": "Combined Arms Command (CAC)",
+   "unitFull": null,
+   "lat": 39.35,
+   "lon": -94.92,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "T2COM",
+   "tenants": [
+    "Combined Arms Command (CAC)",
+    "35th Infantry Division",
+    "Army University",
+    "Centers of Excellence (CoEs)",
+    "Combat Training Centers (CTCs)",
+    "Command & General Staff College (CGSC)",
+    "Army Management Staff College (AMSC)",
+    "Army University Press (AUP)"
+   ]
+  },
+  {
+   "id": "fort-sill",
+   "base": "Fort Sill",
+   "st": "OK",
+   "unit": "31st Air Defense Artillery Brigade",
+   "unitFull": null,
+   "lat": 34.65,
+   "lon": -98.4,
+   "grp": "conus",
+   "parent": "fort-bliss",
+   "parentUnit": "32nd Army Air & Missile Defense Command (AAMDC)",
+   "tenants": [
+    "31st Air Defense Artillery Brigade",
+    "75th Field Artillery Brigade",
+    "AMCOM Combined Logistics Command (ACLC)",
+    "3-2 ADA",
+    "4-3 ADA",
+    "Fires CoE (FCoE)",
+    "Fires Future Capability Directorate",
+    "USAG Fort Sill"
+   ]
+  },
+  {
+   "id": "fort-benning",
+   "base": "Fort Benning",
+   "st": "GA",
+   "unit": "1st SFAB",
+   "unitFull": "1st Security Force Assistance Brigade",
+   "lat": 32.35,
+   "lon": -84.97,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "1st SFAB",
+    "75th Ranger Regiment",
+    "Army Security Cooperation Group-South (ASCG-S)",
+    "Western Hemisphere Institute for Security Cooperation (WHINSEC)",
+    "Maneuver CoE (MCoE)",
+    "USAG Fort Benning",
+    "199th Infantry Brigade",
+    "Airborne and Ranger Training Brigade (ARTB)"
+   ]
+  },
+  {
+   "id": "fort-rucker",
+   "base": "Fort Rucker",
+   "st": "AL",
+   "unit": "Air Traffic Services Command (ATSCOM)",
+   "unitFull": null,
+   "lat": 31.34,
+   "lon": -85.72,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "Air Traffic Services Command (ATSCOM)",
+    "Aviation CoE (AVCoE)",
+    "U.S. Army Warrant Officer Career College (WOCC)",
+    "USAG Fort Rucker",
+    "110th Aviation Brigade",
+    "1st Aviation Brigade",
+    "Aviation CoE NCO Academy"
+   ]
+  },
+  {
+   "id": "fort-lee",
+   "base": "Fort Lee",
+   "st": "VA",
+   "unit": "Sustainment CoE / CASCOM",
+   "unitFull": null,
+   "lat": 37.24,
+   "lon": -77.33,
+   "grp": "conus",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Centers of Excellence (CoEs)",
+   "tenants": [
+    "Sustainment CoE / CASCOM",
+    "USAG Fort Lee",
+    "Army Sustainment University",
+    "Ordnance School",
+    "Quartermaster School",
+    "Transportation School",
+    "23rd Quartermaster Brigade",
+    "59th Ordnance Brigade"
+   ]
+  },
+  {
+   "id": "fort-eustis",
+   "base": "Fort Eustis",
+   "st": "VA",
+   "unit": "Cross-Functional Teams (CFTs)",
+   "unitFull": null,
+   "lat": 37.13,
+   "lon": -76.6,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "Futures & Concepts Command (FCC)",
+   "tenants": [
+    "Cross-Functional Teams (CFTs)",
+    "DCRF",
+    "Future Capability Directorates (FCDs)",
+    "Futures Integration Directorate (FID)",
+    "Field Directorate Office-Fort Eustis",
+    "128th Aviation Brigade"
+   ]
+  },
+  {
+   "id": "fort-leonard-wood",
+   "base": "Fort Leonard Wood",
+   "st": "MO",
+   "unit": "PAE Layered Protection & CBRN",
+   "unitFull": "Portfolio Acquisition Executive (PAE) — Layered Protection & CBRN Defense",
+   "lat": 37.71,
+   "lon": -92.13,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PAE Layered Protection & CBRN",
+    "Formation-Based Layered Protection Future Capability Directorate",
+    "Maneuver Support CoE (MSCoE)",
+    "USAG Fort Leonard Wood",
+    "CBRN School",
+    "Engineer School",
+    "Military Police School",
+    "MSCoE NCO Academy"
+   ]
+  },
+  {
+   "id": "fort-belvoir",
+   "base": "Fort Belvoir",
+   "st": "VA",
+   "unit": "Military Intelligence Readiness Command (MIRC)",
+   "unitFull": null,
+   "lat": 38.71,
+   "lon": -77.14,
+   "grp": "ncr",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "CPE ES2 — Enterprise Software & Services",
+    "CPE Soldier Systems",
+    "Military Intelligence Readiness Command (MIRC)",
+    "29th Infantry Division",
+    "USAG Fort Belvoir",
+    "Night Vision & Electronic Sensors Directorate (NVESD)",
+    "Acquisition, Training & Readiness portfolio",
+    "Business Technology Solutions"
+   ]
+  },
+  {
+   "id": "fort-meade",
+   "base": "Fort Meade",
+   "st": "MD",
+   "unit": "200th Military Police Command",
+   "unitFull": null,
+   "lat": 39.11,
+   "lon": -76.74,
+   "grp": "ncr",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "200th Military Police Command",
+    "780th Military Intelligence Brigade (Cyber)",
+    "352nd Civil Affairs Command (CACOM)",
+    "704th MI Brigade (SIGINT)",
+    "7th Signal Command (Theater)",
+    "1st Recruiting Brigade",
+    "USAG Fort Meade",
+    "11th Cyber Battalion"
+   ]
+  },
+  {
+   "id": "fort-detrick",
+   "base": "Fort Detrick",
+   "st": "MD",
+   "unit": "Medical Research & Development Command",
+   "unitFull": null,
+   "lat": 39.44,
+   "lon": -77.43,
+   "grp": "ncr",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "MEDCOM",
+   "tenants": [
+    "Medical Research & Development Command",
+    "AMLC",
+    "6th MLMC",
+    "USAG Fort Detrick",
+    "USAMMA (inactivating)"
+   ]
+  },
+  {
+   "id": "fort-gordon",
+   "base": "Fort Gordon",
+   "st": "GA",
+   "unit": "ARCYBER",
+   "unitFull": "U.S. Army Cyber Command",
+   "lat": 33.42,
+   "lon": -82.15,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "ARCYBER",
+    "116th MI Brigade (Aerial Intelligence)",
+    "359th Signal Brigade (Theater Tactical)",
+    "513th MI Brigade",
+    "706th MI Group",
+    "202nd Military Intelligence Battalion",
+    "297th Military Intelligence Battalion",
+    "324th Expeditionary Signal Battalion"
+   ]
+  },
+  {
+   "id": "fort-huachuca",
+   "base": "Fort Huachuca",
+   "st": "AZ",
+   "unit": "JTF-Southern Border",
+   "unitFull": "Joint Task Force-Southern Border",
+   "lat": 31.55,
+   "lon": -110.35,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "Electronic Proving Ground (EPG)",
+    "JTF-Southern Border",
+    "NETCOM",
+    "Army Capability Managers (ACMs)",
+    "U.S. Army Information Systems Engineering Command (USAISEC)",
+    "Intelligence CoE (ICoE)",
+    "Intelligence Future Capability Directorate",
+    "Regional Cyber Center – CONUS (RCC-C)"
+   ]
+  },
+  {
+   "id": "aberdeen-proving-ground",
+   "base": "Aberdeen Proving Ground",
+   "st": "MD",
+   "unit": "ATEC",
+   "unitFull": "Army Test & Evaluation Command",
+   "lat": 39.47,
+   "lon": -76.13,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "ATEC",
+    "CHRA",
+    "PAE C2 / CC2",
+    "20th CBRNE Command",
+    "Aberdeen Test Center (ATC)",
+    "Army Evaluation Center (AEC)",
+    "C2/CC2 Systems Center",
+    "CECOM"
+   ]
+  },
+  {
+   "id": "redstone-arsenal",
+   "base": "Redstone Arsenal",
+   "st": "AL",
+   "unit": "AMC",
+   "unitFull": "U.S. Army Materiel Command",
+   "lat": 34.68,
+   "lon": -86.65,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "AMC",
+    "PAE Fires",
+    "ACC",
+    "AMCOM",
+    "AMCOM (Aviation)",
+    "AMCOM (Missiles)",
+    "CPE Aviation",
+    "CPE Defensive Fires"
+   ]
+  },
+  {
+   "id": "detroit-arsenal",
+   "base": "Detroit Arsenal",
+   "st": "MI",
+   "unit": "TACOM",
+   "unitFull": "Tank-automotive & Armaments Command",
+   "lat": 42.59,
+   "lon": -83.04,
+   "grp": "conus",
+   "parent": "redstone-arsenal",
+   "parentUnit": "AMC",
+   "tenants": [
+    "CPE Combat Logistics",
+    "CPE Ground Combat Platforms",
+    "Director of Sustainment / OIB",
+    "Strategic Contracting Office",
+    "TACOM",
+    "TACOM (Chem/Bio)",
+    "ACC-Detroit Arsenal",
+    "Integrated Logistics Support Center (ILSC)"
+   ]
+  },
+  {
+   "id": "picatinny-arsenal",
+   "base": "Picatinny Arsenal",
+   "st": "NJ",
+   "unit": "PAE Agile Sustainment & Ammo",
+   "unitFull": "Portfolio Acquisition Executive (PAE) — Agile Sustainment & Ammunition",
+   "lat": 40.87,
+   "lon": -74.55,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PAE Agile Sustainment & Ammo",
+    "Armaments System Center",
+    "CPE Ammunition & Energetics",
+    "ACC-New Jersey",
+    "Armaments Center (AC)",
+    "Deputy PAE",
+    "Future Capabilities (Sustainment)",
+    "International Cooperation"
+   ]
+  },
+  {
+   "id": "rock-island-arsenal",
+   "base": "Rock Island Arsenal",
+   "st": "IL",
+   "unit": "First Army",
+   "unitFull": null,
+   "lat": 41.51,
+   "lon": -90.55,
+   "grp": "oib",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "ASC",
+    "First Army",
+    "JMC",
+    "Strategic Contracting Official",
+    "ACC-Rock Island",
+    "Ammunition Plants (produce)",
+    "Army Field Support Brigades (AFSBs)",
+    "Army Prepositioned Stocks (APS)"
+   ]
+  },
+  {
+   "id": "jbsa-fort-sam-houston",
+   "base": "JBSA Fort Sam Houston",
+   "st": "TX",
+   "unit": "MEDCOM",
+   "unitFull": "U.S. Army Medical Command",
+   "lat": 29.46,
+   "lon": -98.43,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "MEDCOM",
+    "ARNORTH",
+    "ARSOUTH",
+    "IMCOM",
+    "Medical Center of Excellence (MEDCoE)",
+    "USAWHC HHBN",
+    "ARNORTH Theater Security Cooperation (Canada/Mexico/Bahamas)",
+    "MICC"
+   ]
+  },
+  {
+   "id": "jb-langley-eustis",
+   "base": "JB Langley-Eustis",
+   "st": "VA",
+   "unit": "597th Transportation Brigade",
+   "unitFull": null,
+   "lat": 37.08,
+   "lon": -76.36,
+   "grp": "conus",
+   "parent": "scott-afb",
+   "parentUnit": "ARTRANS",
+   "tenants": [
+    "597th Transportation Brigade",
+    "93rd Signal Brigade"
+   ]
+  },
+  {
+   "id": "west-point",
+   "base": "West Point",
+   "st": "NY",
+   "unit": "USMA",
+   "unitFull": "U.S. Military Academy",
+   "lat": 41.39,
+   "lon": -73.96,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USMA",
+    "USAG West Point",
+    "Dean of the Academic Board",
+    "U.S. Military Academy Preparatory School (USMAPS)",
+    "United States Corps of Cadets (USCC)"
+   ]
+  },
+  {
+   "id": "carlisle-barracks",
+   "base": "Carlisle Barracks",
+   "st": "PA",
+   "unit": "USAWC",
+   "unitFull": "U.S. Army War College",
+   "lat": 40.21,
+   "lon": -77.18,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USAWC",
+    "Security Force Assistance and Stability Integration Directorate (SFASID)",
+    "U.S. Army War College (AWC)",
+    "School of Strategic Landpower (SSL)",
+    "Strategic Studies Institute (SSI)",
+    "U.S. Army Heritage and Education Center (AHEC)",
+    "Center for Strategic Leadership (CSL)",
+    "School of Strategic Landpower"
+   ]
+  },
+  {
+   "id": "indianapolis",
+   "base": "Indianapolis",
+   "st": "IN",
+   "unit": "USAFMCOM",
+   "unitFull": "Financial Management Command",
+   "lat": 39.77,
+   "lon": -86.16,
+   "grp": "conus",
+   "parent": "redstone-arsenal",
+   "parentUnit": "AMC",
+   "tenants": [
+    "USAFMCOM",
+    "38th Infantry Division",
+    "Army Financial Management Center (45th FC)",
+    "37th Infantry Brigade Combat Team",
+    "38th CAB",
+    "76th Infantry Brigade Combat Team"
+   ]
+  },
+  {
+   "id": "quantico",
+   "base": "Quantico",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.52,
+   "lon": -77.29,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "arlington",
+   "base": "Arlington",
+   "st": "VA",
+   "unit": "Army National Guard (ARNG)",
+   "unitFull": "Army National Guard Directorate",
+   "lat": 38.88,
+   "lon": -77.07,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "Army National Guard (ARNG)",
+    "MPSA",
+    "Office of Army Cemeteries (OAC) / Army National Military Cemeteries (ANMC)",
+    "Arlington National Cemetery",
+    "U.S. Soldiers' and Airmen's Home National Cemetery",
+    "USAG Joint Base Myer-Henderson Hall",
+    "Air National Guard (ANG)",
+    "116th Cavalry Brigade Combat Team"
+   ]
+  },
+  {
+   "id": "the-pentagon",
+   "base": "The Pentagon",
+   "st": "VA",
+   "unit": "PIT — Pathway for Innovation & Technology",
+   "unitFull": "Pathway for Innovation & Technology (PIT) — ASA(ALT)",
+   "lat": 38.87,
+   "lon": -77.06,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PIT — Pathway for Innovation & Technology",
+    "Force Development (Aviation)",
+    "Force Development (Fires)",
+    "Force Development (Maneuver)",
+    "Force Development (Protection)",
+    "Force Development (Sustainment)",
+    "Army FUZE",
+    "G-TEAD Marketplace"
+   ]
+  },
+  {
+   "id": "jblm",
+   "base": "JBLM",
+   "st": "WA",
+   "unit": "I Corps",
+   "unitFull": null,
+   "lat": 47.08,
+   "lon": -122.58,
+   "grp": "conus",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "USARPAC",
+   "tenants": [
+    "596th Transportation Brigade",
+    "5th Security Force Assistance Brigade (SFAB)",
+    "I Corps",
+    "17th Field Artillery Brigade",
+    "17th Field Artillery Brigade (\"America's Premier HIMARS Brigade\")",
+    "1st Battalion, 17th Field Artillery Regiment (1-17 FA)",
+    "1st Special Forces Group (Airborne)",
+    "201st Expeditionary Military Intelligence Brigade"
+   ]
+  },
+  {
+   "id": "dugway-pg",
+   "base": "Dugway PG",
+   "st": "UT",
+   "unit": "Dugway Proving Ground (DPG)",
+   "unitFull": null,
+   "lat": 40.21,
+   "lon": -112.74,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "ATEC",
+   "tenants": [
+    "Dugway Proving Ground (DPG)",
+    "West Desert Test Center (WDTC)"
+   ]
+  },
+  {
+   "id": "white-sands-mr",
+   "base": "White Sands MR",
+   "st": "NM",
+   "unit": "White Sands Missile Range (WSMR)",
+   "unitFull": null,
+   "lat": 32.38,
+   "lon": -106.48,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "ATEC",
+   "tenants": [
+    "White Sands Missile Range (WSMR)"
+   ]
+  },
+  {
+   "id": "yuma-pg",
+   "base": "Yuma PG",
+   "st": "AZ",
+   "unit": "Yuma Proving Ground (YPG)",
+   "unitFull": null,
+   "lat": 32.49,
+   "lon": -114.32,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "ATEC",
+   "tenants": [
+    "Yuma Proving Ground (YPG)",
+    "Yuma Test Center (YTC)",
+    "Tropic Regions Test Center (TRTC)"
+   ]
+  },
+  {
+   "id": "draper",
+   "base": "Draper",
+   "st": "UT",
+   "unit": "19th Special Forces Group (Airborne)",
+   "unitFull": null,
+   "lat": 40.52,
+   "lon": -111.86,
+   "grp": "conus",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "19th Special Forces Group (Airborne)",
+    "300th MI Brigade (Linguist)"
+   ]
+  },
+  {
+   "id": "fort-wainwright-greely-alaska",
+   "base": "Fort Wainwright/Greely (Alaska)",
+   "st": "AK",
+   "unit": "11th Airborne Division",
+   "unitFull": null,
+   "lat": 64,
+   "lon": -147,
+   "grp": "conus",
+   "parent": "jblm",
+   "parentUnit": "I Corps",
+   "tenants": [
+    "833rd Transportation Battalion",
+    "Alaska Army National Guard",
+    "11th Airborne Division",
+    "49th Missile Defense Battalion (GMD)",
+    "Alaska District",
+    "Cold Regions Test Center (CRTC)",
+    "17th Combat Sustainment Support Battalion",
+    "1st Infantry Brigade Combat Team"
+   ]
+  },
+  {
+   "id": "fort-shafter-schofield-hawaii",
+   "base": "Fort Shafter / Schofield (Hawaii)",
+   "st": "HI",
+   "unit": "USARPAC",
+   "unitFull": "U.S. Army Pacific",
+   "lat": 21.35,
+   "lon": -157.9,
+   "grp": "pi",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USARPAC",
+    "18th Medical Command (Deployment Support)",
+    "18th Theater Medical Command",
+    "18th Theater Medical Command (formerly 18th Medical Command (Deployment Support) / 18th MEDCOM (DS))",
+    "196th Infantry Brigade",
+    "3rd Multi-Domain Task Force",
+    "8th Theater Sustainment Command",
+    "94th Army Air & Missile Defense Command"
+   ]
+  },
+  {
+   "id": "wiesbaden",
+   "base": "Wiesbaden",
+   "st": "Germany",
+   "unit": "USAREUR-AF",
+   "unitFull": "U.S. Army Europe & Africa",
+   "lat": 50.08,
+   "lon": 8.24,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USAREUR-AF",
+    "Cyber Field Office",
+    "HHBN, USAREUR-AF",
+    "Security Assistance Group-Ukraine (SAG-U)",
+    "2nd Theater Signal Brigade",
+    "66th MI Brigade",
+    "102nd Strategic Signal Battalion",
+    "Regional Cyber Center – Europe (RCC-E)"
+   ]
+  },
+  {
+   "id": "kaiserslautern",
+   "base": "Kaiserslautern",
+   "st": "Germany",
+   "unit": "598th Transportation Brigade",
+   "unitFull": null,
+   "lat": 49.44,
+   "lon": 7.77,
+   "grp": "eur",
+   "parent": "scott-afb",
+   "parentUnit": "ARTRANS",
+   "tenants": [
+    "598th Transportation Brigade",
+    "7th Mission Support Command",
+    "405th Army Field Support Brigade",
+    "U.S. Army Garrison Rheinland-Pfalz",
+    "USAG Rheinland-Pfalz",
+    "USAMMC-E",
+    "839th Transportation Battalion",
+    "Army Field Support Battalion-Benelux"
+   ]
+  },
+  {
+   "id": "mainz-kastel",
+   "base": "Mainz-Kastel",
+   "st": "Germany",
+   "unit": "Multi-Domain Command Europe (MDC-E)",
+   "unitFull": null,
+   "lat": 49.3,
+   "lon": 9.6,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "Multi-Domain Command Europe (MDC-E)",
+    "19th Battlefield Coordination Detachment",
+    "2nd Multi-Domain Task Force"
+   ]
+  },
+  {
+   "id": "sembach",
+   "base": "Sembach",
+   "st": "Germany",
+   "unit": "10th Army Air & Missile Defense Command",
+   "unitFull": null,
+   "lat": 49.85,
+   "lon": 6.4,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "10th Army Air & Missile Defense Command",
+    "409th Contracting Support Brigade",
+    "52nd Air Defense Artillery Brigade",
+    "Installation Management Command - Europe (IMCOM-Europe)",
+    "U.S. Army Garrisons — Europe (USAG)",
+    "United States Army Europe and Africa Band & Chorus",
+    "13th Missile Defense Battery",
+    "U.S. Army Garrison Poland"
+   ]
+  },
+  {
+   "id": "vilseck",
+   "base": "Vilseck",
+   "st": "Germany",
+   "unit": "Army Field Support Battalion-Germany",
+   "unitFull": null,
+   "lat": 49.1,
+   "lon": 12.4,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Germany"
+   ]
+  },
+  {
+   "id": "vicenza",
+   "base": "Vicenza",
+   "st": "Italy",
+   "unit": "SETAF-AF",
+   "unitFull": null,
+   "lat": 45.55,
+   "lon": 11.55,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "SETAF-AF",
+    "U.S. Army Southern European Task Force, Africa (SETAF-AF)",
+    "173rd Airborne Brigade",
+    "207th MI Brigade",
+    "414th Contracting Support Brigade",
+    "Headquarters and Headquarters Battalion, SETAF-AF",
+    "509th Strategic Signal Battalion",
+    "Regional Contracting Office-Africa"
+   ]
+  },
+  {
+   "id": "chi-vres",
+   "base": "Chièvres",
+   "st": "Belgium",
+   "unit": "650th MI Group / Allied Command CI (ACCI)",
+   "unitFull": null,
+   "lat": 50.58,
+   "lon": 3.83,
+   "grp": "eur",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "Functional & National MI",
+   "tenants": [
+    "650th MI Group / Allied Command CI (ACCI)",
+    "39th Strategic Signal Battalion",
+    "U.S. Army Garrison Benelux",
+    "USAG Benelux"
+   ]
+  },
+  {
+   "id": "camp-humphreys",
+   "base": "Camp Humphreys",
+   "st": "Korea",
+   "unit": "Eighth Army",
+   "unitFull": null,
+   "lat": 36.97,
+   "lon": 127.03,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "USARPAC",
+   "tenants": [
+    "Eighth Army",
+    "1st Signal Brigade",
+    "2nd Infantry Division / ROK-US Combined Division",
+    "35th Air Defense Artillery Brigade",
+    "411th Contracting Support Brigade",
+    "501st MI Brigade",
+    "65th Medical Brigade",
+    "837th Transportation Battalion"
+   ]
+  },
+  {
+   "id": "camp-zama",
+   "base": "Camp Zama",
+   "st": "Japan",
+   "unit": "U.S. Army Japan",
+   "unitFull": null,
+   "lat": 35.51,
+   "lon": 139.4,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "USARPAC",
+   "tenants": [
+    "U.S. Army Japan",
+    "836th Transportation Battalion",
+    "I Corps (Forward)",
+    "Japan Engineer District",
+    "1st Battalion, 1st Air Defense Artillery Regiment (Patriot) - Kadena Air Base, Japan",
+    "DEVCOM-Americas / -Atlantic / -Pacific",
+    "USAG Japan"
+   ]
+  },
+  {
+   "id": "camp-arifjan",
+   "base": "Camp Arifjan",
+   "st": "Kuwait",
+   "unit": "28th Infantry Division (TF Spartan rotational command, historical)",
+   "unitFull": "28th Infantry Division, Pennsylvania Army National Guard",
+   "lat": 28.86,
+   "lon": 48.15,
+   "grp": "swa",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "160th Theater Signal Brigade",
+    "595th Transportation Brigade",
+    "Area Support Group – Kuwait (ASG-KU)",
+    "Operation Spartan Shield",
+    "Task Force Spartan / rotational BCTs",
+    "USARCENT (Forward)",
+    "USARCENT (Forward) / Operational Command Post",
+    "1100th Theater Aviation Sustainment Maintenance Group"
+   ]
+  },
+  {
+   "id": "shaw-afb",
+   "base": "Shaw AFB",
+   "st": "SC",
+   "unit": "USARCENT",
+   "unitFull": "U.S. Army Central",
+   "lat": 33.97,
+   "lon": -80.47,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USARCENT",
+    "Area Support Group – Jordan (ASG-J)",
+    "Headquarters and Headquarters Battalion, USARCENT",
+    "Task Force Sinai",
+    "1st Support Battalion (Task Force Sinai)",
+    "301st Maneuver Enhancement Brigade (ASG-Jordan rotational HQ)",
+    "USBATT (1-157 IN, CO ARNG)",
+    "USBATT (Task Force Sinai infantry battalion)"
+   ]
+  },
+  {
+   "id": "scott-afb",
+   "base": "Scott AFB",
+   "st": "IL",
+   "unit": "ARTRANS",
+   "unitFull": "U.S. Army Transportation Command",
+   "lat": 38.54,
+   "lon": -89.85,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "ARTRANS",
+    "ARTRANS (AMC MSC hat)",
+    "Transportation Engineering Agency (ARTRANS-TEA)",
+    "599th Transportation Brigade"
+   ]
+  },
+  {
+   "id": "fort-irwin-ntc",
+   "base": "Fort Irwin (NTC)",
+   "st": "CA",
+   "unit": "National Training Center (NTC)",
+   "unitFull": null,
+   "lat": 35.26,
+   "lon": -116.68,
+   "grp": "conus",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Combat Training Centers (CTCs)",
+   "tenants": [
+    "National Training Center (NTC)",
+    "USAG Fort Irwin",
+    "11th Armored Cavalry Regiment (Blackhorse) (OPFOR)",
+    "Operations Group (NTC)",
+    "1st Squadron, 11th ACR (Ironhorse)",
+    "2nd Squadron, 11th ACR (Eaglehorse)",
+    "Regimental Support Squadron, 11th ACR"
+   ]
+  },
+  {
+   "id": "fort-polk",
+   "base": "Fort Polk",
+   "st": "LA",
+   "unit": "Fort Johnson Public Affairs Office",
+   "unitFull": "U.S. Army Garrison Fort Johnson Public Affairs Office",
+   "lat": 31.05,
+   "lon": -93.2,
+   "grp": "conus",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "IMCOM",
+   "tenants": [
+    "Fort Johnson Public Affairs Office",
+    "3rd Mobile Brigade Combat Team (10th Mtn)",
+    "46th Engineer Battalion",
+    "Joint Readiness Training Center (JRTC)",
+    "USAG Fort Polk",
+    "2nd Battalion, 2nd Infantry Regiment",
+    "3rd Squadron, 89th Cavalry Regiment",
+    "5th Battalion, 25th Field Artillery Regiment"
+   ]
+  },
+  {
+   "id": "fort-jackson",
+   "base": "Fort Jackson",
+   "st": "SC",
+   "unit": "Readiness Divisions (63rd · 81st · 88th · 99th)",
+   "unitFull": null,
+   "lat": 34.04,
+   "lon": -80.82,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "Readiness Divisions (63rd · 81st · 88th · 99th)",
+    "U.S. Army Center for Initial Military Training (CIMT)",
+    "U.S. Army Training Center & Fort Jackson",
+    "Leader Training Brigade (CIMT)",
+    "U.S. Army Drill Sergeant Academy",
+    "USAG Fort Jackson",
+    "Adjutant General School",
+    "Finance School"
+   ]
+  },
+  {
+   "id": "fort-mccoy",
+   "base": "Fort McCoy",
+   "st": "WI",
+   "unit": "USAG Fort McCoy",
+   "unitFull": "U.S. Army Garrison Fort McCoy",
+   "lat": 44.03,
+   "lon": -90.67,
+   "grp": "conus",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "U.S. Army Garrisons — CONUS",
+   "tenants": [
+    "USAG Fort McCoy"
+   ]
+  },
+  {
+   "id": "fort-devens",
+   "base": "Fort Devens",
+   "st": "MA",
+   "unit": "Cyber Protection Brigade",
+   "unitFull": null,
+   "lat": 42.54,
+   "lon": -71.62,
+   "grp": "conus",
+   "parent": "fort-gordon",
+   "parentUnit": "ARCYBER",
+   "tenants": [
+    "Cyber Protection Brigade"
+   ]
+  },
+  {
+   "id": "fort-buchanan",
+   "base": "Fort Buchanan",
+   "st": "PR",
+   "unit": "1st Mission Support Command",
+   "unitFull": null,
+   "lat": 18.39,
+   "lon": -66.13,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "1st Mission Support Command",
+    "Puerto Rico Army National Guard",
+    "U.S. Army Garrison Fort Buchanan",
+    "USAG Fort Buchanan"
+   ]
+  },
+  {
+   "id": "presidio-of-monterey",
+   "base": "Presidio of Monterey",
+   "st": "CA",
+   "unit": "Defense Language Institute (DLIFLC)",
+   "unitFull": null,
+   "lat": 36.6,
+   "lon": -121.92,
+   "grp": "conus",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Army University",
+   "tenants": [
+    "Defense Language Institute (DLIFLC)",
+    "USAG Presidio of Monterey"
+   ]
+  },
+  {
+   "id": "fort-hamilton",
+   "base": "Fort Hamilton",
+   "st": "NY",
+   "unit": "USAG Fort Hamilton",
+   "unitFull": "U.S. Army Garrison Fort Hamilton",
+   "lat": 40.61,
+   "lon": -74.03,
+   "grp": "conus",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "U.S. Army Garrisons — CONUS",
+   "tenants": [
+    "USAG Fort Hamilton"
+   ]
+  },
+  {
+   "id": "grafenw-hr-vilseck",
+   "base": "Grafenwöhr / Vilseck",
+   "st": "Germany",
+   "unit": "7th Army Training Command (7ATC)",
+   "unitFull": null,
+   "lat": 49.7,
+   "lon": 11.94,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "7th Army Training Command (7ATC)",
+    "41st Field Artillery Brigade",
+    "7th Army NCO Academy",
+    "928th Contracting Battalion",
+    "U.S. Army Garrison Bavaria",
+    "USAG Bavaria"
+   ]
+  },
+  {
+   "id": "hohenfels-jmrc",
+   "base": "Hohenfels (JMRC)",
+   "st": "Germany",
+   "unit": "Joint Multinational Readiness Center (JMRC)",
+   "unitFull": null,
+   "lat": 49.22,
+   "lon": 11.84,
+   "grp": "eur",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Combat Training Centers (CTCs)",
+   "tenants": [
+    "Joint Multinational Readiness Center (JMRC)"
+   ]
+  },
+  {
+   "id": "ansbach",
+   "base": "Ansbach",
+   "st": "Germany",
+   "unit": "12th Combat Aviation Brigade",
+   "unitFull": null,
+   "lat": 49.3,
+   "lon": 10.59,
+   "grp": "eur",
+   "parent": "fort-knox",
+   "parentUnit": "V Corps",
+   "tenants": [
+    "12th Combat Aviation Brigade",
+    "1st Battalion, 57th Air Defense Artillery Regiment",
+    "5th Battalion, 4th Air Defense Artillery Regiment",
+    "U.S. Army Garrison Ansbach",
+    "USAG Ansbach"
+   ]
+  },
+  {
+   "id": "baumholder",
+   "base": "Baumholder",
+   "st": "Germany",
+   "unit": "16th Sustainment Brigade",
+   "unitFull": null,
+   "lat": 49.62,
+   "lon": 7.34,
+   "grp": "eur",
+   "parent": "stuttgart",
+   "parentUnit": "21st Theater Sustainment Command",
+   "tenants": [
+    "16th Sustainment Brigade",
+    "421st Medical Battalion (Multifunctional)",
+    "5th Battalion, 7th Air Defense Artillery Regiment"
+   ]
+  },
+  {
+   "id": "stuttgart",
+   "base": "Stuttgart",
+   "st": "Germany",
+   "unit": "21st Theater Sustainment Command",
+   "unitFull": null,
+   "lat": 48.78,
+   "lon": 9.18,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "21st Theater Sustainment Command",
+    "838th Transportation Battalion",
+    "52nd Strategic Signal Battalion",
+    "U.S. Army Garrison Stuttgart",
+    "USAG Stuttgart",
+    "18th Military Police Brigade",
+    "30th Medical Brigade"
+   ]
+  },
+  {
+   "id": "garmisch",
+   "base": "Garmisch",
+   "st": "Germany",
+   "unit": null,
+   "unitFull": null,
+   "lat": 47.49,
+   "lon": 11.1,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-darby",
+   "base": "Camp Darby",
+   "st": "Italy",
+   "unit": "Army Field Support Battalion-Africa",
+   "unitFull": null,
+   "lat": 43.62,
+   "lon": 10.3,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Africa"
+   ]
+  },
+  {
+   "id": "usag-daegu",
+   "base": "USAG Daegu",
+   "st": "Korea",
+   "unit": "19th Expeditionary Sustainment Command (19th ESC)",
+   "unitFull": null,
+   "lat": 35.87,
+   "lon": 128.6,
+   "grp": "kj",
+   "parent": "camp-humphreys",
+   "parentUnit": "Eighth Army",
+   "tenants": [
+    "19th Expeditionary Sustainment Command (19th ESC)",
+    "403rd Army Field Support Brigade",
+    "541st Quartermaster Company - Field Feeding (Camp Carroll)",
+    "551st Transportation Company - Inland Cargo Transfer (Camp Carroll)",
+    "6th Ordnance Battalion (Camp Carroll)",
+    "APS-4 (Northeast Asia)",
+    "USAG Daegu",
+    "USAMMC-K"
+   ]
+  },
+  {
+   "id": "camp-casey",
+   "base": "Camp Casey",
+   "st": "Korea",
+   "unit": "USAG Yongsan-Casey",
+   "unitFull": null,
+   "lat": 37.92,
+   "lon": 127.05,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "U.S. Army Garrisons — Pacific (USAG)",
+   "tenants": [
+    "USAG Yongsan-Casey"
+   ]
+  },
+  {
+   "id": "torii-station",
+   "base": "Torii Station",
+   "st": "Japan",
+   "unit": "10th Support Group",
+   "unitFull": null,
+   "lat": 26.27,
+   "lon": 127.74,
+   "grp": "kj",
+   "parent": "camp-zama",
+   "parentUnit": "U.S. Army Japan",
+   "tenants": [
+    "10th Support Group",
+    "835th Transportation Battalion",
+    "USAG Okinawa"
+   ]
+  },
+  {
+   "id": "watervliet-arsenal",
+   "base": "Watervliet Arsenal",
+   "st": "NY",
+   "unit": "Watervliet Arsenal",
+   "unitFull": null,
+   "lat": 42.73,
+   "lon": -73.69,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Arsenals (manufacture)",
+   "tenants": [
+    "Watervliet Arsenal"
+   ]
+  },
+  {
+   "id": "pine-bluff-arsenal",
+   "base": "Pine Bluff Arsenal",
+   "st": "AR",
+   "unit": "Pine Bluff Arsenal",
+   "unitFull": null,
+   "lat": 34.27,
+   "lon": -92.08,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Arsenals (manufacture)",
+   "tenants": [
+    "Pine Bluff Arsenal"
+   ]
+  },
+  {
+   "id": "anniston-army-depot",
+   "base": "Anniston Army Depot",
+   "st": "AL",
+   "unit": "Anniston Army Depot",
+   "unitFull": null,
+   "lat": 33.6,
+   "lon": -85.96,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Anniston Army Depot",
+    "Anniston Munitions Center"
+   ]
+  },
+  {
+   "id": "corpus-christi-army-depot",
+   "base": "Corpus Christi Army Depot",
+   "st": "TX",
+   "unit": "Corpus Christi Army Depot",
+   "unitFull": null,
+   "lat": 27.7,
+   "lon": -97.27,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Corpus Christi Army Depot"
+   ]
+  },
+  {
+   "id": "letterkenny-army-depot",
+   "base": "Letterkenny Army Depot",
+   "st": "PA",
+   "unit": "Letterkenny Army Depot",
+   "unitFull": null,
+   "lat": 39.95,
+   "lon": -77.71,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Letterkenny Army Depot"
+   ]
+  },
+  {
+   "id": "red-river-army-depot",
+   "base": "Red River Army Depot",
+   "st": "TX",
+   "unit": "Red River Army Depot",
+   "unitFull": null,
+   "lat": 33.45,
+   "lon": -94.16,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Red River Army Depot"
+   ]
+  },
+  {
+   "id": "tobyhanna-army-depot",
+   "base": "Tobyhanna Army Depot",
+   "st": "PA",
+   "unit": "Tobyhanna Army Depot",
+   "unitFull": null,
+   "lat": 41.19,
+   "lon": -75.41,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Tobyhanna Army Depot"
+   ]
+  },
+  {
+   "id": "tooele-army-depot",
+   "base": "Tooele Army Depot",
+   "st": "UT",
+   "unit": "Tooele Army Depot",
+   "unitFull": null,
+   "lat": 40.4,
+   "lon": -112.36,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Tooele Army Depot"
+   ]
+  },
+  {
+   "id": "sierra-army-depot",
+   "base": "Sierra Army Depot",
+   "st": "CA",
+   "unit": "Sierra Army Depot",
+   "unitFull": null,
+   "lat": 40.34,
+   "lon": -120.2,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Sierra Army Depot"
+   ]
+  },
+  {
+   "id": "mcalester-aap",
+   "base": "McAlester AAP",
+   "st": "OK",
+   "unit": "McAlester Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 34.84,
+   "lon": -95.92,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "McAlester Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "holston-aap",
+   "base": "Holston AAP",
+   "st": "TN",
+   "unit": "Holston Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 36.55,
+   "lon": -82.49,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Holston Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "radford-aap",
+   "base": "Radford AAP",
+   "st": "VA",
+   "unit": "Radford Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 37.18,
+   "lon": -80.55,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Radford Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "lake-city-aap",
+   "base": "Lake City AAP",
+   "st": "MO",
+   "unit": "OIB Optimization Integrator",
+   "unitFull": null,
+   "lat": 39.1,
+   "lon": -94.35,
+   "grp": "oib",
+   "parent": "picatinny-arsenal",
+   "parentUnit": "PAE Agile Sustainment & Ammo",
+   "tenants": [
+    "OIB Optimization Integrator",
+    "850th Signal Company",
+    "Lake City Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "iowa-aap",
+   "base": "Iowa AAP",
+   "st": "IA",
+   "unit": "Iowa Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 40.85,
+   "lon": -91.1,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Iowa Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "scranton-aap",
+   "base": "Scranton AAP",
+   "st": "PA",
+   "unit": "Scranton Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 41.41,
+   "lon": -75.66,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Scranton Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "blue-grass-army-depot",
+   "base": "Blue Grass Army Depot",
+   "st": "KY",
+   "unit": "Blue Grass Army Depot",
+   "unitFull": null,
+   "lat": 37.7,
+   "lon": -84.16,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Blue Grass Army Depot"
+   ]
+  },
+  {
+   "id": "hawthorne-army-depot",
+   "base": "Hawthorne Army Depot",
+   "st": "NV",
+   "unit": "Hawthorne Army Depot",
+   "unitFull": null,
+   "lat": 38.54,
+   "lon": -118.63,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Hawthorne Army Depot"
+   ]
+  },
+  {
+   "id": "letterkenny-munitions-center",
+   "base": "Letterkenny Munitions Center",
+   "st": "PA",
+   "unit": "Letterkenny Munitions Center",
+   "unitFull": null,
+   "lat": 39.93,
+   "lon": -77.7,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Letterkenny Munitions Center"
+   ]
+  },
+  {
+   "id": "alabama-national-guard",
+   "base": "Alabama National Guard",
+   "st": "AL",
+   "unit": "Alabama Army National Guard",
+   "unitFull": null,
+   "lat": 32.38,
+   "lon": -86.3,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Alabama Army National Guard"
+   ]
+  },
+  {
+   "id": "alaska-national-guard",
+   "base": "Alaska National Guard",
+   "st": "AK",
+   "unit": null,
+   "unitFull": null,
+   "lat": 58.3,
+   "lon": -134.42,
+   "grp": "guardInset",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "arizona-national-guard",
+   "base": "Arizona National Guard",
+   "st": "AZ",
+   "unit": "Arizona Army National Guard",
+   "unitFull": null,
+   "lat": 33.45,
+   "lon": -112.07,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Arizona Army National Guard"
+   ]
+  },
+  {
+   "id": "arkansas-national-guard",
+   "base": "Arkansas National Guard",
+   "st": "AR",
+   "unit": "Arkansas Army National Guard",
+   "unitFull": null,
+   "lat": 34.75,
+   "lon": -92.29,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Arkansas Army National Guard"
+   ]
+  },
+  {
+   "id": "california-national-guard",
+   "base": "California National Guard",
+   "st": "CA",
+   "unit": "California Army National Guard",
+   "unitFull": null,
+   "lat": 38.58,
+   "lon": -121.49,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "California Army National Guard"
+   ]
+  },
+  {
+   "id": "colorado-national-guard",
+   "base": "Colorado National Guard",
+   "st": "CO",
+   "unit": "Colorado Army National Guard",
+   "unitFull": null,
+   "lat": 39.74,
+   "lon": -104.98,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Colorado Army National Guard"
+   ]
+  },
+  {
+   "id": "connecticut-national-guard",
+   "base": "Connecticut National Guard",
+   "st": "CT",
+   "unit": "Connecticut Army National Guard",
+   "unitFull": null,
+   "lat": 41.76,
+   "lon": -72.68,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Connecticut Army National Guard"
+   ]
+  },
+  {
+   "id": "delaware-national-guard",
+   "base": "Delaware National Guard",
+   "st": "DE",
+   "unit": "Delaware Army National Guard",
+   "unitFull": null,
+   "lat": 39.16,
+   "lon": -75.52,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Delaware Army National Guard"
+   ]
+  },
+  {
+   "id": "florida-national-guard",
+   "base": "Florida National Guard",
+   "st": "FL",
+   "unit": "Florida Army National Guard",
+   "unitFull": null,
+   "lat": 30.44,
+   "lon": -84.28,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Florida Army National Guard"
+   ]
+  },
+  {
+   "id": "georgia-national-guard",
+   "base": "Georgia National Guard",
+   "st": "GA",
+   "unit": "Georgia Army National Guard",
+   "unitFull": null,
+   "lat": 33.75,
+   "lon": -84.39,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Georgia Army National Guard"
+   ]
+  },
+  {
+   "id": "hawaii-national-guard",
+   "base": "Hawaii National Guard",
+   "st": "HI",
+   "unit": "Hawaii Army National Guard",
+   "unitFull": null,
+   "lat": 21.31,
+   "lon": -157.86,
+   "grp": "pi",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Hawaii Army National Guard"
+   ]
+  },
+  {
+   "id": "idaho-national-guard",
+   "base": "Idaho National Guard",
+   "st": "ID",
+   "unit": "Idaho Army National Guard",
+   "unitFull": null,
+   "lat": 43.62,
+   "lon": -116.2,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Idaho Army National Guard"
+   ]
+  },
+  {
+   "id": "illinois-national-guard",
+   "base": "Illinois National Guard",
+   "st": "IL",
+   "unit": "Illinois Army National Guard",
+   "unitFull": null,
+   "lat": 39.8,
+   "lon": -89.65,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Illinois Army National Guard"
+   ]
+  },
+  {
+   "id": "indiana-national-guard",
+   "base": "Indiana National Guard",
+   "st": "IN",
+   "unit": "Indiana Army National Guard",
+   "unitFull": null,
+   "lat": 39.77,
+   "lon": -86.16,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Indiana Army National Guard"
+   ]
+  },
+  {
+   "id": "iowa-national-guard",
+   "base": "Iowa National Guard",
+   "st": "IA",
+   "unit": "Iowa Army National Guard",
+   "unitFull": null,
+   "lat": 41.59,
+   "lon": -93.62,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Iowa Army National Guard"
+   ]
+  },
+  {
+   "id": "kansas-national-guard",
+   "base": "Kansas National Guard",
+   "st": "KS",
+   "unit": "Kansas Army National Guard",
+   "unitFull": null,
+   "lat": 39.05,
+   "lon": -95.69,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Kansas Army National Guard"
+   ]
+  },
+  {
+   "id": "kentucky-national-guard",
+   "base": "Kentucky National Guard",
+   "st": "KY",
+   "unit": "Kentucky Army National Guard",
+   "unitFull": null,
+   "lat": 38.19,
+   "lon": -84.87,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Kentucky Army National Guard"
+   ]
+  },
+  {
+   "id": "louisiana-national-guard",
+   "base": "Louisiana National Guard",
+   "st": "LA",
+   "unit": "Louisiana Army National Guard",
+   "unitFull": null,
+   "lat": 30.46,
+   "lon": -91.14,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Louisiana Army National Guard"
+   ]
+  },
+  {
+   "id": "maine-national-guard",
+   "base": "Maine National Guard",
+   "st": "ME",
+   "unit": "Maine Army National Guard",
+   "unitFull": null,
+   "lat": 44.31,
+   "lon": -69.78,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Maine Army National Guard"
+   ]
+  },
+  {
+   "id": "maryland-national-guard",
+   "base": "Maryland National Guard",
+   "st": "MD",
+   "unit": "Maryland Army National Guard",
+   "unitFull": null,
+   "lat": 38.98,
+   "lon": -76.49,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Maryland Army National Guard"
+   ]
+  },
+  {
+   "id": "massachusetts-national-guard",
+   "base": "Massachusetts National Guard",
+   "st": "MA",
+   "unit": "Massachusetts Army National Guard",
+   "unitFull": null,
+   "lat": 42.36,
+   "lon": -71.06,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Massachusetts Army National Guard"
+   ]
+  },
+  {
+   "id": "michigan-national-guard",
+   "base": "Michigan National Guard",
+   "st": "MI",
+   "unit": "Michigan Army National Guard",
+   "unitFull": null,
+   "lat": 42.73,
+   "lon": -84.56,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Michigan Army National Guard"
+   ]
+  },
+  {
+   "id": "minnesota-national-guard",
+   "base": "Minnesota National Guard",
+   "st": "MN",
+   "unit": "Minnesota Army National Guard",
+   "unitFull": null,
+   "lat": 44.95,
+   "lon": -93.09,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Minnesota Army National Guard"
+   ]
+  },
+  {
+   "id": "mississippi-national-guard",
+   "base": "Mississippi National Guard",
+   "st": "MS",
+   "unit": "184th Sustainment Command (Expeditionary)",
+   "unitFull": "184th Sustainment Command (Expeditionary), Mississippi Army National Guard",
+   "lat": 32.3,
+   "lon": -90.18,
+   "grp": "guard",
+   "parent": "camp-arifjan",
+   "parentUnit": "1st TSC Operational Command Post",
+   "tenants": [
+    "Mississippi Army National Guard",
+    "184th Sustainment Command (Expeditionary)"
+   ]
+  },
+  {
+   "id": "missouri-national-guard",
+   "base": "Missouri National Guard",
+   "st": "MO",
+   "unit": "Missouri Army National Guard",
+   "unitFull": null,
+   "lat": 38.58,
+   "lon": -92.17,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Missouri Army National Guard"
+   ]
+  },
+  {
+   "id": "montana-national-guard",
+   "base": "Montana National Guard",
+   "st": "MT",
+   "unit": "Montana Army National Guard",
+   "unitFull": null,
+   "lat": 46.59,
+   "lon": -112.02,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Montana Army National Guard"
+   ]
+  },
+  {
+   "id": "nebraska-national-guard",
+   "base": "Nebraska National Guard",
+   "st": "NE",
+   "unit": "Nebraska Army National Guard",
+   "unitFull": null,
+   "lat": 40.81,
+   "lon": -96.68,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Nebraska Army National Guard"
+   ]
+  },
+  {
+   "id": "nevada-national-guard",
+   "base": "Nevada National Guard",
+   "st": "NV",
+   "unit": "Nevada Army National Guard",
+   "unitFull": null,
+   "lat": 39.16,
+   "lon": -119.77,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Nevada Army National Guard"
+   ]
+  },
+  {
+   "id": "new-hampshire-national-guard",
+   "base": "New Hampshire National Guard",
+   "st": "NH",
+   "unit": "New Hampshire Army National Guard",
+   "unitFull": null,
+   "lat": 43.21,
+   "lon": -71.54,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "New Hampshire Army National Guard"
+   ]
+  },
+  {
+   "id": "new-jersey-national-guard",
+   "base": "New Jersey National Guard",
+   "st": "NJ",
+   "unit": "New Jersey Army National Guard",
+   "unitFull": null,
+   "lat": 40.22,
+   "lon": -74.74,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "New Jersey Army National Guard"
+   ]
+  },
+  {
+   "id": "new-mexico-national-guard",
+   "base": "New Mexico National Guard",
+   "st": "NM",
+   "unit": "New Mexico Army National Guard",
+   "unitFull": null,
+   "lat": 35.68,
+   "lon": -105.94,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "New Mexico Army National Guard"
+   ]
+  },
+  {
+   "id": "new-york-national-guard",
+   "base": "New York National Guard",
+   "st": "NY",
+   "unit": "New York Army National Guard",
+   "unitFull": null,
+   "lat": 42.65,
+   "lon": -73.76,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "New York Army National Guard"
+   ]
+  },
+  {
+   "id": "north-carolina-national-guard",
+   "base": "North Carolina National Guard",
+   "st": "NC",
+   "unit": "North Carolina Army National Guard",
+   "unitFull": null,
+   "lat": 35.78,
+   "lon": -78.64,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "North Carolina Army National Guard"
+   ]
+  },
+  {
+   "id": "north-dakota-national-guard",
+   "base": "North Dakota National Guard",
+   "st": "ND",
+   "unit": "North Dakota Army National Guard",
+   "unitFull": null,
+   "lat": 46.81,
+   "lon": -100.78,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "North Dakota Army National Guard"
+   ]
+  },
+  {
+   "id": "ohio-national-guard",
+   "base": "Ohio National Guard",
+   "st": "OH",
+   "unit": "Ohio Army National Guard",
+   "unitFull": null,
+   "lat": 39.96,
+   "lon": -83,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Ohio Army National Guard"
+   ]
+  },
+  {
+   "id": "oklahoma-national-guard",
+   "base": "Oklahoma National Guard",
+   "st": "OK",
+   "unit": "Oklahoma Army National Guard",
+   "unitFull": null,
+   "lat": 35.49,
+   "lon": -97.5,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Oklahoma Army National Guard"
+   ]
+  },
+  {
+   "id": "oregon-national-guard",
+   "base": "Oregon National Guard",
+   "st": "OR",
+   "unit": "Oregon Army National Guard",
+   "unitFull": null,
+   "lat": 44.94,
+   "lon": -123.04,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Oregon Army National Guard"
+   ]
+  },
+  {
+   "id": "pennsylvania-national-guard",
+   "base": "Pennsylvania National Guard",
+   "st": "PA",
+   "unit": "Pennsylvania Army National Guard",
+   "unitFull": null,
+   "lat": 40.26,
+   "lon": -76.88,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Pennsylvania Army National Guard"
+   ]
+  },
+  {
+   "id": "rhode-island-national-guard",
+   "base": "Rhode Island National Guard",
+   "st": "RI",
+   "unit": "Rhode Island Army National Guard",
+   "unitFull": null,
+   "lat": 41.83,
+   "lon": -71.41,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Rhode Island Army National Guard"
+   ]
+  },
+  {
+   "id": "south-carolina-national-guard",
+   "base": "South Carolina National Guard",
+   "st": "SC",
+   "unit": "South Carolina Army National Guard",
+   "unitFull": null,
+   "lat": 34,
+   "lon": -81.03,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "South Carolina Army National Guard"
+   ]
+  },
+  {
+   "id": "south-dakota-national-guard",
+   "base": "South Dakota National Guard",
+   "st": "SD",
+   "unit": "South Dakota Army National Guard",
+   "unitFull": null,
+   "lat": 44.37,
+   "lon": -100.35,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "South Dakota Army National Guard"
+   ]
+  },
+  {
+   "id": "tennessee-national-guard",
+   "base": "Tennessee National Guard",
+   "st": "TN",
+   "unit": "Tennessee Army National Guard",
+   "unitFull": null,
+   "lat": 36.17,
+   "lon": -86.78,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Tennessee Army National Guard"
+   ]
+  },
+  {
+   "id": "texas-national-guard",
+   "base": "Texas National Guard",
+   "st": "TX",
+   "unit": "Texas Army National Guard",
+   "unitFull": null,
+   "lat": 30.27,
+   "lon": -97.74,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Texas Army National Guard"
+   ]
+  },
+  {
+   "id": "utah-national-guard",
+   "base": "Utah National Guard",
+   "st": "UT",
+   "unit": "Utah Army National Guard",
+   "unitFull": null,
+   "lat": 40.78,
+   "lon": -111.89,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Utah Army National Guard"
+   ]
+  },
+  {
+   "id": "vermont-national-guard",
+   "base": "Vermont National Guard",
+   "st": "VT",
+   "unit": "Vermont Army National Guard",
+   "unitFull": null,
+   "lat": 44.26,
+   "lon": -72.58,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Vermont Army National Guard"
+   ]
+  },
+  {
+   "id": "virginia-national-guard",
+   "base": "Virginia National Guard",
+   "st": "VA",
+   "unit": "Virginia Army National Guard",
+   "unitFull": null,
+   "lat": 37.54,
+   "lon": -77.43,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Virginia Army National Guard"
+   ]
+  },
+  {
+   "id": "washington-national-guard",
+   "base": "Washington National Guard",
+   "st": "WA",
+   "unit": "Washington Army National Guard",
+   "unitFull": null,
+   "lat": 47.04,
+   "lon": -122.9,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Washington Army National Guard"
+   ]
+  },
+  {
+   "id": "west-virginia-national-guard",
+   "base": "West Virginia National Guard",
+   "st": "WV",
+   "unit": "West Virginia Army National Guard",
+   "unitFull": null,
+   "lat": 38.34,
+   "lon": -81.63,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "West Virginia Army National Guard"
+   ]
+  },
+  {
+   "id": "wisconsin-national-guard",
+   "base": "Wisconsin National Guard",
+   "st": "WI",
+   "unit": "Wisconsin Army National Guard",
+   "unitFull": null,
+   "lat": 43.07,
+   "lon": -89.4,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Wisconsin Army National Guard"
+   ]
+  },
+  {
+   "id": "wyoming-national-guard",
+   "base": "Wyoming National Guard",
+   "st": "WY",
+   "unit": "Wyoming Army National Guard",
+   "unitFull": null,
+   "lat": 41.14,
+   "lon": -104.82,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Wyoming Army National Guard"
+   ]
+  },
+  {
+   "id": "district-of-columbia-national-guard",
+   "base": "District of Columbia National Guard",
+   "st": "DC",
+   "unit": "District of Columbia Army National Guard",
+   "unitFull": null,
+   "lat": 38.9,
+   "lon": -77.04,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "District of Columbia Army National Guard"
+   ]
+  },
+  {
+   "id": "puerto-rico-national-guard",
+   "base": "Puerto Rico National Guard",
+   "st": "PR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 18.47,
+   "lon": -66.11,
+   "grp": "guardInset",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "guam-national-guard",
+   "base": "Guam National Guard",
+   "st": "GU",
+   "unit": "Guam Army National Guard",
+   "unitFull": null,
+   "lat": 13.44,
+   "lon": 144.79,
+   "grp": "gu",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Guam Army National Guard"
+   ]
+  },
+  {
+   "id": "u-s-virgin-islands-national-guard",
+   "base": "U.S. Virgin Islands National Guard",
+   "st": "VI",
+   "unit": "U.S. Virgin Islands Army National Guard",
+   "unitFull": null,
+   "lat": 18.34,
+   "lon": -64.93,
+   "grp": "guardInset",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "U.S. Virgin Islands Army National Guard"
+   ]
+  },
+  {
+   "id": "buffalo-district",
+   "base": "Buffalo District",
+   "st": "NY",
+   "unit": "Buffalo District",
+   "unitFull": null,
+   "lat": 42.89,
+   "lon": -78.88,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Buffalo District"
+   ]
+  },
+  {
+   "id": "chicago-district",
+   "base": "Chicago District",
+   "st": "IL",
+   "unit": "Chicago District",
+   "unitFull": null,
+   "lat": 41.88,
+   "lon": -87.63,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Chicago District"
+   ]
+  },
+  {
+   "id": "detroit-district",
+   "base": "Detroit District",
+   "st": "MI",
+   "unit": "Detroit District",
+   "unitFull": null,
+   "lat": 42.33,
+   "lon": -83.05,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Detroit District"
+   ]
+  },
+  {
+   "id": "huntington-district",
+   "base": "Huntington District",
+   "st": "WV",
+   "unit": "Huntington District",
+   "unitFull": null,
+   "lat": 38.42,
+   "lon": -82.45,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Huntington District"
+   ]
+  },
+  {
+   "id": "louisville-district",
+   "base": "Louisville District",
+   "st": "KY",
+   "unit": "Louisville District",
+   "unitFull": null,
+   "lat": 38.25,
+   "lon": -85.76,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Louisville District"
+   ]
+  },
+  {
+   "id": "nashville-district",
+   "base": "Nashville District",
+   "st": "TN",
+   "unit": "Nashville District",
+   "unitFull": null,
+   "lat": 36.16,
+   "lon": -86.78,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Nashville District"
+   ]
+  },
+  {
+   "id": "pittsburgh-district",
+   "base": "Pittsburgh District",
+   "st": "PA",
+   "unit": "Pittsburgh District",
+   "unitFull": null,
+   "lat": 40.44,
+   "lon": -79.99,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Pittsburgh District"
+   ]
+  },
+  {
+   "id": "st-paul-district",
+   "base": "St. Paul District",
+   "st": "MN",
+   "unit": "St. Paul District",
+   "unitFull": null,
+   "lat": 44.95,
+   "lon": -93.09,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "St. Paul District"
+   ]
+  },
+  {
+   "id": "rock-island-district",
+   "base": "Rock Island District",
+   "st": "IL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.51,
+   "lon": -90.58,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "st-louis-district",
+   "base": "St. Louis District",
+   "st": "MO",
+   "unit": "St. Louis District",
+   "unitFull": null,
+   "lat": 38.63,
+   "lon": -90.2,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "St. Louis District"
+   ]
+  },
+  {
+   "id": "memphis-district",
+   "base": "Memphis District",
+   "st": "TN",
+   "unit": "Memphis District",
+   "unitFull": null,
+   "lat": 35.15,
+   "lon": -90.05,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "Memphis District"
+   ]
+  },
+  {
+   "id": "vicksburg-district",
+   "base": "Vicksburg District",
+   "st": "MS",
+   "unit": "Vicksburg District",
+   "unitFull": null,
+   "lat": 32.35,
+   "lon": -90.88,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "Vicksburg District"
+   ]
+  },
+  {
+   "id": "new-orleans-district",
+   "base": "New Orleans District",
+   "st": "LA",
+   "unit": "New Orleans District",
+   "unitFull": null,
+   "lat": 29.95,
+   "lon": -90.07,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "New Orleans District"
+   ]
+  },
+  {
+   "id": "baltimore-district",
+   "base": "Baltimore District",
+   "st": "MD",
+   "unit": "Baltimore District",
+   "unitFull": null,
+   "lat": 39.29,
+   "lon": -76.61,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Baltimore District"
+   ]
+  },
+  {
+   "id": "new-england-district",
+   "base": "New England District",
+   "st": "MA",
+   "unit": "New England District",
+   "unitFull": null,
+   "lat": 42.46,
+   "lon": -71.35,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "New England District"
+   ]
+  },
+  {
+   "id": "new-york-district",
+   "base": "New York District",
+   "st": "NY",
+   "unit": "New York District",
+   "unitFull": null,
+   "lat": 40.71,
+   "lon": -74.01,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "New York District"
+   ]
+  },
+  {
+   "id": "norfolk-district",
+   "base": "Norfolk District",
+   "st": "VA",
+   "unit": "Norfolk District",
+   "unitFull": null,
+   "lat": 36.85,
+   "lon": -76.29,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Norfolk District"
+   ]
+  },
+  {
+   "id": "philadelphia-district",
+   "base": "Philadelphia District",
+   "st": "PA",
+   "unit": "Philadelphia District",
+   "unitFull": null,
+   "lat": 39.95,
+   "lon": -75.17,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Philadelphia District"
+   ]
+  },
+  {
+   "id": "kansas-city-district",
+   "base": "Kansas City District",
+   "st": "MO",
+   "unit": "Kansas City District",
+   "unitFull": null,
+   "lat": 39.1,
+   "lon": -94.58,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Kansas City District"
+   ]
+  },
+  {
+   "id": "omaha-district",
+   "base": "Omaha District",
+   "st": "NE",
+   "unit": "Omaha District",
+   "unitFull": null,
+   "lat": 41.26,
+   "lon": -95.93,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Omaha District"
+   ]
+  },
+  {
+   "id": "portland-district",
+   "base": "Portland District",
+   "st": "OR",
+   "unit": "Portland District",
+   "unitFull": null,
+   "lat": 45.52,
+   "lon": -122.68,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Portland District"
+   ]
+  },
+  {
+   "id": "seattle-district",
+   "base": "Seattle District",
+   "st": "WA",
+   "unit": "Seattle District",
+   "unitFull": null,
+   "lat": 47.61,
+   "lon": -122.33,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Seattle District"
+   ]
+  },
+  {
+   "id": "walla-walla-district",
+   "base": "Walla Walla District",
+   "st": "WA",
+   "unit": "Walla Walla District",
+   "unitFull": null,
+   "lat": 46.06,
+   "lon": -118.34,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Walla Walla District"
+   ]
+  },
+  {
+   "id": "charleston-district",
+   "base": "Charleston District",
+   "st": "SC",
+   "unit": "Charleston District",
+   "unitFull": null,
+   "lat": 32.78,
+   "lon": -79.93,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Charleston District"
+   ]
+  },
+  {
+   "id": "jacksonville-district",
+   "base": "Jacksonville District",
+   "st": "FL",
+   "unit": "Jacksonville District",
+   "unitFull": null,
+   "lat": 30.33,
+   "lon": -81.66,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Jacksonville District"
+   ]
+  },
+  {
+   "id": "mobile-district",
+   "base": "Mobile District",
+   "st": "AL",
+   "unit": "Mobile District",
+   "unitFull": null,
+   "lat": 30.69,
+   "lon": -88.04,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Mobile District"
+   ]
+  },
+  {
+   "id": "savannah-district",
+   "base": "Savannah District",
+   "st": "GA",
+   "unit": "Savannah District",
+   "unitFull": null,
+   "lat": 32.08,
+   "lon": -81.09,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Savannah District"
+   ]
+  },
+  {
+   "id": "wilmington-district",
+   "base": "Wilmington District",
+   "st": "NC",
+   "unit": "Wilmington District",
+   "unitFull": null,
+   "lat": 34.23,
+   "lon": -77.94,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Wilmington District"
+   ]
+  },
+  {
+   "id": "albuquerque-district",
+   "base": "Albuquerque District",
+   "st": "NM",
+   "unit": "Albuquerque District",
+   "unitFull": null,
+   "lat": 35.08,
+   "lon": -106.65,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "Albuquerque District"
+   ]
+  },
+  {
+   "id": "los-angeles-district",
+   "base": "Los Angeles District",
+   "st": "CA",
+   "unit": "Los Angeles District",
+   "unitFull": null,
+   "lat": 34.05,
+   "lon": -118.24,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "Los Angeles District"
+   ]
+  },
+  {
+   "id": "sacramento-district",
+   "base": "Sacramento District",
+   "st": "CA",
+   "unit": "Sacramento District",
+   "unitFull": null,
+   "lat": 38.58,
+   "lon": -121.49,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "Sacramento District"
+   ]
+  },
+  {
+   "id": "san-francisco-district",
+   "base": "San Francisco District",
+   "st": "CA",
+   "unit": "San Francisco District",
+   "unitFull": null,
+   "lat": 37.77,
+   "lon": -122.42,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "San Francisco District"
+   ]
+  },
+  {
+   "id": "little-rock-district",
+   "base": "Little Rock District",
+   "st": "AR",
+   "unit": "Little Rock District",
+   "unitFull": null,
+   "lat": 34.75,
+   "lon": -92.29,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Little Rock District"
+   ]
+  },
+  {
+   "id": "tulsa-district",
+   "base": "Tulsa District",
+   "st": "OK",
+   "unit": "Tulsa District",
+   "unitFull": null,
+   "lat": 36.15,
+   "lon": -95.99,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Tulsa District"
+   ]
+  },
+  {
+   "id": "fort-worth-district",
+   "base": "Fort Worth District",
+   "st": "TX",
+   "unit": "Fort Worth District",
+   "unitFull": null,
+   "lat": 32.76,
+   "lon": -97.33,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Fort Worth District"
+   ]
+  },
+  {
+   "id": "galveston-district",
+   "base": "Galveston District",
+   "st": "TX",
+   "unit": "Galveston District",
+   "unitFull": null,
+   "lat": 29.3,
+   "lon": -94.8,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Galveston District"
+   ]
+  },
+  {
+   "id": "europe-district",
+   "base": "Europe District",
+   "st": "Germany",
+   "unit": "Europe District",
+   "unitFull": null,
+   "lat": 50.08,
+   "lon": 8.24,
+   "grp": "eur",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Europe District"
+   ]
+  },
+  {
+   "id": "far-east-district",
+   "base": "Far East District",
+   "st": "Korea",
+   "unit": "Far East District",
+   "unitFull": null,
+   "lat": 36.97,
+   "lon": 127.03,
+   "grp": "kj",
+   "parent": "pacific-ocean-div-fort-shafter",
+   "parentUnit": "Pacific Ocean Division (POD)",
+   "tenants": [
+    "Far East District"
+   ]
+  },
+  {
+   "id": "japan-engineer-district",
+   "base": "Japan Engineer District",
+   "st": "Japan",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.49,
+   "lon": 139.4,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "alaska-district",
+   "base": "Alaska District",
+   "st": "AK",
+   "unit": null,
+   "unitFull": null,
+   "lat": 61.25,
+   "lon": -149.8,
+   "grp": "guardInset",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "honolulu-district",
+   "base": "Honolulu District",
+   "st": "HI",
+   "unit": "Honolulu District",
+   "unitFull": null,
+   "lat": 21.36,
+   "lon": -157.9,
+   "grp": "pi",
+   "parent": "pacific-ocean-div-fort-shafter",
+   "parentUnit": "Pacific Ocean Division (POD)",
+   "tenants": [
+    "Honolulu District"
+   ]
+  },
+  {
+   "id": "uscentcom-macdill-afb",
+   "base": "USCENTCOM (MacDill AFB)",
+   "st": "FL",
+   "unit": "377th Theater Sustainment Command",
+   "unitFull": null,
+   "lat": 27.85,
+   "lon": -82.5,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "377th Theater Sustainment Command",
+    "4th Battlefield Coordination Detachment",
+    "831st Transportation Battalion",
+    "Middle East District",
+    "USA-MAG (MOI-MAG)",
+    "53rd Transportation Battalion (Movement Control)",
+    "310th Expeditionary Sustainment Command (ESC)",
+    "316th Expeditionary Sustainment Command (ESC)"
+   ]
+  },
+  {
+   "id": "ussouthcom-doral",
+   "base": "USSOUTHCOM (Doral)",
+   "st": "FL",
+   "unit": "7th Special Forces Group (Airborne)",
+   "unitFull": null,
+   "lat": 25.81,
+   "lon": -80.34,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "1st Special Forces Command (Airborne)",
+   "tenants": [
+    "7th Special Forces Group (Airborne)",
+    "841st Transportation Battalion"
+   ]
+  },
+  {
+   "id": "usnorthcom-peterson-sfb",
+   "base": "USNORTHCOM (Peterson SFB)",
+   "st": "CO",
+   "unit": "263rd Army Air & Missile Defense Command (AAMDC)",
+   "unitFull": null,
+   "lat": 38.82,
+   "lon": -104.7,
+   "grp": "conus",
+   "parent": "usasmdc-redstone-huntsville",
+   "parentUnit": "USASMDC",
+   "tenants": [
+    "263rd Army Air & Missile Defense Command (AAMDC)",
+    "JTF-Gold",
+    "678th Air Defense Artillery Brigade"
+   ]
+  },
+  {
+   "id": "usindopacom-camp-smith",
+   "base": "USINDOPACOM (Camp Smith)",
+   "st": "HI",
+   "unit": null,
+   "unitFull": null,
+   "lat": 21.39,
+   "lon": -157.91,
+   "grp": "pi",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "useucom-stuttgart",
+   "base": "USEUCOM (Stuttgart)",
+   "st": "Germany",
+   "unit": null,
+   "unitFull": null,
+   "lat": 48.74,
+   "lon": 9.1,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "usafricom-stuttgart",
+   "base": "USAFRICOM (Stuttgart)",
+   "st": "Germany",
+   "unit": null,
+   "unitFull": null,
+   "lat": 48.78,
+   "lon": 9.18,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "ustranscom-scott-afb",
+   "base": "USTRANSCOM (Scott AFB)",
+   "st": "IL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.54,
+   "lon": -89.85,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "usspacecom-peterson-sfb",
+   "base": "USSPACECOM (Peterson SFB)",
+   "st": "CO",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.82,
+   "lon": -104.7,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "usstratcom-offutt-afb",
+   "base": "USSTRATCOM (Offutt AFB)",
+   "st": "NE",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.12,
+   "lon": -95.91,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "ussocom-macdill-afb",
+   "base": "USSOCOM (MacDill AFB)",
+   "st": "FL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 27.85,
+   "lon": -82.5,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "nato-shape-mons",
+   "base": "NATO SHAPE (Mons)",
+   "st": "Belgium",
+   "unit": null,
+   "unitFull": null,
+   "lat": 50.44,
+   "lon": 3.99,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "mnc-ne-szczecin",
+   "base": "MNC-NE (Szczecin)",
+   "st": "Poland",
+   "unit": null,
+   "unitFull": null,
+   "lat": 53.43,
+   "lon": 14.55,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "cjtf-hoa-camp-lemonnier",
+   "base": "CJTF-HOA (Camp Lemonnier)",
+   "st": "Djibouti",
+   "unit": null,
+   "unitFull": null,
+   "lat": 11.54,
+   "lon": 43.15,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "uscybercom-fort-meade",
+   "base": "USCYBERCOM (Fort Meade)",
+   "st": "MD",
+   "unit": null,
+   "unitFull": null,
+   "lat": 39.11,
+   "lon": -76.77,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "nsa-css-fort-meade",
+   "base": "NSA / CSS (Fort Meade)",
+   "st": "MD",
+   "unit": "PAE Maneuver Ground",
+   "unitFull": "Portfolio Acquisition Executive (PAE) — Maneuver Ground",
+   "lat": 39.11,
+   "lon": -76.77,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PAE Maneuver Ground",
+    "Infantry Squad Vehicle (M1301)",
+    "Integrated Logistics Support Center (ILSC)",
+    "Deputy PAE",
+    "Future Capabilities Division",
+    "International Cooperation",
+    "Maneuver Systems Center",
+    "T&E Integrator"
+   ]
+  },
+  {
+   "id": "nsa-georgia-fort-gordon",
+   "base": "NSA-Georgia (Fort Gordon)",
+   "st": "GA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 33.42,
+   "lon": -82.15,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "nga-springfield",
+   "base": "NGA (Springfield)",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.74,
+   "lon": -77.19,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "the-pentagon-hqda-cio-g-6",
+   "base": "The Pentagon (HQDA · CIO/G-6)",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.87,
+   "lon": -77.06,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "shape-saceur-mons",
+   "base": "SHAPE / SACEUR (Mons)",
+   "st": "Belgium",
+   "unit": "11th Missile Defense Battery",
+   "unitFull": null,
+   "lat": 50.5,
+   "lon": 3.96,
+   "grp": "eur",
+   "parent": "sembach",
+   "parentUnit": "52nd Air Defense Artillery Brigade",
+   "tenants": [
+    "11th Missile Defense Battery"
+   ]
+  },
+  {
+   "id": "austin-t2com-hq",
+   "base": "Austin (T2COM HQ)",
+   "st": "TX",
+   "unit": "T2COM",
+   "unitFull": "U.S. Army Transformation & Training Command",
+   "lat": 30.27,
+   "lon": -97.74,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "T2COM",
+    "Army Applications Laboratory",
+    "Futures & Concepts Command (FCC)",
+    "Army Applications Laboratory (AAL)",
+    "INSCOM",
+    "MDW",
+    "PAE Maneuver Air",
+    "USAASC"
+   ]
+  },
+  {
+   "id": "army-research-laboratory-adelphi",
+   "base": "Army Research Laboratory (Adelphi)",
+   "st": "MD",
+   "unit": "Army Research Laboratory (ARL)",
+   "unitFull": null,
+   "lat": 39,
+   "lon": -76.96,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "DEVCOM",
+   "tenants": [
+    "Army Research Laboratory (ARL)",
+    "Army Research Directorate (ARD)",
+    "Army Research Office (ARO)",
+    "Research Business Directorate (RBD)"
+   ]
+  },
+  {
+   "id": "soldier-center-natick",
+   "base": "Soldier Center (Natick)",
+   "st": "MA",
+   "unit": "Soldier Center (SC)",
+   "unitFull": null,
+   "lat": 42.28,
+   "lon": -71.35,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "DEVCOM",
+   "tenants": [
+    "Soldier Center (SC)"
+   ]
+  },
+  {
+   "id": "335th-signal-command-east-point",
+   "base": "335th Signal Command (East Point)",
+   "st": "GA",
+   "unit": "335th Signal Command (Theater)",
+   "unitFull": null,
+   "lat": 33.68,
+   "lon": -84.44,
+   "grp": "conus",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "335th Signal Command (Theater)",
+    "505th Signal Brigade",
+    "319th Expeditionary Signal Battalion",
+    "98th Expeditionary Signal Battalion"
+   ]
+  },
+  {
+   "id": "national-ground-intelligence-center-charlottesville",
+   "base": "National Ground Intelligence Center (Charlottesville)",
+   "st": "VA",
+   "unit": "National Ground Intelligence Center (NGIC)",
+   "unitFull": null,
+   "lat": 38.03,
+   "lon": -78.48,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "Functional & National MI",
+   "tenants": [
+    "National Ground Intelligence Center (NGIC)",
+    "Army Geospatial Intelligence Battalion (AGB)"
+   ]
+  },
+  {
+   "id": "usasmdc-redstone-huntsville",
+   "base": "USASMDC (Redstone/Huntsville)",
+   "st": "AL",
+   "unit": "USASMDC",
+   "unitFull": "U.S. Army Space & Missile Defense Command",
+   "lat": 34.68,
+   "lon": -86.65,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USASMDC",
+    "100th Missile Defense Brigade (GMD)",
+    "1st Space Brigade",
+    "Future Warfare Center",
+    "Technical Center"
+   ]
+  },
+  {
+   "id": "usace-hq-washington-dc",
+   "base": "USACE HQ (Washington, DC)",
+   "st": "DC",
+   "unit": "USACE",
+   "unitFull": "U.S. Army Corps of Engineers",
+   "lat": 38.87,
+   "lon": -77.02,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USACE",
+    "249th Engineer Battalion (Prime Power)",
+    "Army Geospatial Center (AGC)",
+    "Engineering and Support Center, Huntsville (HNC)",
+    "Institute for Water Resources (IWR)",
+    "USACE Southwestern Division",
+    "USACE Transatlantic Division",
+    "USACE Middle East District (USACE Southwestern Division)"
+   ]
+  },
+  {
+   "id": "great-lakes-ohio-river-div-cincinnati",
+   "base": "Great Lakes & Ohio River Div (Cincinnati)",
+   "st": "OH",
+   "unit": "Great Lakes & Ohio River Division (LRD)",
+   "unitFull": null,
+   "lat": 39.1,
+   "lon": -84.51,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Great Lakes & Ohio River Division (LRD)"
+   ]
+  },
+  {
+   "id": "mississippi-valley-div-vicksburg",
+   "base": "Mississippi Valley Div (Vicksburg)",
+   "st": "MS",
+   "unit": "Mississippi Valley Division (MVD)",
+   "unitFull": null,
+   "lat": 32.35,
+   "lon": -90.88,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Mississippi Valley Division (MVD)"
+   ]
+  },
+  {
+   "id": "northwestern-div-portland",
+   "base": "Northwestern Div (Portland)",
+   "st": "OR",
+   "unit": "Northwestern Division (NWD)",
+   "unitFull": null,
+   "lat": 45.52,
+   "lon": -122.68,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Northwestern Division (NWD)"
+   ]
+  },
+  {
+   "id": "south-atlantic-div-atlanta",
+   "base": "South Atlantic Div (Atlanta)",
+   "st": "GA",
+   "unit": "South Atlantic Division (SAD)",
+   "unitFull": null,
+   "lat": 33.75,
+   "lon": -84.39,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "South Atlantic Division (SAD)"
+   ]
+  },
+  {
+   "id": "south-pacific-div-san-francisco",
+   "base": "South Pacific Div (San Francisco)",
+   "st": "CA",
+   "unit": "South Pacific Division (SPD)",
+   "unitFull": null,
+   "lat": 37.77,
+   "lon": -122.42,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "South Pacific Division (SPD)"
+   ]
+  },
+  {
+   "id": "southwestern-div-dallas",
+   "base": "Southwestern Div (Dallas)",
+   "st": "TX",
+   "unit": "Southwestern Division (SWD)",
+   "unitFull": null,
+   "lat": 32.78,
+   "lon": -96.8,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Southwestern Division (SWD)"
+   ]
+  },
+  {
+   "id": "transatlantic-div-winchester",
+   "base": "Transatlantic Div (Winchester)",
+   "st": "VA",
+   "unit": "Transatlantic Division (TAD)",
+   "unitFull": null,
+   "lat": 39.19,
+   "lon": -78.16,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Transatlantic Division (TAD)"
+   ]
+  },
+  {
+   "id": "north-atlantic-div-brooklyn",
+   "base": "North Atlantic Div (Brooklyn)",
+   "st": "NY",
+   "unit": "North Atlantic Division (NAD)",
+   "unitFull": null,
+   "lat": 40.69,
+   "lon": -73.99,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "North Atlantic Division (NAD)"
+   ]
+  },
+  {
+   "id": "pacific-ocean-div-fort-shafter",
+   "base": "Pacific Ocean Div (Fort Shafter)",
+   "st": "HI",
+   "unit": "Pacific Ocean Division (POD)",
+   "unitFull": null,
+   "lat": 21.36,
+   "lon": -157.9,
+   "grp": "pi",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Pacific Ocean Division (POD)"
+   ]
+  },
+  {
+   "id": "caribbean-district-san-juan",
+   "base": "Caribbean District (San Juan)",
+   "st": "PR",
+   "unit": "Caribbean District",
+   "unitFull": null,
+   "lat": 18.47,
+   "lon": -66.11,
+   "grp": "guardInset",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Caribbean District"
+   ]
+  },
+  {
+   "id": "engineer-r-d-center-vicksburg",
+   "base": "Engineer R&D Center (Vicksburg)",
+   "st": "MS",
+   "unit": "Engineer R&D Center (ERDC)",
+   "unitFull": null,
+   "lat": 32.3,
+   "lon": -90.86,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Engineer R&D Center (ERDC)"
+   ]
+  },
+  {
+   "id": "camp-atterbury",
+   "base": "Camp Atterbury",
+   "st": "IN",
+   "unit": "157th Infantry Brigade",
+   "unitFull": "157th Infantry Brigade (Training Support) \"Spartan\"",
+   "lat": 39.33,
+   "lon": -86.03,
+   "grp": "guard",
+   "parent": "fort-knox",
+   "parentUnit": "Division East",
+   "tenants": [
+    "157th Infantry Brigade"
+   ]
+  },
+  {
+   "id": "muscatatuck-urban-training-center",
+   "base": "Muscatatuck Urban Training Center",
+   "st": "IN",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.94,
+   "lon": -85.99,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-shelby",
+   "base": "Camp Shelby",
+   "st": "MS",
+   "unit": null,
+   "unitFull": null,
+   "lat": 31.2,
+   "lon": -89.2,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-blanding",
+   "base": "Camp Blanding",
+   "st": "FL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 29.95,
+   "lon": -81.98,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-grayling",
+   "base": "Camp Grayling",
+   "st": "MI",
+   "unit": null,
+   "unitFull": null,
+   "lat": 44.65,
+   "lon": -84.71,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-ripley",
+   "base": "Camp Ripley",
+   "st": "MN",
+   "unit": null,
+   "unitFull": null,
+   "lat": 46.09,
+   "lon": -94.36,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-roberts",
+   "base": "Camp Roberts",
+   "st": "CA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.79,
+   "lon": -120.75,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-san-luis-obispo",
+   "base": "Camp San Luis Obispo",
+   "st": "CA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.33,
+   "lon": -120.73,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-williams",
+   "base": "Camp Williams",
+   "st": "UT",
+   "unit": "807th Theater Medical Command",
+   "unitFull": null,
+   "lat": 40.43,
+   "lon": -111.92,
+   "grp": "guard",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "76th Operational Response Command",
+    "807th Theater Medical Command"
+   ]
+  },
+  {
+   "id": "gowen-field",
+   "base": "Gowen Field",
+   "st": "ID",
+   "unit": null,
+   "unitFull": null,
+   "lat": 43.56,
+   "lon": -116.24,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "orchard-combat-training-center",
+   "base": "Orchard Combat Training Center",
+   "st": "ID",
+   "unit": null,
+   "unitFull": null,
+   "lat": 43.31,
+   "lon": -116.02,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-guernsey",
+   "base": "Camp Guernsey",
+   "st": "WY",
+   "unit": null,
+   "unitFull": null,
+   "lat": 42.27,
+   "lon": -104.74,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-gruber",
+   "base": "Camp Gruber",
+   "st": "OK",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.65,
+   "lon": -95.15,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "fort-chaffee",
+   "base": "Fort Chaffee",
+   "st": "AR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.3,
+   "lon": -94.3,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-robinson",
+   "base": "Camp Robinson",
+   "st": "AR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 34.85,
+   "lon": -92.3,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-beauregard",
+   "base": "Camp Beauregard",
+   "st": "LA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 31.33,
+   "lon": -92.38,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-swift",
+   "base": "Camp Swift",
+   "st": "TX",
+   "unit": null,
+   "unitFull": null,
+   "lat": 30.19,
+   "lon": -97.29,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-mabry",
+   "base": "Camp Mabry",
+   "st": "TX",
+   "unit": "36th Infantry Division",
+   "unitFull": null,
+   "lat": 30.31,
+   "lon": -97.76,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "ARNG Divisions",
+   "tenants": [
+    "36th Infantry Division",
+    "155th Armored Brigade Combat Team",
+    "256th Infantry Brigade Combat Team",
+    "36th CAB",
+    "56th IBCT, 36th ID",
+    "72nd IBCT, 36th ID"
+   ]
+  },
+  {
+   "id": "camp-bowie",
+   "base": "Camp Bowie",
+   "st": "TX",
+   "unit": null,
+   "unitFull": null,
+   "lat": 31.7,
+   "lon": -98.99,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-dodge",
+   "base": "Camp Dodge",
+   "st": "IA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.7,
+   "lon": -93.72,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-perry",
+   "base": "Camp Perry",
+   "st": "OH",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.54,
+   "lon": -83.02,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-edwards",
+   "base": "Camp Edwards",
+   "st": "MA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.66,
+   "lon": -70.54,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-johnson",
+   "base": "Camp Johnson",
+   "st": "VT",
+   "unit": null,
+   "unitFull": null,
+   "lat": 44.53,
+   "lon": -73.19,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-murray",
+   "base": "Camp Murray",
+   "st": "WA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 47.11,
+   "lon": -122.57,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-rilea",
+   "base": "Camp Rilea",
+   "st": "OR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 46.12,
+   "lon": -123.93,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-navajo",
+   "base": "Camp Navajo",
+   "st": "AZ",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.18,
+   "lon": -111.85,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "fort-custer",
+   "base": "Fort Custer",
+   "st": "MI",
+   "unit": null,
+   "unitFull": null,
+   "lat": 42.31,
+   "lon": -85.3,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "fort-indiantown-gap",
+   "base": "Fort Indiantown Gap",
+   "st": "PA",
+   "unit": "28th Infantry Division",
+   "unitFull": null,
+   "lat": 40.43,
+   "lon": -76.57,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "ARNG Divisions",
+   "tenants": [
+    "28th Infantry Division",
+    "28th ECAB",
+    "2nd IBCT, 28th ID",
+    "56th Stryker BCT, 28th ID"
+   ]
+  },
+  {
+   "id": "fort-pickett-barfoot",
+   "base": "Fort Pickett (Barfoot)",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 37.05,
+   "lon": -77.95,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "fort-hunter-liggett",
+   "base": "Fort Hunter Liggett",
+   "st": "CA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.98,
+   "lon": -121.24,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "parks-reserve-forces-training-area",
+   "base": "Parks Reserve Forces Training Area",
+   "st": "CA",
+   "unit": "304th Cyber Battalion",
+   "unitFull": null,
+   "lat": 37.72,
+   "lon": -121.89,
+   "grp": "conus",
+   "parent": "fort-devens",
+   "parentUnit": "Cyber Protection Brigade",
+   "tenants": [
+    "304th Cyber Battalion"
+   ]
+  },
+  {
+   "id": "mot-sunny-point",
+   "base": "MOT Sunny Point",
+   "st": "NC",
+   "unit": "596th Transportation Surface Brigade",
+   "unitFull": null,
+   "lat": 33.99,
+   "lon": -77.96,
+   "grp": "conus",
+   "parent": "scott-afb",
+   "parentUnit": "ARTRANS",
+   "tenants": [
+    "596th Transportation Surface Brigade",
+    "832nd Transportation Battalion"
+   ]
+  },
+  {
+   "id": "mot-concord",
+   "base": "MOT Concord",
+   "st": "CA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.05,
+   "lon": -122.03,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "pohakuloa-training-area",
+   "base": "Pohakuloa Training Area",
+   "st": "HI",
+   "unit": "USAG Pohakuloa",
+   "unitFull": "U.S. Army Garrison Pōhakuloa",
+   "lat": 19.7,
+   "lon": -155.53,
+   "grp": "pi",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "U.S. Army Garrisons — Pacific (USAG)",
+   "tenants": [
+    "USAG Pohakuloa"
+   ]
+  },
+  {
+   "id": "crane-army-ammunition-activity",
+   "base": "Crane Army Ammunition Activity",
+   "st": "IN",
+   "unit": "Crane Army Ammunition Activity",
+   "unitFull": null,
+   "lat": 38.86,
+   "lon": -86.83,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Crane Army Ammunition Activity"
+   ]
+  },
+  {
+   "id": "sembach-kaserne",
+   "base": "Sembach Kaserne",
+   "st": "DE",
+   "unit": null,
+   "unitFull": null,
+   "lat": 49.5,
+   "lon": 7.86,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "landstuhl",
+   "base": "Landstuhl",
+   "st": "DE",
+   "unit": "Landstuhl Regional Medical Center",
+   "unitFull": null,
+   "lat": 49.41,
+   "lon": 7.55,
+   "grp": "eur",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "Medical Readiness Command, Europe",
+   "tenants": [
+    "Landstuhl Regional Medical Center"
+   ]
+  },
+  {
+   "id": "coleman-barracks",
+   "base": "Coleman Barracks",
+   "st": "DE",
+   "unit": "Army Field Support Battalion-Mannheim",
+   "unitFull": null,
+   "lat": 49.56,
+   "lon": 8.46,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Mannheim"
+   ]
+  },
+  {
+   "id": "camp-kosciuszko",
+   "base": "Camp Kosciuszko",
+   "st": "PL",
+   "unit": "V Corps Headquarters (Forward)",
+   "unitFull": null,
+   "lat": 52.41,
+   "lon": 16.93,
+   "grp": "eur",
+   "parent": "fort-knox",
+   "parentUnit": "V Corps",
+   "tenants": [
+    "V Corps Headquarters (Forward)"
+   ]
+  },
+  {
+   "id": "powidz",
+   "base": "Powidz",
+   "st": "PL",
+   "unit": "APS-2 (Europe)",
+   "unitFull": "Army Prepositioned Stock 2 - Europe",
+   "lat": 52.44,
+   "lon": 17.85,
+   "grp": "eur",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Army Prepositioned Stocks (APS)",
+   "tenants": [
+    "APS-2 (Europe)"
+   ]
+  },
+  {
+   "id": "drawsko-pomorskie-training-area",
+   "base": "Drawsko Pomorskie Training Area",
+   "st": "PL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 53.53,
+   "lon": 15.81,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "novo-selo-training-area",
+   "base": "Novo Selo Training Area",
+   "st": "BG",
+   "unit": "U.S. Army Garrison Black Sea",
+   "unitFull": null,
+   "lat": 42.72,
+   "lon": 26.35,
+   "grp": "eur",
+   "parent": "sembach",
+   "parentUnit": "Installation Management Command - Europe (IMCOM-Europe)",
+   "tenants": [
+    "U.S. Army Garrison Black Sea"
+   ]
+  },
+  {
+   "id": "camp-bondsteel",
+   "base": "Camp Bondsteel",
+   "st": "XK",
+   "unit": null,
+   "unitFull": null,
+   "lat": 42.36,
+   "lon": 21.24,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "mk-air-base",
+   "base": "MK Air Base",
+   "st": "RO",
+   "unit": null,
+   "unitFull": null,
+   "lat": 44.36,
+   "lon": 28.49,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-carroll",
+   "base": "Camp Carroll",
+   "st": "KR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 36.03,
+   "lon": 128.4,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "k-16-air-base",
+   "base": "K-16 Air Base",
+   "st": "KR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 37.44,
+   "lon": 127.11,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "sagami-general-depot",
+   "base": "Sagami General Depot",
+   "st": "JP",
+   "unit": "38th Air Defense Artillery Brigade",
+   "unitFull": null,
+   "lat": 35.57,
+   "lon": 139.4,
+   "grp": "kj",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "94th Army Air & Missile Defense Command",
+   "tenants": [
+    "38th Air Defense Artillery Brigade",
+    "10th Missile Defense Battery",
+    "14th Missile Defense Battery",
+    "Headquarters and Headquarters Battery",
+    "Task Force Talon / E Battery, 3rd Air Defense Artillery Regiment (THAAD) - Andersen AFB, Guam"
+   ]
+  },
+  {
+   "id": "camp-buehring",
+   "base": "Camp Buehring",
+   "st": "KW",
+   "unit": "Theater Aviation Task Force (Rotational CAB), Camp Buehring",
+   "unitFull": "Enduring rotational Combat Aviation Brigade billet, Operation Spartan Shield, Camp Buehring, Kuwait",
+   "lat": 29.66,
+   "lon": 47.76,
+   "grp": "swa",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "Theater Aviation Task Force (Rotational CAB), Camp Buehring",
+    "4th Combat Aviation Brigade (Task Force Ivy Eagle)",
+    "Camp Buehring",
+    "Rotational Brigade Combat Team, Camp Buehring (current: 2nd MBCT, 10th Mountain Division)",
+    "2nd Battalion, 4th Aviation Regiment",
+    "2nd IBCT, 34th ID",
+    "30th Armored Brigade Combat Team",
+    "404th Aviation Support Battalion"
+   ]
+  },
+  {
+   "id": "camp-as-sayliyah",
+   "base": "Camp As Sayliyah",
+   "st": "QA",
+   "unit": "Area Support Group-Qatar",
+   "unitFull": "Area Support Group-Qatar (ASG-Qatar) — DEACTIVATED June 10, 2021",
+   "lat": 25.26,
+   "lon": 51.39,
+   "grp": "swa",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "Area Support Group-Qatar"
+   ]
+  },
+  {
+   "id": "camp-mujuk",
+   "base": "Camp Mujuk",
+   "st": "KR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 36.03,
+   "lon": 129.36,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "yokohama-north-dock",
+   "base": "Yokohama North Dock",
+   "st": "JP",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.46,
+   "lon": 139.64,
+   "grp": "kj",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "rose-barracks-vilseck",
+   "base": "Rose Barracks (Vilseck)",
+   "st": "DE",
+   "unit": "2nd Cavalry Regiment",
+   "unitFull": null,
+   "lat": 49.63,
+   "lon": 11.79,
+   "grp": "eur",
+   "parent": "fort-knox",
+   "parentUnit": "V Corps",
+   "tenants": [
+    "2nd Cavalry Regiment",
+    "709th Military Police Battalion",
+    "1st Squadron, 2nd Cavalry Regiment (Stryker mounted infantry)",
+    "2nd Squadron, 2nd Cavalry Regiment (Stryker mounted infantry)",
+    "3rd Squadron, 2nd Cavalry Regiment (Stryker mounted infantry)",
+    "4th Squadron, 2nd Cavalry Regiment (reconnaissance, surveillance, target acquisition)",
+    "Regimental Engineer Squadron (assured mobility / counter-mobility / general engineering)"
+   ]
+  },
+  {
+   "id": "zagan-aps-2-site",
+   "base": "Zagan APS-2 Site",
+   "st": "PL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 51.61,
+   "lon": 15.3,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "d-lmen-aps-2-site",
+   "base": "Dülmen APS-2 Site",
+   "st": "DE",
+   "unit": "Army Field Support Battalion-Benelux (operates APS-2 sites at Zutendaal, Belgium; Dülmen, Germany; Eygelshoven, Netherlands)",
+   "unitFull": null,
+   "lat": 51.83,
+   "lon": 7.28,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Benelux (operates APS-2 sites at Zutendaal, Belgium; Dülmen, Germany; Eygelshoven, Netherlands)"
+   ]
+  },
+  {
+   "id": "camp-lemonnier",
+   "base": "Camp Lemonnier",
+   "st": "DJ",
+   "unit": null,
+   "unitFull": null,
+   "lat": 11.55,
+   "lon": 43.15,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  }
+ ]
+}

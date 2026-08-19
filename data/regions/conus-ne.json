@@ -1,0 +1,899 @@
+{
+ "region": "conus-ne",
+ "sites": [
+  {
+   "id": "fort-drum",
+   "base": "Fort Drum",
+   "st": "NY",
+   "unit": "10th Mountain Division",
+   "unitFull": null,
+   "lat": 44.05,
+   "lon": -75.72,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "XVIII Airborne Corps",
+   "tenants": [
+    "10th Mountain Division",
+    "Fort Drum Garrison Public Affairs",
+    "10th Combat Aviation Brigade",
+    "10th Division Artillery (DIVARTY)",
+    "10th Mountain Division Sustainment Brigade",
+    "1st Brigade Combat Team (10th Mtn)",
+    "2nd Brigade Combat Team (10th Mtn)",
+    "Headquarters and Headquarters Battalion, 10th Mountain Division"
+   ]
+  },
+  {
+   "id": "fort-campbell",
+   "base": "Fort Campbell",
+   "st": "KY",
+   "unit": "101st Airborne Division (Air Assault)",
+   "unitFull": null,
+   "lat": 36.67,
+   "lon": -87.46,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "XVIII Airborne Corps",
+   "tenants": [
+    "101st Airborne Division (Air Assault)",
+    "160th Special Operations Aviation Regiment (Airborne)",
+    "52nd Ordnance Group (EOD)",
+    "5th SFG(A) Forward",
+    "5th Special Forces Group (Airborne)",
+    "Fort Campbell Public Affairs Office",
+    "101st Airborne Division Sustainment Brigade",
+    "101st Combat Aviation Brigade"
+   ]
+  },
+  {
+   "id": "fort-knox",
+   "base": "Fort Knox",
+   "st": "KY",
+   "unit": "U.S. Army Recruiting Command (USAREC)",
+   "unitFull": null,
+   "lat": 37.89,
+   "lon": -85.96,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "T2COM",
+   "tenants": [
+    "HRC",
+    "1st Theater Sustainment Command",
+    "84th Training Command",
+    "U.S. Army Recruiting Command (USAREC)",
+    "U.S. Army Reserve Aviation Command",
+    "V Corps",
+    "Division East",
+    "Medical Recruiting Brigade"
+   ]
+  },
+  {
+   "id": "fort-lee",
+   "base": "Fort Lee",
+   "st": "VA",
+   "unit": "Sustainment CoE / CASCOM",
+   "unitFull": null,
+   "lat": 37.24,
+   "lon": -77.33,
+   "grp": "conus",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Centers of Excellence (CoEs)",
+   "tenants": [
+    "Sustainment CoE / CASCOM",
+    "USAG Fort Lee",
+    "Army Sustainment University",
+    "Ordnance School",
+    "Quartermaster School",
+    "Transportation School",
+    "23rd Quartermaster Brigade",
+    "59th Ordnance Brigade"
+   ]
+  },
+  {
+   "id": "fort-eustis",
+   "base": "Fort Eustis",
+   "st": "VA",
+   "unit": "Cross-Functional Teams (CFTs)",
+   "unitFull": null,
+   "lat": 37.13,
+   "lon": -76.6,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "Futures & Concepts Command (FCC)",
+   "tenants": [
+    "Cross-Functional Teams (CFTs)",
+    "DCRF",
+    "Future Capability Directorates (FCDs)",
+    "Futures Integration Directorate (FID)",
+    "Field Directorate Office-Fort Eustis",
+    "128th Aviation Brigade"
+   ]
+  },
+  {
+   "id": "fort-belvoir",
+   "base": "Fort Belvoir",
+   "st": "VA",
+   "unit": "Military Intelligence Readiness Command (MIRC)",
+   "unitFull": null,
+   "lat": 38.71,
+   "lon": -77.14,
+   "grp": "ncr",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "CPE ES2 — Enterprise Software & Services",
+    "CPE Soldier Systems",
+    "Military Intelligence Readiness Command (MIRC)",
+    "29th Infantry Division",
+    "USAG Fort Belvoir",
+    "Night Vision & Electronic Sensors Directorate (NVESD)",
+    "Acquisition, Training & Readiness portfolio",
+    "Business Technology Solutions"
+   ]
+  },
+  {
+   "id": "fort-meade",
+   "base": "Fort Meade",
+   "st": "MD",
+   "unit": "200th Military Police Command",
+   "unitFull": null,
+   "lat": 39.11,
+   "lon": -76.74,
+   "grp": "ncr",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "200th Military Police Command",
+    "780th Military Intelligence Brigade (Cyber)",
+    "352nd Civil Affairs Command (CACOM)",
+    "704th MI Brigade (SIGINT)",
+    "7th Signal Command (Theater)",
+    "1st Recruiting Brigade",
+    "USAG Fort Meade",
+    "11th Cyber Battalion"
+   ]
+  },
+  {
+   "id": "fort-detrick",
+   "base": "Fort Detrick",
+   "st": "MD",
+   "unit": "Medical Research & Development Command",
+   "unitFull": null,
+   "lat": 39.44,
+   "lon": -77.43,
+   "grp": "ncr",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "MEDCOM",
+   "tenants": [
+    "Medical Research & Development Command",
+    "AMLC",
+    "6th MLMC",
+    "USAG Fort Detrick",
+    "USAMMA (inactivating)"
+   ]
+  },
+  {
+   "id": "aberdeen-proving-ground",
+   "base": "Aberdeen Proving Ground",
+   "st": "MD",
+   "unit": "ATEC",
+   "unitFull": "Army Test & Evaluation Command",
+   "lat": 39.47,
+   "lon": -76.13,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "ATEC",
+    "CHRA",
+    "PAE C2 / CC2",
+    "20th CBRNE Command",
+    "Aberdeen Test Center (ATC)",
+    "Army Evaluation Center (AEC)",
+    "C2/CC2 Systems Center",
+    "CECOM"
+   ]
+  },
+  {
+   "id": "detroit-arsenal",
+   "base": "Detroit Arsenal",
+   "st": "MI",
+   "unit": "TACOM",
+   "unitFull": "Tank-automotive & Armaments Command",
+   "lat": 42.59,
+   "lon": -83.04,
+   "grp": "conus",
+   "parent": "redstone-arsenal",
+   "parentUnit": "AMC",
+   "tenants": [
+    "CPE Combat Logistics",
+    "CPE Ground Combat Platforms",
+    "Director of Sustainment / OIB",
+    "Strategic Contracting Office",
+    "TACOM",
+    "TACOM (Chem/Bio)",
+    "ACC-Detroit Arsenal",
+    "Integrated Logistics Support Center (ILSC)"
+   ]
+  },
+  {
+   "id": "picatinny-arsenal",
+   "base": "Picatinny Arsenal",
+   "st": "NJ",
+   "unit": "PAE Agile Sustainment & Ammo",
+   "unitFull": "Portfolio Acquisition Executive (PAE) — Agile Sustainment & Ammunition",
+   "lat": 40.87,
+   "lon": -74.55,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PAE Agile Sustainment & Ammo",
+    "Armaments System Center",
+    "CPE Ammunition & Energetics",
+    "ACC-New Jersey",
+    "Armaments Center (AC)",
+    "Deputy PAE",
+    "Future Capabilities (Sustainment)",
+    "International Cooperation"
+   ]
+  },
+  {
+   "id": "jb-langley-eustis",
+   "base": "JB Langley-Eustis",
+   "st": "VA",
+   "unit": "597th Transportation Brigade",
+   "unitFull": null,
+   "lat": 37.08,
+   "lon": -76.36,
+   "grp": "conus",
+   "parent": "scott-afb",
+   "parentUnit": "ARTRANS",
+   "tenants": [
+    "597th Transportation Brigade",
+    "93rd Signal Brigade"
+   ]
+  },
+  {
+   "id": "west-point",
+   "base": "West Point",
+   "st": "NY",
+   "unit": "USMA",
+   "unitFull": "U.S. Military Academy",
+   "lat": 41.39,
+   "lon": -73.96,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USMA",
+    "USAG West Point",
+    "Dean of the Academic Board",
+    "U.S. Military Academy Preparatory School (USMAPS)",
+    "United States Corps of Cadets (USCC)"
+   ]
+  },
+  {
+   "id": "carlisle-barracks",
+   "base": "Carlisle Barracks",
+   "st": "PA",
+   "unit": "USAWC",
+   "unitFull": "U.S. Army War College",
+   "lat": 40.21,
+   "lon": -77.18,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USAWC",
+    "Security Force Assistance and Stability Integration Directorate (SFASID)",
+    "U.S. Army War College (AWC)",
+    "School of Strategic Landpower (SSL)",
+    "Strategic Studies Institute (SSI)",
+    "U.S. Army Heritage and Education Center (AHEC)",
+    "Center for Strategic Leadership (CSL)",
+    "School of Strategic Landpower"
+   ]
+  },
+  {
+   "id": "indianapolis",
+   "base": "Indianapolis",
+   "st": "IN",
+   "unit": "USAFMCOM",
+   "unitFull": "Financial Management Command",
+   "lat": 39.77,
+   "lon": -86.16,
+   "grp": "conus",
+   "parent": "redstone-arsenal",
+   "parentUnit": "AMC",
+   "tenants": [
+    "USAFMCOM",
+    "38th Infantry Division",
+    "Army Financial Management Center (45th FC)",
+    "37th Infantry Brigade Combat Team",
+    "38th CAB",
+    "76th Infantry Brigade Combat Team"
+   ]
+  },
+  {
+   "id": "quantico",
+   "base": "Quantico",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.52,
+   "lon": -77.29,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "arlington",
+   "base": "Arlington",
+   "st": "VA",
+   "unit": "Army National Guard (ARNG)",
+   "unitFull": "Army National Guard Directorate",
+   "lat": 38.88,
+   "lon": -77.07,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "Army National Guard (ARNG)",
+    "MPSA",
+    "Office of Army Cemeteries (OAC) / Army National Military Cemeteries (ANMC)",
+    "Arlington National Cemetery",
+    "U.S. Soldiers' and Airmen's Home National Cemetery",
+    "USAG Joint Base Myer-Henderson Hall",
+    "Air National Guard (ANG)",
+    "116th Cavalry Brigade Combat Team"
+   ]
+  },
+  {
+   "id": "the-pentagon",
+   "base": "The Pentagon",
+   "st": "VA",
+   "unit": "PIT — Pathway for Innovation & Technology",
+   "unitFull": "Pathway for Innovation & Technology (PIT) — ASA(ALT)",
+   "lat": 38.87,
+   "lon": -77.06,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PIT — Pathway for Innovation & Technology",
+    "Force Development (Aviation)",
+    "Force Development (Fires)",
+    "Force Development (Maneuver)",
+    "Force Development (Protection)",
+    "Force Development (Sustainment)",
+    "Army FUZE",
+    "G-TEAD Marketplace"
+   ]
+  },
+  {
+   "id": "scott-afb",
+   "base": "Scott AFB",
+   "st": "IL",
+   "unit": "ARTRANS",
+   "unitFull": "U.S. Army Transportation Command",
+   "lat": 38.54,
+   "lon": -89.85,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "ARTRANS",
+    "ARTRANS (AMC MSC hat)",
+    "Transportation Engineering Agency (ARTRANS-TEA)",
+    "599th Transportation Brigade"
+   ]
+  },
+  {
+   "id": "fort-devens",
+   "base": "Fort Devens",
+   "st": "MA",
+   "unit": "Cyber Protection Brigade",
+   "unitFull": null,
+   "lat": 42.54,
+   "lon": -71.62,
+   "grp": "conus",
+   "parent": "fort-gordon",
+   "parentUnit": "ARCYBER",
+   "tenants": [
+    "Cyber Protection Brigade"
+   ]
+  },
+  {
+   "id": "fort-hamilton",
+   "base": "Fort Hamilton",
+   "st": "NY",
+   "unit": "USAG Fort Hamilton",
+   "unitFull": "U.S. Army Garrison Fort Hamilton",
+   "lat": 40.61,
+   "lon": -74.03,
+   "grp": "conus",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "U.S. Army Garrisons — CONUS",
+   "tenants": [
+    "USAG Fort Hamilton"
+   ]
+  },
+  {
+   "id": "watervliet-arsenal",
+   "base": "Watervliet Arsenal",
+   "st": "NY",
+   "unit": "Watervliet Arsenal",
+   "unitFull": null,
+   "lat": 42.73,
+   "lon": -73.69,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Arsenals (manufacture)",
+   "tenants": [
+    "Watervliet Arsenal"
+   ]
+  },
+  {
+   "id": "letterkenny-army-depot",
+   "base": "Letterkenny Army Depot",
+   "st": "PA",
+   "unit": "Letterkenny Army Depot",
+   "unitFull": null,
+   "lat": 39.95,
+   "lon": -77.71,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Letterkenny Army Depot"
+   ]
+  },
+  {
+   "id": "tobyhanna-army-depot",
+   "base": "Tobyhanna Army Depot",
+   "st": "PA",
+   "unit": "Tobyhanna Army Depot",
+   "unitFull": null,
+   "lat": 41.19,
+   "lon": -75.41,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Tobyhanna Army Depot"
+   ]
+  },
+  {
+   "id": "radford-aap",
+   "base": "Radford AAP",
+   "st": "VA",
+   "unit": "Radford Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 37.18,
+   "lon": -80.55,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Radford Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "scranton-aap",
+   "base": "Scranton AAP",
+   "st": "PA",
+   "unit": "Scranton Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 41.41,
+   "lon": -75.66,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Scranton Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "blue-grass-army-depot",
+   "base": "Blue Grass Army Depot",
+   "st": "KY",
+   "unit": "Blue Grass Army Depot",
+   "unitFull": null,
+   "lat": 37.7,
+   "lon": -84.16,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Blue Grass Army Depot"
+   ]
+  },
+  {
+   "id": "letterkenny-munitions-center",
+   "base": "Letterkenny Munitions Center",
+   "st": "PA",
+   "unit": "Letterkenny Munitions Center",
+   "unitFull": null,
+   "lat": 39.93,
+   "lon": -77.7,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Letterkenny Munitions Center"
+   ]
+  },
+  {
+   "id": "buffalo-district",
+   "base": "Buffalo District",
+   "st": "NY",
+   "unit": "Buffalo District",
+   "unitFull": null,
+   "lat": 42.89,
+   "lon": -78.88,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Buffalo District"
+   ]
+  },
+  {
+   "id": "chicago-district",
+   "base": "Chicago District",
+   "st": "IL",
+   "unit": "Chicago District",
+   "unitFull": null,
+   "lat": 41.88,
+   "lon": -87.63,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Chicago District"
+   ]
+  },
+  {
+   "id": "detroit-district",
+   "base": "Detroit District",
+   "st": "MI",
+   "unit": "Detroit District",
+   "unitFull": null,
+   "lat": 42.33,
+   "lon": -83.05,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Detroit District"
+   ]
+  },
+  {
+   "id": "huntington-district",
+   "base": "Huntington District",
+   "st": "WV",
+   "unit": "Huntington District",
+   "unitFull": null,
+   "lat": 38.42,
+   "lon": -82.45,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Huntington District"
+   ]
+  },
+  {
+   "id": "louisville-district",
+   "base": "Louisville District",
+   "st": "KY",
+   "unit": "Louisville District",
+   "unitFull": null,
+   "lat": 38.25,
+   "lon": -85.76,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Louisville District"
+   ]
+  },
+  {
+   "id": "pittsburgh-district",
+   "base": "Pittsburgh District",
+   "st": "PA",
+   "unit": "Pittsburgh District",
+   "unitFull": null,
+   "lat": 40.44,
+   "lon": -79.99,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Pittsburgh District"
+   ]
+  },
+  {
+   "id": "baltimore-district",
+   "base": "Baltimore District",
+   "st": "MD",
+   "unit": "Baltimore District",
+   "unitFull": null,
+   "lat": 39.29,
+   "lon": -76.61,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Baltimore District"
+   ]
+  },
+  {
+   "id": "new-england-district",
+   "base": "New England District",
+   "st": "MA",
+   "unit": "New England District",
+   "unitFull": null,
+   "lat": 42.46,
+   "lon": -71.35,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "New England District"
+   ]
+  },
+  {
+   "id": "new-york-district",
+   "base": "New York District",
+   "st": "NY",
+   "unit": "New York District",
+   "unitFull": null,
+   "lat": 40.71,
+   "lon": -74.01,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "New York District"
+   ]
+  },
+  {
+   "id": "norfolk-district",
+   "base": "Norfolk District",
+   "st": "VA",
+   "unit": "Norfolk District",
+   "unitFull": null,
+   "lat": 36.85,
+   "lon": -76.29,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Norfolk District"
+   ]
+  },
+  {
+   "id": "philadelphia-district",
+   "base": "Philadelphia District",
+   "st": "PA",
+   "unit": "Philadelphia District",
+   "unitFull": null,
+   "lat": 39.95,
+   "lon": -75.17,
+   "grp": "conus",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Philadelphia District"
+   ]
+  },
+  {
+   "id": "ustranscom-scott-afb",
+   "base": "USTRANSCOM (Scott AFB)",
+   "st": "IL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.54,
+   "lon": -89.85,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "uscybercom-fort-meade",
+   "base": "USCYBERCOM (Fort Meade)",
+   "st": "MD",
+   "unit": null,
+   "unitFull": null,
+   "lat": 39.11,
+   "lon": -76.77,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "nsa-css-fort-meade",
+   "base": "NSA / CSS (Fort Meade)",
+   "st": "MD",
+   "unit": "PAE Maneuver Ground",
+   "unitFull": "Portfolio Acquisition Executive (PAE) — Maneuver Ground",
+   "lat": 39.11,
+   "lon": -76.77,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PAE Maneuver Ground",
+    "Infantry Squad Vehicle (M1301)",
+    "Integrated Logistics Support Center (ILSC)",
+    "Deputy PAE",
+    "Future Capabilities Division",
+    "International Cooperation",
+    "Maneuver Systems Center",
+    "T&E Integrator"
+   ]
+  },
+  {
+   "id": "nga-springfield",
+   "base": "NGA (Springfield)",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.74,
+   "lon": -77.19,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "the-pentagon-hqda-cio-g-6",
+   "base": "The Pentagon (HQDA · CIO/G-6)",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.87,
+   "lon": -77.06,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "army-research-laboratory-adelphi",
+   "base": "Army Research Laboratory (Adelphi)",
+   "st": "MD",
+   "unit": "Army Research Laboratory (ARL)",
+   "unitFull": null,
+   "lat": 39,
+   "lon": -76.96,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "DEVCOM",
+   "tenants": [
+    "Army Research Laboratory (ARL)",
+    "Army Research Directorate (ARD)",
+    "Army Research Office (ARO)",
+    "Research Business Directorate (RBD)"
+   ]
+  },
+  {
+   "id": "soldier-center-natick",
+   "base": "Soldier Center (Natick)",
+   "st": "MA",
+   "unit": "Soldier Center (SC)",
+   "unitFull": null,
+   "lat": 42.28,
+   "lon": -71.35,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "DEVCOM",
+   "tenants": [
+    "Soldier Center (SC)"
+   ]
+  },
+  {
+   "id": "national-ground-intelligence-center-charlottesville",
+   "base": "National Ground Intelligence Center (Charlottesville)",
+   "st": "VA",
+   "unit": "National Ground Intelligence Center (NGIC)",
+   "unitFull": null,
+   "lat": 38.03,
+   "lon": -78.48,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "Functional & National MI",
+   "tenants": [
+    "National Ground Intelligence Center (NGIC)",
+    "Army Geospatial Intelligence Battalion (AGB)"
+   ]
+  },
+  {
+   "id": "usace-hq-washington-dc",
+   "base": "USACE HQ (Washington, DC)",
+   "st": "DC",
+   "unit": "USACE",
+   "unitFull": "U.S. Army Corps of Engineers",
+   "lat": 38.87,
+   "lon": -77.02,
+   "grp": "ncr",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USACE",
+    "249th Engineer Battalion (Prime Power)",
+    "Army Geospatial Center (AGC)",
+    "Engineering and Support Center, Huntsville (HNC)",
+    "Institute for Water Resources (IWR)",
+    "USACE Southwestern Division",
+    "USACE Transatlantic Division",
+    "USACE Middle East District (USACE Southwestern Division)"
+   ]
+  },
+  {
+   "id": "great-lakes-ohio-river-div-cincinnati",
+   "base": "Great Lakes & Ohio River Div (Cincinnati)",
+   "st": "OH",
+   "unit": "Great Lakes & Ohio River Division (LRD)",
+   "unitFull": null,
+   "lat": 39.1,
+   "lon": -84.51,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Great Lakes & Ohio River Division (LRD)"
+   ]
+  },
+  {
+   "id": "transatlantic-div-winchester",
+   "base": "Transatlantic Div (Winchester)",
+   "st": "VA",
+   "unit": "Transatlantic Division (TAD)",
+   "unitFull": null,
+   "lat": 39.19,
+   "lon": -78.16,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Transatlantic Division (TAD)"
+   ]
+  },
+  {
+   "id": "north-atlantic-div-brooklyn",
+   "base": "North Atlantic Div (Brooklyn)",
+   "st": "NY",
+   "unit": "North Atlantic Division (NAD)",
+   "unitFull": null,
+   "lat": 40.69,
+   "lon": -73.99,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "North Atlantic Division (NAD)"
+   ]
+  },
+  {
+   "id": "crane-army-ammunition-activity",
+   "base": "Crane Army Ammunition Activity",
+   "st": "IN",
+   "unit": "Crane Army Ammunition Activity",
+   "unitFull": null,
+   "lat": 38.86,
+   "lon": -86.83,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Crane Army Ammunition Activity"
+   ]
+  }
+ ]
+}

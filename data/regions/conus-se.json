@@ -1,0 +1,451 @@
+{
+ "region": "conus-se",
+ "sites": [
+  {
+   "id": "fort-bragg",
+   "base": "Fort Bragg",
+   "st": "NC",
+   "unit": "USAWHC",
+   "unitFull": "U.S. Army Western Hemisphere Command",
+   "lat": 35.14,
+   "lon": -79,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USARC",
+    "USASOC",
+    "USAWHC",
+    "1st Special Forces Command (Airborne)",
+    "5th Multi-Domain Task Force",
+    "John F. Kennedy Special Warfare Center & School (USAJFKSWCS)",
+    "U.S. Army Civil Affairs & PSYOP Command (USACAPOC(A))",
+    "XVIII Airborne Corps"
+   ]
+  },
+  {
+   "id": "fort-stewart",
+   "base": "Fort Stewart",
+   "st": "GA",
+   "unit": "3rd Infantry Division",
+   "unitFull": null,
+   "lat": 31.87,
+   "lon": -81.61,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "XVIII Airborne Corps",
+   "tenants": [
+    "3rd Infantry Division",
+    "14th Combat Support Hospital",
+    "188th Infantry Brigade",
+    "1st Armored Brigade Combat Team",
+    "2nd Armored Brigade Combat Team",
+    "3rd Combat Aviation Brigade",
+    "3rd Division Artillery (DIVARTY)",
+    "3rd Division Sustainment Brigade"
+   ]
+  },
+  {
+   "id": "fort-benning",
+   "base": "Fort Benning",
+   "st": "GA",
+   "unit": "1st SFAB",
+   "unitFull": "1st Security Force Assistance Brigade",
+   "lat": 32.35,
+   "lon": -84.97,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "1st SFAB",
+    "75th Ranger Regiment",
+    "Army Security Cooperation Group-South (ASCG-S)",
+    "Western Hemisphere Institute for Security Cooperation (WHINSEC)",
+    "Maneuver CoE (MCoE)",
+    "USAG Fort Benning",
+    "199th Infantry Brigade",
+    "Airborne and Ranger Training Brigade (ARTB)"
+   ]
+  },
+  {
+   "id": "fort-rucker",
+   "base": "Fort Rucker",
+   "st": "AL",
+   "unit": "Air Traffic Services Command (ATSCOM)",
+   "unitFull": null,
+   "lat": 31.34,
+   "lon": -85.72,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "Air Traffic Services Command (ATSCOM)",
+    "Aviation CoE (AVCoE)",
+    "U.S. Army Warrant Officer Career College (WOCC)",
+    "USAG Fort Rucker",
+    "110th Aviation Brigade",
+    "1st Aviation Brigade",
+    "Aviation CoE NCO Academy"
+   ]
+  },
+  {
+   "id": "fort-gordon",
+   "base": "Fort Gordon",
+   "st": "GA",
+   "unit": "ARCYBER",
+   "unitFull": "U.S. Army Cyber Command",
+   "lat": 33.42,
+   "lon": -82.15,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "ARCYBER",
+    "116th MI Brigade (Aerial Intelligence)",
+    "359th Signal Brigade (Theater Tactical)",
+    "513th MI Brigade",
+    "706th MI Group",
+    "202nd Military Intelligence Battalion",
+    "297th Military Intelligence Battalion",
+    "324th Expeditionary Signal Battalion"
+   ]
+  },
+  {
+   "id": "redstone-arsenal",
+   "base": "Redstone Arsenal",
+   "st": "AL",
+   "unit": "AMC",
+   "unitFull": "U.S. Army Materiel Command",
+   "lat": 34.68,
+   "lon": -86.65,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "AMC",
+    "PAE Fires",
+    "ACC",
+    "AMCOM",
+    "AMCOM (Aviation)",
+    "AMCOM (Missiles)",
+    "CPE Aviation",
+    "CPE Defensive Fires"
+   ]
+  },
+  {
+   "id": "shaw-afb",
+   "base": "Shaw AFB",
+   "st": "SC",
+   "unit": "USARCENT",
+   "unitFull": "U.S. Army Central",
+   "lat": 33.97,
+   "lon": -80.47,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USARCENT",
+    "Area Support Group – Jordan (ASG-J)",
+    "Headquarters and Headquarters Battalion, USARCENT",
+    "Task Force Sinai",
+    "1st Support Battalion (Task Force Sinai)",
+    "301st Maneuver Enhancement Brigade (ASG-Jordan rotational HQ)",
+    "USBATT (1-157 IN, CO ARNG)",
+    "USBATT (Task Force Sinai infantry battalion)"
+   ]
+  },
+  {
+   "id": "fort-jackson",
+   "base": "Fort Jackson",
+   "st": "SC",
+   "unit": "Readiness Divisions (63rd · 81st · 88th · 99th)",
+   "unitFull": null,
+   "lat": 34.04,
+   "lon": -80.82,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "Readiness Divisions (63rd · 81st · 88th · 99th)",
+    "U.S. Army Center for Initial Military Training (CIMT)",
+    "U.S. Army Training Center & Fort Jackson",
+    "Leader Training Brigade (CIMT)",
+    "U.S. Army Drill Sergeant Academy",
+    "USAG Fort Jackson",
+    "Adjutant General School",
+    "Finance School"
+   ]
+  },
+  {
+   "id": "fort-buchanan",
+   "base": "Fort Buchanan",
+   "st": "PR",
+   "unit": "1st Mission Support Command",
+   "unitFull": null,
+   "lat": 18.39,
+   "lon": -66.13,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "1st Mission Support Command",
+    "Puerto Rico Army National Guard",
+    "U.S. Army Garrison Fort Buchanan",
+    "USAG Fort Buchanan"
+   ]
+  },
+  {
+   "id": "anniston-army-depot",
+   "base": "Anniston Army Depot",
+   "st": "AL",
+   "unit": "Anniston Army Depot",
+   "unitFull": null,
+   "lat": 33.6,
+   "lon": -85.96,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Anniston Army Depot",
+    "Anniston Munitions Center"
+   ]
+  },
+  {
+   "id": "holston-aap",
+   "base": "Holston AAP",
+   "st": "TN",
+   "unit": "Holston Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 36.55,
+   "lon": -82.49,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Holston Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "nashville-district",
+   "base": "Nashville District",
+   "st": "TN",
+   "unit": "Nashville District",
+   "unitFull": null,
+   "lat": 36.16,
+   "lon": -86.78,
+   "grp": "conus",
+   "parent": "great-lakes-ohio-river-div-cincinnati",
+   "parentUnit": "Great Lakes & Ohio River Division (LRD)",
+   "tenants": [
+    "Nashville District"
+   ]
+  },
+  {
+   "id": "charleston-district",
+   "base": "Charleston District",
+   "st": "SC",
+   "unit": "Charleston District",
+   "unitFull": null,
+   "lat": 32.78,
+   "lon": -79.93,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Charleston District"
+   ]
+  },
+  {
+   "id": "jacksonville-district",
+   "base": "Jacksonville District",
+   "st": "FL",
+   "unit": "Jacksonville District",
+   "unitFull": null,
+   "lat": 30.33,
+   "lon": -81.66,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Jacksonville District"
+   ]
+  },
+  {
+   "id": "mobile-district",
+   "base": "Mobile District",
+   "st": "AL",
+   "unit": "Mobile District",
+   "unitFull": null,
+   "lat": 30.69,
+   "lon": -88.04,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Mobile District"
+   ]
+  },
+  {
+   "id": "savannah-district",
+   "base": "Savannah District",
+   "st": "GA",
+   "unit": "Savannah District",
+   "unitFull": null,
+   "lat": 32.08,
+   "lon": -81.09,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Savannah District"
+   ]
+  },
+  {
+   "id": "wilmington-district",
+   "base": "Wilmington District",
+   "st": "NC",
+   "unit": "Wilmington District",
+   "unitFull": null,
+   "lat": 34.23,
+   "lon": -77.94,
+   "grp": "conus",
+   "parent": "south-atlantic-div-atlanta",
+   "parentUnit": "South Atlantic Division (SAD)",
+   "tenants": [
+    "Wilmington District"
+   ]
+  },
+  {
+   "id": "uscentcom-macdill-afb",
+   "base": "USCENTCOM (MacDill AFB)",
+   "st": "FL",
+   "unit": "377th Theater Sustainment Command",
+   "unitFull": null,
+   "lat": 27.85,
+   "lon": -82.5,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "377th Theater Sustainment Command",
+    "4th Battlefield Coordination Detachment",
+    "831st Transportation Battalion",
+    "Middle East District",
+    "USA-MAG (MOI-MAG)",
+    "53rd Transportation Battalion (Movement Control)",
+    "310th Expeditionary Sustainment Command (ESC)",
+    "316th Expeditionary Sustainment Command (ESC)"
+   ]
+  },
+  {
+   "id": "ussouthcom-doral",
+   "base": "USSOUTHCOM (Doral)",
+   "st": "FL",
+   "unit": "7th Special Forces Group (Airborne)",
+   "unitFull": null,
+   "lat": 25.81,
+   "lon": -80.34,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "1st Special Forces Command (Airborne)",
+   "tenants": [
+    "7th Special Forces Group (Airborne)",
+    "841st Transportation Battalion"
+   ]
+  },
+  {
+   "id": "ussocom-macdill-afb",
+   "base": "USSOCOM (MacDill AFB)",
+   "st": "FL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 27.85,
+   "lon": -82.5,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "nsa-georgia-fort-gordon",
+   "base": "NSA-Georgia (Fort Gordon)",
+   "st": "GA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 33.42,
+   "lon": -82.15,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "335th-signal-command-east-point",
+   "base": "335th Signal Command (East Point)",
+   "st": "GA",
+   "unit": "335th Signal Command (Theater)",
+   "unitFull": null,
+   "lat": 33.68,
+   "lon": -84.44,
+   "grp": "conus",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "335th Signal Command (Theater)",
+    "505th Signal Brigade",
+    "319th Expeditionary Signal Battalion",
+    "98th Expeditionary Signal Battalion"
+   ]
+  },
+  {
+   "id": "usasmdc-redstone-huntsville",
+   "base": "USASMDC (Redstone/Huntsville)",
+   "st": "AL",
+   "unit": "USASMDC",
+   "unitFull": "U.S. Army Space & Missile Defense Command",
+   "lat": 34.68,
+   "lon": -86.65,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USASMDC",
+    "100th Missile Defense Brigade (GMD)",
+    "1st Space Brigade",
+    "Future Warfare Center",
+    "Technical Center"
+   ]
+  },
+  {
+   "id": "south-atlantic-div-atlanta",
+   "base": "South Atlantic Div (Atlanta)",
+   "st": "GA",
+   "unit": "South Atlantic Division (SAD)",
+   "unitFull": null,
+   "lat": 33.75,
+   "lon": -84.39,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "South Atlantic Division (SAD)"
+   ]
+  },
+  {
+   "id": "mot-sunny-point",
+   "base": "MOT Sunny Point",
+   "st": "NC",
+   "unit": "596th Transportation Surface Brigade",
+   "unitFull": null,
+   "lat": 33.99,
+   "lon": -77.96,
+   "grp": "conus",
+   "parent": "scott-afb",
+   "parentUnit": "ARTRANS",
+   "tenants": [
+    "596th Transportation Surface Brigade",
+    "832nd Transportation Battalion"
+   ]
+  }
+ ]
+}

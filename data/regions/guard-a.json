@@ -1,0 +1,607 @@
+{
+ "region": "guard-a",
+ "sites": [
+  {
+   "id": "alabama-national-guard",
+   "base": "Alabama National Guard",
+   "st": "AL",
+   "unit": "Alabama Army National Guard",
+   "unitFull": null,
+   "lat": 32.38,
+   "lon": -86.3,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Alabama Army National Guard"
+   ]
+  },
+  {
+   "id": "arizona-national-guard",
+   "base": "Arizona National Guard",
+   "st": "AZ",
+   "unit": "Arizona Army National Guard",
+   "unitFull": null,
+   "lat": 33.45,
+   "lon": -112.07,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Arizona Army National Guard"
+   ]
+  },
+  {
+   "id": "california-national-guard",
+   "base": "California National Guard",
+   "st": "CA",
+   "unit": "California Army National Guard",
+   "unitFull": null,
+   "lat": 38.58,
+   "lon": -121.49,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "California Army National Guard"
+   ]
+  },
+  {
+   "id": "connecticut-national-guard",
+   "base": "Connecticut National Guard",
+   "st": "CT",
+   "unit": "Connecticut Army National Guard",
+   "unitFull": null,
+   "lat": 41.76,
+   "lon": -72.68,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Connecticut Army National Guard"
+   ]
+  },
+  {
+   "id": "florida-national-guard",
+   "base": "Florida National Guard",
+   "st": "FL",
+   "unit": "Florida Army National Guard",
+   "unitFull": null,
+   "lat": 30.44,
+   "lon": -84.28,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Florida Army National Guard"
+   ]
+  },
+  {
+   "id": "idaho-national-guard",
+   "base": "Idaho National Guard",
+   "st": "ID",
+   "unit": "Idaho Army National Guard",
+   "unitFull": null,
+   "lat": 43.62,
+   "lon": -116.2,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Idaho Army National Guard"
+   ]
+  },
+  {
+   "id": "indiana-national-guard",
+   "base": "Indiana National Guard",
+   "st": "IN",
+   "unit": "Indiana Army National Guard",
+   "unitFull": null,
+   "lat": 39.77,
+   "lon": -86.16,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Indiana Army National Guard"
+   ]
+  },
+  {
+   "id": "kansas-national-guard",
+   "base": "Kansas National Guard",
+   "st": "KS",
+   "unit": "Kansas Army National Guard",
+   "unitFull": null,
+   "lat": 39.05,
+   "lon": -95.69,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Kansas Army National Guard"
+   ]
+  },
+  {
+   "id": "louisiana-national-guard",
+   "base": "Louisiana National Guard",
+   "st": "LA",
+   "unit": "Louisiana Army National Guard",
+   "unitFull": null,
+   "lat": 30.46,
+   "lon": -91.14,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Louisiana Army National Guard"
+   ]
+  },
+  {
+   "id": "maryland-national-guard",
+   "base": "Maryland National Guard",
+   "st": "MD",
+   "unit": "Maryland Army National Guard",
+   "unitFull": null,
+   "lat": 38.98,
+   "lon": -76.49,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Maryland Army National Guard"
+   ]
+  },
+  {
+   "id": "michigan-national-guard",
+   "base": "Michigan National Guard",
+   "st": "MI",
+   "unit": "Michigan Army National Guard",
+   "unitFull": null,
+   "lat": 42.73,
+   "lon": -84.56,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Michigan Army National Guard"
+   ]
+  },
+  {
+   "id": "mississippi-national-guard",
+   "base": "Mississippi National Guard",
+   "st": "MS",
+   "unit": "184th Sustainment Command (Expeditionary)",
+   "unitFull": "184th Sustainment Command (Expeditionary), Mississippi Army National Guard",
+   "lat": 32.3,
+   "lon": -90.18,
+   "grp": "guard",
+   "parent": "camp-arifjan",
+   "parentUnit": "1st TSC Operational Command Post",
+   "tenants": [
+    "Mississippi Army National Guard",
+    "184th Sustainment Command (Expeditionary)"
+   ]
+  },
+  {
+   "id": "montana-national-guard",
+   "base": "Montana National Guard",
+   "st": "MT",
+   "unit": "Montana Army National Guard",
+   "unitFull": null,
+   "lat": 46.59,
+   "lon": -112.02,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Montana Army National Guard"
+   ]
+  },
+  {
+   "id": "nevada-national-guard",
+   "base": "Nevada National Guard",
+   "st": "NV",
+   "unit": "Nevada Army National Guard",
+   "unitFull": null,
+   "lat": 39.16,
+   "lon": -119.77,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Nevada Army National Guard"
+   ]
+  },
+  {
+   "id": "new-jersey-national-guard",
+   "base": "New Jersey National Guard",
+   "st": "NJ",
+   "unit": "New Jersey Army National Guard",
+   "unitFull": null,
+   "lat": 40.22,
+   "lon": -74.74,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "New Jersey Army National Guard"
+   ]
+  },
+  {
+   "id": "new-york-national-guard",
+   "base": "New York National Guard",
+   "st": "NY",
+   "unit": "New York Army National Guard",
+   "unitFull": null,
+   "lat": 42.65,
+   "lon": -73.76,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "New York Army National Guard"
+   ]
+  },
+  {
+   "id": "north-dakota-national-guard",
+   "base": "North Dakota National Guard",
+   "st": "ND",
+   "unit": "North Dakota Army National Guard",
+   "unitFull": null,
+   "lat": 46.81,
+   "lon": -100.78,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "North Dakota Army National Guard"
+   ]
+  },
+  {
+   "id": "oklahoma-national-guard",
+   "base": "Oklahoma National Guard",
+   "st": "OK",
+   "unit": "Oklahoma Army National Guard",
+   "unitFull": null,
+   "lat": 35.49,
+   "lon": -97.5,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Oklahoma Army National Guard"
+   ]
+  },
+  {
+   "id": "pennsylvania-national-guard",
+   "base": "Pennsylvania National Guard",
+   "st": "PA",
+   "unit": "Pennsylvania Army National Guard",
+   "unitFull": null,
+   "lat": 40.26,
+   "lon": -76.88,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Pennsylvania Army National Guard"
+   ]
+  },
+  {
+   "id": "south-carolina-national-guard",
+   "base": "South Carolina National Guard",
+   "st": "SC",
+   "unit": "South Carolina Army National Guard",
+   "unitFull": null,
+   "lat": 34,
+   "lon": -81.03,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "South Carolina Army National Guard"
+   ]
+  },
+  {
+   "id": "tennessee-national-guard",
+   "base": "Tennessee National Guard",
+   "st": "TN",
+   "unit": "Tennessee Army National Guard",
+   "unitFull": null,
+   "lat": 36.17,
+   "lon": -86.78,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Tennessee Army National Guard"
+   ]
+  },
+  {
+   "id": "utah-national-guard",
+   "base": "Utah National Guard",
+   "st": "UT",
+   "unit": "Utah Army National Guard",
+   "unitFull": null,
+   "lat": 40.78,
+   "lon": -111.89,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Utah Army National Guard"
+   ]
+  },
+  {
+   "id": "virginia-national-guard",
+   "base": "Virginia National Guard",
+   "st": "VA",
+   "unit": "Virginia Army National Guard",
+   "unitFull": null,
+   "lat": 37.54,
+   "lon": -77.43,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Virginia Army National Guard"
+   ]
+  },
+  {
+   "id": "west-virginia-national-guard",
+   "base": "West Virginia National Guard",
+   "st": "WV",
+   "unit": "West Virginia Army National Guard",
+   "unitFull": null,
+   "lat": 38.34,
+   "lon": -81.63,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "West Virginia Army National Guard"
+   ]
+  },
+  {
+   "id": "wyoming-national-guard",
+   "base": "Wyoming National Guard",
+   "st": "WY",
+   "unit": "Wyoming Army National Guard",
+   "unitFull": null,
+   "lat": 41.14,
+   "lon": -104.82,
+   "grp": "guard",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "Wyoming Army National Guard"
+   ]
+  },
+  {
+   "id": "puerto-rico-national-guard",
+   "base": "Puerto Rico National Guard",
+   "st": "PR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 18.47,
+   "lon": -66.11,
+   "grp": "guardInset",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "alaska-district",
+   "base": "Alaska District",
+   "st": "AK",
+   "unit": null,
+   "unitFull": null,
+   "lat": 61.25,
+   "lon": -149.8,
+   "grp": "guardInset",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-atterbury",
+   "base": "Camp Atterbury",
+   "st": "IN",
+   "unit": "157th Infantry Brigade",
+   "unitFull": "157th Infantry Brigade (Training Support) \"Spartan\"",
+   "lat": 39.33,
+   "lon": -86.03,
+   "grp": "guard",
+   "parent": "fort-knox",
+   "parentUnit": "Division East",
+   "tenants": [
+    "157th Infantry Brigade"
+   ]
+  },
+  {
+   "id": "camp-shelby",
+   "base": "Camp Shelby",
+   "st": "MS",
+   "unit": null,
+   "unitFull": null,
+   "lat": 31.2,
+   "lon": -89.2,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-grayling",
+   "base": "Camp Grayling",
+   "st": "MI",
+   "unit": null,
+   "unitFull": null,
+   "lat": 44.65,
+   "lon": -84.71,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-roberts",
+   "base": "Camp Roberts",
+   "st": "CA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.79,
+   "lon": -120.75,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-williams",
+   "base": "Camp Williams",
+   "st": "UT",
+   "unit": "807th Theater Medical Command",
+   "unitFull": null,
+   "lat": 40.43,
+   "lon": -111.92,
+   "grp": "guard",
+   "parent": "fort-bragg",
+   "parentUnit": "USARC",
+   "tenants": [
+    "76th Operational Response Command",
+    "807th Theater Medical Command"
+   ]
+  },
+  {
+   "id": "orchard-combat-training-center",
+   "base": "Orchard Combat Training Center",
+   "st": "ID",
+   "unit": null,
+   "unitFull": null,
+   "lat": 43.31,
+   "lon": -116.02,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-gruber",
+   "base": "Camp Gruber",
+   "st": "OK",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.65,
+   "lon": -95.15,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-robinson",
+   "base": "Camp Robinson",
+   "st": "AR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 34.85,
+   "lon": -92.3,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-swift",
+   "base": "Camp Swift",
+   "st": "TX",
+   "unit": null,
+   "unitFull": null,
+   "lat": 30.19,
+   "lon": -97.29,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-bowie",
+   "base": "Camp Bowie",
+   "st": "TX",
+   "unit": null,
+   "unitFull": null,
+   "lat": 31.7,
+   "lon": -98.99,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-perry",
+   "base": "Camp Perry",
+   "st": "OH",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.54,
+   "lon": -83.02,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-johnson",
+   "base": "Camp Johnson",
+   "st": "VT",
+   "unit": null,
+   "unitFull": null,
+   "lat": 44.53,
+   "lon": -73.19,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-rilea",
+   "base": "Camp Rilea",
+   "st": "OR",
+   "unit": null,
+   "unitFull": null,
+   "lat": 46.12,
+   "lon": -123.93,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "fort-custer",
+   "base": "Fort Custer",
+   "st": "MI",
+   "unit": null,
+   "unitFull": null,
+   "lat": 42.31,
+   "lon": -85.3,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "fort-pickett-barfoot",
+   "base": "Fort Pickett (Barfoot)",
+   "st": "VA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 37.05,
+   "lon": -77.95,
+   "grp": "guard",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  }
+ ]
+}

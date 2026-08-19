@@ -1,0 +1,598 @@
+{
+ "region": "conus-cent",
+ "sites": [
+  {
+   "id": "fort-hood",
+   "base": "Fort Hood",
+   "st": "TX",
+   "unit": "III Armored Corps",
+   "unitFull": null,
+   "lat": 31.13,
+   "lon": -97.78,
+   "grp": "conus",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "3rd Security Force Assistance Brigade (SFAB)",
+    "III Armored Corps",
+    "Operational Test Command (OTC)",
+    "11th Corps Signal Brigade",
+    "13th Armored Corps Sustainment Command",
+    "1st Cavalry Division",
+    "1st Medical Brigade",
+    "36th Engineer Brigade"
+   ]
+  },
+  {
+   "id": "fort-riley",
+   "base": "Fort Riley",
+   "st": "KS",
+   "unit": "1st Infantry Division",
+   "unitFull": null,
+   "lat": 39.08,
+   "lon": -96.79,
+   "grp": "conus",
+   "parent": "fort-hood",
+   "parentUnit": "III Armored Corps",
+   "tenants": [
+    "1st Infantry Division",
+    "1st Armored Brigade Combat Team (1 ID)",
+    "1st Combat Aviation Brigade",
+    "1st Division Artillery (DIVARTY)",
+    "1st Infantry Division Sustainment Brigade",
+    "2nd Armored Brigade Combat Team (1 ID)",
+    "USAG Fort Riley",
+    "Army Field Support Battalion-Riley"
+   ]
+  },
+  {
+   "id": "fort-carson",
+   "base": "Fort Carson",
+   "st": "CO",
+   "unit": "4th Infantry Division",
+   "unitFull": null,
+   "lat": 38.74,
+   "lon": -104.79,
+   "grp": "conus",
+   "parent": "jblm",
+   "parentUnit": "I Corps",
+   "tenants": [
+    "4th Multi-Domain Task Force",
+    "10th Special Forces Group (Airborne)",
+    "4th Infantry Division",
+    "71st Ordnance Group (EOD)",
+    "Fort Carson Public Affairs Office",
+    "14th Public Affairs Detachment",
+    "1st Stryker Brigade Combat Team (4 ID)",
+    "2nd Stryker Brigade Combat Team (4 ID)"
+   ]
+  },
+  {
+   "id": "fort-leavenworth",
+   "base": "Fort Leavenworth",
+   "st": "KS",
+   "unit": "Combined Arms Command (CAC)",
+   "unitFull": null,
+   "lat": 39.35,
+   "lon": -94.92,
+   "grp": "conus",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "T2COM",
+   "tenants": [
+    "Combined Arms Command (CAC)",
+    "35th Infantry Division",
+    "Army University",
+    "Centers of Excellence (CoEs)",
+    "Combat Training Centers (CTCs)",
+    "Command & General Staff College (CGSC)",
+    "Army Management Staff College (AMSC)",
+    "Army University Press (AUP)"
+   ]
+  },
+  {
+   "id": "fort-sill",
+   "base": "Fort Sill",
+   "st": "OK",
+   "unit": "31st Air Defense Artillery Brigade",
+   "unitFull": null,
+   "lat": 34.65,
+   "lon": -98.4,
+   "grp": "conus",
+   "parent": "fort-bliss",
+   "parentUnit": "32nd Army Air & Missile Defense Command (AAMDC)",
+   "tenants": [
+    "31st Air Defense Artillery Brigade",
+    "75th Field Artillery Brigade",
+    "AMCOM Combined Logistics Command (ACLC)",
+    "3-2 ADA",
+    "4-3 ADA",
+    "Fires CoE (FCoE)",
+    "Fires Future Capability Directorate",
+    "USAG Fort Sill"
+   ]
+  },
+  {
+   "id": "fort-leonard-wood",
+   "base": "Fort Leonard Wood",
+   "st": "MO",
+   "unit": "PAE Layered Protection & CBRN",
+   "unitFull": "Portfolio Acquisition Executive (PAE) — Layered Protection & CBRN Defense",
+   "lat": 37.71,
+   "lon": -92.13,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "PAE Layered Protection & CBRN",
+    "Formation-Based Layered Protection Future Capability Directorate",
+    "Maneuver Support CoE (MSCoE)",
+    "USAG Fort Leonard Wood",
+    "CBRN School",
+    "Engineer School",
+    "Military Police School",
+    "MSCoE NCO Academy"
+   ]
+  },
+  {
+   "id": "rock-island-arsenal",
+   "base": "Rock Island Arsenal",
+   "st": "IL",
+   "unit": "First Army",
+   "unitFull": null,
+   "lat": 41.51,
+   "lon": -90.55,
+   "grp": "oib",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "ASC",
+    "First Army",
+    "JMC",
+    "Strategic Contracting Official",
+    "ACC-Rock Island",
+    "Ammunition Plants (produce)",
+    "Army Field Support Brigades (AFSBs)",
+    "Army Prepositioned Stocks (APS)"
+   ]
+  },
+  {
+   "id": "jbsa-fort-sam-houston",
+   "base": "JBSA Fort Sam Houston",
+   "st": "TX",
+   "unit": "MEDCOM",
+   "unitFull": "U.S. Army Medical Command",
+   "lat": 29.46,
+   "lon": -98.43,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "MEDCOM",
+    "ARNORTH",
+    "ARSOUTH",
+    "IMCOM",
+    "Medical Center of Excellence (MEDCoE)",
+    "USAWHC HHBN",
+    "ARNORTH Theater Security Cooperation (Canada/Mexico/Bahamas)",
+    "MICC"
+   ]
+  },
+  {
+   "id": "fort-polk",
+   "base": "Fort Polk",
+   "st": "LA",
+   "unit": "Fort Johnson Public Affairs Office",
+   "unitFull": "U.S. Army Garrison Fort Johnson Public Affairs Office",
+   "lat": 31.05,
+   "lon": -93.2,
+   "grp": "conus",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "IMCOM",
+   "tenants": [
+    "Fort Johnson Public Affairs Office",
+    "3rd Mobile Brigade Combat Team (10th Mtn)",
+    "46th Engineer Battalion",
+    "Joint Readiness Training Center (JRTC)",
+    "USAG Fort Polk",
+    "2nd Battalion, 2nd Infantry Regiment",
+    "3rd Squadron, 89th Cavalry Regiment",
+    "5th Battalion, 25th Field Artillery Regiment"
+   ]
+  },
+  {
+   "id": "fort-mccoy",
+   "base": "Fort McCoy",
+   "st": "WI",
+   "unit": "USAG Fort McCoy",
+   "unitFull": "U.S. Army Garrison Fort McCoy",
+   "lat": 44.03,
+   "lon": -90.67,
+   "grp": "conus",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "U.S. Army Garrisons — CONUS",
+   "tenants": [
+    "USAG Fort McCoy"
+   ]
+  },
+  {
+   "id": "pine-bluff-arsenal",
+   "base": "Pine Bluff Arsenal",
+   "st": "AR",
+   "unit": "Pine Bluff Arsenal",
+   "unitFull": null,
+   "lat": 34.27,
+   "lon": -92.08,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Arsenals (manufacture)",
+   "tenants": [
+    "Pine Bluff Arsenal"
+   ]
+  },
+  {
+   "id": "corpus-christi-army-depot",
+   "base": "Corpus Christi Army Depot",
+   "st": "TX",
+   "unit": "Corpus Christi Army Depot",
+   "unitFull": null,
+   "lat": 27.7,
+   "lon": -97.27,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Corpus Christi Army Depot"
+   ]
+  },
+  {
+   "id": "red-river-army-depot",
+   "base": "Red River Army Depot",
+   "st": "TX",
+   "unit": "Red River Army Depot",
+   "unitFull": null,
+   "lat": 33.45,
+   "lon": -94.16,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Red River Army Depot"
+   ]
+  },
+  {
+   "id": "mcalester-aap",
+   "base": "McAlester AAP",
+   "st": "OK",
+   "unit": "McAlester Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 34.84,
+   "lon": -95.92,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "McAlester Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "lake-city-aap",
+   "base": "Lake City AAP",
+   "st": "MO",
+   "unit": "OIB Optimization Integrator",
+   "unitFull": null,
+   "lat": 39.1,
+   "lon": -94.35,
+   "grp": "oib",
+   "parent": "picatinny-arsenal",
+   "parentUnit": "PAE Agile Sustainment & Ammo",
+   "tenants": [
+    "OIB Optimization Integrator",
+    "850th Signal Company",
+    "Lake City Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "iowa-aap",
+   "base": "Iowa AAP",
+   "st": "IA",
+   "unit": "Iowa Army Ammunition Plant",
+   "unitFull": null,
+   "lat": 40.85,
+   "lon": -91.1,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Iowa Army Ammunition Plant"
+   ]
+  },
+  {
+   "id": "st-paul-district",
+   "base": "St. Paul District",
+   "st": "MN",
+   "unit": "St. Paul District",
+   "unitFull": null,
+   "lat": 44.95,
+   "lon": -93.09,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "St. Paul District"
+   ]
+  },
+  {
+   "id": "rock-island-district",
+   "base": "Rock Island District",
+   "st": "IL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.51,
+   "lon": -90.58,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "st-louis-district",
+   "base": "St. Louis District",
+   "st": "MO",
+   "unit": "St. Louis District",
+   "unitFull": null,
+   "lat": 38.63,
+   "lon": -90.2,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "St. Louis District"
+   ]
+  },
+  {
+   "id": "memphis-district",
+   "base": "Memphis District",
+   "st": "TN",
+   "unit": "Memphis District",
+   "unitFull": null,
+   "lat": 35.15,
+   "lon": -90.05,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "Memphis District"
+   ]
+  },
+  {
+   "id": "vicksburg-district",
+   "base": "Vicksburg District",
+   "st": "MS",
+   "unit": "Vicksburg District",
+   "unitFull": null,
+   "lat": 32.35,
+   "lon": -90.88,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "Vicksburg District"
+   ]
+  },
+  {
+   "id": "new-orleans-district",
+   "base": "New Orleans District",
+   "st": "LA",
+   "unit": "New Orleans District",
+   "unitFull": null,
+   "lat": 29.95,
+   "lon": -90.07,
+   "grp": "conus",
+   "parent": "mississippi-valley-div-vicksburg",
+   "parentUnit": "Mississippi Valley Division (MVD)",
+   "tenants": [
+    "New Orleans District"
+   ]
+  },
+  {
+   "id": "kansas-city-district",
+   "base": "Kansas City District",
+   "st": "MO",
+   "unit": "Kansas City District",
+   "unitFull": null,
+   "lat": 39.1,
+   "lon": -94.58,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Kansas City District"
+   ]
+  },
+  {
+   "id": "omaha-district",
+   "base": "Omaha District",
+   "st": "NE",
+   "unit": "Omaha District",
+   "unitFull": null,
+   "lat": 41.26,
+   "lon": -95.93,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Omaha District"
+   ]
+  },
+  {
+   "id": "little-rock-district",
+   "base": "Little Rock District",
+   "st": "AR",
+   "unit": "Little Rock District",
+   "unitFull": null,
+   "lat": 34.75,
+   "lon": -92.29,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Little Rock District"
+   ]
+  },
+  {
+   "id": "tulsa-district",
+   "base": "Tulsa District",
+   "st": "OK",
+   "unit": "Tulsa District",
+   "unitFull": null,
+   "lat": 36.15,
+   "lon": -95.99,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Tulsa District"
+   ]
+  },
+  {
+   "id": "fort-worth-district",
+   "base": "Fort Worth District",
+   "st": "TX",
+   "unit": "Fort Worth District",
+   "unitFull": null,
+   "lat": 32.76,
+   "lon": -97.33,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Fort Worth District"
+   ]
+  },
+  {
+   "id": "galveston-district",
+   "base": "Galveston District",
+   "st": "TX",
+   "unit": "Galveston District",
+   "unitFull": null,
+   "lat": 29.3,
+   "lon": -94.8,
+   "grp": "conus",
+   "parent": "southwestern-div-dallas",
+   "parentUnit": "Southwestern Division (SWD)",
+   "tenants": [
+    "Galveston District"
+   ]
+  },
+  {
+   "id": "usnorthcom-peterson-sfb",
+   "base": "USNORTHCOM (Peterson SFB)",
+   "st": "CO",
+   "unit": "263rd Army Air & Missile Defense Command (AAMDC)",
+   "unitFull": null,
+   "lat": 38.82,
+   "lon": -104.7,
+   "grp": "conus",
+   "parent": "usasmdc-redstone-huntsville",
+   "parentUnit": "USASMDC",
+   "tenants": [
+    "263rd Army Air & Missile Defense Command (AAMDC)",
+    "JTF-Gold",
+    "678th Air Defense Artillery Brigade"
+   ]
+  },
+  {
+   "id": "usspacecom-peterson-sfb",
+   "base": "USSPACECOM (Peterson SFB)",
+   "st": "CO",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.82,
+   "lon": -104.7,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "usstratcom-offutt-afb",
+   "base": "USSTRATCOM (Offutt AFB)",
+   "st": "NE",
+   "unit": null,
+   "unitFull": null,
+   "lat": 41.12,
+   "lon": -95.91,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "austin-t2com-hq",
+   "base": "Austin (T2COM HQ)",
+   "st": "TX",
+   "unit": "T2COM",
+   "unitFull": "U.S. Army Transformation & Training Command",
+   "lat": 30.27,
+   "lon": -97.74,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "T2COM",
+    "Army Applications Laboratory",
+    "Futures & Concepts Command (FCC)",
+    "Army Applications Laboratory (AAL)",
+    "INSCOM",
+    "MDW",
+    "PAE Maneuver Air",
+    "USAASC"
+   ]
+  },
+  {
+   "id": "mississippi-valley-div-vicksburg",
+   "base": "Mississippi Valley Div (Vicksburg)",
+   "st": "MS",
+   "unit": "Mississippi Valley Division (MVD)",
+   "unitFull": null,
+   "lat": 32.35,
+   "lon": -90.88,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Mississippi Valley Division (MVD)"
+   ]
+  },
+  {
+   "id": "southwestern-div-dallas",
+   "base": "Southwestern Div (Dallas)",
+   "st": "TX",
+   "unit": "Southwestern Division (SWD)",
+   "unitFull": null,
+   "lat": 32.78,
+   "lon": -96.8,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Southwestern Division (SWD)"
+   ]
+  },
+  {
+   "id": "engineer-r-d-center-vicksburg",
+   "base": "Engineer R&D Center (Vicksburg)",
+   "st": "MS",
+   "unit": "Engineer R&D Center (ERDC)",
+   "unitFull": null,
+   "lat": 32.3,
+   "lon": -90.86,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Engineer R&D Center (ERDC)"
+   ]
+  }
+ ]
+}

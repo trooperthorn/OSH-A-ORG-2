@@ -1,0 +1,415 @@
+{
+ "region": "conus-west",
+ "sites": [
+  {
+   "id": "fort-bliss",
+   "base": "Fort Bliss",
+   "st": "TX",
+   "unit": "32nd Army Air & Missile Defense Command (AAMDC)",
+   "unitFull": null,
+   "lat": 31.81,
+   "lon": -106.42,
+   "grp": "conus",
+   "parent": "usasmdc-redstone-huntsville",
+   "parentUnit": "USASMDC",
+   "tenants": [
+    "32nd Army Air & Missile Defense Command (AAMDC)",
+    "11th Air Defense Artillery Brigade",
+    "1st Armored Division",
+    "1-43 ADA",
+    "1st Armored Brigade Combat Team (1 AD)",
+    "1st Armored Division Artillery (DIVARTY)",
+    "1st Armored Division Sustainment Brigade",
+    "2-43 ADA"
+   ]
+  },
+  {
+   "id": "fort-huachuca",
+   "base": "Fort Huachuca",
+   "st": "AZ",
+   "unit": "JTF-Southern Border",
+   "unitFull": "Joint Task Force-Southern Border",
+   "lat": 31.55,
+   "lon": -110.35,
+   "grp": "conus",
+   "parent": "fort-bragg",
+   "parentUnit": "USAWHC",
+   "tenants": [
+    "Electronic Proving Ground (EPG)",
+    "JTF-Southern Border",
+    "NETCOM",
+    "Army Capability Managers (ACMs)",
+    "U.S. Army Information Systems Engineering Command (USAISEC)",
+    "Intelligence CoE (ICoE)",
+    "Intelligence Future Capability Directorate",
+    "Regional Cyber Center – CONUS (RCC-C)"
+   ]
+  },
+  {
+   "id": "jblm",
+   "base": "JBLM",
+   "st": "WA",
+   "unit": "I Corps",
+   "unitFull": null,
+   "lat": 47.08,
+   "lon": -122.58,
+   "grp": "conus",
+   "parent": "fort-shafter-schofield-hawaii",
+   "parentUnit": "USARPAC",
+   "tenants": [
+    "596th Transportation Brigade",
+    "5th Security Force Assistance Brigade (SFAB)",
+    "I Corps",
+    "17th Field Artillery Brigade",
+    "17th Field Artillery Brigade (\"America's Premier HIMARS Brigade\")",
+    "1st Battalion, 17th Field Artillery Regiment (1-17 FA)",
+    "1st Special Forces Group (Airborne)",
+    "201st Expeditionary Military Intelligence Brigade"
+   ]
+  },
+  {
+   "id": "dugway-pg",
+   "base": "Dugway PG",
+   "st": "UT",
+   "unit": "Dugway Proving Ground (DPG)",
+   "unitFull": null,
+   "lat": 40.21,
+   "lon": -112.74,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "ATEC",
+   "tenants": [
+    "Dugway Proving Ground (DPG)",
+    "West Desert Test Center (WDTC)"
+   ]
+  },
+  {
+   "id": "white-sands-mr",
+   "base": "White Sands MR",
+   "st": "NM",
+   "unit": "White Sands Missile Range (WSMR)",
+   "unitFull": null,
+   "lat": 32.38,
+   "lon": -106.48,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "ATEC",
+   "tenants": [
+    "White Sands Missile Range (WSMR)"
+   ]
+  },
+  {
+   "id": "yuma-pg",
+   "base": "Yuma PG",
+   "st": "AZ",
+   "unit": "Yuma Proving Ground (YPG)",
+   "unitFull": null,
+   "lat": 32.49,
+   "lon": -114.32,
+   "grp": "conus",
+   "parent": "aberdeen-proving-ground",
+   "parentUnit": "ATEC",
+   "tenants": [
+    "Yuma Proving Ground (YPG)",
+    "Yuma Test Center (YTC)",
+    "Tropic Regions Test Center (TRTC)"
+   ]
+  },
+  {
+   "id": "draper",
+   "base": "Draper",
+   "st": "UT",
+   "unit": "19th Special Forces Group (Airborne)",
+   "unitFull": null,
+   "lat": 40.52,
+   "lon": -111.86,
+   "grp": "conus",
+   "parent": "arlington",
+   "parentUnit": "Army National Guard (ARNG)",
+   "tenants": [
+    "19th Special Forces Group (Airborne)",
+    "300th MI Brigade (Linguist)"
+   ]
+  },
+  {
+   "id": "fort-wainwright-greely-alaska",
+   "base": "Fort Wainwright/Greely (Alaska)",
+   "st": "AK",
+   "unit": "11th Airborne Division",
+   "unitFull": null,
+   "lat": 64,
+   "lon": -147,
+   "grp": "conus",
+   "parent": "jblm",
+   "parentUnit": "I Corps",
+   "tenants": [
+    "833rd Transportation Battalion",
+    "Alaska Army National Guard",
+    "11th Airborne Division",
+    "49th Missile Defense Battalion (GMD)",
+    "Alaska District",
+    "Cold Regions Test Center (CRTC)",
+    "17th Combat Sustainment Support Battalion",
+    "1st Infantry Brigade Combat Team"
+   ]
+  },
+  {
+   "id": "fort-irwin-ntc",
+   "base": "Fort Irwin (NTC)",
+   "st": "CA",
+   "unit": "National Training Center (NTC)",
+   "unitFull": null,
+   "lat": 35.26,
+   "lon": -116.68,
+   "grp": "conus",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Combat Training Centers (CTCs)",
+   "tenants": [
+    "National Training Center (NTC)",
+    "USAG Fort Irwin",
+    "11th Armored Cavalry Regiment (Blackhorse) (OPFOR)",
+    "Operations Group (NTC)",
+    "1st Squadron, 11th ACR (Ironhorse)",
+    "2nd Squadron, 11th ACR (Eaglehorse)",
+    "Regimental Support Squadron, 11th ACR"
+   ]
+  },
+  {
+   "id": "presidio-of-monterey",
+   "base": "Presidio of Monterey",
+   "st": "CA",
+   "unit": "Defense Language Institute (DLIFLC)",
+   "unitFull": null,
+   "lat": 36.6,
+   "lon": -121.92,
+   "grp": "conus",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Army University",
+   "tenants": [
+    "Defense Language Institute (DLIFLC)",
+    "USAG Presidio of Monterey"
+   ]
+  },
+  {
+   "id": "tooele-army-depot",
+   "base": "Tooele Army Depot",
+   "st": "UT",
+   "unit": "Tooele Army Depot",
+   "unitFull": null,
+   "lat": 40.4,
+   "lon": -112.36,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Tooele Army Depot"
+   ]
+  },
+  {
+   "id": "sierra-army-depot",
+   "base": "Sierra Army Depot",
+   "st": "CA",
+   "unit": "Sierra Army Depot",
+   "unitFull": null,
+   "lat": 40.34,
+   "lon": -120.2,
+   "grp": "oib",
+   "parent": "redstone-arsenal",
+   "parentUnit": "Depots (maintain / reset)",
+   "tenants": [
+    "Sierra Army Depot"
+   ]
+  },
+  {
+   "id": "hawthorne-army-depot",
+   "base": "Hawthorne Army Depot",
+   "st": "NV",
+   "unit": "Hawthorne Army Depot",
+   "unitFull": null,
+   "lat": 38.54,
+   "lon": -118.63,
+   "grp": "oib",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Ammunition Plants (produce)",
+   "tenants": [
+    "Hawthorne Army Depot"
+   ]
+  },
+  {
+   "id": "portland-district",
+   "base": "Portland District",
+   "st": "OR",
+   "unit": "Portland District",
+   "unitFull": null,
+   "lat": 45.52,
+   "lon": -122.68,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Portland District"
+   ]
+  },
+  {
+   "id": "seattle-district",
+   "base": "Seattle District",
+   "st": "WA",
+   "unit": "Seattle District",
+   "unitFull": null,
+   "lat": 47.61,
+   "lon": -122.33,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Seattle District"
+   ]
+  },
+  {
+   "id": "walla-walla-district",
+   "base": "Walla Walla District",
+   "st": "WA",
+   "unit": "Walla Walla District",
+   "unitFull": null,
+   "lat": 46.06,
+   "lon": -118.34,
+   "grp": "conus",
+   "parent": "northwestern-div-portland",
+   "parentUnit": "Northwestern Division (NWD)",
+   "tenants": [
+    "Walla Walla District"
+   ]
+  },
+  {
+   "id": "albuquerque-district",
+   "base": "Albuquerque District",
+   "st": "NM",
+   "unit": "Albuquerque District",
+   "unitFull": null,
+   "lat": 35.08,
+   "lon": -106.65,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "Albuquerque District"
+   ]
+  },
+  {
+   "id": "los-angeles-district",
+   "base": "Los Angeles District",
+   "st": "CA",
+   "unit": "Los Angeles District",
+   "unitFull": null,
+   "lat": 34.05,
+   "lon": -118.24,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "Los Angeles District"
+   ]
+  },
+  {
+   "id": "sacramento-district",
+   "base": "Sacramento District",
+   "st": "CA",
+   "unit": "Sacramento District",
+   "unitFull": null,
+   "lat": 38.58,
+   "lon": -121.49,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "Sacramento District"
+   ]
+  },
+  {
+   "id": "san-francisco-district",
+   "base": "San Francisco District",
+   "st": "CA",
+   "unit": "San Francisco District",
+   "unitFull": null,
+   "lat": 37.77,
+   "lon": -122.42,
+   "grp": "conus",
+   "parent": "south-pacific-div-san-francisco",
+   "parentUnit": "South Pacific Division (SPD)",
+   "tenants": [
+    "San Francisco District"
+   ]
+  },
+  {
+   "id": "northwestern-div-portland",
+   "base": "Northwestern Div (Portland)",
+   "st": "OR",
+   "unit": "Northwestern Division (NWD)",
+   "unitFull": null,
+   "lat": 45.52,
+   "lon": -122.68,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "Northwestern Division (NWD)"
+   ]
+  },
+  {
+   "id": "south-pacific-div-san-francisco",
+   "base": "South Pacific Div (San Francisco)",
+   "st": "CA",
+   "unit": "South Pacific Division (SPD)",
+   "unitFull": null,
+   "lat": 37.77,
+   "lon": -122.42,
+   "grp": "conus",
+   "parent": "usace-hq-washington-dc",
+   "parentUnit": "USACE",
+   "tenants": [
+    "South Pacific Division (SPD)"
+   ]
+  },
+  {
+   "id": "fort-hunter-liggett",
+   "base": "Fort Hunter Liggett",
+   "st": "CA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 35.98,
+   "lon": -121.24,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "parks-reserve-forces-training-area",
+   "base": "Parks Reserve Forces Training Area",
+   "st": "CA",
+   "unit": "304th Cyber Battalion",
+   "unitFull": null,
+   "lat": 37.72,
+   "lon": -121.89,
+   "grp": "conus",
+   "parent": "fort-devens",
+   "parentUnit": "Cyber Protection Brigade",
+   "tenants": [
+    "304th Cyber Battalion"
+   ]
+  },
+  {
+   "id": "mot-concord",
+   "base": "MOT Concord",
+   "st": "CA",
+   "unit": null,
+   "unitFull": null,
+   "lat": 38.05,
+   "lon": -122.03,
+   "grp": "conus",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  }
+ ]
+}

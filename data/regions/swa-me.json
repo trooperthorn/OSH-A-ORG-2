@@ -1,0 +1,64 @@
+{
+ "region": "swa-me",
+ "sites": [
+  {
+   "id": "camp-arifjan",
+   "base": "Camp Arifjan",
+   "st": "Kuwait",
+   "unit": "28th Infantry Division (TF Spartan rotational command, historical)",
+   "unitFull": "28th Infantry Division, Pennsylvania Army National Guard",
+   "lat": 28.86,
+   "lon": 48.15,
+   "grp": "swa",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "160th Theater Signal Brigade",
+    "595th Transportation Brigade",
+    "Area Support Group – Kuwait (ASG-KU)",
+    "Operation Spartan Shield",
+    "Task Force Spartan / rotational BCTs",
+    "USARCENT (Forward)",
+    "USARCENT (Forward) / Operational Command Post",
+    "1100th Theater Aviation Sustainment Maintenance Group"
+   ]
+  },
+  {
+   "id": "camp-buehring",
+   "base": "Camp Buehring",
+   "st": "KW",
+   "unit": "Theater Aviation Task Force (Rotational CAB), Camp Buehring",
+   "unitFull": "Enduring rotational Combat Aviation Brigade billet, Operation Spartan Shield, Camp Buehring, Kuwait",
+   "lat": 29.66,
+   "lon": 47.76,
+   "grp": "swa",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "Theater Aviation Task Force (Rotational CAB), Camp Buehring",
+    "4th Combat Aviation Brigade (Task Force Ivy Eagle)",
+    "Camp Buehring",
+    "Rotational Brigade Combat Team, Camp Buehring (current: 2nd MBCT, 10th Mountain Division)",
+    "2nd Battalion, 4th Aviation Regiment",
+    "2nd IBCT, 34th ID",
+    "30th Armored Brigade Combat Team",
+    "404th Aviation Support Battalion"
+   ]
+  },
+  {
+   "id": "camp-as-sayliyah",
+   "base": "Camp As Sayliyah",
+   "st": "QA",
+   "unit": "Area Support Group-Qatar",
+   "unitFull": "Area Support Group-Qatar (ASG-Qatar) — DEACTIVATED June 10, 2021",
+   "lat": 25.26,
+   "lon": 51.39,
+   "grp": "swa",
+   "parent": "shaw-afb",
+   "parentUnit": "USARCENT",
+   "tenants": [
+    "Area Support Group-Qatar"
+   ]
+  }
+ ]
+}

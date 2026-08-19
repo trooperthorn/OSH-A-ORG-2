@@ -1,0 +1,547 @@
+{
+ "region": "europe",
+ "sites": [
+  {
+   "id": "wiesbaden",
+   "base": "Wiesbaden",
+   "st": "Germany",
+   "unit": "USAREUR-AF",
+   "unitFull": "U.S. Army Europe & Africa",
+   "lat": 50.08,
+   "lon": 8.24,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": [
+    "USAREUR-AF",
+    "Cyber Field Office",
+    "HHBN, USAREUR-AF",
+    "Security Assistance Group-Ukraine (SAG-U)",
+    "2nd Theater Signal Brigade",
+    "66th MI Brigade",
+    "102nd Strategic Signal Battalion",
+    "Regional Cyber Center – Europe (RCC-E)"
+   ]
+  },
+  {
+   "id": "kaiserslautern",
+   "base": "Kaiserslautern",
+   "st": "Germany",
+   "unit": "598th Transportation Brigade",
+   "unitFull": null,
+   "lat": 49.44,
+   "lon": 7.77,
+   "grp": "eur",
+   "parent": "scott-afb",
+   "parentUnit": "ARTRANS",
+   "tenants": [
+    "598th Transportation Brigade",
+    "7th Mission Support Command",
+    "405th Army Field Support Brigade",
+    "U.S. Army Garrison Rheinland-Pfalz",
+    "USAG Rheinland-Pfalz",
+    "USAMMC-E",
+    "839th Transportation Battalion",
+    "Army Field Support Battalion-Benelux"
+   ]
+  },
+  {
+   "id": "mainz-kastel",
+   "base": "Mainz-Kastel",
+   "st": "Germany",
+   "unit": "Multi-Domain Command Europe (MDC-E)",
+   "unitFull": null,
+   "lat": 49.3,
+   "lon": 9.6,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "Multi-Domain Command Europe (MDC-E)",
+    "19th Battlefield Coordination Detachment",
+    "2nd Multi-Domain Task Force"
+   ]
+  },
+  {
+   "id": "sembach",
+   "base": "Sembach",
+   "st": "Germany",
+   "unit": "10th Army Air & Missile Defense Command",
+   "unitFull": null,
+   "lat": 49.85,
+   "lon": 6.4,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "10th Army Air & Missile Defense Command",
+    "409th Contracting Support Brigade",
+    "52nd Air Defense Artillery Brigade",
+    "Installation Management Command - Europe (IMCOM-Europe)",
+    "U.S. Army Garrisons — Europe (USAG)",
+    "United States Army Europe and Africa Band & Chorus",
+    "13th Missile Defense Battery",
+    "U.S. Army Garrison Poland"
+   ]
+  },
+  {
+   "id": "vilseck",
+   "base": "Vilseck",
+   "st": "Germany",
+   "unit": "Army Field Support Battalion-Germany",
+   "unitFull": null,
+   "lat": 49.1,
+   "lon": 12.4,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Germany"
+   ]
+  },
+  {
+   "id": "vicenza",
+   "base": "Vicenza",
+   "st": "Italy",
+   "unit": "SETAF-AF",
+   "unitFull": null,
+   "lat": 45.55,
+   "lon": 11.55,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "SETAF-AF",
+    "U.S. Army Southern European Task Force, Africa (SETAF-AF)",
+    "173rd Airborne Brigade",
+    "207th MI Brigade",
+    "414th Contracting Support Brigade",
+    "Headquarters and Headquarters Battalion, SETAF-AF",
+    "509th Strategic Signal Battalion",
+    "Regional Contracting Office-Africa"
+   ]
+  },
+  {
+   "id": "chi-vres",
+   "base": "Chièvres",
+   "st": "Belgium",
+   "unit": "650th MI Group / Allied Command CI (ACCI)",
+   "unitFull": null,
+   "lat": 50.58,
+   "lon": 3.83,
+   "grp": "eur",
+   "parent": "austin-t2com-hq",
+   "parentUnit": "Functional & National MI",
+   "tenants": [
+    "650th MI Group / Allied Command CI (ACCI)",
+    "39th Strategic Signal Battalion",
+    "U.S. Army Garrison Benelux",
+    "USAG Benelux"
+   ]
+  },
+  {
+   "id": "grafenw-hr-vilseck",
+   "base": "Grafenwöhr / Vilseck",
+   "st": "Germany",
+   "unit": "7th Army Training Command (7ATC)",
+   "unitFull": null,
+   "lat": 49.7,
+   "lon": 11.94,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "7th Army Training Command (7ATC)",
+    "41st Field Artillery Brigade",
+    "7th Army NCO Academy",
+    "928th Contracting Battalion",
+    "U.S. Army Garrison Bavaria",
+    "USAG Bavaria"
+   ]
+  },
+  {
+   "id": "hohenfels-jmrc",
+   "base": "Hohenfels (JMRC)",
+   "st": "Germany",
+   "unit": "Joint Multinational Readiness Center (JMRC)",
+   "unitFull": null,
+   "lat": 49.22,
+   "lon": 11.84,
+   "grp": "eur",
+   "parent": "fort-leavenworth",
+   "parentUnit": "Combat Training Centers (CTCs)",
+   "tenants": [
+    "Joint Multinational Readiness Center (JMRC)"
+   ]
+  },
+  {
+   "id": "ansbach",
+   "base": "Ansbach",
+   "st": "Germany",
+   "unit": "12th Combat Aviation Brigade",
+   "unitFull": null,
+   "lat": 49.3,
+   "lon": 10.59,
+   "grp": "eur",
+   "parent": "fort-knox",
+   "parentUnit": "V Corps",
+   "tenants": [
+    "12th Combat Aviation Brigade",
+    "1st Battalion, 57th Air Defense Artillery Regiment",
+    "5th Battalion, 4th Air Defense Artillery Regiment",
+    "U.S. Army Garrison Ansbach",
+    "USAG Ansbach"
+   ]
+  },
+  {
+   "id": "baumholder",
+   "base": "Baumholder",
+   "st": "Germany",
+   "unit": "16th Sustainment Brigade",
+   "unitFull": null,
+   "lat": 49.62,
+   "lon": 7.34,
+   "grp": "eur",
+   "parent": "stuttgart",
+   "parentUnit": "21st Theater Sustainment Command",
+   "tenants": [
+    "16th Sustainment Brigade",
+    "421st Medical Battalion (Multifunctional)",
+    "5th Battalion, 7th Air Defense Artillery Regiment"
+   ]
+  },
+  {
+   "id": "stuttgart",
+   "base": "Stuttgart",
+   "st": "Germany",
+   "unit": "21st Theater Sustainment Command",
+   "unitFull": null,
+   "lat": 48.78,
+   "lon": 9.18,
+   "grp": "eur",
+   "parent": "wiesbaden",
+   "parentUnit": "USAREUR-AF",
+   "tenants": [
+    "21st Theater Sustainment Command",
+    "838th Transportation Battalion",
+    "52nd Strategic Signal Battalion",
+    "U.S. Army Garrison Stuttgart",
+    "USAG Stuttgart",
+    "18th Military Police Brigade",
+    "30th Medical Brigade"
+   ]
+  },
+  {
+   "id": "garmisch",
+   "base": "Garmisch",
+   "st": "Germany",
+   "unit": null,
+   "unitFull": null,
+   "lat": 47.49,
+   "lon": 11.1,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "camp-darby",
+   "base": "Camp Darby",
+   "st": "Italy",
+   "unit": "Army Field Support Battalion-Africa",
+   "unitFull": null,
+   "lat": 43.62,
+   "lon": 10.3,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Africa"
+   ]
+  },
+  {
+   "id": "europe-district",
+   "base": "Europe District",
+   "st": "Germany",
+   "unit": "Europe District",
+   "unitFull": null,
+   "lat": 50.08,
+   "lon": 8.24,
+   "grp": "eur",
+   "parent": "north-atlantic-div-brooklyn",
+   "parentUnit": "North Atlantic Division (NAD)",
+   "tenants": [
+    "Europe District"
+   ]
+  },
+  {
+   "id": "useucom-stuttgart",
+   "base": "USEUCOM (Stuttgart)",
+   "st": "Germany",
+   "unit": null,
+   "unitFull": null,
+   "lat": 48.74,
+   "lon": 9.1,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "usafricom-stuttgart",
+   "base": "USAFRICOM (Stuttgart)",
+   "st": "Germany",
+   "unit": null,
+   "unitFull": null,
+   "lat": 48.78,
+   "lon": 9.18,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "nato-shape-mons",
+   "base": "NATO SHAPE (Mons)",
+   "st": "Belgium",
+   "unit": null,
+   "unitFull": null,
+   "lat": 50.44,
+   "lon": 3.99,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "mnc-ne-szczecin",
+   "base": "MNC-NE (Szczecin)",
+   "st": "Poland",
+   "unit": null,
+   "unitFull": null,
+   "lat": 53.43,
+   "lon": 14.55,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "cjtf-hoa-camp-lemonnier",
+   "base": "CJTF-HOA (Camp Lemonnier)",
+   "st": "Djibouti",
+   "unit": null,
+   "unitFull": null,
+   "lat": 11.54,
+   "lon": 43.15,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "shape-saceur-mons",
+   "base": "SHAPE / SACEUR (Mons)",
+   "st": "Belgium",
+   "unit": "11th Missile Defense Battery",
+   "unitFull": null,
+   "lat": 50.5,
+   "lon": 3.96,
+   "grp": "eur",
+   "parent": "sembach",
+   "parentUnit": "52nd Air Defense Artillery Brigade",
+   "tenants": [
+    "11th Missile Defense Battery"
+   ]
+  },
+  {
+   "id": "sembach-kaserne",
+   "base": "Sembach Kaserne",
+   "st": "DE",
+   "unit": null,
+   "unitFull": null,
+   "lat": 49.5,
+   "lon": 7.86,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "landstuhl",
+   "base": "Landstuhl",
+   "st": "DE",
+   "unit": "Landstuhl Regional Medical Center",
+   "unitFull": null,
+   "lat": 49.41,
+   "lon": 7.55,
+   "grp": "eur",
+   "parent": "jbsa-fort-sam-houston",
+   "parentUnit": "Medical Readiness Command, Europe",
+   "tenants": [
+    "Landstuhl Regional Medical Center"
+   ]
+  },
+  {
+   "id": "coleman-barracks",
+   "base": "Coleman Barracks",
+   "st": "DE",
+   "unit": "Army Field Support Battalion-Mannheim",
+   "unitFull": null,
+   "lat": 49.56,
+   "lon": 8.46,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Mannheim"
+   ]
+  },
+  {
+   "id": "camp-kosciuszko",
+   "base": "Camp Kosciuszko",
+   "st": "PL",
+   "unit": "V Corps Headquarters (Forward)",
+   "unitFull": null,
+   "lat": 52.41,
+   "lon": 16.93,
+   "grp": "eur",
+   "parent": "fort-knox",
+   "parentUnit": "V Corps",
+   "tenants": [
+    "V Corps Headquarters (Forward)"
+   ]
+  },
+  {
+   "id": "powidz",
+   "base": "Powidz",
+   "st": "PL",
+   "unit": "APS-2 (Europe)",
+   "unitFull": "Army Prepositioned Stock 2 - Europe",
+   "lat": 52.44,
+   "lon": 17.85,
+   "grp": "eur",
+   "parent": "rock-island-arsenal",
+   "parentUnit": "Army Prepositioned Stocks (APS)",
+   "tenants": [
+    "APS-2 (Europe)"
+   ]
+  },
+  {
+   "id": "drawsko-pomorskie-training-area",
+   "base": "Drawsko Pomorskie Training Area",
+   "st": "PL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 53.53,
+   "lon": 15.81,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "novo-selo-training-area",
+   "base": "Novo Selo Training Area",
+   "st": "BG",
+   "unit": "U.S. Army Garrison Black Sea",
+   "unitFull": null,
+   "lat": 42.72,
+   "lon": 26.35,
+   "grp": "eur",
+   "parent": "sembach",
+   "parentUnit": "Installation Management Command - Europe (IMCOM-Europe)",
+   "tenants": [
+    "U.S. Army Garrison Black Sea"
+   ]
+  },
+  {
+   "id": "camp-bondsteel",
+   "base": "Camp Bondsteel",
+   "st": "XK",
+   "unit": null,
+   "unitFull": null,
+   "lat": 42.36,
+   "lon": 21.24,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "mk-air-base",
+   "base": "MK Air Base",
+   "st": "RO",
+   "unit": null,
+   "unitFull": null,
+   "lat": 44.36,
+   "lon": 28.49,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "rose-barracks-vilseck",
+   "base": "Rose Barracks (Vilseck)",
+   "st": "DE",
+   "unit": "2nd Cavalry Regiment",
+   "unitFull": null,
+   "lat": 49.63,
+   "lon": 11.79,
+   "grp": "eur",
+   "parent": "fort-knox",
+   "parentUnit": "V Corps",
+   "tenants": [
+    "2nd Cavalry Regiment",
+    "709th Military Police Battalion",
+    "1st Squadron, 2nd Cavalry Regiment (Stryker mounted infantry)",
+    "2nd Squadron, 2nd Cavalry Regiment (Stryker mounted infantry)",
+    "3rd Squadron, 2nd Cavalry Regiment (Stryker mounted infantry)",
+    "4th Squadron, 2nd Cavalry Regiment (reconnaissance, surveillance, target acquisition)",
+    "Regimental Engineer Squadron (assured mobility / counter-mobility / general engineering)"
+   ]
+  },
+  {
+   "id": "zagan-aps-2-site",
+   "base": "Zagan APS-2 Site",
+   "st": "PL",
+   "unit": null,
+   "unitFull": null,
+   "lat": 51.61,
+   "lon": 15.3,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  },
+  {
+   "id": "d-lmen-aps-2-site",
+   "base": "Dülmen APS-2 Site",
+   "st": "DE",
+   "unit": "Army Field Support Battalion-Benelux (operates APS-2 sites at Zutendaal, Belgium; Dülmen, Germany; Eygelshoven, Netherlands)",
+   "unitFull": null,
+   "lat": 51.83,
+   "lon": 7.28,
+   "grp": "eur",
+   "parent": "kaiserslautern",
+   "parentUnit": "405th Army Field Support Brigade",
+   "tenants": [
+    "Army Field Support Battalion-Benelux (operates APS-2 sites at Zutendaal, Belgium; Dülmen, Germany; Eygelshoven, Netherlands)"
+   ]
+  },
+  {
+   "id": "camp-lemonnier",
+   "base": "Camp Lemonnier",
+   "st": "DJ",
+   "unit": null,
+   "unitFull": null,
+   "lat": 11.55,
+   "lon": 43.15,
+   "grp": "eur",
+   "parent": null,
+   "parentUnit": null,
+   "tenants": []
+  }
+ ]
+}
