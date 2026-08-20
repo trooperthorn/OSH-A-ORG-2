@@ -29,8 +29,16 @@ if (!fs.existsSync(IDX)) {
 }
 const src = fs.readFileSync(IDX, 'utf8');
 
-// ── locate ALL <style> blocks (shell contract: @TOKENS wrapper + @THEMES wrapper) ──
-const styleBlocks = [...src.matchAll(/<style>([\s\S]*?)<\/style>/g)];
+// ── locate ALL <style> blocks (shell contract: @TOKENS wrapper + identity wrapper).
+//    Real style elements never live inside <script>, but script STRINGS/comments can
+//    mention style tags (the export renderers write '<style>' into popup docs; an s3
+//    comment names its old injected tag) — so blank out script bodies first and find
+//    style spans in the blanked copy. Offsets still line up: blanking preserves length.
+const srcNoScript = src.replace(/(<script[^>]*>)([\s\S]*?)(<\/script>)/g,
+  (m, a, b, c) => a + b.replace(/[^\n]/g, ' ') + c);
+const styleBlocks = [...srcNoScript.matchAll(/<style>([\s\S]*?)<\/style>/g)].map(m => {
+  return { index: m.index, 0: src.slice(m.index, m.index + m[0].length), 1: src.slice(m.index + 7, m.index + m[0].length - 8) };
+});
 if (!styleBlocks.length) { bad('could not locate any <style> block'); console.log('DEAD LINT FAIL'); process.exit(1); }
 const css = styleBlocks.map(m => m[1]).join('\n');
 let rest = '', last = 0;                                      // everything outside style innards

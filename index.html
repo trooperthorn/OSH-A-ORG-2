@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-app-theme="atlas">
+<html lang="en" data-app-theme="orbit">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -96,7 +96,7 @@
      --t1 --t2 --t3 --t4          (brief tier law — see LOCKED SEMANTICS below)
      --r-card --r-chip --r-pill   (radii, ported from A-ORG-1 P1 tokens ~L92)
      --disp --body --mono         (system font stacks only — no webfonts at boot)
-   Themes land in the @THEMES layer as html[data-app-theme="atlas"|"slate"|"field"]{...}
+   The identity layer below :root holds no overrides — ORBIT is the one look.
    overrides. Default theme is arctic; these :root values ARE arctic, so
    (ATLAS is also the :root default; its block is inlined anyway — one source of truth.)
 
@@ -128,49 +128,49 @@
 
 /* ─── 1 · TOKENS — ARCTIC is the :root default ─────────────────────────────── */
 :root{
-  /* ═══ ATLAS — daylight cartographic (the :root default; owner directive 19 Aug:
-     complete shift away from the radar identity — no glow, no phosphor, no
-     wireframe-on-black; the globe reads as a printed atlas plate) ═══ */
-  /* ground + surfaces — cool daylight paper, three sheet steps */
-  --ground:#EEF2F5;                       /* page + label halos                   */
-  --panel:#FFFFFF;                        /* raised sheet (brightest = closest)   */
-  --panel-2:#E2E9EF;                      /* second step (hover/nested) — the
-                                             darkest surface = contrast worst case*/
-  --line:rgba(16,32,48,.22);              /* ink hairline                         */
+  /* ═══ ORBIT — the committed identity (owner references, 20 Aug: the modern
+     "global network" globe — deep-space navy, a luminous earth, thin light arcs,
+     glass chrome at the edges that never impedes the sphere). Not the radar:
+     no phosphor green, no wireframe scope; luminance does the work. ═══ */
+  /* ground + surfaces — space navy, three steps of glass depth */
+  --ground:#0A1220;                       /* page + label halos (space)           */
+  --panel:#111B2E;                        /* raised glass                         */
+  --panel-2:#182338;                      /* second step (hover/nested)           */
+  --line:rgba(150,190,235,.18);           /* steel hairline                       */
   /* ink ladder */
-  --text:#16222E;                         /* primary ink, blue-black              */
-  --dim:#405468;                          /* secondary ink                        */
-  --faint:#526578;                        /* tertiary ink / placeholders (4.91:1+ worst case) */
+  --text:#EAF0F8;                         /* near-white ink                       */
+  --dim:#A9B8CC;                          /* secondary ink                        */
+  --faint:#8494AA;                        /* tertiary ink / placeholders (5.09:1 worst case) */
   --safe-l:calc(env(safe-area-inset-left,0px) + 12px);   /* viewport-fit=cover: edge chrome respects the notch */
   --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
-  /* voices — cartographic blue leads; brass signals the command line */
-  --accent:#0E5FA8;                       /* map blue — live/active/selection     */
-  --accent-deep:#0A4478;                  /* pressed / gradient floor             */
-  --accent-wash:rgba(14,95,168,.10);
-  --signal:#8A5800;                       /* brass — lineage/attention            */
-  --signal-wash:rgba(138,88,0,.12);
-  --danger:#AC2418;
-  --ok:#166F3E;                           /* status only — NEVER on brief data    */
-  /* brief tiers (LOCKED SEMANTICS at their ink end: t1 white-family reads as the
-     deepest ink on paper; t2 cool NEVER green; t3 warm; t4 rose) */
-  --t1:#0D1117; --t2:#0B6484; --t3:#9A4D00; --t4:#A1246E;
+  /* voices — luminous sky-blue leads; amber signals the command line */
+  --accent:#5CC8FF;                       /* luminous blue — live/active/selection*/
+  --accent-deep:#2E9BDD;                  /* pressed / gradient floor             */
+  --accent-wash:rgba(92,200,255,.13);
+  --signal:#E8B45A;                       /* amber — lineage/attention            */
+  --signal-wash:rgba(232,180,90,.14);
+  --danger:#FF7A66;
+  --ok:#58C08A;                           /* status only — NEVER on brief data    */
+  /* brief tiers (LOCKED SEMANTICS: t1 white · t2 cool NEVER green · t3 warm · t4 rose) */
+  --t1:#FFFFFF; --t2:#6FC7E8; --t3:#FFC95C; --t4:#FF8FC0;
   /* radii (A-ORG-1 P1 values, ported) */
   --r-card:16px; --r-chip:11px; --r-pill:999px;
   /* type (system stacks only — zero webfonts at boot) */
   --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  /* derived component tokens (glass material → bright paper stock) */
-  --glass-hi:rgba(255,255,255,.93);
-  --glass-lo:rgba(236,242,247,.88);
-  --spec:rgba(255,255,255,.75);
-  --drop:0 10px 26px -12px rgba(16,32,48,.28);
-  /* world paint (the canvas reads these through _mTok) — flat cartographic mode */
-  --ocean-hi:#D9E6F2;                     /* sphere gradient ceiling              */
-  --ocean-lo:#C2D5E6;                     /* sphere gradient floor                */
-  --land:247,243,234;                     /* land fill triple (paper)             */
-  --coast:90,110,128;                     /* coast/border stroke triple           */
-  --world-glow:0;                         /* 0 = flat print · 1 = instrument glow */
+  /* derived component tokens (glass material — navy glass) */
+  --glass-hi:rgba(20,32,54,.88);
+  --glass-lo:rgba(9,15,28,.94);
+  --spec:rgba(255,255,255,.08);
+  --drop:0 10px 26px -10px rgba(0,0,0,.6);
+  /* world paint — the luminous network earth: BRIGHT land on DARK ocean, soft
+     blue limb halo (glow:1 here is the ISS-tracker limb, not the radar scope) */
+  --ocean-hi:#10203A;                     /* sphere gradient ceiling              */
+  --ocean-lo:#081020;                     /* sphere gradient floor                */
+  --land:44,66,98;                        /* luminous slab (city-lit continents)  */
+  --coast:127,180,232;                    /* coast/border strokes                 */
+  --world-glow:1;                         /* subtle accent limb halo              */
 }
 
 /* ─── 2 · RESET + THE STAGE (the globe IS the page) ────────────────────────── */
@@ -264,7 +264,7 @@ body{
 #searchPill{
   position:absolute; z-index:20;
   top:calc(env(safe-area-inset-top,0px) + 10px);
-  left:var(--safe-l); right:calc(var(--safe-r) + 52px);  /* right lane reserved for #themeSwitch */
+  left:var(--safe-l); right:var(--safe-r);
   display:flex; align-items:center; gap:8px;
   min-height:46px; padding:0 14px; border-radius:var(--r-pill);
 }
@@ -277,19 +277,7 @@ body{
 #searchPill:focus-within{
   box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
 }
-#themeSwitch{
-  position:absolute; z-index:20;
-  top:calc(env(safe-area-inset-top,0px) + 10px); right:var(--safe-r);
-  width:46px; height:46px; border-radius:var(--r-pill);
-  display:flex; align-items:center; justify-content:center;
-}
-#themeSwitch:empty{display:none}
-#themeSwitch .ts-b{
-  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0;
-  width:100%; height:100%; border-radius:var(--r-pill);
-  color:var(--dim); font-size:17px; line-height:1; cursor:pointer;
-  user-select:none; -webkit-user-select:none;
-}
+/* (the #themeSwitch corner control retired at v0.2.0 — identity committed) */
 
 /* search results — SCROLL CONTAINER: inset math only, never transformed */
 #searchResults{
@@ -410,7 +398,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
     max-height:calc(100vh - 180px); max-height:calc(100dvh - 180px)}
   #stageBar{bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
   /* hovers live ONLY here */
-  .pill:hover,.chip:hover,#themeSwitch .ts-b:hover{
+  .pill:hover,.chip:hover{
     box-shadow:0 0 0 1px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
     color:var(--text)}
   #searchResults .sr-row:hover{background:var(--accent-wash)}
@@ -420,98 +408,63 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   #errToast{left:auto; right:24px; max-width:520px; bottom:24px}
 }
 
+
+/* ═══ v0.2.0 CHROME — trail · legend · export sheet · slim-first dossier
+   (owner references: edge chrome, the globe never impeded) ═══ */
+#trailBar{position:absolute; z-index:24; top:calc(env(safe-area-inset-top,0px) + 114px);  /* under the corner clocks */
+  left:var(--safe-l); right:var(--safe-r); display:flex; gap:6px; overflow-x:auto;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none; pointer-events:auto}
+#trailBar::-webkit-scrollbar{display:none}
+#trailBar:empty{display:none}
+.tr-chip{flex:none; max-width:44vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  border:none; cursor:pointer; padding:6px 12px; border-radius:var(--r-pill);
+  font:700 11.5px/1 var(--body); color:var(--dim)}
+.tr-chip.tip{color:var(--text); box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec)}
+.tr-chip:active{background:var(--accent-wash)}
+
+#legendPanel{position:absolute; z-index:40; left:var(--safe-l);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 62px);
+  width:min(78vw,280px); max-height:46vh; max-height:46dvh; overflow-y:auto;
+  -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:6px}
+.lg-head{font:800 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--faint); padding:8px 10px 6px}
+.lg-row{display:flex; align-items:center; gap:9px; width:100%; border:none; background:none;
+  cursor:pointer; padding:8px 10px; border-radius:9px; color:var(--text); font:600 12.5px/1.2 var(--body); text-align:left}
+.lg-row:active{background:var(--accent-wash)}
+.lg-row.off{opacity:.38}
+.lg-row.off .lg-nm{text-decoration:line-through}
+.lg-sw{flex:none; width:11px; height:11px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.lg-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.lg-ct{flex:none; font:700 10.5px/1 var(--mono); color:var(--faint)}
+
+#exportSheet{position:absolute; z-index:40; right:var(--safe-r);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 62px);
+  width:min(86vw,320px); padding:6px}
+.xp-head{font:800 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--faint); padding:8px 10px 6px}
+.xp-row{display:block; width:100%; border:none; background:none; cursor:pointer; text-align:left;
+  padding:9px 10px; border-radius:9px; color:var(--text)}
+.xp-row:active{background:var(--accent-wash)}
+.xp-row b{display:block; font:700 13px/1.25 var(--body)}
+.xp-row span{display:block; font:500 11px/1.35 var(--body); color:var(--dim); margin-top:1px}
+
+/* slim-first dossier: the bottom NAME BAR (owner reference #2). Phone-scoped —
+   desktop's side card never covers the sphere. Collapsed shows head + unit +
+   stats; a fade hints at depth; tapping the card body toggles. */
+@media (max-width:1099px){
+  #dossier.dz-min{max-height:132px; overflow:hidden}  /* absolute base stays — relative here once dropped the card into page flow */
+  #dossier.dz-min::after{content:''; position:absolute; left:0; right:0; bottom:0; height:34px;
+    background:linear-gradient(180deg, rgba(0,0,0,0), var(--glass-lo)); pointer-events:none;
+    border-radius:0 0 var(--r-card) var(--r-card)}
+}
 </style>
 <style>
-/* ═══ THEME LAYER — the three NON-RADAR candidates (owner directive, 19 Aug 2026:
-   "a complete shift away from this radar-esque theme"). Values only — never new
-   selectors, never token names. Every block carries the FULL token shape
-   (33 tokens incl. the world-paint set) so no theme rides on :root fallback.
-   ATLAS is also the :root default — its block is inlined so the set has one
-   source of truth. The retired radar family (arctic/night/paper) lives in git
-   history at v0.1.0. ═══ */
-
-/* ── ATLAS — daylight cartographic. A printed map plate: paper land, soft blue
-   ocean, ink text, cartographic-blue accent, brass command line. ── */
-html[data-app-theme="atlas"]{
-  --ground:#EEF2F5; --panel:#FFFFFF; --panel-2:#E2E9EF;
-  --line:rgba(16,32,48,.22);
-  --text:#16222E; --dim:#405468; --faint:#526578;
-  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
-  --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
-  --accent:#0E5FA8; --accent-deep:#0A4478; --accent-wash:rgba(14,95,168,.10);
-  --signal:#8A5800; --signal-wash:rgba(138,88,0,.12);
-  --danger:#AC2418; --ok:#166F3E;
-  --t1:#0D1117; --t2:#0B6484; --t3:#9A4D00; --t4:#A1246E;
-  --r-card:16px; --r-chip:11px; --r-pill:999px;
-  --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-  --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-  --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  --glass-hi:rgba(255,255,255,.93); --glass-lo:rgba(236,242,247,.88);
-  --spec:rgba(255,255,255,.75); --drop:0 10px 26px -12px rgba(16,32,48,.28);
-  --ocean-hi:#D9E6F2; --ocean-lo:#C2D5E6;
-  --land:247,243,234; --coast:90,110,128; --world-glow:0;
-}
-
-/* ── SLATE — modern product dark. Neutral graphite (no green cast), solid flat
-   land slab, indigo accent, amber command line, zero glow anywhere. ── */
-html[data-app-theme="slate"]{
-  --ground:#15171C; --panel:#1D2026; --panel-2:#252932;
-  --line:rgba(180,195,215,.16);
-  --text:#E9ECF1; --dim:#A7B0BD; --faint:#8A94A2;
-  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
-  --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
-  --accent:#8FA7FF; --accent-deep:#6E88E8; --accent-wash:rgba(143,167,255,.14);
-  --signal:#E3B45C; --signal-wash:rgba(227,180,92,.14);
-  --danger:#FF7A66; --ok:#58C08A;
-  --t1:#FFFFFF; --t2:#6FC7E8; --t3:#FFC95C; --t4:#FF8FC0;
-  --r-card:16px; --r-chip:11px; --r-pill:999px;
-  --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-  --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-  --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  --glass-hi:rgba(32,36,44,.88); --glass-lo:rgba(21,23,28,.94);
-  --spec:rgba(255,255,255,.06); --drop:0 10px 26px -10px rgba(0,0,0,.6);
-  --ocean-hi:#191C22; --ocean-lo:#14161B;
-  --land:42,47,56; --coast:122,136,152; --world-glow:0;
-}
-
-/* ── FIELD — warm editorial print. Bone paper, olive accent, terracotta-brass
-   command line, serif display voice; the map reads as a field-guide plate. ── */
-html[data-app-theme="field"]{
-  --ground:#F1EDE3; --panel:#FAF7EF; --panel-2:#E6E0D1;
-  --line:rgba(45,38,26,.24);
-  --text:#29231A; --dim:#57503F; --faint:#5F5742;
-  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
-  --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
-  --accent:#49573D; --accent-deep:#36422C; --accent-wash:rgba(73,87,61,.12);
-  --signal:#8A4D18; --signal-wash:rgba(138,77,24,.12);
-  --danger:#A8321E; --ok:#2F6B3E;
-  --t1:#14100A; --t2:#0F6070; --t3:#8F4A05; --t4:#99306B;
-  --r-card:16px; --r-chip:11px; --r-pill:999px;
-  --disp:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
-  --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-  --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  --glass-hi:rgba(252,249,241,.93); --glass-lo:rgba(238,232,218,.88);
-  --spec:rgba(255,255,255,.70); --drop:0 10px 26px -12px rgba(48,40,24,.28);
-  --ocean-hi:#D7E0D8; --ocean-lo:#C6D2C8;
-  --land:240,234,216; --coast:122,110,84; --world-glow:0;
-}
-
-/* ═══ CONTRAST MATH (WCAG 2.x, ratio vs ground · panel · panel-2; text needs
-   ≥4.5, chrome ≥3.0). All values machine-checked 19 Aug 2026:
-   ATLAS  text 14.3/16.1/13.2 · dim 7.0/7.8/6.4 · faint 5.3/6.0/4.9 ·
-          accent 5.8/6.5/5.3 · signal 5.4/6.0/4.9 · danger 6.2/7.0/5.7 ·
-          ok 5.5/6.2/5.1 · t1 16.8/18.9/15.4 · t2 5.9/6.6/5.4 · t3 5.4/6.1/5.0 ·
-          t4 6.2/7.0/5.7 — ALL PASS
-   SLATE  text 15.1/13.8/12.3 · dim 8.2/7.5/6.7 · faint 5.8/5.3/4.7 ·
-          accent 7.8/7.1/6.3 · signal 9.4/8.5/7.6 · danger 7.0/6.4/5.7 ·
-          ok 8.0/7.2/6.5 · t1 17.9/16.3/14.6 · t2 9.4/8.6/7.6 · t3 11.8/10.7/9.5 ·
-          t4 8.5/7.7/6.9 — ALL PASS
-   FIELD  text 13.3/14.5/11.8 · dim 6.8/7.5/6.1 · faint 6.1/6.7/5.5 ·
-          accent 6.6/7.2/5.9 · signal 5.7/6.2/5.1 · danger 5.7/6.3/5.1 ·
-          ok 5.5/6.0/4.8 · t1 16.2/17.7/14.4 · t2 6.1/6.7/5.5 · t3 5.7/6.2/5.1 ·
-          t4 6.0/6.6/5.3 — ALL PASS
-   Tier law holds in all three: t1 white-family (ink end on light grounds),
-   t2 cool NEVER green, t3 warm, t4 rose. --ok is status-only, never brief data. ═══ */
+/* ═══ IDENTITY LAYER — ORBIT (owner-committed via references, 20 Aug 2026: the
+   modern global-network globe). The full token set lives in :root above; this
+   layer intentionally holds no override blocks. Prior candidates (atlas, slate,
+   field) and the retired radar family live in git history @ v0.1.1 / v0.1.0.
+   Chrome contrast machine-checked 20 Aug: worst text pair --faint 5.09:1 on
+   --panel-2; every voice ≥6.1:1; family dot hues ≥3.7:1 on the land slab. ═══ */
 </style>
 <!-- DEV PREVIEW ONLY — uncomment while working on the un-integrated skeleton;
      integration/ship keeps it commented (the shipped app is one file):
@@ -531,6 +484,21 @@ html[data-app-theme="field"]{
 </div>
 <div id="searchResults" class="glass" role="listbox" aria-label="Search results"></div>
 
+<!-- breadcrumb trail — the globe stroll's memory; selection owner renders it -->
+<nav id="trailBar" aria-label="Selection trail"></nav>
+
+<!-- family legend / layer list — swatch · name · count; tap toggles the family -->
+<section id="legendPanel" class="glass card" hidden aria-label="Map layers"></section>
+
+<!-- export chooser — the Snapshot spine's front door -->
+<section id="exportSheet" class="glass card" hidden aria-label="Export">
+  <div class="xp-head">Export this picture</div>
+  <button class="xp-row" type="button" data-xp="png"><b>PNG image</b><span>the stage as shown — title + legend burned in</span></button>
+  <button class="xp-row" type="button" data-xp="pdf"><b>PDF dossier</b><span>print one-pager: map + command line + roster</span></button>
+  <button class="xp-row" type="button" data-xp="html"><b>HTML dossier</b><span>self-contained file — shareable, offline, data embedded</span></button>
+  <button class="xp-row" type="button" data-xp="json"><b>JSON snapshot</b><span>camera · selection · every site in scope</span></button>
+</section>
+
 <!-- dossier: THE drawer (single-brain law — one drawer) -->
 <section id="dossier" class="glass card" role="dialog" aria-label="Dossier" hidden></section>
 
@@ -545,6 +513,8 @@ html[data-app-theme="field"]{
   <button id="stageFit" class="pill glass" type="button" hidden>⊡ Fit</button>
   <button id="zoomOutBtn" class="pill glass" type="button" aria-label="Zoom out">−</button>
   <button id="zoomInBtn" class="pill glass" type="button" aria-label="Zoom in">＋</button>
+  <button id="legendBtn" class="pill glass" type="button" aria-label="Layers">⊙</button>
+  <button id="exportBtn" class="pill glass" type="button" aria-label="Export">⇪</button>
   <div class="seg glass" role="group" aria-label="Globe or Brief mode">
     <button id="stageModeGlobe" class="seg-b on" data-gseg="cmd" type="button" title="Globe mode" aria-label="Globe mode">Globe</button>
     <button id="stageModeBrief" class="seg-b" data-gseg="brief" type="button" title="Brief mode" aria-label="Brief mode" disabled>Brief</button>
@@ -558,17 +528,35 @@ html[data-app-theme="field"]{
 <div id="clockBL" class="clock glass"></div>
 <div id="clockBR" class="clock glass"></div>
 
-<!-- M1 theme picker mount (D3: theme picked from live mockups at M1 gate).
-     The theme module owns the picker UI + binding; the shell provides the mount. -->
-<div id="themeSwitch" class="glass">
-  <button class="ts-b" type="button" aria-label="Theme">◐</button>
-</div>
-
 <!-- version chip — long-press dumps the diagnostics ring buffer -->
 <span id="verChip" class="glass"></span>
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.2.0 • ORBIT + THE SNAPSHOT SPINE (owner directive + reference set, 20 Aug).
+//            IDENTITY COMMITTED — ORBIT: the modern global-network globe. Deep-
+//            space navy ground, luminous continents on a dark ocean, soft blue
+//            limb halo, thin light arcs for connections; glass chrome rides the
+//            edges and never impedes the sphere (the references' law). Theme
+//            switcher retired — one look, tokens still rule.
+//            QUICK-IDENTIFY MARKERS: color-by-command-family (9 machine-checked
+//            luminous hues via famOf branch walk), echelon sizing (roots > hubs >
+//            leaves > guard), and the ⊙ LAYERS legend — swatch · name · count
+//            rows; tap a family to clear it off the map (chain members immune).
+//            GLOBE STROLL: breadcrumb TRAIL chips under the search pill remember
+//            the walk (12 stops, deduped); ‹ Back rides the stage bar. SLIM-FIRST
+//            DOSSIER on phones: selection opens as a bottom name-bar (head, unit,
+//            stats + depth fade); tap the card to unfold — the globe stays owner
+//            of the screen.
+//            THE FLAGSHIP FOUNDATION — ⇪ EXPORT, built on ONE producer:
+//            buildSnapshot() serializes what the map shows AND the data beneath
+//            (camera · selection · chain · scope rows · family census · stage
+//            image). Four renderers consume it: PNG (title/meta burned in), PDF
+//            dossier (print one-pager: map + command line + rosters), HTML
+//            dossier (self-contained shareable file, snapshot JSON embedded),
+//            JSON. M2 datastore and M3 brief ATTACH to the snapshot — exports
+//            never get rebuilt. smoke grew spine probes; dead-lint learned to
+//            ignore style-tag text inside script strings.
 //   v0.1.1 • THE RADAR IS RETIRED (owner directive, 19 Aug): complete identity
 //            shift away from the radar/phosphor look. Three NEW theme candidates,
 //            all non-radar, all contrast-machine-checked, behind the same ◐
@@ -599,7 +587,7 @@ html[data-app-theme="field"]{
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.1.1';
+const APP_VERSION = 'v0.2.0';
 const APP_UPDATED = '19 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -913,7 +901,7 @@ function drawGlobe(cv, ctx){
   // land: flat print = near-solid paper/slab fill under a quiet coast stroke;
   // glow = the old translucent accent wash under a bright accent line.
   ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.85')+')'; ctx.lineWidth=(wGlow?1.4:1.0);
-  ctx.fillStyle=wGlow?('rgba('+wAcc+',.30)'):('rgba('+wLand+',.96)');
+  ctx.fillStyle=(W&&W.land)?('rgba('+wLand+',.96)'):(wGlow?('rgba('+wAcc+',.30)'):('rgba('+wLand+',.96)'));
   for(const ring of GLOBE_RINGS){ drawGlobePath(ctx,m, ring, true); }
   // World COUNTRY borders — very thin, dim, global context layer.
   if(GLOBE_COUNTRY_RINGS && GLOBE_COUNTRY_RINGS.length){
@@ -1589,6 +1577,85 @@ function siteById(id){ if(id==null) return null; return _siteIndex().get(id)||nu
 // Direct children of a site (fresh array — callers may sort/splice for their UI).
 function childrenOf(id){ _siteIndex(); return (_kidIdx.get(id)||[]).slice(); }
 
+// ---- COMMAND FAMILIES (v0.2.0) — color-by-branch so locations read at a glance.
+// A site's family = the ancestor one hop below its root, mapped through
+// FAM_ANCHOR; grp overrides for guard/oib. Colors are LUMINOUS data hues for the
+// Orbit ground (machine-checked ≥3.7:1 on the land slab) — data categories, not
+// theme chrome, so they live here rather than in the token layer.
+const FAM_META={
+  hqda:      {c:'159,182,204', n:'HQDA & DRUs'},
+  land:      {c:'78,155,255',  n:'Land Forces'},
+  theater:   {c:'219,128,208', n:'Theaters & COCOMs'},
+  futures:   {c:'180,140,255', n:'Futures & Training'},
+  materiel:  {c:'62,210,200',  n:'Materiel & Sustainment'},
+  engineers: {c:'255,153,80',  n:'Engineers'},
+  guard:     {c:'138,151,166', n:'National Guard'},
+  oib:       {c:'224,179,84',  n:'Industrial Base'},
+  other:     {c:'126,142,160', n:'Other'},
+};
+const FAM_ANCHOR={
+  'the-pentagon':'hqda','fort-mcnair':'hqda','west-point':'hqda','fort-belvoir':'hqda',
+  'fort-bragg':'land','fort-meade':'land',
+  'austin-t2com-hq':'futures','fort-eustis':'futures','fort-leavenworth':'futures',
+  'redstone-arsenal':'materiel','aberdeen-proving-ground':'materiel','detroit-arsenal':'materiel','picatinny-arsenal':'materiel',
+  'usace-hq-washington-dc':'engineers',
+  'wiesbaden':'theater','fort-shafter-schofield-hawaii':'theater','shaw-afb':'theater','fort-gordon':'theater','usasmdc-redstone-huntsville':'theater',
+  'usindopacom-camp-smith':'theater','uscentcom-macdill-afb':'theater','ussouthcom-doral':'theater','useucom-stuttgart':'theater','ussocom-macdill-afb':'theater',
+  'usstratcom-offutt-afb':'theater','usspacecom-peterson-sfb':'theater','usnorthcom-peterson-sfb':'theater','uscybercom-fort-meade':'theater','nsa-css-fort-meade':'theater',
+  'usafricom-stuttgart':'theater','ustranscom-scott-afb':'theater','nsa-georgia-fort-gordon':'theater',
+  'arlington':'hqda','the-pentagon-hqda-cio-g-6':'hqda',
+};
+let _famCache=null;
+function famOf(id){
+  if(!_famCache) _famCache=new Map();
+  if(_famCache.has(id)) return _famCache.get(id);
+  const s0=siteById(id); let key='other';
+  if(s0){
+    if(s0.grp==='guard'||s0.grp==='guardInset') key='guard';
+    else if(s0.grp==='oib') key='oib';
+    else{
+      let cur=s0, below=s0; const seen=new Set([s0.id]);
+      while(cur && cur.parent!=null){ const p=siteById(cur.parent); if(!p||seen.has(p.id)) break; seen.add(p.id); below=cur; cur=p; }
+      key=FAM_ANCHOR[below.id]||FAM_ANCHOR[cur?cur.id:'']||'other';
+    }
+  }
+  _famCache.set(id,key); return key;
+}
+try{ window.famOf=famOf; }catch(_){}
+
+// ---- Legend / layer list — swatch · name · count; tap toggles the family ------
+function renderLegend(){
+  const el=document.getElementById('legendPanel'); if(!el) return;
+  const off=GlobeState._famOff||(GlobeState._famOff=new Set());
+  const counts={}; for(const st of _sitesArr()){ const k=famOf(st.id); counts[k]=(counts[k]||0)+1; }
+  let h='<div class="lg-head">Layers</div>';
+  for(const k of Object.keys(FAM_META)){
+    if(!counts[k]) continue;
+    h+='<button type="button" class="lg-row'+(off.has(k)?' off':'')+'" data-fam="'+k+'">'
+      +'<span class="lg-sw" style="background:rgb('+FAM_META[k].c+')"></span>'
+      +'<span class="lg-nm">'+FAM_META[k].n+'</span><span class="lg-ct">'+counts[k]+'</span></button>';
+  }
+  el.innerHTML=h;
+}
+try{ window.renderLegend=renderLegend; }catch(_){}
+if(!window.__lgWired){ window.__lgWired=true;
+  document.addEventListener('click', function(e){
+    if(!e.target||!e.target.closest) return;
+    const b=e.target.closest('#legendBtn');
+    if(b){ const p=document.getElementById('legendPanel'); if(p){ if(p.hidden) renderLegend(); p.hidden=!p.hidden; } return; }
+    const r=e.target.closest('.lg-row');
+    if(r){ const k=r.getAttribute('data-fam');
+      const off=GlobeState._famOff||(GlobeState._famOff=new Set());
+      if(off.has(k)) off.delete(k); else off.add(k);
+      renderLegend();
+      if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
+      return; }
+    // tap-away closes the panel (never over the globe's tap — canvas taps route via m3)
+    const p=document.getElementById('legendPanel');
+    if(p&&!p.hidden&&!e.target.closest('#legendPanel')) p.hidden=true;
+  });
+}
+
 // Chain UP from a site: [parent, grandparent, …, root]. Cycle-guarded so a bad
 // parent pointer can never hang the render loop.
 function parentChainOf(id){
@@ -1618,7 +1685,7 @@ function _cssRGB(c, fb){
 
 function _mTok(){
   const root=(typeof document!=='undefined')?document.documentElement:null;
-  const th=root?(root.getAttribute('data-app-theme')||'atlas'):'atlas';
+  const th=root?(root.getAttribute('data-app-theme')||'orbit'):'orbit';
   if(_mTokCache && _mTokTheme===th) return _mTokCache;
   let rd=function(){ return ''; };
   try{ if(root){ const cs=getComputedStyle(root); rd=function(n){ return (cs.getPropertyValue(n)||'').trim(); }; } }catch(_){}
@@ -1822,11 +1889,17 @@ function drawGlobeMarkers(ctx, m){
     const isDown=!!(downSet && downSet.has(inst.id));
     const onChain=isSel||isUp||isDown;
     const isGuard=(inst.grp==='guard'||inst.grp==='guardInset');
-    const isOib=(inst.grp==='oib');
-    // class hue via tokens (deviation 2): lineage gold up, doctrine blue down/selected,
-    // amber industrial base, dim guard, ice-white default.
-    const col = isSel||isDown ? T.accent : (isUp ? T.signal : (isOib ? T.signal : (isGuard ? T.dim : T.text)));
-    const dotR=(isSel?3.4:(onChain?2.9:(isGuard?2.1:2.5)))*rScale;
+    const fam=famOf(inst.id);
+    // v0.2.0 FAMILY FILTER: a toggled-off family vanishes (chain members stay —
+    // the selected picture always outranks the layer list).
+    if(!onChain && GlobeState._famOff && GlobeState._famOff.has(fam)) continue;
+    // v0.2.0 COLOR-BY-FAMILY: the branch hue is the base identity; selection and
+    // lineage overrides keep the one-brain grammar (accent sel/down, amber up).
+    const col = isSel||isDown ? T.accent : (isUp ? T.signal : (FAM_META[fam]||FAM_META.other).c);
+    // v0.2.0 ECHELON SIZE: roots read largest, hubs (sites with subordinates)
+    // next, leaves standard, guard smallest.
+    const isRoot=(inst.parent==null), isHub=!isRoot&&(_kidIdx&&_kidIdx.has(inst.id));
+    const dotR=(isSel?3.6:(onChain?3.0:(isRoot?3.3:(isHub?2.9:(isGuard?2.0:2.4)))))*rScale;
 
     // selection pulse rings — the ring pair breathes on m2's sel-keyed throttle
     // (deviation 3: no dirty-marking here).
@@ -2646,6 +2719,7 @@ function selectSite(id){
     if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
     // arcs drop NOW (deviation 6); m5's lazy follow re-confirms next frame.
     try{ if(typeof _syncSelArcs==='function') _syncSelArcs(null); }catch(_){}
+    try{ _trailClear(); }catch(_){}
     hideDossier();
     return;
   }
@@ -2657,7 +2731,39 @@ function selectSite(id){
     // the base-dossier fly (~L15089): never zoom OUT to meet a selection
     try{ flyToLatLon(s.lat, s.lon, Math.max(GlobeState.zoom||1, 2.6)); }catch(_){}
   }
+  try{ _trailPush(s.id); }catch(_){}
   showDossier(s.id);
+}
+
+// ---- BREADCRUMB TRAIL (v0.2.0) — the globe stroll's memory. Session-only (the
+// no-localStorage-at-boot law holds); ‹ Back walks it, chips jump anywhere in it.
+function _trailPush(id){
+  const t=GlobeState._trail||(GlobeState._trail=[]);
+  if(t[t.length-1]===id) { _trailRender(); return; }
+  const i=t.indexOf(id); if(i>=0) t.splice(i,1);   // revisits move to the tip, no dupes
+  t.push(id); if(t.length>12) t.shift();
+  _trailRender();
+}
+function _trailBack(){
+  const t=GlobeState._trail||[];
+  if(t.length<2) return;
+  t.pop();                                          // drop the tip…
+  const prev=t.pop();                               // …selectSite re-pushes the target
+  if(prev!=null) selectSite(prev);
+}
+function _trailClear(){ GlobeState._trail=[]; _trailRender(); }
+function _trailRender(){
+  const bar=document.getElementById('trailBar'); if(!bar) return;
+  const t=GlobeState._trail||[];
+  const bk=document.getElementById('stageBack'); if(bk) bk.hidden=(t.length<2);
+  if(t.length<2){ bar.innerHTML=''; return; }       // one stop is not a trail
+  let h='';
+  for(const id of t.slice(-4)){
+    const st=siteById(id); if(!st) continue;
+    const tip=(id===t[t.length-1]);
+    h+='<button type="button" class="tr-chip glass'+(tip?' tip':'')+'" data-odsel="'+_odEscA(id)+'">'+_odEsc(st.base)+'</button>';
+  }
+  bar.innerHTML=h;
 }
 try{ window.selectSite=selectSite; }catch(_){}   // mission: expose the brain globally
 
@@ -2676,6 +2782,7 @@ function showDossier(id){
   if(!s){ hideDossier(); return; }
   _odInjectCSS();                                  // order-safe if a select lands before 'load'
   host.innerHTML=_odRender(s);
+  host.classList.add('dz-min');                    // slim name-bar first; tap for depth
   host.hidden=false;
   try{ host.setAttribute('aria-label', s.base+' — dossier'); }catch(_){}
   host.scrollTop=0;                                // deviation 7: whole card into view
@@ -2773,8 +2880,13 @@ if(!window._odWired){
     const x=e.target.closest('[data-odclose]');
     if(x){ selectSite(null); return; }
     if(e.target.closest('#stageClear')){ selectSite(null); return; }
+    if(e.target.closest('#stageBack')){ try{ _trailBack(); }catch(_){} return; }
     const t=e.target.closest('[data-odsel]');
     if(t){ selectSite(t.getAttribute('data-odsel')); return; }
+    // v0.2.0 SLIM-FIRST DOSSIER (owner reference: the bottom name-bar pattern —
+    // information never impedes the globe). Tapping the card body toggles depth.
+    const dz=e.target.closest('#dossier');
+    if(dz && !e.target.closest('button')){ dz.classList.toggle('dz-min'); return; }
   });
 }
 
@@ -2867,6 +2979,169 @@ function _odInjectCSS(){
       '.od-ico:hover{color:var(--text,#e7edf2);box-shadow:0 0 0 1.5px var(--accent,#36b6ff)}'+
     '}';
   document.head.appendChild(st);
+}
+
+
+/* ══════════ module: s6-export ══════════ */
+/* ============================================================================
+   s6-export (NEW at v0.2.0) — THE SNAPSHOT SPINE. The flagship export contract:
+   buildSnapshot(scope) is the ONE producer every exporter consumes — take what
+   the map shows AND the data beneath it, in one serializable object. Future
+   layers (M2 datastore people/notes/equipment, M3 brief chains) ATTACH to
+   Snapshot.sites rows / Snapshot.extras — renderers never learn app internals,
+   so export never has to be rebuilt. Renderers today: PNG · PDF (print) ·
+   HTML dossier (self-contained file) · JSON.
+   ========================================================================= */
+
+// scope: 'auto' (selection family if selected, else everything visible-eligible)
+function buildSnapshot(scope){
+  scope=scope||'auto';
+  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
+  const off=GlobeState._famOff||new Set();
+  const chain=sel?parentChainOf(sel.id):[];
+  const kids=sel?childrenOf(sel.id):[];
+  let rows;
+  if(sel && scope!=='all'){
+    rows=[sel].concat(chain, kids);
+  } else {
+    rows=_sitesArr().filter(function(st){ return !off.has(famOf(st.id)); });
+  }
+  const seen=new Set(); rows=rows.filter(function(r){ if(!r||seen.has(r.id)) return false; seen.add(r.id); return true; });
+  const famCounts={}; rows.forEach(function(r){ const k=famOf(r.id); famCounts[k]=(famCounts[k]||0)+1; });
+  let img=null;
+  try{ const cv=document.getElementById('globeCanvas'); if(cv&&cv.toDataURL) img=cv.toDataURL('image/png'); }catch(_){}
+  const cam=(function(){ try{ return {zoom:GlobeState.zoom, yaw:GlobeState.yaw, pitch:GlobeState.pitch}; }catch(_){ return {}; } })();
+  return {
+    meta:{ app:'A-ORG-2', version:(typeof APP_VERSION!=='undefined'?APP_VERSION:''),
+           generated:new Date().toISOString(),
+           title: sel ? (sel.base+' — '+(sel.unit||'')) : 'U.S. Army — global laydown',
+           scope: sel&&scope!=='all' ? 'selection-family' : 'all-visible' },
+    camera:cam,
+    selection: sel ? { id:sel.id, chainUp:chain.map(function(c){return c.id;}), children:kids.map(function(k){return k.id;}) } : null,
+    filters:{ familiesOff:Array.from(off) },
+    families:famCounts,
+    sites:rows.map(function(r){ return { id:r.id, base:r.base, st:r.st, unit:r.unit, unitFull:r.unitFull||null,
+      lat:r.lat, lon:r.lon, grp:r.grp, parent:r.parent, parentUnit:r.parentUnit||null, family:famOf(r.id) }; }),
+    extras:{},                                       // M2 datastore + M3 brief attach here
+    image:img,
+  };
+}
+try{ window.buildSnapshot=buildSnapshot; }catch(_){}
+
+// ---- shared download helper (app context — a real user gesture each time) -----
+function _xpDownload(name, mime, data){
+  try{
+    const blob=(data instanceof Blob)?data:new Blob([data],{type:mime});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ try{ URL.revokeObjectURL(a.href); a.remove(); }catch(_){} }, 800);
+  }catch(e){ try{ window._errToast&&_errToast('export failed: '+e.message); }catch(_){} }
+}
+function _xpStamp(){ const d=new Date(); const p=function(n){return (n<10?'0':'')+n;};
+  return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes()); }
+function _xpSlug(sn){ return (sn.selection?sn.selection.id:'laydown'); }
+
+// ---- ① PNG — the stage as shown, title + legend burned in ---------------------
+function exportPNG(){
+  const sn=buildSnapshot();
+  const cv=document.getElementById('globeCanvas'); if(!cv) return;
+  const W=cv.width, HEAD=Math.round(58*(window.devicePixelRatio||1)), FOOT=Math.round(40*(window.devicePixelRatio||1));
+  const out=document.createElement('canvas'); out.width=W; out.height=cv.height+HEAD+FOOT;
+  const cx=out.getContext('2d'); const T=_mTok();
+  cx.fillStyle='rgb('+T.ground+')'; cx.fillRect(0,0,out.width,out.height);
+  cx.drawImage(cv,0,HEAD);
+  const fs=Math.round(HEAD*0.34);
+  cx.fillStyle='rgb('+T.text+')'; cx.font='800 '+fs+'px '+T.body;
+  cx.textBaseline='middle'; cx.fillText(sn.meta.title, Math.round(HEAD*0.35), Math.round(HEAD*0.52));
+  cx.font='600 '+Math.round(fs*0.62)+'px '+T.body; cx.fillStyle='rgba('+T.text+',.62)';
+  const when=new Date(sn.meta.generated).toLocaleString();
+  cx.fillText(sn.meta.app+' '+sn.meta.version+' · '+when+' · '+sn.sites.length+' sites', Math.round(HEAD*0.35), out.height-FOOT*0.5);
+  _xpDownload('a-org-2-'+_xpSlug(sn)+'-'+_xpStamp()+'.png','image/png',
+    (function(){ const b=atob(out.toDataURL('image/png').split(',')[1]); const u=new Uint8Array(b.length);
+      for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return new Blob([u],{type:'image/png'}); })());
+}
+
+// ---- shared dossier body (PDF + HTML renderers) — print-safe inks --------------
+function _xpDossierBody(sn){
+  const esc=_odEsc;
+  const by={}; sn.sites.forEach(function(r){ by[r.id]=r; });
+  let h='<h1>'+esc(sn.meta.title)+'</h1>'
+    +'<div class="meta">'+esc(sn.meta.app)+' '+esc(sn.meta.version)+' · generated '+esc(new Date(sn.meta.generated).toLocaleString())
+    +' · scope: '+esc(sn.meta.scope)+' · '+sn.sites.length+' sites</div>';
+  if(sn.image) h+='<img class="map" src="'+sn.image+'" alt="globe view">';
+  if(sn.selection){
+    const s0=by[sn.selection.id];
+    h+='<h2>Command line</h2><table><tr><th>Echelon</th><th>Site</th><th>Unit</th><th>Location</th></tr>';
+    h+='<tr><td>Selected</td><td><b>'+esc(s0.base)+'</b></td><td>'+esc(s0.unit||'')+'</td><td>'+esc(s0.st||'')+'</td></tr>';
+    sn.selection.chainUp.forEach(function(id,i){ const r=by[id]; if(r) h+='<tr><td>Up '+(i+1)+'</td><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td></tr>'; });
+    h+='</table>';
+    if(sn.selection.children.length){
+      h+='<h2>Subordinate sites ('+sn.selection.children.length+')</h2><table><tr><th>Site</th><th>Unit</th><th>Location</th></tr>';
+      sn.selection.children.forEach(function(id){ const r=by[id]; if(r) h+='<tr><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td></tr>'; });
+      h+='</table>';
+    }
+  }
+  h+='<h2>All sites in scope</h2><table><tr><th>Base</th><th>Unit</th><th>Loc</th><th>Family</th><th>Reports to</th></tr>';
+  sn.sites.forEach(function(r){
+    h+='<tr><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td><td>'+esc(r.family)+'</td><td>'+esc(r.parentUnit||(r.parent?String(r.parent):''))+'</td></tr>';
+  });
+  h+='</table>';
+  return h;
+}
+const _XP_CSS='body{font:13px/1.45 -apple-system,system-ui,Segoe UI,sans-serif;color:#16222E;margin:28px}'
+  +'h1{font-size:21px;margin:0 0 2px}h2{font-size:14px;margin:18px 0 6px;border-bottom:1.5px solid #16222E;padding-bottom:3px}'
+  +'.meta{color:#53687A;font-size:11px;margin-bottom:12px}'
+  +'img.map{width:100%;max-width:680px;border-radius:10px;border:1px solid #C9D4DE;margin:6px 0 4px}'
+  +'table{border-collapse:collapse;width:100%;margin:4px 0}th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#53687A}'
+  +'th,td{padding:4px 8px;border-bottom:1px solid #E2E9EF;font-size:12px}tr:nth-child(even) td{background:#F5F8FA}'
+  +'@media print{body{margin:8mm}img.map{max-width:100%}}';
+
+// ---- ② PDF — the proven print-popup idiom (system print → Save as PDF) ---------
+function exportPDF(){
+  const sn=buildSnapshot();
+  const w=window.open('','_blank'); if(!w){ try{ _errToast('pop-up blocked — allow pop-ups to export PDF'); }catch(_){} return; }
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+_odEsc(sn.meta.title)+'</title>'
+    +'<style>'+_XP_CSS+'</style></head><body>'+_xpDossierBody(sn)
+    +'<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print();},250);}</scr'+'ipt></body></html>');
+  w.document.close();
+}
+
+// ---- ③ HTML dossier — one self-contained shareable file, data embedded ---------
+function exportHTML(){
+  const sn=buildSnapshot();
+  const doc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>'+_odEsc(sn.meta.title)+'</title><style>'+_XP_CSS+'</style></head><body>'
+    +_xpDossierBody(sn)
+    +'<script type="application/json" id="snapshot">'+JSON.stringify((function(){ const c=JSON.parse(JSON.stringify(sn)); delete c.image; return c; })()).replace(/</g,'\\u003c')+'</scr'+'ipt>'
+    +'</body></html>';
+  _xpDownload('a-org-2-'+_xpSlug(sn)+'-'+_xpStamp()+'.html','text/html',doc);
+}
+
+// ---- ④ JSON — the snapshot itself -----------------------------------------------
+function exportJSON(){
+  const sn=buildSnapshot();
+  _xpDownload('a-org-2-'+_xpSlug(sn)+'-'+_xpStamp()+'.json','application/json',JSON.stringify(sn,null,1));
+}
+
+// ---- sheet wiring (same one-delegate idiom) -------------------------------------
+if(!window.__xpWired){ window.__xpWired=true;
+  document.addEventListener('click', function(e){
+    if(!e.target||!e.target.closest) return;
+    if(e.target.closest('#exportBtn')){
+      const p=document.getElementById('exportSheet'); if(p) p.hidden=!p.hidden; return; }
+    const r=e.target.closest('.xp-row');
+    if(r){
+      const k=r.getAttribute('data-xp');
+      const p=document.getElementById('exportSheet'); if(p) p.hidden=true;
+      try{
+        if(k==='png') exportPNG(); else if(k==='pdf') exportPDF();
+        else if(k==='html') exportHTML(); else if(k==='json') exportJSON();
+      }catch(err){ try{ _errToast('export failed: '+err.message); }catch(_){} }
+      return; }
+    const p=document.getElementById('exportSheet');
+    if(p&&!p.hidden&&!e.target.closest('#exportSheet')) p.hidden=true;
+  });
 }
 
 
@@ -3139,24 +3414,10 @@ function bootShell(){
     });
   }catch(_){}
 
-  // M1 THEME MOCKUP SWITCHER (D3): cycle the three candidates on the live
-  // instrument; the owner picks at the M1 gate. Deliberately no persistence —
-  // A-ORG-2 reads no localStorage at boot; the winning theme ships as :root.
-  try{
-    var THEME_CYCLE=['atlas','slate','field'];
-    var tsb=document.querySelector('#themeSwitch button');
-    var setTheme=function(t){
-      document.documentElement.setAttribute('data-app-theme', t);
-      if(tsb) tsb.textContent=t.charAt(0).toUpperCase()+t.slice(1);
-      try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
-    };
-    document.addEventListener('click', function(e){
-      if(!e.target || !e.target.closest || !e.target.closest('#themeSwitch')) return;
-      var cur=document.documentElement.getAttribute('data-app-theme')||'atlas';
-      setTheme(THEME_CYCLE[(THEME_CYCLE.indexOf(cur)+1)%THEME_CYCLE.length]);
-    });
-    setTheme('atlas');
-  }catch(_){}
+  // Identity is COMMITTED (owner, 20 Aug): Clean Cartography — the Atlas token
+  // set in :root is THE look. The mockup switcher and the slate/field candidate
+  // blocks were retired to git history @ v0.1.1; --world-glow survives as a token.
+  document.documentElement.setAttribute('data-app-theme','orbit');
 
   // Version chip.
   try{

@@ -45,3 +45,15 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
    grp=conus; inert on a sphere, but decide the vocabulary before any flat inset ships.
 6. Upstream A-ORG-1 fix to send back: Detroit Arsenal latitude (42.59 → 42.49) at its
    index.html:12147.
+
+## v0.2.0 — the committed identity + the export contract
+- **ORBIT is THE look** (owner references, 20 Aug): deep-space navy, luminous
+  continents on dark ocean, blue limb halo, light arcs; glass chrome at the
+  edges only. No theme switcher. World paint = tokens (--ocean-hi/lo, --land,
+  --coast, --world-glow).
+- **buildSnapshot() is the export law.** Every exporter (PNG/PDF/HTML/JSON —
+  s6-export) consumes ONLY the Snapshot object. New capability (datastore,
+  brief) attaches to Snapshot.sites / Snapshot.extras — never rebuild a renderer.
+- famOf()/FAM_META = command-family colors (data hues, not theme chrome);
+  legend (⊙) is a filter. Trail chips + ‹ Back = the stroll. Dossier opens SLIM
+  on phones (name-bar first — the globe owns the screen).

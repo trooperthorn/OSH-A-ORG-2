@@ -262,6 +262,34 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
   { let fr2=0; while(rafQ.length && fr2<4){ const cb=rafQ.shift(); fr2++;
       try{ cb(performance.now()); }catch(e){ fails++; console.log('✗ post-select frame throw: '+e.message); } } }
 
+  // ── PROBE: v0.2.0 spine — Snapshot, families, legend, trail ──
+  try{
+    if(typeof global.buildSnapshot!=='function') throw new Error('buildSnapshot not exposed (s6-export absent)');
+    const sn=global.buildSnapshot();
+    if(!sn || !sn.meta || !sn.meta.title || !Array.isArray(sn.sites) || sn.sites.length<1){
+      fails++; console.log('✗ SNAPSHOT malformed: '+JSON.stringify(sn&&sn.meta));
+    } else if(sn.selection && sn.selection.id!=='fort-bragg'){
+      fails++; console.log('✗ SNAPSHOT selection drifted: '+sn.selection.id);
+    } else if(!sn.sites.every(function(r){ return r.family; })){
+      fails++; console.log('✗ SNAPSHOT rows missing family keys');
+    } else console.log('  ✓ snapshot: "'+sn.meta.title+'" · '+sn.sites.length+' sites in scope, families attached');
+    if(typeof global.famOf==='function'){
+      const f=global.famOf('fort-stewart');
+      if(f!=='land'){ fails++; console.log('✗ famOf(fort-stewart) = '+f+' (expected land)'); }
+      else console.log('  ✓ famOf walks the branch (fort-stewart → land)');
+    }
+    if(typeof global.renderLegend==='function'){
+      global.renderLegend();
+      const lg=IDS['legendPanel'];
+      if(!lg || lg.innerHTML.indexOf('lg-row')<0){ fails++; console.log('✗ LEGEND did not render rows'); }
+      else console.log('  ✓ legend rows rendered');
+    }
+    const tb=IDS['trailBar'];
+    global.selectSite('fort-stewart');   // second stop → the trail becomes visible
+    if(!tb || tb.innerHTML.indexOf('tr-chip')<0){ fails++; console.log('✗ TRAIL bar empty after two selections'); }
+    else console.log('  ✓ trail renders after the second stop');
+  }catch(e){ fails++; console.log('✗ SPINE probe: '+e.message); }
+
   // ── PROBE: corner clocks populated (s5) ──
   { let ok=true;
     for(const id of ['clockTL','clockTR','clockBL','clockBR']){
