@@ -550,6 +550,24 @@ a.rc-top{color:var(--accent)}
 .rc-save{background:var(--accent); color:#141006}
 .rc-cancel{background:none; color:var(--faint)}
 .rc-del{background:none; color:var(--danger); box-shadow:0 0 0 1px rgba(255,122,102,.4); padding:0 14px}
+
+/* ═══ v0.5.0 BRIEF 2.0 — add action · annotations · selected box ═══ */
+.bf-act{
+  appearance:none; -webkit-appearance:none; border:0; margin:12px 0 0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; width:100%;
+  min-height:48px; border-radius:12px; background:var(--accent); color:#141006;
+  font:800 13px/1 var(--body);
+}
+.bf-act.in{background:none; color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
+.bf-act:active{filter:brightness(1.1)}
+.bf-addsel{
+  appearance:none; -webkit-appearance:none; border:0; margin:4px auto 0; cursor:pointer;
+  min-height:48px; padding:0 22px; border-radius:var(--r-pill); background:var(--accent);
+  color:#141006; font:800 13px/1 var(--body);
+}
+.bf-box.on{background:rgba(245,215,110,.1)}
+.bf-ann{display:block; margin-top:4px; font:600 10px/1.35 var(--body); font-style:normal; color:var(--signal)}
+.bf-box{max-width:340px}
 </style>
 <style>
 /* ═══ IDENTITY LAYER — LUMEN (owner-committed 20 Aug: illuminated light yellow
@@ -622,6 +640,20 @@ a.rc-top{color:var(--accent)}
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.5.0 • BRIEF 2.0 (charter M3). The brief is now a USER-ASSEMBLED SET of
+//            HQs, not an echo of the selection: 'Add to brief' rides the org
+//            sheet in map mode (and the empty brief offers the selected org);
+//            each HQ renders as its own tier-law block, FOUR echelons deep
+//            (L1 white · L2 cools · L3 warms · L4 roses — green never touches
+//            brief data), connectors as exact CSS lines. Boxes carry record
+//            counts; tapping one selects the org. ANNOTATIONS: ≤80-char
+//            callouts per HQ, edited in the brief manifest sheet (the sheet in
+//            brief mode lists members — annotate via the same inline-form
+//            grammar, remove inside the form). PERSISTENCE: the brief survives
+//            reload (IndexedDB kv, db v2). EXPORTS: Snapshot.extras.brief;
+//            PDF/HTML dossiers grow a per-HQ tiered Brief section with notes;
+//            snapshot title becomes the brief's when exporting from brief mode.
+//            Smoke grew the brief probe chain.
 //   v0.4.0 • THE DATASTORE (plan board 6, owner-approved). Every org carries a
 //            RECORD: People · Specs · Notes · Links — tabs in the context sheet,
 //            counts on the tab and in the stats line. Adding is one Add row that
@@ -708,7 +740,7 @@ a.rc-top{color:var(--accent)}
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.4.0';
+const APP_VERSION = 'v0.5.0';
 const APP_UPDATED = '19 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2868,13 +2900,14 @@ function selectSite(id){
   if(!s) return;                       // stale id (old DOM, bad deep link): keep the current picture
   GlobeState.sel=s.id;
   if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
-  if(typeof flyToLatLon==='function' && s.lat!=null && s.lon!=null){
+  const _inBrief=(function(){ try{ return document.body.classList.contains('brief-mode'); }catch(_){ return false; } })();
+  if(!_inBrief && typeof flyToLatLon==='function' && s.lat!=null && s.lon!=null){
     // the base-dossier fly (~L15089): never zoom OUT to meet a selection
     try{ flyToLatLon(s.lat, s.lon, Math.max(GlobeState.zoom||1, 2.6)); }catch(_){}
   }
   try{ _trailPush(s.id); }catch(_){}
   showDossier(s.id);
-  try{ if(document.body.classList.contains('brief-mode')) renderBrief(); }catch(_){}
+  if(_inBrief){ try{ renderBrief(); }catch(_){} }
 }
 
 // ---- MODE (v0.3.0 control law): MAP ⇄ BRIEF — one seg, unmistakable shift ----
@@ -2885,39 +2918,65 @@ function setMode(m){
     b.classList.toggle('on', b.getAttribute('data-mode')===(brief?'brief':'map'));
   });
   if(brief) renderBrief();
+  try{                                            // the sheet follows the mode
+    const host=document.getElementById('dossier');
+    if(host){ if(brief){ _odInjectCSS(); _bfSheetShow(host); } else if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); }
+  }catch(_){}
   try{ if(typeof globeMark==='function') globeMark(); }catch(_){}
 }
 try{ window.setMode=setMode; }catch(_){}
 
-// The v0.3 brief: the selected HQ's chain as tier-law boxes, full screen.
-// Connectors are borders — exact lines, never drawn by hand. L1 white spine,
-// L2 cools, L3 warms, L4 roses; green never touches brief data.
+// BRIEF 2.0 (v0.5.0): the user-assembled chain — every HQ in the brief set
+// renders as its own tier-law block, four echelons deep. Connectors are
+// borders: exact lines, never hand-drawn. L1 white spine · L2 cools · L3
+// warms · L4 roses; green never touches brief data. Boxes carry the org's
+// record count; annotations (≤80 chars) ride under their box in the signal
+// voice (chrome, not tier data).
 function renderBrief(){
   const el=document.getElementById('briefStage'); if(!el) return;
-  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
-  if(!sel){
-    el.innerHTML='<div class="bf-empty glass card"><b>No HQ selected</b><span>Pick an organization on the map, then flip to BRIEF.</span></div>';
+  const esc=_odEsc, escA=_odEscA;
+  if(!BRIEF.hqs.length){
+    const sel=GlobeState.sel?siteById(GlobeState.sel):null;
+    el.innerHTML='<div class="bf-empty glass card"><b>The brief is empty</b>'
+      +(sel?('<button type="button" class="bf-addsel" data-bfadd="'+escA(sel.id)+'">Add '+esc(sel.base)+'</button>')
+            :'<span>Pick an organization on the map, then add it here.</span>')
+      +'</div>';
     return;
   }
-  const esc=_odEsc, escA=_odEscA;
   const box=function(st,tier){
-    const tcls='bf-t'+tier;                       // tier class, quote-adjacent for the lint's dynamic guard
-    return '<button type="button" class="bf-box '+tcls+'" data-odsel="'+escA(st.id)+'"><b>'+esc(st.unit||st.base)+'</b><span>'+esc(st.base)+(st.st?(' · '+esc(st.st)):'')+'</span></button>'; };
-  const kids=childrenOf(sel.id).sort(function(a,b){ return String(a.base).localeCompare(String(b.base)); });
-  let h='<div class="bf-col">';
-  h+='<div class="bf-row">'+box(sel,1)+'</div>';
-  if(kids.length){
-    h+='<div class="bf-rail"></div>';
-    h+='<div class="bf-row">'+kids.slice(0,6).map(function(k){ return box(k,2); }).join('')+'</div>';
-    if(kids.length>6) h+='<div class="bf-more">+'+(kids.length-6)+' more</div>';
-    const g=[]; kids.slice(0,6).forEach(function(k){ childrenOf(k.id).forEach(function(x){ g.push(x); }); });
-    if(g.length){
+    const n=(typeof recCount==='function')?recCount(st.id):0;
+    const tcls='bf-t'+tier;
+    const on=(GlobeState.sel===st.id);
+    return '<button type="button" class="bf-box '+tcls+(on?' on':'')+'" data-odsel="'+escA(st.id)+'">'
+      +'<b>'+esc(st.unit||st.base)+'</b><span>'+esc(st.base)+(st.st?(' · '+esc(st.st)):'')+(n?(' · '+n+' rec'):'')+'</span>'
+      +(BRIEF.ann[st.id]?('<i class="bf-ann">'+esc(BRIEF.ann[st.id])+'</i>'):'')
+      +'</button>';
+  };
+  let h='';
+  BRIEF.hqs.forEach(function(hid){
+    const hq=siteById(hid); if(!hq) return;
+    const kids=childrenOf(hid).sort(function(a,b){ return String(a.base).localeCompare(String(b.base)); });
+    h+='<div class="bf-col">';
+    h+='<div class="bf-row">'+box(hq,1)+'</div>';
+    if(kids.length){
       h+='<div class="bf-rail"></div>';
-      h+='<div class="bf-row">'+g.slice(0,8).map(function(x){ return box(x,3); }).join('')+'</div>';
-      if(g.length>8) h+='<div class="bf-more">+'+(g.length-8)+' more</div>';
+      h+='<div class="bf-row">'+kids.slice(0,6).map(function(k){ return box(k,2); }).join('')+'</div>';
+      if(kids.length>6) h+='<div class="bf-more">+'+(kids.length-6)+' more</div>';
+      const g=[]; kids.slice(0,6).forEach(function(k){ childrenOf(k.id).forEach(function(x){ g.push(x); }); });
+      if(g.length){
+        h+='<div class="bf-rail"></div>';
+        h+='<div class="bf-row">'+g.slice(0,8).map(function(x){ return box(x,3); }).join('')+'</div>';
+        if(g.length>8) h+='<div class="bf-more">+'+(g.length-8)+' more</div>';
+        const gg=[]; g.slice(0,8).forEach(function(x){ childrenOf(x.id).forEach(function(y){ gg.push(y); }); });
+        if(gg.length){
+          h+='<div class="bf-rail"></div>';
+          h+='<div class="bf-row">'+gg.slice(0,10).map(function(y){ return box(y,4); }).join('')+'</div>';
+          if(gg.length>10) h+='<div class="bf-more">+'+(gg.length-10)+' more</div>';
+        }
+      }
     }
-  }
-  h+='</div>';
+    h+='</div>';
+  });
   el.innerHTML=h;
 }
 try{ window.renderBrief=renderBrief; }catch(_){}
@@ -2950,6 +3009,9 @@ function tapAtScreen(x, y){
 // ---- The card (PORT of renderBaseDossier's grammar — render only, no state) ----
 function showDossier(id){
   const host=document.getElementById('dossier'); if(!host) return;
+  if(document.body && document.body.classList && document.body.classList.contains('brief-mode')){
+    _odInjectCSS(); _bfSheetShow(host); return;    // brief mode: the sheet is the brief manifest
+  }
   const s=(typeof siteById==='function') ? siteById(id) : null;
   if(!s){ hideDossier(); return; }
   _odInjectCSS();                                  // order-safe if a select lands before 'load'
@@ -3026,6 +3088,9 @@ function _odRender(s){
   const rec=(typeof recordOf==='function')?recordOf(s.id):null;
   const cnt=function(k){ return rec?rec[k].length:0; };
   if(_odTab!=='ov' && !RC_KINDS[_odTab]) _odTab='ov';
+  h+=bfHas(s.id)
+    ?'<button class="bf-act in" type="button" data-bfrm="'+_odEscA(s.id)+'">In the brief · remove</button>'
+    :'<button class="bf-act" type="button" data-bfadd="'+_odEscA(s.id)+'">Add to brief</button>';
   h+='<div class="od-tabs">'
     +'<button type="button" class="od-tab'+(_odTab==='ov'?' on':'')+'" data-odtab="ov">Overview</button>'
     +Object.keys(RC_KINDS).map(function(k){
@@ -3075,6 +3140,48 @@ function _odRender(s){
     h+='<div class="od-sec od-sec-down">Subordinate sites</div>'
       +'<div class="od-note">No subordinate sites on file.</div>';
   }
+  return h;
+}
+
+// ---- brief manifest sheet (v0.5.0) — members · annotate · remove · export ----
+let _bfAnnEdit=null;                                 // site id with the annotation form open
+function _bfSheetShow(host){
+  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1]||'peek';
+  host.innerHTML=_bfSheetRender();
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add('dz-'+_kept);
+  host.hidden=false;
+  try{ host.setAttribute('aria-label','Brief'); }catch(_){}
+}
+function _bfSheetRender(){
+  const esc=_odEsc, escA=_odEscA;
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim">'
+    +'<div class="od-name">Brief · '+BRIEF.hqs.length+' HQ'+(BRIEF.hqs.length===1?'':'s')+'</div>'
+    +'<span class="od-sp"></span>'
+    +'<button class="od-ico" id="exportBtn" type="button" aria-label="Export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>'
+    +'</div>';
+  BRIEF.hqs.forEach(function(id){
+    const st=siteById(id); if(!st) return;
+    if(_bfAnnEdit===id){
+      h+='<div class="rc-form">'
+        +'<input class="rc-in" id="rcF1" type="text" maxlength="80" placeholder="Callout (80 max)" value="'+escA(BRIEF.ann[id]||'')+'">'
+        +'<div class="rc-btns">'
+        +'<button class="rc-del" type="button" data-bfrm="'+escA(id)+'">Remove HQ</button>'
+        +'<span class="od-sp"></span>'
+        +'<button class="rc-cancel" type="button" data-bfanncancel="1">Cancel</button>'
+        +'<button class="rc-save" type="button" data-bfannsave="'+escA(id)+'">Save</button>'
+        +'</div></div>';
+      return;
+    }
+    h+='<div class="rc-row">'
+      +'<span class="rc-top">'+esc(st.unit||st.base)+'</span>'
+      +'<span class="rc-sub">'+esc(BRIEF.ann[id]||st.base)+'</span>'
+      +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(id)+'" aria-label="Annotate"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
+      +'</div>';
+  });
+  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
+  if(sel && !bfHas(sel.id)) h+='<button class="rc-add" type="button" data-bfadd="'+escA(sel.id)+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Add '+esc(sel.base)+'</button>';
   return h;
 }
 
@@ -3147,6 +3254,19 @@ if(!window._odWired){
     if(rc0){ _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
     const rd=e.target.closest('[data-rcdel]');
     if(rd){ const id=GlobeState.sel; if(id){ recRemove(id,_odTab,parseInt(rd.getAttribute('data-rcdel'),10)); _rcForm=null; showDossier(id); } return; }
+    const ba=e.target.closest('[data-bfadd]');
+    if(ba){ bfAdd(ba.getAttribute('data-bfadd')); return; }
+    const br=e.target.closest('[data-bfrm]');
+    if(br){ _bfAnnEdit=null; bfRemove(br.getAttribute('data-bfrm')); return; }
+    const be=e.target.closest('[data-bfannedit]');
+    if(be){ _bfAnnEdit=be.getAttribute('data-bfannedit');
+      const hst=document.getElementById('dossier'); if(hst) _bfSheetShow(hst);
+      try{ const f=document.getElementById('rcF1'); f&&f.focus(); }catch(_){} return; }
+    const bs=e.target.closest('[data-bfannsave]');
+    if(bs){ const f=document.getElementById('rcF1'); bfNote(bs.getAttribute('data-bfannsave'), f?f.value:'');
+      _bfAnnEdit=null; const hst=document.getElementById('dossier'); if(hst) _bfSheetShow(hst); return; }
+    const bc=e.target.closest('[data-bfanncancel]');
+    if(bc){ _bfAnnEdit=null; const hst=document.getElementById('dossier'); if(hst) _bfSheetShow(hst); return; }
     const t=e.target.closest('[data-odsel]');
     if(t){ selectSite(t.getAttribute('data-odsel')); return; }
     // detent stepping: the grip cycles peek → half → full → peek; tapping the
@@ -3298,10 +3418,11 @@ function recRemove(id, kind, idx){
 function _rdbOpen(){
   try{
     if(typeof indexedDB==='undefined') return;         // stubs/old engines: memory-only, everything still works
-    const rq=indexedDB.open('aorg2', 1);
+    const rq=indexedDB.open('aorg2', 2);               // v2 (v0.5.0): + 'kv' for the brief
     rq.onupgradeneeded=function(e){
       const db=e.target.result;
       if(!db.objectStoreNames.contains('records')) db.createObjectStore('records',{keyPath:'id'});
+      if(!db.objectStoreNames.contains('kv')) db.createObjectStore('kv',{keyPath:'k'});
     };
     rq.onsuccess=function(e){
       _rdb=e.target.result;
@@ -3314,9 +3435,44 @@ function _rdbOpen(){
           try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
         };
       }catch(_){}
+      try{
+        const tk=_rdb.transaction('kv','readonly');
+        const gb=tk.objectStore('kv').get('brief');
+        gb.onsuccess=function(){
+          const v=gb.result&&gb.result.v;
+          if(v && Array.isArray(v.hqs)){ BRIEF.hqs=v.hqs.filter(function(id){ return siteById(id); }); BRIEF.ann=v.ann||{}; }
+          try{ if(document.body.classList.contains('brief-mode')) renderBrief(); }catch(_){}
+        };
+      }catch(_){}
     };
   }catch(_){}
 }
+
+// ---- THE BRIEF SET (v0.5.0) — the user-assembled chain of HQs + annotations ----
+const BRIEF={ hqs:[], ann:{} };                        // ann: site id → ≤80-char callout
+function _bfSave(){
+  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'brief', v:{hqs:BRIEF.hqs, ann:BRIEF.ann}}); } }catch(_){}
+}
+function bfHas(id){ return BRIEF.hqs.indexOf(id)>=0; }
+function bfAdd(id){
+  if(!siteById(id) || bfHas(id)) return;
+  BRIEF.hqs.push(id); _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+}
+function bfRemove(id){
+  const i=BRIEF.hqs.indexOf(id); if(i<0) return;
+  BRIEF.hqs.splice(i,1); delete BRIEF.ann[id]; _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+}
+function bfNote(id, text){
+  text=String(text||'').slice(0,80).trim();
+  if(text) BRIEF.ann[id]=text; else delete BRIEF.ann[id];
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+}
+try{ window.Brief={ add:bfAdd, remove:bfRemove, note:bfNote, has:bfHas, list:function(){ return BRIEF.hqs.slice(); } }; }catch(_){}
 function recBackup(){
   const out={v:1, app:'A-ORG-2', generated:new Date().toISOString(), records:RECORDS};
   _xpDownload('a-org-2-records-'+_xpStamp()+'.json','application/json',JSON.stringify(out,null,1));
@@ -3367,7 +3523,7 @@ function buildSnapshot(scope){
   return {
     meta:{ app:'A-ORG-2', version:(typeof APP_VERSION!=='undefined'?APP_VERSION:''),
            generated:new Date().toISOString(),
-           title: sel ? (sel.base+' — '+(sel.unit||'')) : 'U.S. Army — global laydown',
+           title: (function(){ try{ if(document.body.classList.contains('brief-mode')&&BRIEF.hqs.length){ const h0=siteById(BRIEF.hqs[0]); return 'Brief — '+(h0?(h0.unit||h0.base):'')+(BRIEF.hqs.length>1?(' +'+(BRIEF.hqs.length-1)):''); } }catch(_){} return sel ? (sel.base+' — '+(sel.unit||'')) : 'U.S. Army — global laydown'; })(),
            scope: sel&&scope!=='all' ? 'selection-family' : 'all-visible' },
     camera:cam,
     selection: sel ? { id:sel.id, chainUp:chain.map(function(c){return c.id;}), children:kids.map(function(k){return k.id;}) } : null,
@@ -3375,7 +3531,8 @@ function buildSnapshot(scope){
     families:famCounts,
     sites:rows.map(function(r){ return { id:r.id, base:r.base, st:r.st, unit:r.unit, unitFull:r.unitFull||null,
       lat:r.lat, lon:r.lon, grp:r.grp, parent:r.parent, parentUnit:r.parentUnit||null, family:famOf(r.id) }; }),
-    extras:{ records:(function(){                     // the datastore rides every export
+    extras:{ brief:(BRIEF.hqs.length?{hqs:BRIEF.hqs.slice(), ann:JSON.parse(JSON.stringify(BRIEF.ann))}:null),
+      records:(function(){                     // the datastore rides every export
       const out={}; if(typeof recordOf==='function') rows.forEach(function(r){ const rec=recordOf(r.id); if(rec && recCount(r.id)) out[r.id]=rec; });
       return out; })() },
     image:img,
@@ -3436,6 +3593,22 @@ function _xpDossierBody(sn){
       sn.selection.children.forEach(function(id){ const r=by[id]; if(r) h+='<tr><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td></tr>'; });
       h+='</table>';
     }
+  }
+  const bf=sn.extras&&sn.extras.brief;
+  if(bf && bf.hqs.length){
+    h+='<h2>Brief — '+bf.hqs.length+' HQ'+(bf.hqs.length===1?'':'s')+'</h2>';
+    bf.hqs.forEach(function(hid){
+      const hq=(typeof siteById==='function')?siteById(hid):null; if(!hq) return;
+      h+='<table><tr><th>Tier</th><th>Unit</th><th>Site</th><th>Note</th></tr>';
+      h+='<tr><td>L1</td><td><b>'+esc(hq.unit||hq.base)+'</b></td><td>'+esc(hq.base)+'</td><td>'+esc(bf.ann[hid]||'')+'</td></tr>';
+      childrenOf(hid).forEach(function(k){
+        h+='<tr><td>L2</td><td>'+esc(k.unit||k.base)+'</td><td>'+esc(k.base)+'</td><td>'+esc(bf.ann[k.id]||'')+'</td></tr>';
+        childrenOf(k.id).forEach(function(x){
+          h+='<tr><td>L3</td><td>'+esc(x.unit||x.base)+'</td><td>'+esc(x.base)+'</td><td>'+esc(bf.ann[x.id]||'')+'</td></tr>';
+        });
+      });
+      h+='</table>';
+    });
   }
   const recs=(sn.extras&&sn.extras.records)||{};
   if(sn.selection && recs[sn.selection.id]){

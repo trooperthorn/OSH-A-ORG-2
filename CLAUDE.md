@@ -65,3 +65,11 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - Sheet tabs are the UI; one Add row that becomes the two-field form in place.
 - Records ride Snapshot.extras.records — exporters gained sections with zero
   plumbing changes. Backup/restore = one JSON file via the ⋯ menu.
+
+## v0.5.0 — Brief 2.0 (M3)
+- BRIEF {hqs, ann} is the user-assembled set; persisted in IndexedDB kv (db v2).
+  window.Brief is the API. 'Add to brief' lives on the org sheet; the brief-mode
+  sheet is the manifest (annotate ≤80 chars via the inline-form grammar; remove
+  inside the form). renderBrief: one tier-law block per HQ, four echelons, exact
+  CSS connectors. extras.brief rides the Snapshot; dossier exports grew the
+  tiered Brief section.

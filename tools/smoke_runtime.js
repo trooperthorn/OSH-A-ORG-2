@@ -296,8 +296,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       const bs=IDS['briefStage'];
       const briefOn=(typeof document!=='undefined')&&document.body&&document.body.classList&&document.body.classList.contains('brief-mode');
       if(!briefOn){ fails++; console.log('✗ setMode(brief) did not flip body.brief-mode'); }
-      if(!bs || bs.innerHTML.indexOf('bf-box')<0){ fails++; console.log('✗ BRIEF stage empty with a selection active'); }
-      else console.log('  ✓ brief mode: body flag + tier boxes rendered');
+      // v0.5.0: an empty brief SET shows the add-selected prompt, never an auto-chain
+      if(!bs || bs.innerHTML.indexOf('data-bfadd')<0){ fails++; console.log('✗ BRIEF empty state missing the add-selected action'); }
+      else console.log('  ✓ brief mode: body flag + empty-state add action');
       global.setMode('map');
     } else { fails++; console.log('✗ setMode not exposed'); }
   }catch(e){ fails++; console.log('✗ SPINE probe: '+e.message); }
@@ -324,6 +325,31 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       else console.log('  ✓ records flow into the export dossier body');
     }
   }catch(e){ fails++; console.log('✗ RECORDS probe: '+e.message); }
+
+  // ── PROBE: v0.5.0 brief 2.0 — set API, blocks, manifest, annotation, export ──
+  try{
+    if(!global.Brief) throw new Error('Brief API not exposed');
+    global.Brief.add('fort-bragg');
+    global.Brief.add('the-pentagon');
+    global.Brief.note('fort-bragg','Main effort');
+    if(global.Brief.list().length!==2){ fails++; console.log('✗ BRIEF set wrong: '+global.Brief.list().join()); }
+    global.setMode('brief');
+    const bs2=IDS['briefStage'];
+    const blocks=(bs2.innerHTML.match(/bf-col/g)||[]).length;
+    if(blocks!==2){ fails++; console.log('✗ BRIEF blocks: '+blocks+' (want 2)'); }
+    if(bs2.innerHTML.indexOf('Main effort')<0){ fails++; console.log('✗ BRIEF annotation not rendered'); }
+    if(bs2.innerHTML.indexOf('bf-t4')<0 && bs2.innerHTML.indexOf('bf-t3')<0){ fails++; console.log('✗ BRIEF depth missing (no L3/L4 boxes)'); }
+    const host2=IDS['dossier'];
+    if(host2.innerHTML.indexOf('Brief · 2 HQs')<0){ fails++; console.log('✗ BRIEF manifest sheet not rendered'); }
+    const sn3=global.buildSnapshot();
+    if(!sn3.extras.brief || sn3.extras.brief.hqs.length!==2 || sn3.extras.brief.ann['fort-bragg']!=='Main effort'){
+      fails++; console.log('✗ SNAPSHOT extras.brief wrong'); }
+    const body3=global._xpDossierBody(sn3);
+    if(body3.indexOf('Main effort')<0 || body3.indexOf('Brief — 2 HQs')<0){ fails++; console.log('✗ EXPORT body missing brief section'); }
+    if(!fails) console.log('  ✓ brief 2.0: set + blocks + annotation + manifest + snapshot + export');
+    global.Brief.remove('the-pentagon'); global.Brief.remove('fort-bragg');
+    global.setMode('map');
+  }catch(e){ fails++; console.log('✗ BRIEF probe: '+e.message); }
 
   // ── PROBE: corner clocks populated (s5) ──
   { let ok=true;
