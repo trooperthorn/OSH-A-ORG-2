@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-app-theme="orbit">
+<html lang="en" data-app-theme="lumen">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -128,49 +128,42 @@
 
 /* ─── 1 · TOKENS — ARCTIC is the :root default ─────────────────────────────── */
 :root{
-  /* ═══ ORBIT — the committed identity (owner references, 20 Aug: the modern
-     "global network" globe — deep-space navy, a luminous earth, thin light arcs,
-     glass chrome at the edges that never impedes the sphere). Not the radar:
-     no phosphor green, no wireframe scope; luminance does the work. ═══ */
-  /* ground + surfaces — space navy, three steps of glass depth */
-  --ground:#0A1220;                       /* page + label halos (space)           */
-  --panel:#111B2E;                        /* raised glass                         */
-  --panel-2:#182338;                      /* second step (hover/nested)           */
-  --line:rgba(150,190,235,.18);           /* steel hairline                       */
-  /* ink ladder */
-  --text:#EAF0F8;                         /* near-white ink                       */
-  --dim:#A9B8CC;                          /* secondary ink                        */
-  --faint:#8494AA;                        /* tertiary ink / placeholders (5.09:1 worst case) */
-  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);   /* viewport-fit=cover: edge chrome respects the notch */
+  /* ═══ LUMEN — the committed identity (owner, 20 Aug: "illuminated light
+     yellow with black background"). A black world lit from within: warm-lit
+     continents, bright gold coasts, luminous yellow voice. Not radar — no
+     green, no scope; light does the work. ═══ */
+  --ground:#060504;                       /* true black, warm hint               */
+  --panel:#14110A;                        /* raised glass                        */
+  --panel-2:#1C1810;                      /* second step                         */
+  --line:rgba(240,220,140,.16);           /* warm hairline                       */
+  --text:#F5F1E4;                         /* warm white ink                      */
+  --dim:#C4BBA4;
+  --faint:#9C947E;                        /* 5.85:1 worst case                   */
+  --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
   --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
-  /* voices — luminous sky-blue leads; amber signals the command line */
-  --accent:#5CC8FF;                       /* luminous blue — live/active/selection*/
-  --accent-deep:#2E9BDD;                  /* pressed / gradient floor             */
-  --accent-wash:rgba(92,200,255,.13);
-  --signal:#E8B45A;                       /* amber — lineage/attention            */
-  --signal-wash:rgba(232,180,90,.14);
+  --accent:#F5D76E;                       /* the illuminated yellow — selection/live */
+  --accent-deep:#D4B54A;
+  --accent-wash:rgba(245,215,110,.13);
+  --signal:#FFB35C;                       /* lineage/attention — warmer, orange lean */
+  --signal-wash:rgba(255,179,92,.14);
   --danger:#FF7A66;
-  --ok:#58C08A;                           /* status only — NEVER on brief data    */
-  /* brief tiers (LOCKED SEMANTICS: t1 white · t2 cool NEVER green · t3 warm · t4 rose) */
+  --ok:#58C08A;                           /* status only — NEVER on brief data   */
+  /* brief tiers (LOCKED: t1 white · t2 cool NEVER green · t3 warm · t4 rose) */
   --t1:#FFFFFF; --t2:#6FC7E8; --t3:#FFC95C; --t4:#FF8FC0;
-  /* radii (A-ORG-1 P1 values, ported) */
   --r-card:16px; --r-chip:11px; --r-pill:999px;
-  /* type (system stacks only — zero webfonts at boot) */
   --disp:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
   --mono:ui-monospace,'SF Mono','Cascadia Mono','Segoe UI Mono',Menlo,Consolas,monospace;
-  /* derived component tokens (glass material — navy glass) */
-  --glass-hi:rgba(20,32,54,.88);
-  --glass-lo:rgba(9,15,28,.94);
-  --spec:rgba(255,255,255,.08);
-  --drop:0 10px 26px -10px rgba(0,0,0,.6);
-  /* world paint — the luminous network earth: BRIGHT land on DARK ocean, soft
-     blue limb halo (glow:1 here is the ISS-tracker limb, not the radar scope) */
-  --ocean-hi:#10203A;                     /* sphere gradient ceiling              */
-  --ocean-lo:#081020;                     /* sphere gradient floor                */
-  --land:44,66,98;                        /* luminous slab (city-lit continents)  */
-  --coast:127,180,232;                    /* coast/border strokes                 */
-  --world-glow:1;                         /* subtle accent limb halo              */
+  --glass-hi:rgba(26,22,14,.9);
+  --glass-lo:rgba(8,7,4,.95);
+  --spec:rgba(255,240,200,.09);
+  --drop:0 10px 26px -10px rgba(0,0,0,.7);
+  /* world paint — black ocean, warm-lit land, bright gold coasts, soft warm limb */
+  --ocean-hi:#0B0A07;
+  --ocean-lo:#040302;
+  --land:46,40,24;
+  --coast:240,220,140;
+  --world-glow:1;
 }
 
 /* ─── 2 · RESET + THE STAGE (the globe IS the page) ────────────────────────── */
@@ -238,46 +231,52 @@ body{
   border-radius:var(--r-card); padding:14px 16px; color:var(--text);
 }
 /* segmented control (Globe ⇄ Brief placeholder on #stageBar) */
-.seg{
-  display:inline-flex; align-items:center; gap:2px;
-  padding:3px; border-radius:var(--r-pill);
-}
-.seg .seg-b{
-  appearance:none; -webkit-appearance:none; border:0; margin:0;
-  min-height:38px; padding:0 14px; border-radius:var(--r-pill);
-  background:transparent; color:var(--dim);
-  font:700 11px/1 var(--body); letter-spacing:.1em; text-transform:uppercase;
-  user-select:none; -webkit-user-select:none; cursor:pointer;
-}
-.seg .seg-b.on{
-  color:var(--text); background:var(--accent-wash);
-  box-shadow:0 0 0 1px var(--accent);
-}
-.seg .seg-b:disabled{opacity:.4; cursor:default}
+/* (.seg retired at v0.3.0 — #modeSeg in the command bar is the one seg) */
 /* uppercase micro-label (doctrine: letterspaced, tabular numerals on readouts) */
 
 /* ─── 4 · CHROME PLACEMENT (all absolute — no fixed layers) ────────────────── */
 /* z ladder: stage 0 · clocks 10 · stage bar 25 · top edge 20 · results 30 ·
    dossier 40 · errToast 120 · sbxNote 130 (A-ORG-1's toast z, kept). */
 
-/* minimal top edge: search pill + theme switch float over the globe */
-#searchPill{
+/* DOCK 1 · command bar — the app's one fixed line: search · mode seg · menu */
+#cmdBar{
   position:absolute; z-index:20;
   top:calc(env(safe-area-inset-top,0px) + 10px);
   left:var(--safe-l); right:var(--safe-r);
-  display:flex; align-items:center; gap:8px;
-  min-height:46px; padding:0 14px; border-radius:var(--r-pill);
+  display:flex; align-items:center; gap:6px;
+  min-height:48px; padding:0 4px 0 14px; border-radius:var(--r-pill);
 }
+#cmdBar:focus-within{box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop)}
+#searchPill{flex:1; min-width:0; display:flex; align-items:center; gap:8px}
 #searchPill .sp-ico{color:var(--faint); font-size:15px; line-height:1; flex:none}
 #searchPill input{
   flex:1; min-width:0; background:none; border:0; outline:none; padding:0;
   color:var(--text); font:600 14px/1.2 var(--body);
 }
 #searchPill input::placeholder{color:var(--faint)}
-#searchPill:focus-within{
-  box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
+#modeSeg{flex:none; display:flex; border-radius:var(--r-pill); box-shadow:0 0 0 1px var(--line); overflow:hidden}
+#modeSeg .ms-b{
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0; cursor:pointer;
+  height:44px; padding:0 13px; display:flex; align-items:center;
+  font:800 10.5px/1 var(--mono); letter-spacing:.1em; color:var(--faint);
 }
-/* (the #themeSwitch corner control retired at v0.2.0 — identity committed) */
+#modeSeg .ms-b.on{background:var(--accent-wash); color:var(--accent)}
+#menuBtn{
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0; cursor:pointer;
+  flex:none; width:44px; height:44px; border-radius:50%; color:var(--faint);
+  display:flex; align-items:center; justify-content:center;
+}
+#appMenu{
+  position:absolute; z-index:45; right:var(--safe-r);
+  top:calc(env(safe-area-inset-top,0px) + 64px);
+  width:min(78vw,260px); padding:6px; border-radius:var(--r-card);
+}
+.am-row{
+  display:block; width:100%; border:0; background:none; margin:0; cursor:pointer; text-align:left;
+  padding:13px 12px; border-radius:9px; color:var(--text); font:600 12.5px/1.3 var(--body);
+}
+.am-row:active{background:var(--accent-wash)}
+.am-row.am-ver{color:var(--faint); font:600 10.5px/1.4 var(--mono); letter-spacing:.08em; text-transform:uppercase; cursor:default}
 
 /* search results — SCROLL CONTAINER: inset math only, never transformed */
 #searchResults{
@@ -303,25 +302,94 @@ body{
 #searchResults .sr-none{padding:12px 14px; color:var(--dim); font:500 13px/1.5 var(--body)}
 #searchResults .sr-count{padding:6px 14px 8px; color:var(--faint); font:600 10.5px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase}
 
-/* dossier — bottom sheet card, SCROLL CONTAINER: inset math only */
+/* DOCK 3 · context sheet — one card, three detents. SCROLL CONTAINER:
+   inset math only, never transformed. */
 #dossier{
   position:absolute; z-index:40;
   left:calc(var(--safe-l) - 4px); right:calc(var(--safe-r) - 4px);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 68px);  /* clears the stage bar */
-  max-height:56vh; max-height:56dvh;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  border-radius:var(--r-card); padding:14px 16px;
+  border-radius:var(--r-card); padding:6px 16px 14px;
 }
+#dossier.dz-peek{max-height:112px; overflow:hidden}
+#dossier.dz-peek::after{content:''; position:absolute; left:0; right:0; bottom:0; height:26px;
+  background:linear-gradient(180deg, rgba(0,0,0,0), var(--glass-lo)); pointer-events:none;
+  border-radius:0 0 var(--r-card) var(--r-card)}
+#dossier.dz-half{max-height:46vh; max-height:46dvh}
+#dossier.dz-full{top:calc(env(safe-area-inset-top,0px) + 8px); max-height:none}
+.sh-grip{
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0; cursor:pointer;
+  display:block; width:100%; height:26px; padding:0;
+}
+.sh-grip span{display:block; width:38px; height:4px; border-radius:2px; background:rgba(240,220,140,.35); margin:0 auto}
+.sh-crumbs{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:8px}
+.sh-crumbs::-webkit-scrollbar{display:none}
+.sh-crumb{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  flex:none; max-width:44vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  padding:12px 13px; border-radius:var(--r-pill); background:var(--panel-2);
+  font:700 11px/1 var(--body); color:var(--dim);
+}
+.sh-crumb.tip{color:var(--text); box-shadow:0 0 0 1.5px var(--accent)}
+.sh-crumb:active{background:var(--accent-wash)}
 
-/* stage bar — reset/back/clear pills + Globe⇄Brief seg, bottom center */
-#stageBar{
-  position:absolute; z-index:25;
-  left:0; right:0; bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
-  display:flex; align-items:center; justify-content:center; gap:8px;
-  padding:0 12px; margin:0 auto; max-width:calc(100% - 96px);
-  pointer-events:none;                     /* corners stay live for chrome       */
+/* DOCK 2 · tool rail — 44px circles, one icon set; collapses to the puck */
+#toolRail{
+  position:absolute; z-index:25; right:var(--safe-r); top:50%;
+  transform:translateY(-58%);
+  display:flex; flex-direction:column; gap:9px;
 }
-#stageBar>*{pointer-events:auto}
+.rl-b{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  width:44px; height:44px; border-radius:50%; padding:0;
+  display:flex; align-items:center; justify-content:center; color:var(--text);
+}
+#railPuck{color:var(--faint)}
+body.rail-min #toolRail .rl-b:not(#railPuck){display:none}
+body.rail-min #railPuck svg{transform:rotate(180deg)}
+
+/* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
+   black ink, the page warms, a gold frame bounds the stage, the map chrome
+   yields. Same grammar, different light. */
+#briefStage{display:none}
+body.brief-mode #briefStage{
+  display:block; position:absolute; z-index:15;
+  left:0; right:0; top:calc(env(safe-area-inset-top,0px) + 66px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  padding:18px 14px;
+}
+body.brief-mode{background:#0E0B05}
+body.brief-mode::before{content:''; position:absolute; inset:6px; border-radius:20px;  /* body is the non-scrolling 100dvh anchor — absolute is fixed here, and the no-fixed law holds */
+  box-shadow:0 0 0 1.5px var(--accent); pointer-events:none; z-index:14}
+body.brief-mode #cmdBar{background:linear-gradient(180deg,#F5D76E,#E8C455); box-shadow:0 0 0 1px rgba(0,0,0,.4), var(--drop)}
+body.brief-mode #cmdBar input, body.brief-mode #cmdBar .sp-ico{color:#141006}
+body.brief-mode #cmdBar input::placeholder{color:rgba(20,16,6,.55)}
+body.brief-mode #modeSeg{box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+body.brief-mode #modeSeg .ms-b{color:rgba(20,16,6,.6)}
+body.brief-mode #modeSeg .ms-b.on{background:#141006; color:var(--accent)}
+body.brief-mode #menuBtn{color:rgba(20,16,6,.7)}
+body.brief-mode #toolRail, body.brief-mode #globeCanvas, body.brief-mode .clock,
+body.brief-mode #legendPanel{display:none}
+.bf-empty{max-width:340px; margin:16vh auto 0; padding:22px; text-align:center;
+  display:flex; flex-direction:column; gap:8px}
+.bf-empty b{font:800 16px/1.3 var(--body)}
+.bf-empty span{font:500 13px/1.5 var(--body); color:var(--dim)}
+.bf-col{display:flex; flex-direction:column; align-items:center; gap:0; max-width:760px; margin:0 auto}
+.bf-row{display:flex; flex-wrap:wrap; justify-content:center; gap:10px}
+.bf-rail{width:1.5px; height:26px; background:rgba(240,220,140,.4)}
+.bf-box{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  background:rgba(20,17,10,.7); border-radius:12px; padding:12px 15px; text-align:left;
+  display:flex; flex-direction:column; gap:3px; min-height:44px;
+}
+.bf-box b{font:800 12.5px/1.25 var(--body)}
+.bf-box span{font:600 10px/1.3 var(--body); color:var(--dim)}
+.bf-t1{box-shadow:0 0 0 1.6px var(--t1)} .bf-t1 b{color:var(--t1)}
+.bf-t2{box-shadow:0 0 0 1.4px var(--t2)} .bf-t2 b{color:var(--t2)}
+.bf-t3{box-shadow:0 0 0 1.4px var(--t3)} .bf-t3 b{color:var(--t3)}
+.bf-t4{box-shadow:0 0 0 1.4px var(--t4)} .bf-t4 b{color:var(--t4)}
+.bf-more{font:700 10px/1 var(--mono); letter-spacing:.1em; color:var(--faint); padding:8px 0}
 
 /* corner clocks — glass chips, mono + tabular numerals, readouts only.
    TL/TR sit under the top edge; BL/BR above the stage bar. Empty = hidden
@@ -339,15 +407,7 @@ body{
 #clockBL{bottom:calc(env(safe-area-inset-bottom,0px) + 66px); left:var(--safe-l)}
 #clockBR{bottom:calc(env(safe-area-inset-bottom,0px) + 66px); right:var(--safe-r)}
 
-/* version chip — long-press dumps the diagnostics ring buffer (shell script) */
-#verChip{
-  position:absolute; z-index:26;
-  right:var(--safe-r); bottom:calc(env(safe-area-inset-bottom,0px) + 4px);
-  padding:4px 8px; border-radius:var(--r-pill);
-  font:700 9px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase;
-  color:var(--faint); user-select:none; -webkit-user-select:none;
-  touch-action:none; cursor:default;
-}
+
 
 /* ─── 5 · DIAGNOSTICS SURFACES (load-bearing — never remove) ───────────────── */
 /* A-ORG-1 #errToast (~L2108) ported verbatim except position:fixed→absolute
@@ -391,7 +451,6 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   #clockTR{top:calc(env(safe-area-inset-top,0px) + 18px); right:18px}
   #clockBL{bottom:calc(env(safe-area-inset-bottom,0px) + 18px); left:18px}
   #clockBR{bottom:calc(env(safe-area-inset-bottom,0px) + 18px); right:18px}
-  #verChip{right:18px; bottom:calc(env(safe-area-inset-bottom,0px) + 52px)}
   /* dossier becomes a right-hand panel; still a plain inset scroll container */
   #dossier{left:auto; right:24px; width:400px;
     top:calc(env(safe-area-inset-top,0px) + 84px); bottom:auto;
@@ -411,16 +470,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 
 /* ═══ v0.2.0 CHROME — trail · legend · export sheet · slim-first dossier
    (owner references: edge chrome, the globe never impeded) ═══ */
-#trailBar{position:absolute; z-index:24; top:calc(env(safe-area-inset-top,0px) + 114px);  /* under the corner clocks */
-  left:var(--safe-l); right:var(--safe-r); display:flex; gap:6px; overflow-x:auto;
-  -webkit-overflow-scrolling:touch; scrollbar-width:none; pointer-events:auto}
-#trailBar::-webkit-scrollbar{display:none}
-#trailBar:empty{display:none}
-.tr-chip{flex:none; max-width:44vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  border:none; cursor:pointer; padding:6px 12px; border-radius:var(--r-pill);
-  font:700 11.5px/1 var(--body); color:var(--dim)}
-.tr-chip.tip{color:var(--text); box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec)}
-.tr-chip:active{background:var(--accent-wash)}
+/* (trail bar retired at v0.3.0 — crumbs live in the sheet header) */
 
 #legendPanel{position:absolute; z-index:40; left:var(--safe-l);
   bottom:calc(env(safe-area-inset-bottom,0px) + 62px);
@@ -459,12 +509,10 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 }
 </style>
 <style>
-/* ═══ IDENTITY LAYER — ORBIT (owner-committed via references, 20 Aug 2026: the
-   modern global-network globe). The full token set lives in :root above; this
-   layer intentionally holds no override blocks. Prior candidates (atlas, slate,
-   field) and the retired radar family live in git history @ v0.1.1 / v0.1.0.
-   Chrome contrast machine-checked 20 Aug: worst text pair --faint 5.09:1 on
-   --panel-2; every voice ≥6.1:1; family dot hues ≥3.7:1 on the land slab. ═══ */
+/* ═══ IDENTITY LAYER — LUMEN (owner-committed 20 Aug: illuminated light yellow
+   on black). No override blocks; prior identities live in git history. Chrome
+   contrast machine-checked: worst text pair --faint 5.85:1; every voice ≥6.9:1;
+   family hues ≥6.1:1 on the land slab. ═══ */
 </style>
 <!-- DEV PREVIEW ONLY — uncomment while working on the un-integrated skeleton;
      integration/ship keeps it commented (the shipped app is one file):
@@ -477,15 +525,23 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 <canvas id="globeCanvas" aria-label="Globe"></canvas>
 
 <!-- minimal top edge: search pill + theme switch -->
-<div id="searchPill" class="glass" role="search">
-  <span class="sp-ico" aria-hidden="true">⌕</span>
-  <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
-         spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
-</div>
+<!-- DOCK 1 · command bar — search · MAP⇄BRIEF · menu. The app's one fixed line. -->
+<header id="cmdBar" class="glass">
+  <div id="searchPill" role="search">
+    <span class="sp-ico" aria-hidden="true">⌕</span>
+    <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
+           spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
+  </div>
+  <div id="modeSeg" role="group" aria-label="Map or Brief mode">
+    <button class="ms-b on" data-mode="map" type="button">MAP</button>
+    <button class="ms-b" data-mode="brief" type="button">BRIEF</button>
+  </div>
+  <button id="menuBtn" type="button" aria-label="Menu">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
+  </button>
+</header>
 <div id="searchResults" class="glass" role="listbox" aria-label="Search results"></div>
-
-<!-- breadcrumb trail — the globe stroll's memory; selection owner renders it -->
-<nav id="trailBar" aria-label="Selection trail"></nav>
+<section id="appMenu" class="glass card" hidden aria-label="Menu"></section>
 
 <!-- family legend / layer list — swatch · name · count; tap toggles the family -->
 <section id="legendPanel" class="glass card" hidden aria-label="Map layers"></section>
@@ -502,24 +558,17 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 <!-- dossier: THE drawer (single-brain law — one drawer) -->
 <section id="dossier" class="glass card" role="dialog" aria-label="Dossier" hidden></section>
 
-<!-- stage bar: reset/back/clear pills + Globe⇄Brief seg placeholder.
-     stageModeGlobe/stageModeBrief + data-gseg names ported from A-ORG-1 ~L15831;
-     BRIEF stays a disabled placeholder until M3. back/clear stay hidden until the
-     selection/search owner wires and shows them. -->
-<nav id="stageBar" aria-label="Stage controls">
-  <button id="stageReset" class="pill glass" type="button">⌂ Reset</button>
-  <button id="stageBack" class="pill glass" type="button" hidden>‹ Back</button>
-  <button id="stageClear" class="pill glass" type="button" hidden>✕ Clear</button>
-  <button id="stageFit" class="pill glass" type="button" hidden>⊡ Fit</button>
-  <button id="zoomOutBtn" class="pill glass" type="button" aria-label="Zoom out">−</button>
-  <button id="zoomInBtn" class="pill glass" type="button" aria-label="Zoom in">＋</button>
-  <button id="legendBtn" class="pill glass" type="button" aria-label="Layers">⊙</button>
-  <button id="exportBtn" class="pill glass" type="button" aria-label="Export">⇪</button>
-  <div class="seg glass" role="group" aria-label="Globe or Brief mode">
-    <button id="stageModeGlobe" class="seg-b on" data-gseg="cmd" type="button" title="Globe mode" aria-label="Globe mode">Globe</button>
-    <button id="stageModeBrief" class="seg-b" data-gseg="brief" type="button" title="Brief mode" aria-label="Brief mode" disabled>Brief</button>
-  </div>
+<!-- DOCK 2 · tool rail — zoom · frame · layers; collapses to a puck. -->
+<nav id="toolRail" aria-label="Map tools">
+  <button id="zoomInBtn" class="rl-b glass" type="button" aria-label="Zoom in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+  <button id="zoomOutBtn" class="rl-b glass" type="button" aria-label="Zoom out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+  <button id="railFrame" class="rl-b glass" type="button" aria-label="Frame"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"></path></svg></button>
+  <button id="legendBtn" class="rl-b glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path></svg></button>
+  <button id="railPuck" class="rl-b glass" type="button" aria-label="Collapse tools"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></button>
 </nav>
+
+<!-- BRIEF stage — full screen when body.brief-mode; precise CSS lines, tier law. -->
+<section id="briefStage" aria-label="Brief"></section>
 
 <!-- corner clocks (charter D4: corner clocks only, time console retired).
      Empty until the clock owner fills them — .clock:empty stays hidden. -->
@@ -528,11 +577,25 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 <div id="clockBL" class="clock glass"></div>
 <div id="clockBR" class="clock glass"></div>
 
-<!-- version chip — long-press dumps the diagnostics ring buffer -->
-<span id="verChip" class="glass"></span>
-
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.3.0 • LUMEN + THE CONTROL LAW (owner decisions, 20 Aug). IDENTITY: no
+//            blue — illuminated light yellow on black. Black ocean, warm-lit
+//            land, bright gold coasts, warm limb; luminous yellow voice; family
+//            hues rebalanced warm (machine-checked). CONTROL LAW SHIPPED — three
+//            docks, one grammar, zero overlap: DOCK 1 command bar (search ·
+//            MAP⇄BRIEF seg · ⋯ menu, which absorbs version + diagnostics — the
+//            corner chip is gone); DOCK 2 tool rail (44px circles: zoom ± ·
+//            FRAME, which merges Reset+Fit into one control · layers; collapses
+//            to a puck); DOCK 3 context sheet (grip with peek/half/full detents,
+//            trail crumbs AS back-nav, export + clear in the header). The stage
+//            bar, trail bar, and every redundant pill are deleted. No footnote
+//            copy in the UI ("tap any to open" et al. removed) — intuitive over
+//            explained. BRIEF IS UNMISTAKABLE: the seg flips the whole room —
+//            gold command bar with black ink, warmed page, gold frame, map
+//            chrome yields; the selected HQ renders as a precise tier-law chain
+//            (CSS lines, never hand-drawn): L1 white · L2 cools · L3 warms.
+//            Smoke grew menu/brief/crumb probes.
 //   v0.2.0 • ORBIT + THE SNAPSHOT SPINE (owner directive + reference set, 20 Aug).
 //            IDENTITY COMMITTED — ORBIT: the modern global-network globe. Deep-
 //            space navy ground, luminous continents on a dark ocean, soft blue
@@ -587,7 +650,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.2.0';
+const APP_VERSION = 'v0.3.0';
 const APP_UPDATED = '19 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -923,18 +986,38 @@ function latRing(lat){ if(_latRingCache[lat]) return _latRingCache[lat]; const a
 function lonRing(lon){ if(_lonRingCache[lon]) return _lonRingCache[lon]; const a=[]; for(let lat=-90;lat<=90;lat+=6) a.push([lon,lat]); return (_lonRingCache[lon]=a); }
 
 function drawGlobePath(ctx,m,ring,fill){
-  // Draw each contiguous front-hemisphere run as its own sub-path. Uses the
-  // ring's cached Cartesian vectors + the per-frame camera sin/cos, so there is
-  // no trig per vertex. Runs that wrap the limb never draw a chord across the globe.
+  // STROKE: each contiguous front-hemisphere run is its own sub-path, so the
+  // limb is never stroked. FILL (v0.3.0 fix): one continuous path in which
+  // back-hemisphere vertices are CLAMPED TO THE LIMB — the boundary hugs the
+  // sphere edge instead of auto-closing with a chord across the disc. Those
+  // chords were the owner's "overcast" band: near-invisible under A-ORG-1's
+  // faint washes, glaring under Lumen's near-solid land.
   const xyz=_ringXYZ(ring);
   const m00=_gM.m00,m01=_gM.m01,m02=_gM.m02, m10=_gM.m10,m11=_gM.m11,m12=_gM.m12, m20=_gM.m20,m21=_gM.m21,m22=_gM.m22;
   const cx=m.cx, cy=m.cy, R=m.R;
+  if(fill){
+    let any=false, started=false;
+    ctx.beginPath();
+    for(let i=0;i<xyz.length;i+=3){
+      const x=xyz[i], y=xyz[i+1], z=xyz[i+2];
+      const rz=m20*x+m21*y+m22*z;
+      let rx=m00*x+m01*y+m02*z, ry=m10*x+m11*y+m12*z;
+      let px, py;
+      if(rz>=0){ any=true; px=cx-rx*R; py=cy-ry*R; }
+      else {
+        const L=Math.hypot(rx,ry); if(L<1e-6) continue;   // dead-behind point: no direction
+        px=cx-(rx/L)*R; py=cy-(ry/L)*R;
+      }
+      if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+    }
+    if(any && started){ ctx.closePath(); ctx.fill(); }
+    if(!any) return;                                     // fully behind: nothing to stroke either
+  }
   let run=null;
   const flush=()=>{
     if(run && run.length>=4){
       ctx.beginPath(); ctx.moveTo(run[0],run[1]);
       for(let k=2;k<run.length;k+=2) ctx.lineTo(run[k],run[k+1]);
-      if(fill) ctx.fill();
       ctx.stroke();
     }
     run=null;
@@ -1583,15 +1666,15 @@ function childrenOf(id){ _siteIndex(); return (_kidIdx.get(id)||[]).slice(); }
 // Orbit ground (machine-checked ≥3.7:1 on the land slab) — data categories, not
 // theme chrome, so they live here rather than in the token layer.
 const FAM_META={
-  hqda:      {c:'159,182,204', n:'HQDA & DRUs'},
-  land:      {c:'78,155,255',  n:'Land Forces'},
-  theater:   {c:'219,128,208', n:'Theaters & COCOMs'},
-  futures:   {c:'180,140,255', n:'Futures & Training'},
-  materiel:  {c:'62,210,200',  n:'Materiel & Sustainment'},
+  hqda:      {c:'242,238,226', n:'HQDA & DRUs'},
+  land:      {c:'245,215,110', n:'Land Forces'},
+  theater:   {c:'255,143,192', n:'Theaters & COCOMs'},
+  futures:   {c:'201,160,255', n:'Futures & Training'},
+  materiel:  {c:'232,180,90',  n:'Materiel & Sustainment'},
   engineers: {c:'255,153,80',  n:'Engineers'},
-  guard:     {c:'138,151,166', n:'National Guard'},
-  oib:       {c:'224,179,84',  n:'Industrial Base'},
-  other:     {c:'126,142,160', n:'Other'},
+  guard:     {c:'168,179,154', n:'National Guard'},
+  oib:       {c:'217,195,106', n:'Industrial Base'},
+  other:     {c:'176,168,148', n:'Other'},
 };
 const FAM_ANCHOR={
   'the-pentagon':'hqda','fort-mcnair':'hqda','west-point':'hqda','fort-belvoir':'hqda',
@@ -1685,7 +1768,7 @@ function _cssRGB(c, fb){
 
 function _mTok(){
   const root=(typeof document!=='undefined')?document.documentElement:null;
-  const th=root?(root.getAttribute('data-app-theme')||'orbit'):'orbit';
+  const th=root?(root.getAttribute('data-app-theme')||'lumen'):'lumen';
   if(_mTokCache && _mTokTheme===th) return _mTokCache;
   let rd=function(){ return ''; };
   try{ if(root){ const cs=getComputedStyle(root); rd=function(n){ return (cs.getPropertyValue(n)||'').trim(); }; } }catch(_){}
@@ -1824,7 +1907,7 @@ function _gChromeZones(m){
     if(cr && cr.width>0 && cr.height>0){
       const kx=W/cr.width, ky=H/cr.height, live=[], PAD=4;
       const sels=['#searchPill','#searchResults','#dossier','#stageBar',
-                  '#clockTL','#clockTR','#clockBL','#clockBR','#themeSwitch','#verChip'];
+                  '#clockTL','#clockTR','#clockBL','#clockBR','#cmdBar','#toolRail'];
       for(const s of sels){
         const el=document.querySelector(s); if(!el) continue;
         const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
@@ -2733,7 +2816,53 @@ function selectSite(id){
   }
   try{ _trailPush(s.id); }catch(_){}
   showDossier(s.id);
+  try{ if(document.body.classList.contains('brief-mode')) renderBrief(); }catch(_){}
 }
+
+// ---- MODE (v0.3.0 control law): MAP ⇄ BRIEF — one seg, unmistakable shift ----
+function setMode(m){
+  const brief=(m==='brief');
+  document.body.classList.toggle('brief-mode', brief);
+  document.querySelectorAll('#modeSeg .ms-b').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-mode')===(brief?'brief':'map'));
+  });
+  if(brief) renderBrief();
+  try{ if(typeof globeMark==='function') globeMark(); }catch(_){}
+}
+try{ window.setMode=setMode; }catch(_){}
+
+// The v0.3 brief: the selected HQ's chain as tier-law boxes, full screen.
+// Connectors are borders — exact lines, never drawn by hand. L1 white spine,
+// L2 cools, L3 warms, L4 roses; green never touches brief data.
+function renderBrief(){
+  const el=document.getElementById('briefStage'); if(!el) return;
+  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
+  if(!sel){
+    el.innerHTML='<div class="bf-empty glass card"><b>No HQ selected</b><span>Pick an organization on the map, then flip to BRIEF.</span></div>';
+    return;
+  }
+  const esc=_odEsc, escA=_odEscA;
+  const box=function(st,tier){
+    const tcls='bf-t'+tier;                       // tier class, quote-adjacent for the lint's dynamic guard
+    return '<button type="button" class="bf-box '+tcls+'" data-odsel="'+escA(st.id)+'"><b>'+esc(st.unit||st.base)+'</b><span>'+esc(st.base)+(st.st?(' · '+esc(st.st)):'')+'</span></button>'; };
+  const kids=childrenOf(sel.id).sort(function(a,b){ return String(a.base).localeCompare(String(b.base)); });
+  let h='<div class="bf-col">';
+  h+='<div class="bf-row">'+box(sel,1)+'</div>';
+  if(kids.length){
+    h+='<div class="bf-rail"></div>';
+    h+='<div class="bf-row">'+kids.slice(0,6).map(function(k){ return box(k,2); }).join('')+'</div>';
+    if(kids.length>6) h+='<div class="bf-more">+'+(kids.length-6)+' more</div>';
+    const g=[]; kids.slice(0,6).forEach(function(k){ childrenOf(k.id).forEach(function(x){ g.push(x); }); });
+    if(g.length){
+      h+='<div class="bf-rail"></div>';
+      h+='<div class="bf-row">'+g.slice(0,8).map(function(x){ return box(x,3); }).join('')+'</div>';
+      if(g.length>8) h+='<div class="bf-more">+'+(g.length-8)+' more</div>';
+    }
+  }
+  h+='</div>';
+  el.innerHTML=h;
+}
+try{ window.renderBrief=renderBrief; }catch(_){}
 
 // ---- BREADCRUMB TRAIL (v0.2.0) — the globe stroll's memory. Session-only (the
 // no-localStorage-at-boot law holds); ‹ Back walks it, chips jump anywhere in it.
@@ -2744,26 +2873,11 @@ function _trailPush(id){
   t.push(id); if(t.length>12) t.shift();
   _trailRender();
 }
-function _trailBack(){
-  const t=GlobeState._trail||[];
-  if(t.length<2) return;
-  t.pop();                                          // drop the tip…
-  const prev=t.pop();                               // …selectSite re-pushes the target
-  if(prev!=null) selectSite(prev);
-}
+// (back = tapping a crumb; the dedicated _trailBack retired with the Back pill)
 function _trailClear(){ GlobeState._trail=[]; _trailRender(); }
 function _trailRender(){
-  const bar=document.getElementById('trailBar'); if(!bar) return;
-  const t=GlobeState._trail||[];
-  const bk=document.getElementById('stageBack'); if(bk) bk.hidden=(t.length<2);
-  if(t.length<2){ bar.innerHTML=''; return; }       // one stop is not a trail
-  let h='';
-  for(const id of t.slice(-4)){
-    const st=siteById(id); if(!st) continue;
-    const tip=(id===t[t.length-1]);
-    h+='<button type="button" class="tr-chip glass'+(tip?' tip':'')+'" data-odsel="'+_odEscA(id)+'">'+_odEsc(st.base)+'</button>';
-  }
-  bar.innerHTML=h;
+  // crumbs render inside the sheet header (_odRender reads GlobeState._trail);
+  // the standalone trail bar retired with the control law.
 }
 try{ window.selectSite=selectSite; }catch(_){}   // mission: expose the brain globally
 
@@ -2781,8 +2895,10 @@ function showDossier(id){
   const s=(typeof siteById==='function') ? siteById(id) : null;
   if(!s){ hideDossier(); return; }
   _odInjectCSS();                                  // order-safe if a select lands before 'load'
+  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1]||'peek';
   host.innerHTML=_odRender(s);
-  host.classList.add('dz-min');                    // slim name-bar first; tap for depth
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add('dz-'+_kept);                 // selection keeps the current detent; first open peeks
   host.hidden=false;
   try{ host.setAttribute('aria-label', s.base+' — dossier'); }catch(_){}
   host.scrollTop=0;                                // deviation 7: whole card into view
@@ -2802,11 +2918,24 @@ function _odRender(s){
   const kids=((typeof childrenOf==='function') ? childrenOf(s.id) : [])
     .sort(function(a,b){ return String(a.base).localeCompare(String(b.base)); });
 
-  // header — od-head-slim (~L15083): name · st chip · spacer · ✕ (data-odclose)
-  let h='<div class="od-head od-head-slim">'
+  // sheet header (control law): grip · trail crumbs · export · close. The grip
+  // steps the detent; crumbs ARE back-navigation; nothing here needs a caption.
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  const _tr=(GlobeState._trail||[]);
+  if(_tr.length>1){
+    h+='<div class="sh-crumbs">';
+    for(const tid of _tr.slice(-3)){
+      const ts=siteById(tid); if(!ts) continue;
+      const tip=(tid===_tr[_tr.length-1]);
+      h+='<button type="button" class="sh-crumb'+(tip?' tip':'')+'" data-odsel="'+_odEscA(tid)+'">'+_odEsc(ts.base)+'</button>';
+    }
+    h+='</div>';
+  }
+  h+='<div class="od-head od-head-slim">'
     +'<div class="od-name">'+_odEsc(s.base)+'</div>'
     +(s.st?'<span class="bd-state">'+_odEsc(s.st)+'</span>':'')
     +'<span class="od-sp"></span>'
+    +'<button class="od-ico" id="exportBtn" type="button" aria-label="Export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>'
     +'<button class="od-ico od-ico-x" type="button" data-odclose="1" aria-label="Clear selection">✕</button>'
     +'</div>';
 
@@ -2818,8 +2947,7 @@ function _odRender(s){
   h+='<div class="bd-stats">'
     +(chain.length?('<span>'+chain.length+(chain.length===1?' hop':' hops')+' up the chain</span>'):'')
     +'<span>'+kids.length+' subordinate '+(kids.length===1?'site':'sites')+'</span>'
-    +((chain.length||kids.length)?'<span class="bd-hint">tap any to open</span>':'')
-    +'</div>';
+        +'</div>';
 
   // UP — the command line as crumb ROWS, direct parent first → root last
   // (deviations 3-4; gold voice = m5's parent-chain arcs).
@@ -2864,13 +2992,10 @@ function _odRender(s){
   return h;
 }
 
-// ---- Clear pill sync (shell: the selection owner wires + shows #stageClear) ----
-function _odStageClearSync(on){
-  const b=document.getElementById('stageClear');
-  if(b) b.hidden=!on;
-  const f=document.getElementById('stageFit');   // ⊡ Fit frames the family — only meaningful with a selection
-  if(f) f.hidden=!on;
-}
+// ---- (v0.3.0) the clear/fit pills retired with the control law: ✕ lives in the
+// sheet header, frame lives on the rail. Kept as a no-op so the two call sites
+// in show/hideDossier stay byte-stable.
+function _odStageClearSync(on){}
 
 // ---- ONE delegate (PORT of the _odWired idiom ~L12480; guard name kept) --------
 if(!window._odWired){
@@ -2879,14 +3004,21 @@ if(!window._odWired){
     if(!e.target || !e.target.closest) return;
     const x=e.target.closest('[data-odclose]');
     if(x){ selectSite(null); return; }
-    if(e.target.closest('#stageClear')){ selectSite(null); return; }
-    if(e.target.closest('#stageBack')){ try{ _trailBack(); }catch(_){} return; }
     const t=e.target.closest('[data-odsel]');
     if(t){ selectSite(t.getAttribute('data-odsel')); return; }
-    // v0.2.0 SLIM-FIRST DOSSIER (owner reference: the bottom name-bar pattern —
-    // information never impedes the globe). Tapping the card body toggles depth.
+    // detent stepping: the grip cycles peek → half → full → peek; tapping the
+    // card body while peeked opens to half (the globe stays owner below half).
+    const gp=e.target.closest('[data-dzstep]');
     const dz=e.target.closest('#dossier');
-    if(dz && !e.target.closest('button')){ dz.classList.toggle('dz-min'); return; }
+    if(dz && (gp || !e.target.closest('button'))){
+      const order=['dz-peek','dz-half','dz-full'];
+      let i=order.findIndex(function(c){ return dz.classList.contains(c); });
+      if(i<0) i=0;
+      const next= gp ? order[(i+1)%3] : (i===0?'dz-half':null);
+      if(next){ dz.classList.remove('dz-peek','dz-half','dz-full'); dz.classList.add(next); }
+      if(gp) return;
+      if(next) return;
+    }
   });
 }
 
@@ -3382,48 +3514,65 @@ function bootShell(){
     try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
   });
 
-  // Stage bar: reset pill → m4's resetGlobeView (its named consumer). back/clear
-  // stay hidden and unwired here — the selection/search owner binds and shows them.
-  try{
-    var rb=document.getElementById('stageReset');
-    if(rb) rb.addEventListener('click', function(){
-      try{ if(typeof resetGlobeView==='function') resetGlobeView(); }catch(_){}
-    });
-  }catch(_){}
-
-  // Zoom pills → m4 (_wireZoomHold: tap steps, hold repeats).
+  // DOCK 2 wiring — zoom (tap steps, hold repeats), FRAME (fit family when
+  // selected, home view when not: Reset and Fit are ONE control by law), puck.
   try{
     if(typeof _wireZoomHold==='function'){
       _wireZoomHold(document.getElementById('zoomInBtn'), 1.35);
       _wireZoomHold(document.getElementById('zoomOutBtn'), 1/1.35);
     }
   }catch(_){}
-
-  // ⊡ Fit → frame the selected family: the site, its chain up, its children.
-  // (s4 shows/hides the pill alongside #stageClear.)
   try{
-    var fb=document.getElementById('stageFit');
+    var fb=document.getElementById('railFrame');
     if(fb) fb.addEventListener('click', function(){
       try{
-        if(!GlobeState.sel || typeof fitGlobeToSites!=='function') return;
-        var fam=[GlobeState.sel];
-        if(typeof parentChainOf==='function') fam=fam.concat(parentChainOf(GlobeState.sel));
-        if(typeof childrenOf==='function') fam=fam.concat(childrenOf(GlobeState.sel));
-        fitGlobeToSites(fam);
+        if(GlobeState.sel && typeof fitGlobeToSites==='function'){
+          var fam=[GlobeState.sel];
+          if(typeof parentChainOf==='function') fam=fam.concat(parentChainOf(GlobeState.sel));
+          if(typeof childrenOf==='function') fam=fam.concat(childrenOf(GlobeState.sel));
+          fitGlobeToSites(fam);
+        } else if(typeof resetGlobeView==='function') resetGlobeView();
       }catch(_){}
+    });
+  }catch(_){}
+  try{
+    var pk=document.getElementById('railPuck');
+    if(pk) pk.addEventListener('click', function(){ document.body.classList.toggle('rail-min'); });
+  }catch(_){}
+
+  // DOCK 1 wiring — MAP⇄BRIEF seg + the ⋯ menu (version + diagnostics live here).
+  try{
+    document.querySelectorAll('#modeSeg .ms-b').forEach(function(b){
+      b.addEventListener('click', function(){ try{ setMode(b.getAttribute('data-mode')); }catch(_){} });
+    });
+  }catch(_){}
+  try{
+    window._renderAppMenu=function(){
+      var m=document.getElementById('appMenu'); if(!m) return;
+      m.innerHTML='<div class="am-row am-ver">A-ORG-2 '+APP_VERSION+' · '+APP_UPDATED+'</div>'
+        +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
+        +'<div class="am-row am-ver">'+((typeof SITES!=='undefined'&&SITES)?SITES.length:0)+' sites</div>';
+    };
+    var mb=document.getElementById('menuBtn');
+    if(mb) mb.addEventListener('click', function(){
+      var m=document.getElementById('appMenu'); if(!m) return;
+      if(m.hidden) _renderAppMenu();
+      m.hidden=!m.hidden;
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target||!e.target.closest) return;
+      var d=e.target.closest('[data-am="diag"]');
+      if(d){ try{ window._diagDump&&_diagDump(); }catch(_){} var m=document.getElementById('appMenu'); if(m) m.hidden=true; return; }
+      var m=document.getElementById('appMenu');
+      if(m&&!m.hidden&&!e.target.closest('#appMenu')&&!e.target.closest('#menuBtn')) m.hidden=true;
     });
   }catch(_){}
 
   // Identity is COMMITTED (owner, 20 Aug): Clean Cartography — the Atlas token
   // set in :root is THE look. The mockup switcher and the slate/field candidate
   // blocks were retired to git history @ v0.1.1; --world-glow survives as a token.
-  document.documentElement.setAttribute('data-app-theme','orbit');
+  document.documentElement.setAttribute('data-app-theme','lumen');
 
-  // Version chip.
-  try{
-    var vc=document.getElementById('verChip');
-    if(vc) vc.textContent='A-ORG-2 '+APP_VERSION;
-  }catch(_){}
 
   // DIAGNOSTICS TOAST (PORT of A-ORG-1 ~L13977): uncaught errors + rejections
   // self-report with real details; capture lives in the first-byte head script.
@@ -3443,23 +3592,14 @@ function bootShell(){
     try{ (window.__errLog||[]).slice(-1).forEach(function(e){ window._errToast(e.m+((e.s||e.l)?(' @ '+((e.s||'').split('/').pop()||'inline')+(e.l?(':'+e.l):'')):'')); }); }catch(_){}
   }catch(e){}
 
-  // long-press the VERSION chip → diagnostics dump (PORT of A-ORG-1 ~L19509,
-  // retargeted from #footerVersion to #verChip — the ring buffer of errors).
-  (function(){
-    const hv=document.getElementById('verChip');
-    if(!hv) return;
-    let vt=null;
-    const dump=function(){
-      const L=window.__errLog||[];
-      const txt=L.length? L.map(function(e){ return '['+e.k+'] '+e.m+'\n  @ '+(e.s||'inline')+':'+e.l+':'+e.c+(e.st?('\n  '+e.st.split('\n').slice(0,3).join(' | ')):''); }).join('\n\n') : 'No errors captured this session.';
-      try{ prompt('Diagnostics — last '+L.length+' error(s). Copy below:', txt.slice(0,900)); }
-      catch(_){ alert(txt.slice(0,900)); }
-    };
-    hv.style.pointerEvents='auto';
-    hv.addEventListener('pointerdown', function(){ clearTimeout(vt); vt=setTimeout(dump, 700); });
-    hv.addEventListener('pointerup', function(){ clearTimeout(vt); });
-    hv.addEventListener('pointercancel', function(){ clearTimeout(vt); });
-  })();
+  // Diagnostics dump — now a ⋯ menu row (the version chip retired with the law;
+  // the ring buffer + capture spine are untouched).
+  window._diagDump=function(){
+    const L=window.__errLog||[];
+    const txt=L.length? L.map(function(e){ return '['+e.k+'] '+e.m+'\n  @ '+(e.s||'inline')+':'+e.l+':'+e.c+(e.st?('\n  '+e.st.split('\n').slice(0,3).join(' | ')):''); }).join('\n\n') : 'No errors captured this session.';
+    try{ prompt('Diagnostics — last '+L.length+' error(s). Copy below:', txt.slice(0,900)); }
+    catch(_){ alert(txt.slice(0,900)); }
+  };
 
   // Sandbox banner (PORT of A-ORG-1 ~L22198): preview hosts announce themselves
   // so host console noise is never mistaken for an A-ORG-2 defect.

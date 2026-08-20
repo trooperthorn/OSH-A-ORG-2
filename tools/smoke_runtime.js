@@ -217,9 +217,12 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(GlobeState.baseK!==0.72){ fails++; console.log('✗ baseK '+GlobeState.baseK+' on phone stub (radius law wants 0.72)'); }
     else console.log('  ✓ GlobeState spine (baseK 0.72 phone, zoom '+GlobeState.zoom+')');
   }
-  const vc=IDS['verChip'];
-  if(!vc || !String(vc.textContent||'').trim()){ fails++; console.log('✗ #verChip empty — bootShell did not stamp APP_VERSION'); }
-  else console.log('  ✓ #verChip: "'+vc.textContent+'"');
+  // v0.3.0: version lives in the ⋯ menu — probe the menu render instead.
+  { const mb=IDS['menuBtn'], am=IDS['appMenu'];
+    if(!mb||!am){ fails++; console.log('✗ menu dock missing (#menuBtn/#appMenu)'); }
+    else { try{ global._renderAppMenu&&global._renderAppMenu(); }catch(_){}
+      if(am.innerHTML.indexOf('A-ORG-2')<0){ fails++; console.log('✗ ⋯ menu did not stamp APP_VERSION'); }
+      else console.log('  ✓ ⋯ menu stamps version: ok'); } }
 
   // ── PROBE: search index + ranking + render (s3) ──
   try{
@@ -284,10 +287,19 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!lg || lg.innerHTML.indexOf('lg-row')<0){ fails++; console.log('✗ LEGEND did not render rows'); }
       else console.log('  ✓ legend rows rendered');
     }
-    const tb=IDS['trailBar'];
-    global.selectSite('fort-stewart');   // second stop → the trail becomes visible
-    if(!tb || tb.innerHTML.indexOf('tr-chip')<0){ fails++; console.log('✗ TRAIL bar empty after two selections'); }
-    else console.log('  ✓ trail renders after the second stop');
+    global.selectSite('fort-stewart');   // second stop → crumbs appear in the sheet header
+    const dz=IDS['dossier'];
+    if(!dz || dz.innerHTML.indexOf('sh-crumb')<0){ fails++; console.log('✗ TRAIL crumbs missing from the sheet header after two selections'); }
+    else console.log('  ✓ trail crumbs render in the sheet header');
+    if(typeof global.setMode==='function'){
+      global.setMode('brief');
+      const bs=IDS['briefStage'];
+      const briefOn=(typeof document!=='undefined')&&document.body&&document.body.classList&&document.body.classList.contains('brief-mode');
+      if(!briefOn){ fails++; console.log('✗ setMode(brief) did not flip body.brief-mode'); }
+      if(!bs || bs.innerHTML.indexOf('bf-box')<0){ fails++; console.log('✗ BRIEF stage empty with a selection active'); }
+      else console.log('  ✓ brief mode: body flag + tier boxes rendered');
+      global.setMode('map');
+    } else { fails++; console.log('✗ setMode not exposed'); }
   }catch(e){ fails++; console.log('✗ SPINE probe: '+e.message); }
 
   // ── PROBE: corner clocks populated (s5) ──
