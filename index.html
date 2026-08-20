@@ -507,6 +507,49 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
     background:linear-gradient(180deg, rgba(0,0,0,0), var(--glass-lo)); pointer-events:none;
     border-radius:0 0 var(--r-card) var(--r-card)}
 }
+
+/* ═══ v0.4.0 DATASTORE — sheet tabs · record rows · one add/edit form ═══ */
+.od-tabs{display:flex; gap:4px; margin-top:12px; border-radius:12px; background:rgba(0,0,0,.35);
+  padding:4px; box-shadow:0 0 0 1px var(--line); overflow-x:auto; scrollbar-width:none}
+.od-tabs::-webkit-scrollbar{display:none}
+.od-tab{
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0; cursor:pointer;
+  flex:1 0 auto; min-height:44px; padding:0 12px; border-radius:9px; white-space:nowrap;
+  font:700 11.5px/1 var(--body); color:var(--faint);
+}
+.od-tab.on{background:var(--accent-wash); color:var(--accent)}
+.rc-row{display:flex; align-items:center; gap:10px; min-height:52px; padding:8px 2px;
+  box-shadow:0 -1px 0 var(--line)}
+.rc-row:first-of-type{box-shadow:none}
+.rc-top{flex:none; max-width:52%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  color:var(--text); font:700 13.5px/1.3 var(--body); text-decoration:none}
+a.rc-top{color:var(--accent)}
+.rc-sub{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  color:var(--dim); font:500 12px/1.3 var(--body)}
+.rc-dots{margin-left:auto}
+.rc-add{
+  appearance:none; -webkit-appearance:none; border:0; background:none; margin:10px 0 2px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:7px; width:100%;
+  min-height:48px; border-radius:12px; box-shadow:0 0 0 1px var(--line);
+  font:700 13px/1 var(--body); color:var(--accent);
+}
+.rc-add:active{background:var(--accent-wash)}
+.rc-form{display:flex; flex-direction:column; gap:8px; padding:12px; margin:10px 0 2px;
+  border-radius:12px; background:rgba(0,0,0,.4); box-shadow:0 0 0 1.5px var(--accent)}
+.rc-in{
+  appearance:none; -webkit-appearance:none; border:0; outline:none; width:100%; box-sizing:border-box;
+  min-height:46px; padding:0 13px; border-radius:10px; background:var(--panel-2);
+  box-shadow:0 0 0 1px var(--line); color:var(--text); font:600 14px/1.2 var(--body);
+}
+.rc-in::placeholder{color:var(--faint)}
+.rc-btns{display:flex; align-items:center; gap:8px}
+.rc-save,.rc-cancel,.rc-del{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  min-height:44px; padding:0 18px; border-radius:var(--r-pill); font:800 12.5px/1 var(--body);
+}
+.rc-save{background:var(--accent); color:#141006}
+.rc-cancel{background:none; color:var(--faint)}
+.rc-del{background:none; color:var(--danger); box-shadow:0 0 0 1px rgba(255,122,102,.4); padding:0 14px}
 </style>
 <style>
 /* ═══ IDENTITY LAYER — LUMEN (owner-committed 20 Aug: illuminated light yellow
@@ -579,6 +622,21 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.4.0 • THE DATASTORE (plan board 6, owner-approved). Every org carries a
+//            RECORD: People · Specs · Notes · Links — tabs in the context sheet,
+//            counts on the tab and in the stats line. Adding is one Add row that
+//            becomes a two-field inline form in place (one control, two states);
+//            the row ⋯ opens the same form for edit + delete. Notes stamp their
+//            own date. Storage: in-memory map, write-through to IndexedDB
+//            (aorg2/records, schema v1), loaded once after first paint — the
+//            no-reads-at-boot law holds, and the layer degrades to memory-only
+//            where IndexedDB is absent (harness stubs). THE PIPE PAYS OFF:
+//            records ride Snapshot.extras.records untouched — PDF and HTML
+//            dossiers grow People/Specs/Notes/Links sections and a per-site
+//            record count column, JSON carries everything, with ZERO changes to
+//            any exporter's plumbing. ⋯ menu: Back up records (one JSON file) ·
+//            Restore records (file picker, merge by org). Smoke grew a
+//            records probe (API → tab render → snapshot → export body).
 //   v0.3.0 • LUMEN + THE CONTROL LAW (owner decisions, 20 Aug). IDENTITY: no
 //            blue — illuminated light yellow on black. Black ocean, warm-lit
 //            land, bright gold coasts, warm limb; luminous yellow voice; family
@@ -650,7 +708,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.3.0';
+const APP_VERSION = 'v0.4.0';
 const APP_UPDATED = '19 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2913,6 +2971,19 @@ function hideDossier(){
   _odStageClearSync(false);
 }
 
+// sheet tab + inline-form state (v0.4.0 datastore). Tab sticks across
+// selections — adding people to many orgs in a row is the workflow.
+let _odTab='ov';
+let _rcForm=null;                                   // {kind, idx|null} — one open form at a time
+const RC_KINDS={
+  people:{ n:'People', f1:'Name', f2:'Role / section', k1:'name', k2:'role' },
+  specs:{  n:'Specs',  f1:'Label', f2:'Value',          k1:'label', k2:'value' },
+  notes:{  n:'Notes',  f1:'Note',  f2:null,             k1:'text',  k2:null },
+  links:{  n:'Links',  f1:'Label', f2:'URL',            k1:'label', k2:'url' },
+};
+function _odSetTab(t){ _odTab=t; _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); }
+try{ window._odSetTab=_odSetTab; }catch(_){}
+
 function _odRender(s){
   const chain=(typeof parentChainOf==='function') ? parentChainOf(s.id) : [];
   const kids=((typeof childrenOf==='function') ? childrenOf(s.id) : [])
@@ -2944,10 +3015,25 @@ function _odRender(s){
   if(s.unitFull) h+='<div class="od-unit-full">'+_odEsc(s.unitFull)+'</div>';
 
   // stats line (bd-stats grammar ~L15087)
+  const recN=(typeof recCount==='function')?recCount(s.id):0;
   h+='<div class="bd-stats">'
     +(chain.length?('<span>'+chain.length+(chain.length===1?' hop':' hops')+' up the chain</span>'):'')
     +'<span>'+kids.length+' subordinate '+(kids.length===1?'site':'sites')+'</span>'
-        +'</div>';
+    +(recN?('<span>'+recN+' record'+(recN===1?'':'s')+'</span>'):'')
+    +'</div>';
+
+  // ── tabs (v0.4.0): Overview + the four record kinds; body renders one tab ──
+  const rec=(typeof recordOf==='function')?recordOf(s.id):null;
+  const cnt=function(k){ return rec?rec[k].length:0; };
+  if(_odTab!=='ov' && !RC_KINDS[_odTab]) _odTab='ov';
+  h+='<div class="od-tabs">'
+    +'<button type="button" class="od-tab'+(_odTab==='ov'?' on':'')+'" data-odtab="ov">Overview</button>'
+    +Object.keys(RC_KINDS).map(function(k){
+      const c=cnt(k);
+      return '<button type="button" class="od-tab'+(_odTab===k?' on':'')+'" data-odtab="'+k+'">'+RC_KINDS[k].n+(c?(' · '+c):'')+'</button>';
+    }).join('')
+    +'</div>';
+  if(_odTab!=='ov') return h+_rcRender(s.id, _odTab);
 
   // UP — the command line as crumb ROWS, direct parent first → root last
   // (deviations 3-4; gold voice = m5's parent-chain arcs).
@@ -2992,6 +3078,50 @@ function _odRender(s){
   return h;
 }
 
+// ---- record tab body (v0.4.0): rows · one add/edit form · delete ------------
+function _rcRender(id, kind){
+  const K=RC_KINDS[kind]; const rec=recordOf(id); const items=rec?rec[kind]:[];
+  let h='';
+  items.forEach(function(it, i){
+    if(_rcForm && _rcForm.kind===kind && _rcForm.idx===i){ h+=_rcFormHTML(kind, it, i); return; }
+    let top='', sub='';
+    if(kind==='people'){ top=it.name||''; sub=it.role||''; }
+    else if(kind==='specs'){ top=it.label||''; sub=it.value||''; }
+    else if(kind==='notes'){ top=it.text||''; sub=it.ts?new Date(it.ts).toLocaleDateString():''; }
+    else { top=it.label||''; sub=it.url||''; }
+    h+='<div class="rc-row">'
+      +(kind==='links'&&it.url?('<a class="rc-top" href="'+_odEscA(it.url)+'" target="_blank" rel="noopener">'+_odEsc(top)+'</a>'):('<span class="rc-top">'+_odEsc(top)+'</span>'))
+      +(sub?('<span class="rc-sub">'+_odEsc(sub)+'</span>'):'')
+      +'<button class="od-ico rc-dots" type="button" data-rcedit="'+i+'" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
+      +'</div>';
+  });
+  if(_rcForm && _rcForm.kind===kind && _rcForm.idx==null) h+=_rcFormHTML(kind, null, null);
+  else h+='<button class="rc-add" type="button" data-rcadd="'+kind+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Add</button>';
+  return h;
+}
+function _rcFormHTML(kind, it, idx){
+  const K=RC_KINDS[kind];
+  return '<div class="rc-form">'
+    +'<input class="rc-in" id="rcF1" type="text" placeholder="'+_odEscA(K.f1)+'" value="'+_odEscA(it?(it[K.k1]||''):'')+'">'
+    +(K.f2?('<input class="rc-in" id="rcF2" type="text" placeholder="'+_odEscA(K.f2)+'" value="'+_odEscA(it?(it[K.k2]||''):'')+'">'):'')
+    +'<div class="rc-btns">'
+    +(idx!=null?('<button class="rc-del" type="button" data-rcdel="'+idx+'">Delete</button>'):'')
+    +'<span class="od-sp"></span>'
+    +'<button class="rc-cancel" type="button" data-rccancel="1">Cancel</button>'
+    +'<button class="rc-save" type="button" data-rcsave="'+(idx==null?'':idx)+'">Save</button>'
+    +'</div></div>';
+}
+function _rcCommit(idx){
+  const id=GlobeState.sel; if(!id||!_rcForm) return;
+  const K=RC_KINDS[_rcForm.kind];
+  const f1=document.getElementById('rcF1'), f2=document.getElementById('rcF2');
+  const v1=(f1&&f1.value||'').trim(), v2=(f2&&f2.value||'').trim();
+  if(!v1){ _rcForm=null; showDossier(id); return; }   // empty first field = never save a blank row
+  const item={}; item[K.k1]=v1; if(K.k2) item[K.k2]=v2;
+  if(idx==null||idx==='') recAdd(id,_rcForm.kind,item); else recUpdate(id,_rcForm.kind,parseInt(idx,10),item);
+  _rcForm=null; showDossier(id);
+}
+
 // ---- (v0.3.0) the clear/fit pills retired with the control law: ✕ lives in the
 // sheet header, frame lives on the rail. Kept as a no-op so the two call sites
 // in show/hideDossier stay byte-stable.
@@ -3004,6 +3134,19 @@ if(!window._odWired){
     if(!e.target || !e.target.closest) return;
     const x=e.target.closest('[data-odclose]');
     if(x){ selectSite(null); return; }
+    const tb=e.target.closest('[data-odtab]');
+    if(tb){ _odSetTab(tb.getAttribute('data-odtab')); return; }
+    const ra=e.target.closest('[data-rcadd]');
+    if(ra){ _rcForm={kind:ra.getAttribute('data-rcadd'), idx:null}; if(GlobeState.sel) showDossier(GlobeState.sel);
+      try{ const f=document.getElementById('rcF1'); f&&f.focus(); }catch(_){} return; }
+    const re=e.target.closest('[data-rcedit]');
+    if(re){ _rcForm={kind:_odTab, idx:parseInt(re.getAttribute('data-rcedit'),10)}; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
+    const rs=e.target.closest('[data-rcsave]');
+    if(rs){ _rcCommit(rs.getAttribute('data-rcsave')); return; }
+    const rc0=e.target.closest('[data-rccancel]');
+    if(rc0){ _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
+    const rd=e.target.closest('[data-rcdel]');
+    if(rd){ const id=GlobeState.sel; if(id){ recRemove(id,_odTab,parseInt(rd.getAttribute('data-rcdel'),10)); _rcForm=null; showDossier(id); } return; }
     const t=e.target.closest('[data-odsel]');
     if(t){ selectSite(t.getAttribute('data-odsel')); return; }
     // detent stepping: the grip cycles peek → half → full → peek; tapping the
@@ -3114,6 +3257,84 @@ function _odInjectCSS(){
 }
 
 
+/* ══════════ module: s7-records ══════════ */
+/* ============================================================================
+   s7-records (NEW at v0.4.0) — THE DATASTORE. One record per org, keyed to its
+   map site: people · specs · notes · links. Memory map is the source of truth
+   at runtime; IndexedDB ('aorg2'/'records') is write-through persistence and
+   loads once at boot. No accounts, no network, nothing read at boot from
+   localStorage (the boot law holds — IndexedDB opens async after first paint).
+   Records ride every export through Snapshot.extras.records — the spine built
+   for exactly this. Backup/restore = one JSON file, in the ⋯ menu.
+   ========================================================================= */
+let RECORDS=Object.create(null);
+let _rdb=null;
+
+function _recBlank(id){ return {v:1, id:id, people:[], specs:[], notes:[], links:[], mod:0}; }
+function recordOf(id){ return RECORDS[id]||null; }
+function recCount(id){
+  const r=RECORDS[id]; if(!r) return 0;
+  return (r.people.length+r.specs.length+r.notes.length+r.links.length);
+}
+function _recSave(id){
+  const r=RECORDS[id]; if(!r) return;
+  r.mod=Date.now();
+  try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite'); tx.objectStore('records').put(r); } }catch(_){}
+}
+function recAdd(id, kind, item){
+  if(!RECORDS[id]) RECORDS[id]=_recBlank(id);
+  if(kind==='notes' && item && !item.ts) item.ts=Date.now();
+  RECORDS[id][kind].push(item); _recSave(id);
+}
+function recUpdate(id, kind, idx, item){
+  const r=RECORDS[id]; if(!r||!r[kind]||!r[kind][idx]) return;
+  if(kind==='notes' && r[kind][idx].ts && !item.ts) item.ts=r[kind][idx].ts;
+  r[kind][idx]=item; _recSave(id);
+}
+function recRemove(id, kind, idx){
+  const r=RECORDS[id]; if(!r||!r[kind]) return;
+  r[kind].splice(idx,1); _recSave(id);
+}
+function _rdbOpen(){
+  try{
+    if(typeof indexedDB==='undefined') return;         // stubs/old engines: memory-only, everything still works
+    const rq=indexedDB.open('aorg2', 1);
+    rq.onupgradeneeded=function(e){
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('records')) db.createObjectStore('records',{keyPath:'id'});
+    };
+    rq.onsuccess=function(e){
+      _rdb=e.target.result;
+      try{
+        const tx=_rdb.transaction('records','readonly');
+        const all=tx.objectStore('records').getAll();
+        all.onsuccess=function(){
+          (all.result||[]).forEach(function(r){ if(r&&r.id) RECORDS[r.id]=r; });
+          // a selection made before the load finished re-renders with its records
+          try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+        };
+      }catch(_){}
+    };
+  }catch(_){}
+}
+function recBackup(){
+  const out={v:1, app:'A-ORG-2', generated:new Date().toISOString(), records:RECORDS};
+  _xpDownload('a-org-2-records-'+_xpStamp()+'.json','application/json',JSON.stringify(out,null,1));
+}
+function recRestore(obj){
+  if(!obj || typeof obj.records!=='object') return 0;
+  let n=0;
+  for(const id in obj.records){
+    const r=obj.records[id];
+    if(!r || r.v!==1 || !Array.isArray(r.people)) continue;
+    RECORDS[id]=r; _recSave(id); n++;
+  }
+  try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+  return n;
+}
+try{ window.Records={ add:recAdd, update:recUpdate, remove:recRemove, of:recordOf, count:recCount, backup:recBackup, restore:recRestore }; }catch(_){}
+
+
 /* ══════════ module: s6-export ══════════ */
 /* ============================================================================
    s6-export (NEW at v0.2.0) — THE SNAPSHOT SPINE. The flagship export contract:
@@ -3154,11 +3375,13 @@ function buildSnapshot(scope){
     families:famCounts,
     sites:rows.map(function(r){ return { id:r.id, base:r.base, st:r.st, unit:r.unit, unitFull:r.unitFull||null,
       lat:r.lat, lon:r.lon, grp:r.grp, parent:r.parent, parentUnit:r.parentUnit||null, family:famOf(r.id) }; }),
-    extras:{},                                       // M2 datastore + M3 brief attach here
+    extras:{ records:(function(){                     // the datastore rides every export
+      const out={}; if(typeof recordOf==='function') rows.forEach(function(r){ const rec=recordOf(r.id); if(rec && recCount(r.id)) out[r.id]=rec; });
+      return out; })() },
     image:img,
   };
 }
-try{ window.buildSnapshot=buildSnapshot; }catch(_){}
+try{ window.buildSnapshot=buildSnapshot; window._xpDossierBody=_xpDossierBody; }catch(_){}
 
 // ---- shared download helper (app context — a real user gesture each time) -----
 function _xpDownload(name, mime, data){
@@ -3214,9 +3437,34 @@ function _xpDossierBody(sn){
       h+='</table>';
     }
   }
-  h+='<h2>All sites in scope</h2><table><tr><th>Base</th><th>Unit</th><th>Loc</th><th>Family</th><th>Reports to</th></tr>';
+  const recs=(sn.extras&&sn.extras.records)||{};
+  if(sn.selection && recs[sn.selection.id]){
+    const R=recs[sn.selection.id];
+    if(R.people.length){
+      h+='<h2>People ('+R.people.length+')</h2><table><tr><th>Name</th><th>Role</th></tr>';
+      R.people.forEach(function(p){ h+='<tr><td>'+esc(p.name||'')+'</td><td>'+esc(p.role||'')+'</td></tr>'; });
+      h+='</table>';
+    }
+    if(R.specs.length){
+      h+='<h2>Technical specs ('+R.specs.length+')</h2><table><tr><th>Label</th><th>Value</th></tr>';
+      R.specs.forEach(function(x){ h+='<tr><td>'+esc(x.label||'')+'</td><td>'+esc(x.value||'')+'</td></tr>'; });
+      h+='</table>';
+    }
+    if(R.notes.length){
+      h+='<h2>Notes ('+R.notes.length+')</h2><table><tr><th>Date</th><th>Note</th></tr>';
+      R.notes.forEach(function(x){ h+='<tr><td>'+esc(x.ts?new Date(x.ts).toLocaleDateString():'')+'</td><td>'+esc(x.text||'')+'</td></tr>'; });
+      h+='</table>';
+    }
+    if(R.links.length){
+      h+='<h2>Links ('+R.links.length+')</h2><table><tr><th>Label</th><th>URL</th></tr>';
+      R.links.forEach(function(x){ h+='<tr><td>'+esc(x.label||'')+'</td><td>'+esc(x.url||'')+'</td></tr>'; });
+      h+='</table>';
+    }
+  }
+  h+='<h2>All sites in scope</h2><table><tr><th>Base</th><th>Unit</th><th>Loc</th><th>Family</th><th>Reports to</th><th>Records</th></tr>';
   sn.sites.forEach(function(r){
-    h+='<tr><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td><td>'+esc(r.family)+'</td><td>'+esc(r.parentUnit||(r.parent?String(r.parent):''))+'</td></tr>';
+    const rc=(sn.extras&&sn.extras.records&&sn.extras.records[r.id])?(sn.extras.records[r.id].people.length+sn.extras.records[r.id].specs.length+sn.extras.records[r.id].notes.length+sn.extras.records[r.id].links.length):0;
+    h+='<tr><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td><td>'+esc(r.family)+'</td><td>'+esc(r.parentUnit||(r.parent?String(r.parent):''))+'</td><td>'+(rc||'')+'</td></tr>';
   });
   h+='</table>';
   return h;
@@ -3505,6 +3753,7 @@ function bootShell(){
     try{ if(typeof loadGlobeCoastlinesHi==='function') loadGlobeCoastlinesHi(); }catch(_){}
     try{ if(typeof loadStateBorders==='function') loadStateBorders(); }catch(_){}
     try{ if(typeof loadCountryBorders==='function') loadCountryBorders(); }catch(_){}
+    try{ if(typeof _rdbOpen==='function') _rdbOpen(); }catch(_){}
     try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
   }
 
@@ -3549,7 +3798,10 @@ function bootShell(){
   try{
     window._renderAppMenu=function(){
       var m=document.getElementById('appMenu'); if(!m) return;
+      var _rn=0; try{ for(var k in RECORDS) _rn+=recCount(k); }catch(_){}
       m.innerHTML='<div class="am-row am-ver">A-ORG-2 '+APP_VERSION+' · '+APP_UPDATED+'</div>'
+        +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
+        +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
         +'<div class="am-row am-ver">'+((typeof SITES!=='undefined'&&SITES)?SITES.length:0)+' sites</div>';
     };
@@ -3563,6 +3815,25 @@ function bootShell(){
       if(!e.target||!e.target.closest) return;
       var d=e.target.closest('[data-am="diag"]');
       if(d){ try{ window._diagDump&&_diagDump(); }catch(_){} var m=document.getElementById('appMenu'); if(m) m.hidden=true; return; }
+      var bk=e.target.closest('[data-am="backup"]');
+      if(bk){ try{ recBackup(); }catch(_){} var m2=document.getElementById('appMenu'); if(m2) m2.hidden=true; return; }
+      var rst=e.target.closest('[data-am="restore"]');
+      if(rst){
+        var m3=document.getElementById('appMenu'); if(m3) m3.hidden=true;
+        try{
+          var fi=document.createElement('input'); fi.type='file'; fi.accept='application/json';
+          fi.addEventListener('change', function(){
+            var f=fi.files&&fi.files[0]; if(!f) return;
+            var rd=new FileReader();
+            rd.onload=function(){ try{
+              var n=recRestore(JSON.parse(String(rd.result)));
+              try{ _errToast(n?('records restored for '+n+' org'+(n===1?'':'s')):'no records found in that file'); }catch(_){}
+            }catch(err){ try{ _errToast('restore failed: '+err.message); }catch(_){} } };
+            rd.readAsText(f);
+          });
+          fi.click();
+        }catch(_){}
+        return; }
       var m=document.getElementById('appMenu');
       if(m&&!m.hidden&&!e.target.closest('#appMenu')&&!e.target.closest('#menuBtn')) m.hidden=true;
     });

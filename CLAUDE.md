@@ -57,3 +57,11 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - famOf()/FAM_META = command-family colors (data hues, not theme chrome);
   legend (⊙) is a filter. Trail chips + ‹ Back = the stroll. Dossier opens SLIM
   on phones (name-bar first — the globe owns the screen).
+
+## v0.4.0 — the datastore
+- s7-records: one record per org (people/specs/notes/links), memory map +
+  IndexedDB write-through (aorg2/records, v1), loaded after first paint;
+  degrades to memory-only where IndexedDB is absent. window.Records is the API.
+- Sheet tabs are the UI; one Add row that becomes the two-field form in place.
+- Records ride Snapshot.extras.records — exporters gained sections with zero
+  plumbing changes. Backup/restore = one JSON file via the ⋯ menu.

@@ -302,6 +302,29 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     } else { fails++; console.log('✗ setMode not exposed'); }
   }catch(e){ fails++; console.log('✗ SPINE probe: '+e.message); }
 
+  // ── PROBE: v0.4.0 datastore — records API, tab render, snapshot/export ride ──
+  try{
+    if(!global.Records) throw new Error('Records API not exposed (s7-records absent)');
+    global.Records.add('fort-bragg','people',{name:'COL J. Mercer', role:'G-3'});
+    global.Records.add('fort-bragg','specs',{label:'Runway', value:'10,000 ft'});
+    if(global.Records.count('fort-bragg')!==2){ fails++; console.log('✗ RECORDS count wrong: '+global.Records.count('fort-bragg')); }
+    global.selectSite('fort-bragg');
+    global._odSetTab('people');
+    const host=IDS['dossier'];
+    if(host.innerHTML.indexOf('Mercer')<0 || host.innerHTML.indexOf('People · 1')<0){ fails++; console.log('✗ RECORDS tab did not render the person'); }
+    else console.log('  ✓ records: add + tab render (People · 1, row present)');
+    global._odSetTab('ov');
+    const sn2=global.buildSnapshot();
+    const rr=sn2.extras && sn2.extras.records && sn2.extras.records['fort-bragg'];
+    if(!rr || rr.people.length!==1){ fails++; console.log('✗ SNAPSHOT extras.records missing the record'); }
+    else console.log('  ✓ records ride the snapshot (extras.records)');
+    if(typeof global._xpDossierBody==='function'){
+      const body=global._xpDossierBody(sn2);
+      if(body.indexOf('Mercer')<0 || body.indexOf('Technical specs')<0){ fails++; console.log('✗ EXPORT body missing record sections'); }
+      else console.log('  ✓ records flow into the export dossier body');
+    }
+  }catch(e){ fails++; console.log('✗ RECORDS probe: '+e.message); }
+
   // ── PROBE: corner clocks populated (s5) ──
   { let ok=true;
     for(const id of ['clockTL','clockTR','clockBL','clockBR']){
