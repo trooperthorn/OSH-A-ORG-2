@@ -195,19 +195,33 @@ if(!fails){
       else console.log('✓ SEL ARCS: '+sel.id+' → '+up.length+' gold hop(s) up ('+UP.join('→')+') + '+down.length+' blue child arc(s); drawGlobeLinks drew '+segs+' path segments, '+lc.stroke+' strokes');
     }
 
-    // full marker pass — the v6.6.1-class landmine check: every dot body executes
+    // full marker pass — the v6.6.1-class landmine check: every dot body executes.
+    // v0.6.0: reticle = interior+core (2 arcs) + HQ concentric ring; the selected
+    // site draws a DIAMOND (rects, no arcs). Assert a floor, not an exact count.
+    GS.zoom=2.0;                                           // above the cluster gate
     const front=LOCATED.filter(s=>G._projectLonLat(s.lon,s.lat,m)[2]>=0).length;
     const mc={}, mctx=makeCtx(mc);
     G.drawMarkersHook(mctx,m);
-    const scr=(GS._screen||[]).length, expArc=front*3+2;   // halo+glass+core per dot, +2 sel pulse rings
+    const scr=(GS._screen||[]).length, minArc=front*2-2;   // interior+core per dot (sel draws rects instead)
     if(scr!==front){ fails++; console.log('✗ DRAW PATH: _screen cached '+scr+' dots, '+front+' sites are front-hemisphere'); }
-    else if((mc.arc||0)!==expArc){ fails++; console.log('✗ DRAW PATH: '+(mc.arc||0)+' ctx.arc calls, expected '+expArc+' ('+front+'×3 reticle + 2 pulse rings)'); }
+    else if((mc.arc||0)<minArc){ fails++; console.log('✗ DRAW PATH: '+(mc.arc||0)+' ctx.arc calls, expected ≥'+minArc+' ('+front+'×2 reticle floor)'); }
     else if((mc.save||0)!==(mc.restore||0)){ fails++; console.log('✗ DRAW PATH: ctx.save/restore unbalanced ('+(mc.save||0)+'/'+(mc.restore||0)+')'); }
     else if(!((mc.fillText||0)>0)){ fails++; console.log('✗ DRAW PATH: no chain label reached fillText'); }
     else {
       const hit=G.siteHitTest(m.cx,m.cy);
       if(!hit||!(hit.id===sel.id||(hit.lat===sel.lat&&hit.lon===sel.lon))){ fails++; console.log('✗ DRAW PATH: center hit-test returned '+(hit&&hit.id)+', expected '+sel.id); }
       else console.log('✓ DRAW PATH: drawMarkersHook over '+LOCATED.length+' sites → '+scr+' front dots in _screen, '+mc.arc+' ctx.arc calls, save/restore balanced, hit-test at center → '+hit.id);
+    }
+    // ── CLUSTER GATE (v0.6.0): below zoom 1.6 ordinary sites divert to badges ──
+    {
+      GS.zoom=1.2; GS._clu=null; GS._cluHits=null;
+      const cc={}, cctx=makeCtx(cc);
+      G.drawMarkersHook(cctx,m);
+      const badges=(GS._cluHits||[]).length;
+      if(!(badges>0)){ fails++; console.log('✗ CLUSTERS: zoom 1.2 produced no badges'); }
+      else if((cc.fillText||0)<1){ fails++; console.log('✗ CLUSTERS: no count text drawn'); }
+      else console.log('✓ CLUSTERS: zoom 1.2 → '+badges+' badges with counts; singles return above the 1.6 gate');
+      GS.zoom=2.0;
     }
     GS.sel=null; G._syncSelArcs(null);
   }catch(e){ fails++; console.log('✗ SEL/DRAW crashed:', e.message); console.log((e.stack||'').split('\n').slice(0,4).join('\n')); }

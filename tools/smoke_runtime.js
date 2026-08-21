@@ -273,13 +273,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       fails++; console.log('✗ SNAPSHOT malformed: '+JSON.stringify(sn&&sn.meta));
     } else if(sn.selection && sn.selection.id!=='fort-bragg'){
       fails++; console.log('✗ SNAPSHOT selection drifted: '+sn.selection.id);
-    } else if(!sn.sites.every(function(r){ return r.family; })){
-      fails++; console.log('✗ SNAPSHOT rows missing family keys');
-    } else console.log('  ✓ snapshot: "'+sn.meta.title+'" · '+sn.sites.length+' sites in scope, families attached');
-    if(typeof global.famOf==='function'){
-      const f=global.famOf('fort-stewart');
-      if(f!=='land'){ fails++; console.log('✗ famOf(fort-stewart) = '+f+' (expected land)'); }
-      else console.log('  ✓ famOf walks the branch (fort-stewart → land)');
+    } else if(!sn.sites.every(function(r){ return r.cls; })){
+      fails++; console.log('✗ SNAPSHOT rows missing cls keys');
+    } else console.log('  ✓ snapshot: "'+sn.meta.title+'" · '+sn.sites.length+' sites in scope, classes attached');
+    if(typeof global.clsOf==='function'){
+      const f=global.clsOf('anniston-army-depot');
+      if(f!=='depot'){ fails++; console.log('✗ clsOf(anniston-army-depot) = '+f+' (expected depot)'); }
+      else console.log('  ✓ clsOf reads the carried A-ORG-1 class (depot)');
     }
     if(typeof global.renderLegend==='function'){
       global.renderLegend();
@@ -351,13 +351,32 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     global.setMode('map');
   }catch(e){ fails++; console.log('✗ BRIEF probe: '+e.message); }
 
-  // ── PROBE: corner clocks populated (s5) ──
+  // ── PROBE: LCD clocks (s5, v0.6.0 — seg7 faces, SELECT auto-fill + manual) ──
   { let ok=true;
-    for(const id of ['clockTL','clockTR','clockBL','clockBR']){
-      const el=IDS[id]; const h=el?el.innerHTML:'';
-      if(!/ck-t/.test(h) || !/\d{2}:\d{2}/.test(h)){ ok=false; fails++; console.log('✗ CLOCK #'+id+' not populated: "'+String(h).slice(0,60)+'"'); }
-    }
-    if(ok) console.log('  ✓ corner clocks populated (TL/TR/BL/BR, HH:MM faces)');
+    const tl=IDS['clockTL'], tr=IDS['clockTR'];
+    const hl=tl?tl.innerHTML:'';
+    if(!/seg7-d/.test(hl) || !/bt-z/.test(hl)){ ok=false; fails++; console.log('✗ CLOCK #clockTL no LCD face: "'+String(hl).slice(0,60)+'"'); }
+    let ht=tr?tr.innerHTML:'';
+    if(!(/SELECT/.test(ht) || /seg7-d/.test(ht))){ ok=false; fails++; console.log('✗ CLOCK #clockTR neither idle nor zone face: "'+String(ht).slice(0,60)+'"'); }
+    try{
+      global.selectSite('fort-bragg');                      // → nearest region = US Eastern
+      const z=global._selZone;
+      if(!z || !z.auto || z.tz!=='America/New_York'){ ok=false; fails++; console.log('✗ SELECT auto-fill wrong: '+JSON.stringify(z)); }
+      ht=tr?tr.innerHTML:'';
+      if(!/seg7-d/.test(ht)){ ok=false; fails++; console.log('✗ SELECT cell has no LCD face after auto-fill'); }
+      global.pickZone('Asia/Seoul','Korea');                // manual pick wins…
+      if(!global._selZone || global._selZone.tz!=='Asia/Seoul' || global._selZone.auto){ ok=false; fails++; console.log('✗ manual pick did not win'); }
+      global.pickZone('Asia/Seoul','Korea');                // …and toggles off on repeat
+      if(global._selZone!==null){ ok=false; fails++; console.log('✗ pick toggle-off failed'); }
+      global.selectSite(null);
+    }catch(e){ ok=false; fails++; console.log('✗ LCD select probe: '+e.message); }
+    try{
+      global._tzOpenSheet();
+      const dh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      if(!/data-tzpick="11"/.test(dh) || !/data-tzclear/.test(dh)){ ok=false; fails++; console.log('✗ zone sheet rows missing'); }
+      global.hideDossier();
+    }catch(e){ ok=false; fails++; console.log('✗ zone sheet probe: '+e.message); }
+    if(ok) console.log('  ✓ LCD clocks: seg7 faces + auto-fill (Bragg→US Eastern) + manual pick/toggle-off + zone sheet');
   }
 
   // ── PROBE (non-fatal): drawGlobe on the stub ctx — the stub canvas is

@@ -51,7 +51,7 @@ const byId = new Map();
 // ── 2. id = slug(base) ───────────────────────────────────────────────────────────
 // slug is copied VERBATIM from tools/extract-sites.js — the derivation is the contract.
 {
-  const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const slug = (t) => String(t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // diacritics fold (v0.6.0: Chièvres → chievres)
   const drift = [];
   for (const s of sites) {
     if (typeof s.base !== 'string' || !s.base.trim()) { bad('row "' + s.id + '" has missing/blank base'); continue; }

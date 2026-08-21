@@ -142,6 +142,7 @@
   --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
   --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
   --accent:#F5D76E;                       /* the illuminated yellow — selection/live */
+  --accent-rgb:245,215,110;               /* the same light, for rgba() glows (LCD) */
   --accent-deep:#D4B54A;
   --accent-wash:rgba(245,215,110,.13);
   --signal:#FFB35C;                       /* lineage/attention — warmer, orange lean */
@@ -231,44 +232,57 @@ body{
   border-radius:var(--r-card); padding:14px 16px; color:var(--text);
 }
 /* segmented control (Globe ⇄ Brief placeholder on #stageBar) */
-/* (.seg retired at v0.3.0 — #modeSeg in the command bar is the one seg) */
+/* (.seg retired v0.3.0; #modeSeg retired v0.6.0 — mode flips on the nav globe hold) */
 /* uppercase micro-label (doctrine: letterspaced, tabular numerals on readouts) */
 
 /* ─── 4 · CHROME PLACEMENT (all absolute — no fixed layers) ────────────────── */
 /* z ladder: stage 0 · clocks 10 · stage bar 25 · top edge 20 · results 30 ·
    dossier 40 · errToast 120 · sbxNote 130 (A-ORG-1's toast z, kept). */
 
-/* DOCK 1 · command bar — the app's one fixed line: search · mode seg · menu */
-#cmdBar{
-  position:absolute; z-index:20;
-  top:calc(env(safe-area-inset-top,0px) + 10px);
+/* TITLE BAND — the wordmark, top center; corner tiles carry decor + the ⋯ menu */
+#titleBar{
+  position:absolute; z-index:22;
+  top:calc(env(safe-area-inset-top,0px) + 6px);
   left:var(--safe-l); right:var(--safe-r);
-  display:flex; align-items:center; gap:6px;
-  min-height:48px; padding:0 4px 0 14px; border-radius:var(--r-pill);
+  height:44px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:0 2px;
 }
-#cmdBar:focus-within{box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop)}
-#searchPill{flex:1; min-width:0; display:flex; align-items:center; gap:8px}
-#searchPill .sp-ico{color:var(--faint); font-size:15px; line-height:1; flex:none}
+#wordmark{
+  /* the A-ORG-1 engraved-wordmark voice (900/.34em, consult 2), gold-lit for Lumen */
+  margin:0; font:900 17px/1 var(--disp); letter-spacing:.34em; text-indent:.34em;
+  color:var(--text); text-align:center; flex:1; white-space:nowrap;
+  background:linear-gradient(180deg,#FFFDF2 0%,#FFF6D8 30%,#F5D76E 58%,#B9973E 92%,#D4B54A 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.65)) drop-shadow(0 0 12px rgba(var(--accent-rgb),.30));
+}
+@media(min-width:1100px){ #wordmark{font-size:21px} }
+.tb-tile{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  flex:none; width:40px; height:40px; border-radius:12px; color:var(--faint);
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec);
+}
+span.tb-tile{cursor:default; color:var(--accent)}
+
+/* SEARCH — standalone, one job, search-engine calm */
+#searchPill{
+  position:absolute; z-index:20;
+  top:calc(env(safe-area-inset-top,0px) + 58px);
+  left:max(var(--safe-l), calc(50% - 300px)); right:max(var(--safe-r), calc(50% - 300px));
+  display:flex; align-items:center; gap:10px;
+  min-height:48px; padding:0 18px; border-radius:var(--r-pill);
+}
+#searchPill .sp-ico{color:var(--faint); line-height:0; flex:none}
 #searchPill input{
   flex:1; min-width:0; background:none; border:0; outline:none; padding:0;
-  color:var(--text); font:600 14px/1.2 var(--body);
+  color:var(--text); font:600 16px/1.2 var(--body);   /* 16px kills the iOS focus-zoom (A-ORG-1 usInput law) */
 }
 #searchPill input::placeholder{color:var(--faint)}
-#modeSeg{flex:none; display:flex; border-radius:var(--r-pill); box-shadow:0 0 0 1px var(--line); overflow:hidden}
-#modeSeg .ms-b{
-  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0; cursor:pointer;
-  height:44px; padding:0 13px; display:flex; align-items:center;
-  font:800 10.5px/1 var(--mono); letter-spacing:.1em; color:var(--faint);
-}
-#modeSeg .ms-b.on{background:var(--accent-wash); color:var(--accent)}
-#menuBtn{
-  appearance:none; -webkit-appearance:none; border:0; background:none; margin:0; cursor:pointer;
-  flex:none; width:44px; height:44px; border-radius:50%; color:var(--faint);
-  display:flex; align-items:center; justify-content:center;
-}
+#searchPill:focus-within{box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop)}
 #appMenu{
   position:absolute; z-index:45; right:var(--safe-r);
-  top:calc(env(safe-area-inset-top,0px) + 64px);
+  top:calc(env(safe-area-inset-top,0px) + 54px);
   width:min(78vw,260px); padding:6px; border-radius:var(--r-card);
 }
 .am-row{
@@ -281,9 +295,9 @@ body{
 /* search results — SCROLL CONTAINER: inset math only, never transformed */
 #searchResults{
   position:absolute; z-index:30;
-  top:calc(env(safe-area-inset-top,0px) + 64px);
-  left:var(--safe-l); right:var(--safe-r);
-  max-height:48vh; max-height:48dvh;
+  top:calc(env(safe-area-inset-top,0px) + 112px);
+  left:max(var(--safe-l), calc(50% - 300px)); right:max(var(--safe-r), calc(50% - 300px));
+  max-height:44vh; max-height:48dvh;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   border-radius:var(--r-card); padding:4px;
 }
@@ -333,20 +347,37 @@ body{
 .sh-crumb.tip{color:var(--text); box-shadow:0 0 0 1.5px var(--accent)}
 .sh-crumb:active{background:var(--accent-wash)}
 
-/* DOCK 2 · tool rail — 44px circles, one icon set; collapses to the puck */
-#toolRail{
-  position:absolute; z-index:25; right:var(--safe-r); top:50%;
-  transform:translateY(-58%);
-  display:flex; flex-direction:column; gap:9px;
+/* NAV DOCK — the centerpiece globe button; the ring hides inside it.
+   Satellites pop as small symmetric circles on an arc above the button. */
+#navDock{
+  position:absolute; z-index:44; left:50%; transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
+  width:0; height:0;                                  /* children position from this point */
 }
-.rl-b{
+#navGlobe{
   appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  width:44px; height:44px; border-radius:50%; padding:0;
+  position:absolute; left:-34px; bottom:0; width:68px; height:68px; border-radius:50%;
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
+  color:var(--accent); display:flex; align-items:center; justify-content:center;
+  touch-action:none; user-select:none; -webkit-user-select:none;
+}
+#nvRing{position:absolute; inset:1px; pointer-events:none; transform:rotate(-90deg)}
+#nvRing circle{stroke:var(--signal); stroke-width:3; stroke-linecap:round; transition:none}
+.nv-sat{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  position:absolute; width:48px; height:48px; border-radius:50%; padding:0;
   display:flex; align-items:center; justify-content:center; color:var(--text);
 }
-#railPuck{color:var(--faint)}
-body.rail-min #toolRail .rl-b:not(#railPuck){display:none}
-body.rail-min #railPuck svg{transform:rotate(180deg)}
+.nv-sat{opacity:0; pointer-events:none; transition:opacity .16s ease}
+body.nav-open .nv-sat{opacity:1; pointer-events:auto}
+body.nav-open .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
+/* symmetric arc over the globe button: 150° · 110° · 70° · 30°, r=86px from its center */
+#navSat-home {left:calc(-24px - 74.5px); bottom:calc(34px + 43px  - 24px)}
+#navSat-back {left:calc(-24px - 29.4px); bottom:calc(34px + 80.8px - 24px)}
+#navSat-clear{left:calc(-24px + 29.4px); bottom:calc(34px + 80.8px - 24px)}
+#navSat-saved{left:calc(-24px + 74.5px); bottom:calc(34px + 43px  - 24px)}
+body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,215,110,.35), inset 0 1px 0 var(--spec)}
 
 /* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
    black ink, the page warms, a gold frame bounds the stage, the map chrome
@@ -354,23 +385,39 @@ body.rail-min #railPuck svg{transform:rotate(180deg)}
 #briefStage{display:none}
 body.brief-mode #briefStage{
   display:block; position:absolute; z-index:15;
-  left:0; right:0; top:calc(env(safe-area-inset-top,0px) + 66px);
+  left:0; right:0; top:calc(env(safe-area-inset-top,0px) + 112px);   /* below the search pill */
   bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  padding:18px 14px;
+  padding:18px 14px calc(18px + 110px);   /* the chain never hides under the globe button */
 }
-body.brief-mode{background:#0E0B05}
+body.brief-mode{
+  /* THE INVERTED ROOM — brief flips the scheme (owner law: map = main, brief =
+     inverted). Values only; the canvas keeps map paint because it reads tokens
+     from the document element, while DOM chrome inherits these body-scoped ones.
+     Tier tokens go to their ink-end (t2 stays cool, never green). */
+  --ground:#F3ECD4; --panel:#FBF6E4; --panel-2:#E9E0C4;
+  --line:rgba(60,48,16,.28);
+  --text:#191305; --dim:#4E4526; --faint:#6E6442;
+  --accent:#8A6D00; --accent-rgb:138,109,0; --accent-deep:#6B5400; --accent-wash:rgba(138,109,0,.14);
+  --signal:#8A4D18; --signal-wash:rgba(138,77,24,.14);
+  --danger:#AC2418; --ok:#166F3E;
+  --t1:#0D1117; --t2:#0B6484; --t3:#9A4D00; --t4:#A1246E;
+  --glass-hi:rgba(252,247,230,.94); --glass-lo:rgba(238,229,203,.9);
+  --spec:rgba(255,255,255,.8); --drop:0 10px 26px -12px rgba(60,48,16,.3);
+  background:#F3ECD4;
+}
 body.brief-mode::before{content:''; position:absolute; inset:6px; border-radius:20px;  /* body is the non-scrolling 100dvh anchor — absolute is fixed here, and the no-fixed law holds */
   box-shadow:0 0 0 1.5px var(--accent); pointer-events:none; z-index:14}
-body.brief-mode #cmdBar{background:linear-gradient(180deg,#F5D76E,#E8C455); box-shadow:0 0 0 1px rgba(0,0,0,.4), var(--drop)}
-body.brief-mode #cmdBar input, body.brief-mode #cmdBar .sp-ico{color:#141006}
-body.brief-mode #cmdBar input::placeholder{color:rgba(20,16,6,.55)}
-body.brief-mode #modeSeg{box-shadow:0 0 0 1px rgba(0,0,0,.35)}
-body.brief-mode #modeSeg .ms-b{color:rgba(20,16,6,.6)}
-body.brief-mode #modeSeg .ms-b.on{background:#141006; color:var(--accent)}
-body.brief-mode #menuBtn{color:rgba(20,16,6,.7)}
-body.brief-mode #toolRail, body.brief-mode #globeCanvas, body.brief-mode .clock,
-body.brief-mode #legendPanel{display:none}
+body.brief-mode #wordmark{background:linear-gradient(180deg,#3A2E08 0%,#8A6D00 60%,#B9973E 100%); -webkit-background-clip:text; background-clip:text}
+body.brief-mode .clock, body.brief-mode #legendPanel{display:none}
+/* MINI GLOBE — the one canvas, shrunk to a live thumbnail; the chain picture
+   stays visible in the corner. Tap = back to the map. */
+body.brief-mode #globeCanvas{
+  position:absolute; z-index:16; left:auto; top:auto;
+  right:calc(var(--safe-r) + 2px); bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
+  width:118px; height:118px; border-radius:50%;
+  box-shadow:0 0 0 1.5px var(--accent), var(--drop); background:#060504;
+}
 .bf-empty{max-width:340px; margin:16vh auto 0; padding:22px; text-align:center;
   display:flex; flex-direction:column; gap:8px}
 .bf-empty b{font:800 16px/1.3 var(--body)}
@@ -380,7 +427,7 @@ body.brief-mode #legendPanel{display:none}
 .bf-rail{width:1.5px; height:26px; background:rgba(240,220,140,.4)}
 .bf-box{
   appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  background:rgba(20,17,10,.7); border-radius:12px; padding:12px 15px; text-align:left;
+  background:var(--panel); border-radius:12px; padding:12px 15px; text-align:left;
   display:flex; flex-direction:column; gap:3px; min-height:44px;
 }
 .bf-box b{font:800 12.5px/1.25 var(--body)}
@@ -402,10 +449,10 @@ body.brief-mode #legendPanel{display:none}
   white-space:nowrap;
 }
 .clock:empty{display:none}
-#clockTL{top:calc(env(safe-area-inset-top,0px) + 66px); left:var(--safe-l)}
-#clockTR{top:calc(env(safe-area-inset-top,0px) + 66px); right:var(--safe-r)}
-#clockBL{bottom:calc(env(safe-area-inset-bottom,0px) + 66px); left:var(--safe-l)}
-#clockBR{bottom:calc(env(safe-area-inset-bottom,0px) + 66px); right:var(--safe-r)}
+#clockTL{top:calc(env(safe-area-inset-top,0px) + 116px); left:var(--safe-l)}
+#clockTR{top:calc(env(safe-area-inset-top,0px) + 116px); right:var(--safe-r);
+  pointer-events:auto; cursor:pointer; border:none; -webkit-tap-highlight-color:transparent}
+#clockTR:active{filter:brightness(1.35)}
 
 
 
@@ -447,10 +494,11 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
     top:calc(env(safe-area-inset-top,0px) + 70px); max-height:60vh; max-height:60dvh}
   #themeSwitch{top:calc(env(safe-area-inset-top,0px) + 12px); right:24px}
   /* clocks take the true corners */
-  #clockTL{top:calc(env(safe-area-inset-top,0px) + 18px); left:18px}
-  #clockTR{top:calc(env(safe-area-inset-top,0px) + 18px); right:18px}
-  #clockBL{bottom:calc(env(safe-area-inset-bottom,0px) + 18px); left:18px}
-  #clockBR{bottom:calc(env(safe-area-inset-bottom,0px) + 18px); right:18px}
+  /* below the title tiles — the SELECT cell is a live button and must never
+     hide under the ⋯ tile's hit area */
+  #clockTL{top:calc(env(safe-area-inset-top,0px) + 64px); left:18px}
+  #clockTR{top:calc(env(safe-area-inset-top,0px) + 64px); right:18px}
+  #clockTR:hover{filter:brightness(1.15)}
   /* dossier becomes a right-hand panel; still a plain inset scroll container */
   #dossier{left:auto; right:24px; width:400px;
     top:calc(env(safe-area-inset-top,0px) + 84px); bottom:auto;
@@ -473,7 +521,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 /* (trail bar retired at v0.3.0 — crumbs live in the sheet header) */
 
 #legendPanel{position:absolute; z-index:40; left:var(--safe-l);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 62px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
   width:min(78vw,280px); max-height:46vh; max-height:46dvh; overflow-y:auto;
   -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:6px}
 .lg-head{font:800 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
@@ -488,7 +536,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 .lg-ct{flex:none; font:700 10.5px/1 var(--mono); color:var(--faint)}
 
 #exportSheet{position:absolute; z-index:40; right:var(--safe-r);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 62px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
   width:min(86vw,320px); padding:6px}
 .xp-head{font:800 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
   color:var(--faint); padding:8px 10px 6px}
@@ -524,6 +572,9 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 .rc-top{flex:none; max-width:52%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   color:var(--text); font:700 13.5px/1.3 var(--body); text-decoration:none}
 a.rc-top{color:var(--accent)}
+/* rows that ACT (saved views, time zones) are buttons — kill the UA pill */
+button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:none;
+  padding:0; cursor:pointer; text-align:left; font:700 13.5px/1.3 var(--body)}
 .rc-sub{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   color:var(--dim); font:500 12px/1.3 var(--body)}
 .rc-dots{margin-left:auto}
@@ -565,9 +616,18 @@ a.rc-top{color:var(--accent)}
   min-height:48px; padding:0 22px; border-radius:var(--r-pill); background:var(--accent);
   color:#141006; font:800 13px/1 var(--body);
 }
-.bf-box.on{background:rgba(245,215,110,.1)}
+.bf-box.on{background:var(--accent-wash)}
 .bf-ann{display:block; margin-top:4px; font:600 10px/1.35 var(--body); font-style:normal; color:var(--signal)}
 .bf-box{max-width:340px}
+
+/* ═══ GOOGLE-FEEL FUSION — open results and the pill become ONE surface ═══ */
+#searchPill.sr-open{border-radius:24px 24px 0 0}
+#searchResults.sr-open{
+  top:calc(env(safe-area-inset-top,0px) + 106px);
+  border-radius:0 0 24px 24px; padding:6px 4px 8px;
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--line), var(--drop);
+}
+#searchResults .sr-row.hi{background:var(--accent-wash); box-shadow:inset 0 0 0 1.5px var(--accent)}
 </style>
 <style>
 /* ═══ IDENTITY LAYER — LUMEN (owner-committed 20 Aug: illuminated light yellow
@@ -586,23 +646,37 @@ a.rc-top{color:var(--accent)}
 <canvas id="globeCanvas" aria-label="Globe"></canvas>
 
 <!-- minimal top edge: search pill + theme switch -->
-<!-- DOCK 1 · command bar — search · MAP⇄BRIEF · menu. The app's one fixed line. -->
-<header id="cmdBar" class="glass">
-  <div id="searchPill" role="search">
-    <span class="sp-ico" aria-hidden="true">⌕</span>
-    <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
-           spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
-  </div>
-  <div id="modeSeg" role="group" aria-label="Map or Brief mode">
-    <button class="ms-b on" data-mode="map" type="button">MAP</button>
-    <button class="ms-b" data-mode="brief" type="button">BRIEF</button>
-  </div>
-  <button id="menuBtn" type="button" aria-label="Menu">
+<!-- TITLE BAND — the designed wordmark, top center (A-ORG-1 carryover); the ⋯
+     menu lives in its right corner tile. -->
+<header id="titleBar">
+  <span class="tb-tile" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3.5 3.4 3.5 14.6 0 18M12 3c-3.5 3.4-3.5 14.6 0 18"></path></svg></span>
+  <h1 id="wordmark">A&thinsp;-&thinsp;O&thinsp;R&thinsp;G&thinsp;-&thinsp;2</h1>
+  <button id="menuBtn" class="tb-tile" type="button" aria-label="Menu">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
   </button>
 </header>
+
+<!-- SEARCH — standalone, one job (map is the default room; modes flip on the globe button) -->
+<div id="searchPill" class="glass" role="search">
+  <span class="sp-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></span>
+  <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
+         spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
+</div>
 <div id="searchResults" class="glass" role="listbox" aria-label="Search results"></div>
 <section id="appMenu" class="glass card" hidden aria-label="Menu"></section>
+
+<!-- NAV GLOBE — the centerpiece. Tap: the hidden nav ring pops out (small
+     symmetric circles). Hold 3s: MAP ⇄ BRIEF (progress ring charges). -->
+<nav id="navDock" aria-label="Navigation">
+  <button id="navSat-home"  class="nv-sat glass" type="button" aria-label="Home"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"></path><path d="M5 9v11h14V9"></path></svg></button>
+  <button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Back"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+  <button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
+  <button id="navGlobe" type="button" aria-expanded="false" aria-label="Navigation — tap for controls, hold to switch mode">
+    <svg id="nvRing" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="33" fill="none"></circle></svg>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3.5 3.4 3.5 14.6 0 18M12 3c-3.5 3.4-3.5 14.6 0 18"></path></svg>
+  </button>
+</nav>
 
 <!-- family legend / layer list — swatch · name · count; tap toggles the family -->
 <section id="legendPanel" class="glass card" hidden aria-label="Map layers"></section>
@@ -619,27 +693,37 @@ a.rc-top{color:var(--accent)}
 <!-- dossier: THE drawer (single-brain law — one drawer) -->
 <section id="dossier" class="glass card" role="dialog" aria-label="Dossier" hidden></section>
 
-<!-- DOCK 2 · tool rail — zoom · frame · layers; collapses to a puck. -->
-<nav id="toolRail" aria-label="Map tools">
-  <button id="zoomInBtn" class="rl-b glass" type="button" aria-label="Zoom in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
-  <button id="zoomOutBtn" class="rl-b glass" type="button" aria-label="Zoom out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-  <button id="railFrame" class="rl-b glass" type="button" aria-label="Frame"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"></path></svg></button>
-  <button id="legendBtn" class="rl-b glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path></svg></button>
-  <button id="railPuck" class="rl-b glass" type="button" aria-label="Collapse tools"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></button>
-</nav>
+<!-- (tool rail retired at v0.6.0 — nav lives in the globe button; zoom is gesture-native) -->
 
 <!-- BRIEF stage — full screen when body.brief-mode; precise CSS lines, tier law. -->
 <section id="briefStage" aria-label="Brief"></section>
 
-<!-- corner clocks (charter D4: corner clocks only, time console retired).
-     Empty until the clock owner fills them — .clock:empty stays hidden. -->
-<div id="clockTL" class="clock glass"></div>
-<div id="clockTR" class="clock glass"></div>
-<div id="clockBL" class="clock glass"></div>
-<div id="clockBR" class="clock glass"></div>
+<!-- LCD clocks (v0.6.0 owner directive C): LOCAL top-left · SELECT top-right,
+     7-segment faces, no font. Empty until the clock owner fills them —
+     .clock:empty stays hidden. SELECT is a real button: tap picks a zone. -->
+<div id="clockTL" class="clock glass" aria-label="Local time"></div>
+<button id="clockTR" class="clock glass" type="button" aria-label="Select a time zone"></button>
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.6.0 • THE A-ORG-1 CARRYOVER (owner directive, 20 Aug — consult team of 10
+//            read the source; findings in this build). RADIAL NAV: the four
+//            controls (home · back · clear · saved) live INSIDE the bottom-center
+//            globe button — tap pops them out as small symmetric circles, hold
+//            3 seconds (progress ring) flips MAP ⇄ BRIEF. LOCATIONS: the new
+//            roster is wiped; all 276 A-ORG-1 installations carried over
+//            lightweight (base/state/coords/class + org spine only — leader
+//            prose retired). MARKERS: dots resharpened to the A-ORG-1 glass
+//            reticle (dark disc, thin class ring, bright core; halo deleted);
+//            world zoom now CLUSTERS into count badges — tap flies in. LCD
+//            TIME: LOCAL and SELECT cells in true 7-segment (no font, accent
+//            glow); SELECT auto-fills from every selection (nearest of 12
+//            theater zones, manual pick wins) and taps open the zone sheet.
+//            TITLE: 900-weight engraved gold wordmark. SEARCH: standalone pill
+//            fuses with its results while open. BRIEF: full-screen inverted
+//            scheme keeps the live globe as a 118px thumbnail drawing CHAIN
+//            MEMBERS ONLY; tap returns to map. Suite grew: cluster harness
+//            block, LCD/zone smoke probes, NFD slug folding in data-lint.
 //   v0.5.0 • BRIEF 2.0 (charter M3). The brief is now a USER-ASSEMBLED SET of
 //            HQs, not an echo of the selection: 'Add to brief' rides the org
 //            sheet in map mode (and the empty brief offers the selected org);
@@ -740,8 +824,8 @@ a.rc-top{color:var(--accent)}
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.5.0';
-const APP_UPDATED = '19 August 2026';
+const APP_VERSION = 'v0.6.0';
+const APP_UPDATED = '20 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
 // PORTED from A-ORG-1 ~L13906. Orientation is stored as two plain angles — yaw
@@ -769,7 +853,7 @@ const GlobeState = window.GlobeState = {
    sloppy-mode comment (HTML-like comment, Annex B), so this skeleton also parses
    and runs standalone: everything below is typeof-guarded. */
 // SITES — the map layer (core schema; fat fields live in data/sites.json for the M2 datastore seed)
-var SITES=window.SITES=[{"id":"335th-signal-command-east-point","base":"335th Signal Command (East Point)","st":"GA","unit":"335th Signal Command (Theater)","lat":33.68,"lon":-84.44,"grp":"conus","parent":"shaw-afb"},{"id":"aberdeen-proving-ground","base":"Aberdeen Proving Ground","st":"MD","unit":"ATEC","lat":39.47,"lon":-76.13,"grp":"ncr","parent":"the-pentagon"},{"id":"alabama-national-guard","base":"Alabama National Guard","st":"AL","unit":"Alabama Army National Guard","lat":32.38,"lon":-86.3,"grp":"guard","parent":"arlington"},{"id":"alaska-district","base":"Alaska District","st":"AK","unit":"Alaska District","lat":61.25,"lon":-149.8,"grp":"guardInset","parent":"pacific-ocean-div-fort-shafter"},{"id":"alaska-national-guard","base":"Alaska National Guard","st":"AK","unit":"Alaska Army National Guard","lat":58.3,"lon":-134.42,"grp":"guardInset","parent":"arlington"},{"id":"albuquerque-district","base":"Albuquerque District","st":"NM","unit":"Albuquerque District","lat":35.08,"lon":-106.65,"grp":"conus","parent":"south-pacific-div-san-francisco"},{"id":"anniston-army-depot","base":"Anniston Army Depot","st":"AL","unit":"Anniston Army Depot","lat":33.6,"lon":-85.96,"grp":"oib","parent":"detroit-arsenal"},{"id":"ansbach","base":"Ansbach","st":"Germany","unit":"12th Combat Aviation Brigade","lat":49.3,"lon":10.59,"grp":"eur","parent":"fort-knox"},{"id":"arizona-national-guard","base":"Arizona National Guard","st":"AZ","unit":"Arizona Army National Guard","lat":33.45,"lon":-112.07,"grp":"guard","parent":"arlington"},{"id":"arkansas-national-guard","base":"Arkansas National Guard","st":"AR","unit":"Arkansas Army National Guard","lat":34.75,"lon":-92.29,"grp":"guard","parent":"arlington"},{"id":"arlington","base":"Arlington","st":"VA","unit":"Army National Guard (ARNG)","lat":38.88,"lon":-77.07,"grp":"ncr","parent":null},{"id":"army-research-laboratory-adelphi","base":"Army Research Laboratory (Adelphi)","st":"MD","unit":"Army Research Laboratory (ARL)","lat":39,"lon":-76.96,"grp":"conus","parent":"aberdeen-proving-ground"},{"id":"austin-t2com-hq","base":"Austin (T2COM HQ)","st":"TX","unit":"T2COM","lat":30.27,"lon":-97.74,"grp":"conus","parent":"the-pentagon"},{"id":"baltimore-district","base":"Baltimore District","st":"MD","unit":"Baltimore District","lat":39.29,"lon":-76.61,"grp":"conus","parent":"north-atlantic-div-brooklyn"},{"id":"baumholder","base":"Baumholder","st":"Germany","unit":"16th Sustainment Brigade","lat":49.62,"lon":7.34,"grp":"eur","parent":"kaiserslautern"},{"id":"blue-grass-army-depot","base":"Blue Grass Army Depot","st":"KY","unit":"Blue Grass Army Depot","lat":37.7,"lon":-84.16,"grp":"oib","parent":"rock-island-arsenal"},{"id":"buffalo-district","base":"Buffalo District","st":"NY","unit":"Buffalo District","lat":42.89,"lon":-78.88,"grp":"conus","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"california-national-guard","base":"California National Guard","st":"CA","unit":"California Army National Guard","lat":38.58,"lon":-121.49,"grp":"guard","parent":"arlington"},{"id":"camp-arifjan","base":"Camp Arifjan","st":"Kuwait","unit":"USARCENT (Forward)","lat":28.86,"lon":48.15,"grp":"swa","parent":"shaw-afb"},{"id":"camp-as-sayliyah","base":"Camp As Sayliyah","st":"Qatar","unit":"Area Support Group-Qatar","lat":25.26,"lon":51.39,"grp":"swa","parent":"shaw-afb"},{"id":"camp-atterbury","base":"Camp Atterbury","st":"IN","unit":"157th Infantry Brigade","lat":39.33,"lon":-86.03,"grp":"guard","parent":"fort-knox"},{"id":"camp-beauregard","base":"Camp Beauregard","st":"LA","unit":null,"lat":31.33,"lon":-92.38,"grp":"guard","parent":null},{"id":"camp-blanding","base":"Camp Blanding","st":"FL","unit":null,"lat":29.95,"lon":-81.98,"grp":"guard","parent":null},{"id":"camp-bondsteel","base":"Camp Bondsteel","st":"Kosovo","unit":null,"lat":42.36,"lon":21.24,"grp":"eur","parent":null},{"id":"camp-bowie","base":"Camp Bowie","st":"TX","unit":null,"lat":31.7,"lon":-98.99,"grp":"guard","parent":null},{"id":"camp-buehring","base":"Camp Buehring","st":"Kuwait","unit":"Theater Aviation Task Force (Rotational CAB), Camp Buehring","lat":29.7,"lon":47.43,"grp":"swa","parent":"camp-arifjan"},{"id":"camp-carroll","base":"Camp Carroll","st":"Korea","unit":"Materiel Support Command-Korea (MSC-K)","lat":36.03,"lon":128.4,"grp":"kj","parent":"usag-daegu"},{"id":"camp-casey","base":"Camp Casey","st":"Korea","unit":"210th Field Artillery Brigade","lat":37.92,"lon":127.05,"grp":"kj","parent":"camp-humphreys"},{"id":"camp-darby","base":"Camp Darby","st":"Italy","unit":"Army Field Support Battalion-Africa","lat":43.62,"lon":10.3,"grp":"eur","parent":"kaiserslautern"},{"id":"camp-dodge","base":"Camp Dodge","st":"IA","unit":null,"lat":41.7,"lon":-93.72,"grp":"guard","parent":null},{"id":"camp-edwards","base":"Camp Edwards","st":"MA","unit":null,"lat":41.66,"lon":-70.54,"grp":"guard","parent":null},{"id":"camp-grayling","base":"Camp Grayling","st":"MI","unit":null,"lat":44.65,"lon":-84.71,"grp":"guard","parent":null},{"id":"camp-gruber","base":"Camp Gruber","st":"OK","unit":null,"lat":35.65,"lon":-95.15,"grp":"guard","parent":null},{"id":"camp-guernsey","base":"Camp Guernsey","st":"WY","unit":null,"lat":42.27,"lon":-104.74,"grp":"guard","parent":null},{"id":"camp-humphreys","base":"Camp Humphreys","st":"Korea","unit":"Eighth Army","lat":36.97,"lon":127.03,"grp":"kj","parent":"fort-shafter-schofield-hawaii"},{"id":"camp-johnson","base":"Camp Johnson","st":"VT","unit":null,"lat":44.53,"lon":-73.19,"grp":"guard","parent":null},{"id":"camp-kosciuszko","base":"Camp Kosciuszko","st":"Poland","unit":"V Corps Headquarters (Forward)","lat":52.41,"lon":16.93,"grp":"eur","parent":"fort-knox"},{"id":"camp-lemonnier","base":"Camp Lemonnier","st":"Djibouti","unit":null,"lat":11.55,"lon":43.15,"grp":"eur","parent":null},{"id":"camp-mabry","base":"Camp Mabry","st":"TX","unit":"36th Infantry Division","lat":30.31,"lon":-97.76,"grp":"guard","parent":"arlington"},{"id":"camp-mujuk","base":"Camp Mujuk","st":"Korea","unit":null,"lat":36.03,"lon":129.36,"grp":"kj","parent":null},{"id":"camp-murray","base":"Camp Murray","st":"WA","unit":null,"lat":47.11,"lon":-122.57,"grp":"guard","parent":null},{"id":"camp-navajo","base":"Camp Navajo","st":"AZ","unit":null,"lat":35.18,"lon":-111.85,"grp":"guard","parent":null},{"id":"camp-perry","base":"Camp Perry","st":"OH","unit":null,"lat":41.54,"lon":-83.02,"grp":"guard","parent":null},{"id":"camp-rilea","base":"Camp Rilea","st":"OR","unit":null,"lat":46.12,"lon":-123.93,"grp":"guard","parent":null},{"id":"camp-ripley","base":"Camp Ripley","st":"MN","unit":null,"lat":46.09,"lon":-94.36,"grp":"guard","parent":null},{"id":"camp-roberts","base":"Camp Roberts","st":"CA","unit":null,"lat":35.79,"lon":-120.75,"grp":"guard","parent":null},{"id":"camp-robinson","base":"Camp Robinson","st":"AR","unit":null,"lat":34.85,"lon":-92.3,"grp":"guard","parent":null},{"id":"camp-san-luis-obispo","base":"Camp San Luis Obispo","st":"CA","unit":null,"lat":35.33,"lon":-120.73,"grp":"guard","parent":null},{"id":"camp-shelby","base":"Camp Shelby","st":"MS","unit":"177th Armored Brigade","lat":31.2,"lon":-89.2,"grp":"guard","parent":"fort-knox"},{"id":"camp-swift","base":"Camp Swift","st":"TX","unit":null,"lat":30.19,"lon":-97.29,"grp":"guard","parent":null},{"id":"camp-williams","base":"Camp Williams","st":"UT","unit":"807th Theater Medical Command","lat":40.43,"lon":-111.92,"grp":"guard","parent":"fort-bragg"},{"id":"camp-zama","base":"Camp Zama","st":"Japan","unit":"U.S. Army Japan","lat":35.51,"lon":139.4,"grp":"kj","parent":"fort-shafter-schofield-hawaii"},{"id":"caribbean-district-san-juan","base":"Caribbean District (San Juan)","st":"PR","unit":"Caribbean District","lat":18.47,"lon":-66.11,"grp":"guardInset","parent":"south-atlantic-div-atlanta"},{"id":"carlisle-barracks","base":"Carlisle Barracks","st":"PA","unit":"USAWC","lat":40.21,"lon":-77.18,"grp":"conus","parent":"fort-leavenworth"},{"id":"charleston-district","base":"Charleston District","st":"SC","unit":"Charleston District","lat":32.78,"lon":-79.93,"grp":"conus","parent":"south-atlantic-div-atlanta"},{"id":"chi-vres","base":"Chi\u00e8vres","st":"Belgium","unit":"650th MI Group / Allied Command CI (ACCI)","lat":50.58,"lon":3.83,"grp":"eur","parent":"fort-belvoir"},{"id":"chicago-district","base":"Chicago District","st":"IL","unit":"Chicago District","lat":41.88,"lon":-87.63,"grp":"conus","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"cjtf-hoa-camp-lemonnier","base":"CJTF-HOA (Camp Lemonnier)","st":"Djibouti","unit":null,"lat":11.54,"lon":43.15,"grp":"eur","parent":null},{"id":"coleman-barracks","base":"Coleman Barracks","st":"Germany","unit":"Army Field Support Battalion-Mannheim","lat":49.56,"lon":8.46,"grp":"eur","parent":"kaiserslautern"},{"id":"colorado-national-guard","base":"Colorado National Guard","st":"CO","unit":"Colorado Army National Guard","lat":39.74,"lon":-104.98,"grp":"guard","parent":"arlington"},{"id":"connecticut-national-guard","base":"Connecticut National Guard","st":"CT","unit":"Connecticut Army National Guard","lat":41.76,"lon":-72.68,"grp":"guard","parent":"arlington"},{"id":"corpus-christi-army-depot","base":"Corpus Christi Army Depot","st":"TX","unit":"Corpus Christi Army Depot","lat":27.7,"lon":-97.27,"grp":"oib","parent":"redstone-arsenal"},{"id":"crane-army-ammunition-activity","base":"Crane Army Ammunition Activity","st":"IN","unit":"Crane Army Ammunition Activity","lat":38.86,"lon":-86.83,"grp":"oib","parent":"rock-island-arsenal"},{"id":"d-lmen-aps-2-site","base":"D\u00fclmen APS-2 Site","st":"Germany","unit":"Army Field Support Battalion-Benelux","lat":51.83,"lon":7.28,"grp":"eur","parent":"kaiserslautern"},{"id":"delaware-national-guard","base":"Delaware National Guard","st":"DE","unit":"Delaware Army National Guard","lat":39.16,"lon":-75.52,"grp":"guard","parent":"arlington"},{"id":"detroit-arsenal","base":"Detroit Arsenal","st":"MI","unit":"TACOM","lat":42.49,"lon":-83.03,"grp":"conus","parent":"redstone-arsenal"},{"id":"detroit-district","base":"Detroit District","st":"MI","unit":"Detroit District","lat":42.33,"lon":-83.05,"grp":"conus","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"district-of-columbia-national-guard","base":"District of Columbia National Guard","st":"DC","unit":"District of Columbia Army National Guard","lat":38.9,"lon":-77.04,"grp":"guard","parent":"arlington"},{"id":"draper","base":"Draper","st":"UT","unit":"19th Special Forces Group (Airborne)","lat":40.52,"lon":-111.86,"grp":"conus","parent":"arlington"},{"id":"drawsko-pomorskie-training-area","base":"Drawsko Pomorskie Training Area","st":"Poland","unit":null,"lat":53.53,"lon":15.81,"grp":"eur","parent":null},{"id":"dugway-pg","base":"Dugway PG","st":"UT","unit":"Dugway Proving Ground (DPG)","lat":40.21,"lon":-112.74,"grp":"conus","parent":"aberdeen-proving-ground"},{"id":"eglin-afb","base":"Eglin AFB","st":"FL","unit":"7th Special Forces Group (Airborne)","lat":30.48,"lon":-86.53,"grp":"conus","parent":"fort-bragg"},{"id":"engineer-r-d-center-vicksburg","base":"Engineer R&D Center (Vicksburg)","st":"MS","unit":"Engineer R&D Center (ERDC)","lat":32.3,"lon":-90.86,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"europe-district","base":"Europe District","st":"Germany","unit":"Europe District","lat":50.08,"lon":8.24,"grp":"eur","parent":"north-atlantic-div-brooklyn"},{"id":"far-east-district","base":"Far East District","st":"Korea","unit":"Far East District","lat":36.97,"lon":127.03,"grp":"kj","parent":"pacific-ocean-div-fort-shafter"},{"id":"florida-national-guard","base":"Florida National Guard","st":"FL","unit":"Florida Army National Guard","lat":30.44,"lon":-84.28,"grp":"guard","parent":"arlington"},{"id":"fort-belvoir","base":"Fort Belvoir","st":"VA","unit":"INSCOM","lat":38.71,"lon":-77.14,"grp":"ncr","parent":"the-pentagon"},{"id":"fort-benning","base":"Fort Benning","st":"GA","unit":"Maneuver CoE (MCoE)","lat":32.35,"lon":-84.97,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-bliss","base":"Fort Bliss","st":"TX","unit":"1st Armored Division","lat":31.81,"lon":-106.42,"grp":"conus","parent":"fort-hood"},{"id":"fort-bragg","base":"Fort Bragg","st":"NC","unit":"USAWHC","lat":35.14,"lon":-79,"grp":"conus","parent":"the-pentagon"},{"id":"fort-buchanan","base":"Fort Buchanan","st":"PR","unit":"1st Mission Support Command","lat":18.39,"lon":-66.13,"grp":"conus","parent":"fort-bragg"},{"id":"fort-campbell","base":"Fort Campbell","st":"KY","unit":"101st Airborne Division (Air Assault)","lat":36.67,"lon":-87.46,"grp":"conus","parent":"fort-bragg"},{"id":"fort-carson","base":"Fort Carson","st":"CO","unit":"4th Infantry Division","lat":38.74,"lon":-104.79,"grp":"conus","parent":"jblm"},{"id":"fort-chaffee","base":"Fort Chaffee","st":"AR","unit":null,"lat":35.3,"lon":-94.3,"grp":"guard","parent":null},{"id":"fort-custer","base":"Fort Custer","st":"MI","unit":null,"lat":42.31,"lon":-85.3,"grp":"guard","parent":null},{"id":"fort-detrick","base":"Fort Detrick","st":"MD","unit":"Medical Research & Development Command","lat":39.44,"lon":-77.43,"grp":"ncr","parent":"jbsa-fort-sam-houston"},{"id":"fort-devens","base":"Fort Devens","st":"MA","unit":"Cyber Protection Brigade","lat":42.54,"lon":-71.62,"grp":"conus","parent":"fort-gordon"},{"id":"fort-drum","base":"Fort Drum","st":"NY","unit":"10th Mountain Division","lat":44.05,"lon":-75.72,"grp":"conus","parent":"fort-bragg"},{"id":"fort-eustis","base":"Fort Eustis","st":"VA","unit":"Futures & Concepts Command (FCC)","lat":37.13,"lon":-76.6,"grp":"conus","parent":"austin-t2com-hq"},{"id":"fort-gordon","base":"Fort Gordon","st":"GA","unit":"ARCYBER","lat":33.42,"lon":-82.15,"grp":"conus","parent":"uscybercom-fort-meade"},{"id":"fort-hamilton","base":"Fort Hamilton","st":"NY","unit":"USAG Fort Hamilton","lat":40.61,"lon":-74.03,"grp":"conus","parent":"jbsa-fort-sam-houston"},{"id":"fort-hood","base":"Fort Hood","st":"TX","unit":"III Armored Corps","lat":31.13,"lon":-97.78,"grp":"conus","parent":"fort-bragg"},{"id":"fort-huachuca","base":"Fort Huachuca","st":"AZ","unit":"Intelligence CoE (ICoE)","lat":31.55,"lon":-110.35,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-hunter-liggett","base":"Fort Hunter Liggett","st":"CA","unit":"USAG Fort Hunter Liggett","lat":35.98,"lon":-121.24,"grp":"conus","parent":"fort-bragg"},{"id":"fort-indiantown-gap","base":"Fort Indiantown Gap","st":"PA","unit":"28th Infantry Division","lat":40.43,"lon":-76.57,"grp":"guard","parent":"arlington"},{"id":"fort-irwin-ntc","base":"Fort Irwin (NTC)","st":"CA","unit":"National Training Center (NTC)","lat":35.26,"lon":-116.68,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-jackson","base":"Fort Jackson","st":"SC","unit":"U.S. Army Center for Initial Military Training (CIMT)","lat":34.04,"lon":-80.82,"grp":"conus","parent":"fort-knox"},{"id":"fort-knox","base":"Fort Knox","st":"KY","unit":"V Corps","lat":37.89,"lon":-85.96,"grp":"conus","parent":"wiesbaden"},{"id":"fort-leavenworth","base":"Fort Leavenworth","st":"KS","unit":"Combined Arms Command (CAC)","lat":39.35,"lon":-94.92,"grp":"conus","parent":"austin-t2com-hq"},{"id":"fort-lee","base":"Fort Lee","st":"VA","unit":"Sustainment CoE / CASCOM","lat":37.24,"lon":-77.33,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-leonard-wood","base":"Fort Leonard Wood","st":"MO","unit":"Maneuver Support CoE (MSCoE)","lat":37.71,"lon":-92.13,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-mccoy","base":"Fort McCoy","st":"WI","unit":"USAG Fort McCoy","lat":44.03,"lon":-90.67,"grp":"conus","parent":"jbsa-fort-sam-houston"},{"id":"fort-mcnair","base":"Fort McNair","st":"DC","unit":"MDW","lat":38.867,"lon":-77.017,"grp":"ncr","parent":"the-pentagon"},{"id":"fort-meade","base":"Fort Meade","st":"MD","unit":"200th Military Police Command","lat":39.11,"lon":-76.74,"grp":"ncr","parent":"fort-bragg"},{"id":"fort-pickett-barfoot","base":"Fort Pickett (Barfoot)","st":"VA","unit":null,"lat":37.05,"lon":-77.95,"grp":"guard","parent":null},{"id":"fort-polk","base":"Fort Polk","st":"LA","unit":"Joint Readiness Training Center (JRTC)","lat":31.05,"lon":-93.2,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-riley","base":"Fort Riley","st":"KS","unit":"1st Infantry Division","lat":39.08,"lon":-96.79,"grp":"conus","parent":"fort-hood"},{"id":"fort-rucker","base":"Fort Rucker","st":"AL","unit":"Aviation CoE (AVCoE)","lat":31.34,"lon":-85.72,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-shafter-schofield-hawaii","base":"Fort Shafter / Schofield (Hawaii)","st":"HI","unit":"USARPAC","lat":21.35,"lon":-157.9,"grp":"pi","parent":"usindopacom-camp-smith"},{"id":"fort-sill","base":"Fort Sill","st":"OK","unit":"Fires CoE (FCoE)","lat":34.65,"lon":-98.4,"grp":"conus","parent":"fort-leavenworth"},{"id":"fort-stewart","base":"Fort Stewart","st":"GA","unit":"3rd Infantry Division","lat":31.87,"lon":-81.61,"grp":"conus","parent":"fort-bragg"},{"id":"fort-wainwright-greely-alaska","base":"Fort Wainwright/Greely (Alaska)","st":"AK","unit":"11th Airborne Division","lat":64,"lon":-147,"grp":"conus","parent":"fort-shafter-schofield-hawaii"},{"id":"fort-worth-district","base":"Fort Worth District","st":"TX","unit":"Fort Worth District","lat":32.76,"lon":-97.33,"grp":"conus","parent":"southwestern-div-dallas"},{"id":"galveston-district","base":"Galveston District","st":"TX","unit":"Galveston District","lat":29.3,"lon":-94.8,"grp":"conus","parent":"southwestern-div-dallas"},{"id":"garmisch","base":"Garmisch","st":"Germany","unit":"George C. Marshall European Center for Security Studies","lat":47.49,"lon":11.1,"grp":"eur","parent":null},{"id":"georgia-national-guard","base":"Georgia National Guard","st":"GA","unit":"Georgia Army National Guard","lat":33.75,"lon":-84.39,"grp":"guard","parent":"arlington"},{"id":"gowen-field","base":"Gowen Field","st":"ID","unit":null,"lat":43.56,"lon":-116.24,"grp":"guard","parent":null},{"id":"grafenw-hr-vilseck","base":"Grafenw\u00f6hr / Vilseck","st":"Germany","unit":"7th Army Training Command (7ATC)","lat":49.7,"lon":11.94,"grp":"eur","parent":"wiesbaden"},{"id":"great-lakes-ohio-river-div-cincinnati","base":"Great Lakes & Ohio River Div (Cincinnati)","st":"OH","unit":"Great Lakes & Ohio River Division (LRD)","lat":39.1,"lon":-84.51,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"guam-national-guard","base":"Guam National Guard","st":"GU","unit":"Guam Army National Guard","lat":13.44,"lon":144.79,"grp":"gu","parent":"arlington"},{"id":"hawaii-national-guard","base":"Hawaii National Guard","st":"HI","unit":"Hawaii Army National Guard","lat":21.31,"lon":-157.86,"grp":"pi","parent":"arlington"},{"id":"hawthorne-army-depot","base":"Hawthorne Army Depot","st":"NV","unit":"Hawthorne Army Depot","lat":38.54,"lon":-118.63,"grp":"oib","parent":"rock-island-arsenal"},{"id":"hohenfels-jmrc","base":"Hohenfels (JMRC)","st":"Germany","unit":"Joint Multinational Readiness Center (JMRC)","lat":49.22,"lon":11.84,"grp":"eur","parent":"grafenw-hr-vilseck"},{"id":"holston-aap","base":"Holston AAP","st":"TN","unit":"Holston Army Ammunition Plant","lat":36.55,"lon":-82.49,"grp":"oib","parent":"rock-island-arsenal"},{"id":"honolulu-district","base":"Honolulu District","st":"HI","unit":"Honolulu District","lat":21.36,"lon":-157.9,"grp":"pi","parent":"pacific-ocean-div-fort-shafter"},{"id":"huntington-district","base":"Huntington District","st":"WV","unit":"Huntington District","lat":38.42,"lon":-82.45,"grp":"conus","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"idaho-national-guard","base":"Idaho National Guard","st":"ID","unit":"Idaho Army National Guard","lat":43.62,"lon":-116.2,"grp":"guard","parent":"arlington"},{"id":"illinois-national-guard","base":"Illinois National Guard","st":"IL","unit":"Illinois Army National Guard","lat":39.8,"lon":-89.65,"grp":"guard","parent":"arlington"},{"id":"indiana-national-guard","base":"Indiana National Guard","st":"IN","unit":"Indiana Army National Guard","lat":39.77,"lon":-86.16,"grp":"guard","parent":"arlington"},{"id":"indianapolis","base":"Indianapolis","st":"IN","unit":"USAFMCOM","lat":39.77,"lon":-86.16,"grp":"conus","parent":"redstone-arsenal"},{"id":"iowa-aap","base":"Iowa AAP","st":"IA","unit":"Iowa Army Ammunition Plant","lat":40.85,"lon":-91.1,"grp":"oib","parent":"rock-island-arsenal"},{"id":"iowa-national-guard","base":"Iowa National Guard","st":"IA","unit":"Iowa Army National Guard","lat":41.59,"lon":-93.62,"grp":"guard","parent":"arlington"},{"id":"jacksonville-district","base":"Jacksonville District","st":"FL","unit":"Jacksonville District","lat":30.33,"lon":-81.66,"grp":"conus","parent":"south-atlantic-div-atlanta"},{"id":"japan-engineer-district","base":"Japan Engineer District","st":"Japan","unit":"Japan Engineer District","lat":35.49,"lon":139.4,"grp":"kj","parent":"pacific-ocean-div-fort-shafter"},{"id":"jb-langley-eustis","base":"JB Langley-Eustis","st":"VA","unit":"597th Transportation Brigade","lat":37.08,"lon":-76.36,"grp":"conus","parent":"scott-afb"},{"id":"jblm","base":"JBLM","st":"WA","unit":"I Corps","lat":47.08,"lon":-122.58,"grp":"conus","parent":"fort-shafter-schofield-hawaii"},{"id":"jbsa-fort-sam-houston","base":"JBSA Fort Sam Houston","st":"TX","unit":"MEDCOM","lat":29.46,"lon":-98.43,"grp":"conus","parent":"the-pentagon"},{"id":"k-16-air-base","base":"K-16 Air Base","st":"Korea","unit":"2nd Battalion, 2nd Aviation Regiment (2nd CAB)","lat":37.44,"lon":127.11,"grp":"kj","parent":"camp-humphreys"},{"id":"kaiserslautern","base":"Kaiserslautern","st":"Germany","unit":"21st Theater Sustainment Command","lat":49.44,"lon":7.77,"grp":"eur","parent":"wiesbaden"},{"id":"kansas-city-district","base":"Kansas City District","st":"MO","unit":"Kansas City District","lat":39.1,"lon":-94.58,"grp":"conus","parent":"northwestern-div-portland"},{"id":"kansas-national-guard","base":"Kansas National Guard","st":"KS","unit":"Kansas Army National Guard","lat":39.05,"lon":-95.69,"grp":"guard","parent":"arlington"},{"id":"kentucky-national-guard","base":"Kentucky National Guard","st":"KY","unit":"Kentucky Army National Guard","lat":38.19,"lon":-84.87,"grp":"guard","parent":"arlington"},{"id":"lake-city-aap","base":"Lake City AAP","st":"MO","unit":"Lake City Army Ammunition Plant","lat":39.1,"lon":-94.35,"grp":"oib","parent":"rock-island-arsenal"},{"id":"landstuhl","base":"Landstuhl","st":"Germany","unit":"Landstuhl Regional Medical Center","lat":49.41,"lon":7.55,"grp":"eur","parent":"sembach"},{"id":"letterkenny-army-depot","base":"Letterkenny Army Depot","st":"PA","unit":"Letterkenny Army Depot","lat":39.95,"lon":-77.71,"grp":"oib","parent":"redstone-arsenal"},{"id":"letterkenny-munitions-center","base":"Letterkenny Munitions Center","st":"PA","unit":"Letterkenny Munitions Center","lat":39.93,"lon":-77.7,"grp":"oib","parent":"rock-island-arsenal"},{"id":"little-rock-district","base":"Little Rock District","st":"AR","unit":"Little Rock District","lat":34.75,"lon":-92.29,"grp":"conus","parent":"southwestern-div-dallas"},{"id":"los-angeles-district","base":"Los Angeles District","st":"CA","unit":"Los Angeles District","lat":34.05,"lon":-118.24,"grp":"conus","parent":"south-pacific-div-san-francisco"},{"id":"louisiana-national-guard","base":"Louisiana National Guard","st":"LA","unit":"Louisiana Army National Guard","lat":30.46,"lon":-91.14,"grp":"guard","parent":"arlington"},{"id":"louisville-district","base":"Louisville District","st":"KY","unit":"Louisville District","lat":38.25,"lon":-85.76,"grp":"conus","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"maine-national-guard","base":"Maine National Guard","st":"ME","unit":"Maine Army National Guard","lat":44.31,"lon":-69.78,"grp":"guard","parent":"arlington"},{"id":"mainz-kastel","base":"Mainz-Kastel","st":"Germany","unit":"Multi-Domain Command Europe (MDC-E)","lat":50.01,"lon":8.29,"grp":"eur","parent":"wiesbaden"},{"id":"maryland-national-guard","base":"Maryland National Guard","st":"MD","unit":"Maryland Army National Guard","lat":38.98,"lon":-76.49,"grp":"guard","parent":"arlington"},{"id":"massachusetts-national-guard","base":"Massachusetts National Guard","st":"MA","unit":"Massachusetts Army National Guard","lat":42.36,"lon":-71.06,"grp":"guard","parent":"arlington"},{"id":"mcalester-aap","base":"McAlester AAP","st":"OK","unit":"McAlester Army Ammunition Plant","lat":34.84,"lon":-95.92,"grp":"oib","parent":"rock-island-arsenal"},{"id":"memphis-district","base":"Memphis District","st":"TN","unit":"Memphis District","lat":35.15,"lon":-90.05,"grp":"conus","parent":"mississippi-valley-div-vicksburg"},{"id":"michigan-national-guard","base":"Michigan National Guard","st":"MI","unit":"Michigan Army National Guard","lat":42.73,"lon":-84.56,"grp":"guard","parent":"arlington"},{"id":"minnesota-national-guard","base":"Minnesota National Guard","st":"MN","unit":"Minnesota Army National Guard","lat":44.95,"lon":-93.09,"grp":"guard","parent":"arlington"},{"id":"mississippi-national-guard","base":"Mississippi National Guard","st":"MS","unit":"Mississippi Army National Guard","lat":32.3,"lon":-90.18,"grp":"guard","parent":"arlington"},{"id":"mississippi-valley-div-vicksburg","base":"Mississippi Valley Div (Vicksburg)","st":"MS","unit":"Mississippi Valley Division (MVD)","lat":32.35,"lon":-90.88,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"missouri-national-guard","base":"Missouri National Guard","st":"MO","unit":"Missouri Army National Guard","lat":38.58,"lon":-92.17,"grp":"guard","parent":"arlington"},{"id":"mk-air-base","base":"MK Air Base","st":"Romania","unit":"U.S. Army Garrison Black Sea","lat":44.36,"lon":28.49,"grp":"eur","parent":"sembach"},{"id":"mnc-ne-szczecin","base":"MNC-NE (Szczecin)","st":"Poland","unit":null,"lat":53.43,"lon":14.55,"grp":"eur","parent":null},{"id":"mobile-district","base":"Mobile District","st":"AL","unit":"Mobile District","lat":30.69,"lon":-88.04,"grp":"conus","parent":"south-atlantic-div-atlanta"},{"id":"montana-national-guard","base":"Montana National Guard","st":"MT","unit":"Montana Army National Guard","lat":46.59,"lon":-112.02,"grp":"guard","parent":"arlington"},{"id":"mot-concord","base":"MOT Concord","st":"CA","unit":"834th Transportation Battalion","lat":38.05,"lon":-122.03,"grp":"conus","parent":"jblm"},{"id":"mot-sunny-point","base":"MOT Sunny Point","st":"NC","unit":"832nd Transportation Battalion","lat":33.99,"lon":-77.96,"grp":"conus","parent":"jblm"},{"id":"muscatatuck-urban-training-center","base":"Muscatatuck Urban Training Center","st":"IN","unit":null,"lat":38.94,"lon":-85.99,"grp":"guard","parent":null},{"id":"nas-jrb-new-orleans-belle-chasse","base":"NAS JRB New Orleans (Belle Chasse)","st":"LA","unit":"377th Theater Sustainment Command","lat":29.83,"lon":-90.03,"grp":"conus","parent":"fort-bragg"},{"id":"nashville-district","base":"Nashville District","st":"TN","unit":"Nashville District","lat":36.16,"lon":-86.78,"grp":"conus","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"national-ground-intelligence-center-charlottesville","base":"National Ground Intelligence Center (Charlottesville)","st":"VA","unit":"National Ground Intelligence Center (NGIC)","lat":38.03,"lon":-78.48,"grp":"conus","parent":"fort-belvoir"},{"id":"nato-shape-mons","base":"NATO SHAPE (Mons)","st":"Belgium","unit":null,"lat":50.44,"lon":3.99,"grp":"eur","parent":null},{"id":"nebraska-national-guard","base":"Nebraska National Guard","st":"NE","unit":"Nebraska Army National Guard","lat":40.81,"lon":-96.68,"grp":"guard","parent":"arlington"},{"id":"nevada-national-guard","base":"Nevada National Guard","st":"NV","unit":"Nevada Army National Guard","lat":39.16,"lon":-119.77,"grp":"guard","parent":"arlington"},{"id":"new-england-district","base":"New England District","st":"MA","unit":"New England District","lat":42.46,"lon":-71.35,"grp":"conus","parent":"north-atlantic-div-brooklyn"},{"id":"new-hampshire-national-guard","base":"New Hampshire National Guard","st":"NH","unit":"New Hampshire Army National Guard","lat":43.21,"lon":-71.54,"grp":"guard","parent":"arlington"},{"id":"new-jersey-national-guard","base":"New Jersey National Guard","st":"NJ","unit":"New Jersey Army National Guard","lat":40.22,"lon":-74.74,"grp":"guard","parent":"arlington"},{"id":"new-mexico-national-guard","base":"New Mexico National Guard","st":"NM","unit":"New Mexico Army National Guard","lat":35.68,"lon":-105.94,"grp":"guard","parent":"arlington"},{"id":"new-orleans-district","base":"New Orleans District","st":"LA","unit":"New Orleans District","lat":29.95,"lon":-90.07,"grp":"conus","parent":"mississippi-valley-div-vicksburg"},{"id":"new-york-district","base":"New York District","st":"NY","unit":"New York District","lat":40.71,"lon":-74.01,"grp":"conus","parent":"north-atlantic-div-brooklyn"},{"id":"new-york-national-guard","base":"New York National Guard","st":"NY","unit":"New York Army National Guard","lat":42.65,"lon":-73.76,"grp":"guard","parent":"arlington"},{"id":"nga-springfield","base":"NGA (Springfield)","st":"VA","unit":null,"lat":38.74,"lon":-77.19,"grp":"conus","parent":null},{"id":"norfolk-district","base":"Norfolk District","st":"VA","unit":"Norfolk District","lat":36.85,"lon":-76.29,"grp":"conus","parent":"north-atlantic-div-brooklyn"},{"id":"north-atlantic-div-brooklyn","base":"North Atlantic Div (Brooklyn)","st":"NY","unit":"North Atlantic Division (NAD)","lat":40.69,"lon":-73.99,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"north-carolina-national-guard","base":"North Carolina National Guard","st":"NC","unit":"North Carolina Army National Guard","lat":35.78,"lon":-78.64,"grp":"guard","parent":"arlington"},{"id":"north-dakota-national-guard","base":"North Dakota National Guard","st":"ND","unit":"North Dakota Army National Guard","lat":46.81,"lon":-100.78,"grp":"guard","parent":"arlington"},{"id":"northwestern-div-portland","base":"Northwestern Div (Portland)","st":"OR","unit":"Northwestern Division (NWD)","lat":45.52,"lon":-122.68,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"novo-selo-training-area","base":"Novo Selo Training Area","st":"Bulgaria","unit":"U.S. Army Garrison Black Sea","lat":42.72,"lon":26.35,"grp":"eur","parent":"sembach"},{"id":"nsa-css-fort-meade","base":"NSA / CSS (Fort Meade)","st":"MD","unit":null,"lat":39.11,"lon":-76.77,"grp":"conus","parent":null},{"id":"nsa-georgia-fort-gordon","base":"NSA-Georgia (Fort Gordon)","st":"GA","unit":null,"lat":33.42,"lon":-82.15,"grp":"conus","parent":null},{"id":"ohio-national-guard","base":"Ohio National Guard","st":"OH","unit":"Ohio Army National Guard","lat":39.96,"lon":-83,"grp":"guard","parent":"arlington"},{"id":"oklahoma-national-guard","base":"Oklahoma National Guard","st":"OK","unit":"Oklahoma Army National Guard","lat":35.49,"lon":-97.5,"grp":"guard","parent":"arlington"},{"id":"omaha-district","base":"Omaha District","st":"NE","unit":"Omaha District","lat":41.26,"lon":-95.93,"grp":"conus","parent":"northwestern-div-portland"},{"id":"orchard-combat-training-center","base":"Orchard Combat Training Center","st":"ID","unit":null,"lat":43.31,"lon":-116.02,"grp":"guard","parent":null},{"id":"oregon-national-guard","base":"Oregon National Guard","st":"OR","unit":"Oregon Army National Guard","lat":44.94,"lon":-123.04,"grp":"guard","parent":"arlington"},{"id":"pacific-ocean-div-fort-shafter","base":"Pacific Ocean Div (Fort Shafter)","st":"HI","unit":"Pacific Ocean Division (POD)","lat":21.36,"lon":-157.9,"grp":"pi","parent":"usace-hq-washington-dc"},{"id":"parks-reserve-forces-training-area","base":"Parks Reserve Forces Training Area","st":"CA","unit":"91st Training Division (Operations)","lat":37.72,"lon":-121.89,"grp":"conus","parent":"fort-knox"},{"id":"pennsylvania-national-guard","base":"Pennsylvania National Guard","st":"PA","unit":"Pennsylvania Army National Guard","lat":40.26,"lon":-76.88,"grp":"guard","parent":"arlington"},{"id":"philadelphia-district","base":"Philadelphia District","st":"PA","unit":"Philadelphia District","lat":39.95,"lon":-75.17,"grp":"conus","parent":"north-atlantic-div-brooklyn"},{"id":"picatinny-arsenal","base":"Picatinny Arsenal","st":"NJ","unit":"PAE Agile Sustainment & Ammo","lat":40.87,"lon":-74.55,"grp":"conus","parent":"the-pentagon"},{"id":"pine-bluff-arsenal","base":"Pine Bluff Arsenal","st":"AR","unit":"Pine Bluff Arsenal","lat":34.27,"lon":-92.08,"grp":"oib","parent":"rock-island-arsenal"},{"id":"pittsburgh-district","base":"Pittsburgh District","st":"PA","unit":"Pittsburgh District","lat":40.44,"lon":-79.99,"grp":"conus","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"pohakuloa-training-area","base":"Pohakuloa Training Area","st":"HI","unit":"USAG Pohakuloa","lat":19.7,"lon":-155.53,"grp":"pi","parent":"fort-shafter-schofield-hawaii"},{"id":"portland-district","base":"Portland District","st":"OR","unit":"Portland District","lat":45.52,"lon":-122.68,"grp":"conus","parent":"northwestern-div-portland"},{"id":"powidz","base":"Powidz","st":"Poland","unit":"Army Field Support Battalion-Poland","lat":52.44,"lon":17.85,"grp":"eur","parent":"kaiserslautern"},{"id":"presidio-of-monterey","base":"Presidio of Monterey","st":"CA","unit":"Defense Language Institute (DLIFLC)","lat":36.6,"lon":-121.92,"grp":"conus","parent":"fort-leavenworth"},{"id":"puerto-rico-national-guard","base":"Puerto Rico National Guard","st":"PR","unit":"Puerto Rico Army National Guard","lat":18.47,"lon":-66.11,"grp":"guardInset","parent":"arlington"},{"id":"quantico","base":"Quantico","st":"VA","unit":null,"lat":38.52,"lon":-77.29,"grp":"ncr","parent":null},{"id":"radford-aap","base":"Radford AAP","st":"VA","unit":"Radford Army Ammunition Plant","lat":37.18,"lon":-80.55,"grp":"oib","parent":"rock-island-arsenal"},{"id":"red-river-army-depot","base":"Red River Army Depot","st":"TX","unit":"Red River Army Depot","lat":33.45,"lon":-94.16,"grp":"oib","parent":"detroit-arsenal"},{"id":"redstone-arsenal","base":"Redstone Arsenal","st":"AL","unit":"AMC","lat":34.68,"lon":-86.65,"grp":"conus","parent":"the-pentagon"},{"id":"rhode-island-national-guard","base":"Rhode Island National Guard","st":"RI","unit":"Rhode Island Army National Guard","lat":41.83,"lon":-71.41,"grp":"guard","parent":"arlington"},{"id":"rock-island-arsenal","base":"Rock Island Arsenal","st":"IL","unit":"First Army","lat":41.51,"lon":-90.55,"grp":"oib","parent":"fort-bragg"},{"id":"rock-island-district","base":"Rock Island District","st":"IL","unit":"Rock Island District","lat":41.51,"lon":-90.58,"grp":"conus","parent":"mississippi-valley-div-vicksburg"},{"id":"rose-barracks-vilseck","base":"Rose Barracks (Vilseck)","st":"Germany","unit":"2nd Cavalry Regiment","lat":49.63,"lon":11.79,"grp":"eur","parent":"fort-knox"},{"id":"sacramento-district","base":"Sacramento District","st":"CA","unit":"Sacramento District","lat":38.58,"lon":-121.49,"grp":"conus","parent":"south-pacific-div-san-francisco"},{"id":"sagami-general-depot","base":"Sagami General Depot","st":"Japan","unit":"38th Air Defense Artillery Brigade","lat":35.57,"lon":139.4,"grp":"kj","parent":"fort-shafter-schofield-hawaii"},{"id":"san-francisco-district","base":"San Francisco District","st":"CA","unit":"San Francisco District","lat":37.77,"lon":-122.42,"grp":"conus","parent":"south-pacific-div-san-francisco"},{"id":"savannah-district","base":"Savannah District","st":"GA","unit":"Savannah District","lat":32.08,"lon":-81.09,"grp":"conus","parent":"south-atlantic-div-atlanta"},{"id":"scott-afb","base":"Scott AFB","st":"IL","unit":"ARTRANS","lat":38.54,"lon":-89.85,"grp":"conus","parent":null},{"id":"scranton-aap","base":"Scranton AAP","st":"PA","unit":"Scranton Army Ammunition Plant","lat":41.41,"lon":-75.66,"grp":"oib","parent":"rock-island-arsenal"},{"id":"seattle-district","base":"Seattle District","st":"WA","unit":"Seattle District","lat":47.61,"lon":-122.33,"grp":"conus","parent":"northwestern-div-portland"},{"id":"sembach","base":"Sembach","st":"Germany","unit":"10th Army Air & Missile Defense Command","lat":49.5,"lon":7.86,"grp":"eur","parent":"wiesbaden"},{"id":"shape-saceur-mons","base":"SHAPE / SACEUR (Mons)","st":"Belgium","unit":"11th Missile Defense Battery","lat":50.5,"lon":3.96,"grp":"eur","parent":"sembach"},{"id":"shaw-afb","base":"Shaw AFB","st":"SC","unit":"USARCENT","lat":33.97,"lon":-80.47,"grp":"conus","parent":"uscentcom-macdill-afb"},{"id":"sierra-army-depot","base":"Sierra Army Depot","st":"CA","unit":"Sierra Army Depot","lat":40.34,"lon":-120.2,"grp":"oib","parent":"detroit-arsenal"},{"id":"soldier-center-natick","base":"Soldier Center (Natick)","st":"MA","unit":"Soldier Center (SC)","lat":42.28,"lon":-71.35,"grp":"conus","parent":"aberdeen-proving-ground"},{"id":"south-atlantic-div-atlanta","base":"South Atlantic Div (Atlanta)","st":"GA","unit":"South Atlantic Division (SAD)","lat":33.75,"lon":-84.39,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"south-carolina-national-guard","base":"South Carolina National Guard","st":"SC","unit":"South Carolina Army National Guard","lat":34,"lon":-81.03,"grp":"guard","parent":"arlington"},{"id":"south-dakota-national-guard","base":"South Dakota National Guard","st":"SD","unit":"South Dakota Army National Guard","lat":44.37,"lon":-100.35,"grp":"guard","parent":"arlington"},{"id":"south-pacific-div-san-francisco","base":"South Pacific Div (San Francisco)","st":"CA","unit":"South Pacific Division (SPD)","lat":37.77,"lon":-122.42,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"southwestern-div-dallas","base":"Southwestern Div (Dallas)","st":"TX","unit":"Southwestern Division (SWD)","lat":32.78,"lon":-96.8,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"st-louis-district","base":"St. Louis District","st":"MO","unit":"St. Louis District","lat":38.63,"lon":-90.2,"grp":"conus","parent":"mississippi-valley-div-vicksburg"},{"id":"st-paul-district","base":"St. Paul District","st":"MN","unit":"St. Paul District","lat":44.95,"lon":-93.09,"grp":"conus","parent":"mississippi-valley-div-vicksburg"},{"id":"stuttgart","base":"Stuttgart","st":"Germany","unit":"U.S. Army Garrison Stuttgart","lat":48.78,"lon":9.18,"grp":"eur","parent":"sembach"},{"id":"tennessee-national-guard","base":"Tennessee National Guard","st":"TN","unit":"Tennessee Army National Guard","lat":36.17,"lon":-86.78,"grp":"guard","parent":"arlington"},{"id":"texas-national-guard","base":"Texas National Guard","st":"TX","unit":"Texas Army National Guard","lat":30.27,"lon":-97.74,"grp":"guard","parent":"arlington"},{"id":"the-pentagon","base":"The Pentagon","st":"VA","unit":"HQDA","lat":38.87,"lon":-77.06,"grp":"ncr","parent":null},{"id":"the-pentagon-hqda-cio-g-6","base":"The Pentagon (HQDA \u00b7 CIO/G-6)","st":"VA","unit":null,"lat":38.87,"lon":-77.06,"grp":"ncr","parent":null},{"id":"tobyhanna-army-depot","base":"Tobyhanna Army Depot","st":"PA","unit":"Tobyhanna Army Depot","lat":41.19,"lon":-75.41,"grp":"oib","parent":"aberdeen-proving-ground"},{"id":"tooele-army-depot","base":"Tooele Army Depot","st":"UT","unit":"Tooele Army Depot","lat":40.4,"lon":-112.36,"grp":"oib","parent":"rock-island-arsenal"},{"id":"torii-station","base":"Torii Station","st":"Japan","unit":"10th Support Group","lat":26.38,"lon":127.74,"grp":"kj","parent":"camp-zama"},{"id":"transatlantic-div-winchester","base":"Transatlantic Div (Winchester)","st":"VA","unit":"Transatlantic Division (TAD)","lat":39.19,"lon":-78.16,"grp":"conus","parent":"usace-hq-washington-dc"},{"id":"tulsa-district","base":"Tulsa District","st":"OK","unit":"Tulsa District","lat":36.15,"lon":-95.99,"grp":"conus","parent":"southwestern-div-dallas"},{"id":"u-s-virgin-islands-national-guard","base":"U.S. Virgin Islands National Guard","st":"VI","unit":"U.S. Virgin Islands Army National Guard","lat":18.34,"lon":-64.93,"grp":"guardInset","parent":"arlington"},{"id":"usace-hq-washington-dc","base":"USACE HQ (Washington, DC)","st":"DC","unit":"USACE","lat":38.87,"lon":-77.02,"grp":"ncr","parent":"the-pentagon"},{"id":"usafricom-stuttgart","base":"USAFRICOM (Stuttgart)","st":"Germany","unit":null,"lat":48.78,"lon":9.18,"grp":"eur","parent":null},{"id":"usag-daegu","base":"USAG Daegu","st":"Korea","unit":"19th Expeditionary Sustainment Command (19th ESC)","lat":35.87,"lon":128.6,"grp":"kj","parent":"camp-humphreys"},{"id":"usasmdc-redstone-huntsville","base":"USASMDC (Redstone/Huntsville)","st":"AL","unit":"USASMDC","lat":34.68,"lon":-86.65,"grp":"conus","parent":"the-pentagon"},{"id":"uscentcom-macdill-afb","base":"USCENTCOM (MacDill AFB)","st":"FL","unit":null,"lat":27.85,"lon":-82.5,"grp":"conus","parent":null},{"id":"uscybercom-fort-meade","base":"USCYBERCOM (Fort Meade)","st":"MD","unit":null,"lat":39.11,"lon":-76.77,"grp":"conus","parent":null},{"id":"useucom-stuttgart","base":"USEUCOM (Stuttgart)","st":"Germany","unit":null,"lat":48.74,"lon":9.1,"grp":"eur","parent":null},{"id":"usindopacom-camp-smith","base":"USINDOPACOM (Camp Smith)","st":"HI","unit":null,"lat":21.39,"lon":-157.91,"grp":"pi","parent":null},{"id":"usnorthcom-peterson-sfb","base":"USNORTHCOM (Peterson SFB)","st":"CO","unit":"263rd Army Air & Missile Defense Command (AAMDC)","lat":38.82,"lon":-104.7,"grp":"conus","parent":"usasmdc-redstone-huntsville"},{"id":"ussocom-macdill-afb","base":"USSOCOM (MacDill AFB)","st":"FL","unit":null,"lat":27.85,"lon":-82.5,"grp":"conus","parent":null},{"id":"ussouthcom-doral","base":"USSOUTHCOM (Doral)","st":"FL","unit":null,"lat":25.81,"lon":-80.34,"grp":"conus","parent":null},{"id":"usspacecom-peterson-sfb","base":"USSPACECOM (Peterson SFB)","st":"CO","unit":null,"lat":38.82,"lon":-104.7,"grp":"conus","parent":null},{"id":"usstratcom-offutt-afb","base":"USSTRATCOM (Offutt AFB)","st":"NE","unit":null,"lat":41.12,"lon":-95.91,"grp":"conus","parent":null},{"id":"ustranscom-scott-afb","base":"USTRANSCOM (Scott AFB)","st":"IL","unit":null,"lat":38.54,"lon":-89.85,"grp":"conus","parent":null},{"id":"utah-national-guard","base":"Utah National Guard","st":"UT","unit":"Utah Army National Guard","lat":40.78,"lon":-111.89,"grp":"guard","parent":"arlington"},{"id":"vermont-national-guard","base":"Vermont National Guard","st":"VT","unit":"Vermont Army National Guard","lat":44.26,"lon":-72.58,"grp":"guard","parent":"arlington"},{"id":"vicenza","base":"Vicenza","st":"Italy","unit":"SETAF-AF","lat":45.55,"lon":11.55,"grp":"eur","parent":"wiesbaden"},{"id":"vicksburg-district","base":"Vicksburg District","st":"MS","unit":"Vicksburg District","lat":32.35,"lon":-90.88,"grp":"conus","parent":"mississippi-valley-div-vicksburg"},{"id":"vilseck","base":"Vilseck","st":"Germany","unit":"Army Field Support Battalion-Germany","lat":49.63,"lon":11.8,"grp":"eur","parent":"kaiserslautern"},{"id":"virginia-national-guard","base":"Virginia National Guard","st":"VA","unit":"Virginia Army National Guard","lat":37.54,"lon":-77.43,"grp":"guard","parent":"arlington"},{"id":"walla-walla-district","base":"Walla Walla District","st":"WA","unit":"Walla Walla District","lat":46.06,"lon":-118.34,"grp":"conus","parent":"northwestern-div-portland"},{"id":"washington-national-guard","base":"Washington National Guard","st":"WA","unit":"Washington Army National Guard","lat":47.04,"lon":-122.9,"grp":"guard","parent":"arlington"},{"id":"watervliet-arsenal","base":"Watervliet Arsenal","st":"NY","unit":"Watervliet Arsenal","lat":42.73,"lon":-73.69,"grp":"oib","parent":"detroit-arsenal"},{"id":"west-point","base":"West Point","st":"NY","unit":"USMA","lat":41.39,"lon":-73.96,"grp":"conus","parent":"the-pentagon"},{"id":"west-virginia-national-guard","base":"West Virginia National Guard","st":"WV","unit":"West Virginia Army National Guard","lat":38.34,"lon":-81.63,"grp":"guard","parent":"arlington"},{"id":"white-sands-mr","base":"White Sands MR","st":"NM","unit":"White Sands Missile Range (WSMR)","lat":32.38,"lon":-106.48,"grp":"conus","parent":"aberdeen-proving-ground"},{"id":"wiesbaden","base":"Wiesbaden","st":"Germany","unit":"USAREUR-AF","lat":50.08,"lon":8.24,"grp":"eur","parent":"the-pentagon"},{"id":"wilmington-district","base":"Wilmington District","st":"NC","unit":"Wilmington District","lat":34.23,"lon":-77.94,"grp":"conus","parent":"south-atlantic-div-atlanta"},{"id":"wisconsin-national-guard","base":"Wisconsin National Guard","st":"WI","unit":"Wisconsin Army National Guard","lat":43.07,"lon":-89.4,"grp":"guard","parent":"arlington"},{"id":"wyoming-national-guard","base":"Wyoming National Guard","st":"WY","unit":"Wyoming Army National Guard","lat":41.14,"lon":-104.82,"grp":"guard","parent":"arlington"},{"id":"yokohama-north-dock","base":"Yokohama North Dock","st":"Japan","unit":"836th Transportation Battalion","lat":35.46,"lon":139.64,"grp":"kj","parent":"scott-afb"},{"id":"yuma-pg","base":"Yuma PG","st":"AZ","unit":"Yuma Proving Ground (YPG)","lat":33.02,"lon":-114.25,"grp":"conus","parent":"aberdeen-proving-ground"},{"id":"zagan-aps-2-site","base":"Zagan APS-2 Site","st":"Poland","unit":null,"lat":51.61,"lon":15.3,"grp":"eur","parent":null}];
+var SITES=window.SITES=[{"id":"fort-bragg","base":"Fort Bragg","st":"NC","unit":"USAWHC","lat":35.14,"lon":-79,"grp":"conus","cls":"base","parent":"the-pentagon"},{"id":"fort-stewart","base":"Fort Stewart","st":"GA","unit":"3rd Infantry Division","lat":31.87,"lon":-81.61,"grp":"conus","cls":"base","parent":"fort-bragg"},{"id":"fort-drum","base":"Fort Drum","st":"NY","unit":"10th Mountain Division","lat":44.05,"lon":-75.72,"grp":"conus","cls":"base","parent":"fort-bragg"},{"id":"fort-campbell","base":"Fort Campbell","st":"KY","unit":"101st Airborne Division (Air Assault)","lat":36.67,"lon":-87.46,"grp":"conus","cls":"base","parent":"fort-bragg"},{"id":"fort-knox","base":"Fort Knox","st":"KY","unit":"V Corps","lat":37.89,"lon":-85.96,"grp":"conus","cls":"base","parent":"wiesbaden"},{"id":"fort-hood","base":"Fort Hood","st":"TX","unit":"III Armored Corps","lat":31.13,"lon":-97.78,"grp":"conus","cls":"base","parent":"fort-bragg"},{"id":"fort-bliss","base":"Fort Bliss","st":"TX","unit":"1st Armored Division","lat":31.81,"lon":-106.42,"grp":"conus","cls":"base","parent":"fort-hood"},{"id":"fort-riley","base":"Fort Riley","st":"KS","unit":"1st Infantry Division","lat":39.08,"lon":-96.79,"grp":"conus","cls":"base","parent":"fort-hood"},{"id":"fort-carson","base":"Fort Carson","st":"CO","unit":"4th Infantry Division","lat":38.74,"lon":-104.79,"grp":"conus","cls":"base","parent":"jblm"},{"id":"fort-leavenworth","base":"Fort Leavenworth","st":"KS","unit":"Combined Arms Command (CAC)","lat":39.35,"lon":-94.92,"grp":"conus","cls":"base","parent":"austin-t2com-hq"},{"id":"fort-sill","base":"Fort Sill","st":"OK","unit":"Fires CoE (FCoE)","lat":34.65,"lon":-98.4,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-benning","base":"Fort Benning","st":"GA","unit":"Maneuver CoE (MCoE)","lat":32.35,"lon":-84.97,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-rucker","base":"Fort Rucker","st":"AL","unit":"Aviation CoE (AVCoE)","lat":31.34,"lon":-85.72,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-lee","base":"Fort Lee","st":"VA","unit":"Sustainment CoE / CASCOM","lat":37.24,"lon":-77.33,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-eustis","base":"Fort Eustis","st":"VA","unit":"Futures & Concepts Command (FCC)","lat":37.13,"lon":-76.6,"grp":"conus","cls":"base","parent":"austin-t2com-hq"},{"id":"fort-leonard-wood","base":"Fort Leonard Wood","st":"MO","unit":"Maneuver Support CoE (MSCoE)","lat":37.71,"lon":-92.13,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-belvoir","base":"Fort Belvoir","st":"VA","unit":"INSCOM","lat":38.71,"lon":-77.14,"grp":"ncr","cls":"base","parent":"the-pentagon"},{"id":"fort-meade","base":"Fort Meade","st":"MD","unit":"200th Military Police Command","lat":39.11,"lon":-76.74,"grp":"ncr","cls":"base","parent":"fort-bragg"},{"id":"fort-detrick","base":"Fort Detrick","st":"MD","unit":"Medical Research & Development Command","lat":39.44,"lon":-77.43,"grp":"ncr","cls":"base","parent":"jbsa-fort-sam-houston"},{"id":"fort-gordon","base":"Fort Gordon","st":"GA","unit":"ARCYBER","lat":33.42,"lon":-82.15,"grp":"conus","cls":"base","parent":"uscybercom-fort-meade"},{"id":"fort-huachuca","base":"Fort Huachuca","st":"AZ","unit":"Intelligence CoE (ICoE)","lat":31.55,"lon":-110.35,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"aberdeen-proving-ground","base":"Aberdeen Proving Ground","st":"MD","unit":"ATEC","lat":39.47,"lon":-76.13,"grp":"ncr","cls":"base","parent":"the-pentagon"},{"id":"redstone-arsenal","base":"Redstone Arsenal","st":"AL","unit":"AMC","lat":34.68,"lon":-86.65,"grp":"conus","cls":"base","parent":"the-pentagon"},{"id":"detroit-arsenal","base":"Detroit Arsenal","st":"MI","unit":"TACOM","lat":42.49,"lon":-83.04,"grp":"conus","cls":"base","parent":"redstone-arsenal"},{"id":"picatinny-arsenal","base":"Picatinny Arsenal","st":"NJ","unit":"PAE Agile Sustainment & Ammo","lat":40.87,"lon":-74.55,"grp":"conus","cls":"base","parent":"the-pentagon"},{"id":"rock-island-arsenal","base":"Rock Island Arsenal","st":"IL","unit":"First Army","lat":41.51,"lon":-90.55,"grp":"oib","cls":"depot","parent":"fort-bragg"},{"id":"jbsa-fort-sam-houston","base":"JBSA Fort Sam Houston","st":"TX","unit":"MEDCOM","lat":29.46,"lon":-98.43,"grp":"conus","cls":"base","parent":"the-pentagon"},{"id":"jb-langley-eustis","base":"JB Langley-Eustis","st":"VA","unit":"597th Transportation Brigade","lat":37.08,"lon":-76.36,"grp":"conus","cls":"base","parent":"scott-afb"},{"id":"west-point","base":"West Point","st":"NY","unit":"USMA","lat":41.39,"lon":-73.96,"grp":"conus","cls":"base","parent":"the-pentagon"},{"id":"carlisle-barracks","base":"Carlisle Barracks","st":"PA","unit":"USAWC","lat":40.21,"lon":-77.18,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"indianapolis","base":"Indianapolis","st":"IN","unit":"USAFMCOM","lat":39.77,"lon":-86.16,"grp":"conus","cls":"base","parent":"redstone-arsenal"},{"id":"quantico","base":"Quantico","st":"VA","unit":null,"lat":38.52,"lon":-77.29,"grp":"ncr","cls":"base","parent":null},{"id":"arlington","base":"Arlington","st":"VA","unit":"Army National Guard (ARNG)","lat":38.88,"lon":-77.07,"grp":"ncr","cls":"base","parent":null},{"id":"the-pentagon","base":"The Pentagon","st":"VA","unit":"HQDA","lat":38.87,"lon":-77.06,"grp":"ncr","cls":"base","parent":null},{"id":"jblm","base":"JBLM","st":"WA","unit":"I Corps","lat":47.08,"lon":-122.58,"grp":"conus","cls":"base","parent":"fort-shafter-schofield-hawaii"},{"id":"dugway-pg","base":"Dugway PG","st":"UT","unit":"Dugway Proving Ground (DPG)","lat":40.21,"lon":-112.74,"grp":"conus","cls":"base","parent":"aberdeen-proving-ground"},{"id":"white-sands-mr","base":"White Sands MR","st":"NM","unit":"White Sands Missile Range (WSMR)","lat":32.38,"lon":-106.48,"grp":"conus","cls":"base","parent":"aberdeen-proving-ground"},{"id":"yuma-pg","base":"Yuma PG","st":"AZ","unit":"Yuma Proving Ground (YPG)","lat":32.49,"lon":-114.32,"grp":"conus","cls":"base","parent":"aberdeen-proving-ground"},{"id":"draper","base":"Draper","st":"UT","unit":"19th Special Forces Group (Airborne)","lat":40.52,"lon":-111.86,"grp":"conus","cls":"base","parent":"arlington"},{"id":"fort-wainwright-greely-alaska","base":"Fort Wainwright/Greely (Alaska)","st":"AK","unit":"11th Airborne Division","lat":64,"lon":-147,"grp":"conus","cls":"base","parent":"fort-shafter-schofield-hawaii"},{"id":"fort-shafter-schofield-hawaii","base":"Fort Shafter / Schofield (Hawaii)","st":"HI","unit":"USARPAC","lat":21.35,"lon":-157.9,"grp":"pi","cls":"base","parent":"usindopacom-camp-smith"},{"id":"wiesbaden","base":"Wiesbaden","st":"Germany","unit":"USAREUR-AF","lat":50.08,"lon":8.24,"grp":"eur","cls":"base","parent":"the-pentagon"},{"id":"kaiserslautern","base":"Kaiserslautern","st":"Germany","unit":"21st Theater Sustainment Command","lat":49.44,"lon":7.77,"grp":"eur","cls":"base","parent":"wiesbaden"},{"id":"mainz-kastel","base":"Mainz-Kastel","st":"Germany","unit":"Multi-Domain Command Europe (MDC-E)","lat":49.3,"lon":9.6,"grp":"eur","cls":"base","parent":"wiesbaden"},{"id":"sembach","base":"Sembach","st":"Germany","unit":"10th Army Air & Missile Defense Command","lat":49.85,"lon":6.4,"grp":"eur","cls":"base","parent":"wiesbaden"},{"id":"vilseck","base":"Vilseck","st":"Germany","unit":"Army Field Support Battalion-Germany","lat":49.1,"lon":12.4,"grp":"eur","cls":"base","parent":"kaiserslautern"},{"id":"vicenza","base":"Vicenza","st":"Italy","unit":"SETAF-AF","lat":45.55,"lon":11.55,"grp":"eur","cls":"base","parent":"wiesbaden"},{"id":"chievres","base":"Chièvres","st":"Belgium","unit":"650th MI Group / Allied Command CI (ACCI)","lat":50.58,"lon":3.83,"grp":"eur","cls":"base","parent":"fort-belvoir"},{"id":"camp-humphreys","base":"Camp Humphreys","st":"Korea","unit":"Eighth Army","lat":36.97,"lon":127.03,"grp":"kj","cls":"base","parent":"fort-shafter-schofield-hawaii"},{"id":"camp-zama","base":"Camp Zama","st":"Japan","unit":"U.S. Army Japan","lat":35.51,"lon":139.4,"grp":"kj","cls":"base","parent":"fort-shafter-schofield-hawaii"},{"id":"camp-arifjan","base":"Camp Arifjan","st":"Kuwait","unit":"USARCENT (Forward)","lat":28.86,"lon":48.15,"grp":"swa","cls":"base","parent":"shaw-afb"},{"id":"shaw-afb","base":"Shaw AFB","st":"SC","unit":"USARCENT","lat":33.97,"lon":-80.47,"grp":"conus","cls":"base","parent":"uscentcom-macdill-afb"},{"id":"scott-afb","base":"Scott AFB","st":"IL","unit":"ARTRANS","lat":38.54,"lon":-89.85,"grp":"conus","cls":"base","parent":null},{"id":"fort-irwin-ntc","base":"Fort Irwin (NTC)","st":"CA","unit":"National Training Center (NTC)","lat":35.26,"lon":-116.68,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-polk","base":"Fort Polk","st":"LA","unit":"Joint Readiness Training Center (JRTC)","lat":31.05,"lon":-93.2,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-jackson","base":"Fort Jackson","st":"SC","unit":"U.S. Army Center for Initial Military Training (CIMT)","lat":34.04,"lon":-80.82,"grp":"conus","cls":"base","parent":"fort-knox"},{"id":"fort-mccoy","base":"Fort McCoy","st":"WI","unit":"USAG Fort McCoy","lat":44.03,"lon":-90.67,"grp":"conus","cls":"base","parent":"jbsa-fort-sam-houston"},{"id":"fort-devens","base":"Fort Devens","st":"MA","unit":"Cyber Protection Brigade","lat":42.54,"lon":-71.62,"grp":"conus","cls":"base","parent":"fort-gordon"},{"id":"fort-buchanan","base":"Fort Buchanan","st":"PR","unit":"1st Mission Support Command","lat":18.39,"lon":-66.13,"grp":"conus","cls":"base","parent":"fort-bragg"},{"id":"presidio-of-monterey","base":"Presidio of Monterey","st":"CA","unit":"Defense Language Institute (DLIFLC)","lat":36.6,"lon":-121.92,"grp":"conus","cls":"base","parent":"fort-leavenworth"},{"id":"fort-hamilton","base":"Fort Hamilton","st":"NY","unit":"USAG Fort Hamilton","lat":40.61,"lon":-74.03,"grp":"conus","cls":"base","parent":"jbsa-fort-sam-houston"},{"id":"grafenwohr-vilseck","base":"Grafenwöhr / Vilseck","st":"Germany","unit":"7th Army Training Command (7ATC)","lat":49.7,"lon":11.94,"grp":"eur","cls":"base","parent":"wiesbaden"},{"id":"hohenfels-jmrc","base":"Hohenfels (JMRC)","st":"Germany","unit":"Joint Multinational Readiness Center (JMRC)","lat":49.22,"lon":11.84,"grp":"eur","cls":"base","parent":"grafenwohr-vilseck"},{"id":"ansbach","base":"Ansbach","st":"Germany","unit":"12th Combat Aviation Brigade","lat":49.3,"lon":10.59,"grp":"eur","cls":"base","parent":"fort-knox"},{"id":"baumholder","base":"Baumholder","st":"Germany","unit":"16th Sustainment Brigade","lat":49.62,"lon":7.34,"grp":"eur","cls":"base","parent":"kaiserslautern"},{"id":"stuttgart","base":"Stuttgart","st":"Germany","unit":"U.S. Army Garrison Stuttgart","lat":48.78,"lon":9.18,"grp":"eur","cls":"base","parent":"sembach"},{"id":"garmisch","base":"Garmisch","st":"Germany","unit":"George C. Marshall European Center for Security Studies","lat":47.49,"lon":11.1,"grp":"eur","cls":"base","parent":null},{"id":"camp-darby","base":"Camp Darby","st":"Italy","unit":"Army Field Support Battalion-Africa","lat":43.62,"lon":10.3,"grp":"eur","cls":"base","parent":"kaiserslautern"},{"id":"usag-daegu","base":"USAG Daegu","st":"Korea","unit":"19th Expeditionary Sustainment Command (19th ESC)","lat":35.87,"lon":128.6,"grp":"kj","cls":"base","parent":"camp-humphreys"},{"id":"camp-casey","base":"Camp Casey","st":"Korea","unit":"210th Field Artillery Brigade","lat":37.92,"lon":127.05,"grp":"kj","cls":"base","parent":"camp-humphreys"},{"id":"torii-station","base":"Torii Station","st":"Japan","unit":"10th Support Group","lat":26.27,"lon":127.74,"grp":"kj","cls":"base","parent":"camp-zama"},{"id":"watervliet-arsenal","base":"Watervliet Arsenal","st":"NY","unit":"Watervliet Arsenal","lat":42.73,"lon":-73.69,"grp":"oib","cls":"depot","parent":"detroit-arsenal"},{"id":"pine-bluff-arsenal","base":"Pine Bluff Arsenal","st":"AR","unit":"Pine Bluff Arsenal","lat":34.27,"lon":-92.08,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"anniston-army-depot","base":"Anniston Army Depot","st":"AL","unit":"Anniston Army Depot","lat":33.6,"lon":-85.96,"grp":"oib","cls":"depot","parent":"detroit-arsenal"},{"id":"corpus-christi-army-depot","base":"Corpus Christi Army Depot","st":"TX","unit":"Corpus Christi Army Depot","lat":27.7,"lon":-97.27,"grp":"oib","cls":"depot","parent":"redstone-arsenal"},{"id":"letterkenny-army-depot","base":"Letterkenny Army Depot","st":"PA","unit":"Letterkenny Army Depot","lat":39.95,"lon":-77.71,"grp":"oib","cls":"depot","parent":"redstone-arsenal"},{"id":"red-river-army-depot","base":"Red River Army Depot","st":"TX","unit":"Red River Army Depot","lat":33.45,"lon":-94.16,"grp":"oib","cls":"depot","parent":"detroit-arsenal"},{"id":"tobyhanna-army-depot","base":"Tobyhanna Army Depot","st":"PA","unit":"Tobyhanna Army Depot","lat":41.19,"lon":-75.41,"grp":"oib","cls":"depot","parent":"aberdeen-proving-ground"},{"id":"tooele-army-depot","base":"Tooele Army Depot","st":"UT","unit":"Tooele Army Depot","lat":40.4,"lon":-112.36,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"sierra-army-depot","base":"Sierra Army Depot","st":"CA","unit":"Sierra Army Depot","lat":40.34,"lon":-120.2,"grp":"oib","cls":"depot","parent":"detroit-arsenal"},{"id":"mcalester-aap","base":"McAlester AAP","st":"OK","unit":"McAlester Army Ammunition Plant","lat":34.84,"lon":-95.92,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"holston-aap","base":"Holston AAP","st":"TN","unit":"Holston Army Ammunition Plant","lat":36.55,"lon":-82.49,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"radford-aap","base":"Radford AAP","st":"VA","unit":"Radford Army Ammunition Plant","lat":37.18,"lon":-80.55,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"lake-city-aap","base":"Lake City AAP","st":"MO","unit":"Lake City Army Ammunition Plant","lat":39.1,"lon":-94.35,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"iowa-aap","base":"Iowa AAP","st":"IA","unit":"Iowa Army Ammunition Plant","lat":40.85,"lon":-91.1,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"scranton-aap","base":"Scranton AAP","st":"PA","unit":"Scranton Army Ammunition Plant","lat":41.41,"lon":-75.66,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"blue-grass-army-depot","base":"Blue Grass Army Depot","st":"KY","unit":"Blue Grass Army Depot","lat":37.7,"lon":-84.16,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"hawthorne-army-depot","base":"Hawthorne Army Depot","st":"NV","unit":"Hawthorne Army Depot","lat":38.54,"lon":-118.63,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"letterkenny-munitions-center","base":"Letterkenny Munitions Center","st":"PA","unit":"Letterkenny Munitions Center","lat":39.93,"lon":-77.7,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"alabama-national-guard","base":"Alabama National Guard","st":"AL","unit":"Alabama Army National Guard","lat":32.38,"lon":-86.3,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"alaska-national-guard","base":"Alaska National Guard","st":"AK","unit":"Alaska Army National Guard","lat":58.3,"lon":-134.42,"grp":"guardInset","cls":"guard","parent":"arlington"},{"id":"arizona-national-guard","base":"Arizona National Guard","st":"AZ","unit":"Arizona Army National Guard","lat":33.45,"lon":-112.07,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"arkansas-national-guard","base":"Arkansas National Guard","st":"AR","unit":"Arkansas Army National Guard","lat":34.75,"lon":-92.29,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"california-national-guard","base":"California National Guard","st":"CA","unit":"California Army National Guard","lat":38.58,"lon":-121.49,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"colorado-national-guard","base":"Colorado National Guard","st":"CO","unit":"Colorado Army National Guard","lat":39.74,"lon":-104.98,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"connecticut-national-guard","base":"Connecticut National Guard","st":"CT","unit":"Connecticut Army National Guard","lat":41.76,"lon":-72.68,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"delaware-national-guard","base":"Delaware National Guard","st":"DE","unit":"Delaware Army National Guard","lat":39.16,"lon":-75.52,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"florida-national-guard","base":"Florida National Guard","st":"FL","unit":"Florida Army National Guard","lat":30.44,"lon":-84.28,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"georgia-national-guard","base":"Georgia National Guard","st":"GA","unit":"Georgia Army National Guard","lat":33.75,"lon":-84.39,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"hawaii-national-guard","base":"Hawaii National Guard","st":"HI","unit":"Hawaii Army National Guard","lat":21.31,"lon":-157.86,"grp":"pi","cls":"guard","parent":"arlington"},{"id":"idaho-national-guard","base":"Idaho National Guard","st":"ID","unit":"Idaho Army National Guard","lat":43.62,"lon":-116.2,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"illinois-national-guard","base":"Illinois National Guard","st":"IL","unit":"Illinois Army National Guard","lat":39.8,"lon":-89.65,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"indiana-national-guard","base":"Indiana National Guard","st":"IN","unit":"Indiana Army National Guard","lat":39.77,"lon":-86.16,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"iowa-national-guard","base":"Iowa National Guard","st":"IA","unit":"Iowa Army National Guard","lat":41.59,"lon":-93.62,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"kansas-national-guard","base":"Kansas National Guard","st":"KS","unit":"Kansas Army National Guard","lat":39.05,"lon":-95.69,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"kentucky-national-guard","base":"Kentucky National Guard","st":"KY","unit":"Kentucky Army National Guard","lat":38.19,"lon":-84.87,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"louisiana-national-guard","base":"Louisiana National Guard","st":"LA","unit":"Louisiana Army National Guard","lat":30.46,"lon":-91.14,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"maine-national-guard","base":"Maine National Guard","st":"ME","unit":"Maine Army National Guard","lat":44.31,"lon":-69.78,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"maryland-national-guard","base":"Maryland National Guard","st":"MD","unit":"Maryland Army National Guard","lat":38.98,"lon":-76.49,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"massachusetts-national-guard","base":"Massachusetts National Guard","st":"MA","unit":"Massachusetts Army National Guard","lat":42.36,"lon":-71.06,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"michigan-national-guard","base":"Michigan National Guard","st":"MI","unit":"Michigan Army National Guard","lat":42.73,"lon":-84.56,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"minnesota-national-guard","base":"Minnesota National Guard","st":"MN","unit":"Minnesota Army National Guard","lat":44.95,"lon":-93.09,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"mississippi-national-guard","base":"Mississippi National Guard","st":"MS","unit":"Mississippi Army National Guard","lat":32.3,"lon":-90.18,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"missouri-national-guard","base":"Missouri National Guard","st":"MO","unit":"Missouri Army National Guard","lat":38.58,"lon":-92.17,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"montana-national-guard","base":"Montana National Guard","st":"MT","unit":"Montana Army National Guard","lat":46.59,"lon":-112.02,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"nebraska-national-guard","base":"Nebraska National Guard","st":"NE","unit":"Nebraska Army National Guard","lat":40.81,"lon":-96.68,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"nevada-national-guard","base":"Nevada National Guard","st":"NV","unit":"Nevada Army National Guard","lat":39.16,"lon":-119.77,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"new-hampshire-national-guard","base":"New Hampshire National Guard","st":"NH","unit":"New Hampshire Army National Guard","lat":43.21,"lon":-71.54,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"new-jersey-national-guard","base":"New Jersey National Guard","st":"NJ","unit":"New Jersey Army National Guard","lat":40.22,"lon":-74.74,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"new-mexico-national-guard","base":"New Mexico National Guard","st":"NM","unit":"New Mexico Army National Guard","lat":35.68,"lon":-105.94,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"new-york-national-guard","base":"New York National Guard","st":"NY","unit":"New York Army National Guard","lat":42.65,"lon":-73.76,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"north-carolina-national-guard","base":"North Carolina National Guard","st":"NC","unit":"North Carolina Army National Guard","lat":35.78,"lon":-78.64,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"north-dakota-national-guard","base":"North Dakota National Guard","st":"ND","unit":"North Dakota Army National Guard","lat":46.81,"lon":-100.78,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"ohio-national-guard","base":"Ohio National Guard","st":"OH","unit":"Ohio Army National Guard","lat":39.96,"lon":-83,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"oklahoma-national-guard","base":"Oklahoma National Guard","st":"OK","unit":"Oklahoma Army National Guard","lat":35.49,"lon":-97.5,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"oregon-national-guard","base":"Oregon National Guard","st":"OR","unit":"Oregon Army National Guard","lat":44.94,"lon":-123.04,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"pennsylvania-national-guard","base":"Pennsylvania National Guard","st":"PA","unit":"Pennsylvania Army National Guard","lat":40.26,"lon":-76.88,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"rhode-island-national-guard","base":"Rhode Island National Guard","st":"RI","unit":"Rhode Island Army National Guard","lat":41.83,"lon":-71.41,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"south-carolina-national-guard","base":"South Carolina National Guard","st":"SC","unit":"South Carolina Army National Guard","lat":34,"lon":-81.03,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"south-dakota-national-guard","base":"South Dakota National Guard","st":"SD","unit":"South Dakota Army National Guard","lat":44.37,"lon":-100.35,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"tennessee-national-guard","base":"Tennessee National Guard","st":"TN","unit":"Tennessee Army National Guard","lat":36.17,"lon":-86.78,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"texas-national-guard","base":"Texas National Guard","st":"TX","unit":"Texas Army National Guard","lat":30.27,"lon":-97.74,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"utah-national-guard","base":"Utah National Guard","st":"UT","unit":"Utah Army National Guard","lat":40.78,"lon":-111.89,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"vermont-national-guard","base":"Vermont National Guard","st":"VT","unit":"Vermont Army National Guard","lat":44.26,"lon":-72.58,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"virginia-national-guard","base":"Virginia National Guard","st":"VA","unit":"Virginia Army National Guard","lat":37.54,"lon":-77.43,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"washington-national-guard","base":"Washington National Guard","st":"WA","unit":"Washington Army National Guard","lat":47.04,"lon":-122.9,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"west-virginia-national-guard","base":"West Virginia National Guard","st":"WV","unit":"West Virginia Army National Guard","lat":38.34,"lon":-81.63,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"wisconsin-national-guard","base":"Wisconsin National Guard","st":"WI","unit":"Wisconsin Army National Guard","lat":43.07,"lon":-89.4,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"wyoming-national-guard","base":"Wyoming National Guard","st":"WY","unit":"Wyoming Army National Guard","lat":41.14,"lon":-104.82,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"district-of-columbia-national-guard","base":"District of Columbia National Guard","st":"DC","unit":"District of Columbia Army National Guard","lat":38.9,"lon":-77.04,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"puerto-rico-national-guard","base":"Puerto Rico National Guard","st":"PR","unit":"Puerto Rico Army National Guard","lat":18.47,"lon":-66.11,"grp":"guardInset","cls":"guard","parent":"arlington"},{"id":"guam-national-guard","base":"Guam National Guard","st":"GU","unit":"Guam Army National Guard","lat":13.44,"lon":144.79,"grp":"gu","cls":"guard","parent":"arlington"},{"id":"u-s-virgin-islands-national-guard","base":"U.S. Virgin Islands National Guard","st":"VI","unit":"U.S. Virgin Islands Army National Guard","lat":18.34,"lon":-64.93,"grp":"guardInset","cls":"guard","parent":"arlington"},{"id":"buffalo-district","base":"Buffalo District","st":"NY","unit":"Buffalo District","lat":42.89,"lon":-78.88,"grp":"conus|usace","cls":"base","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"chicago-district","base":"Chicago District","st":"IL","unit":"Chicago District","lat":41.88,"lon":-87.63,"grp":"conus|usace","cls":"base","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"detroit-district","base":"Detroit District","st":"MI","unit":"Detroit District","lat":42.33,"lon":-83.05,"grp":"conus|usace","cls":"base","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"huntington-district","base":"Huntington District","st":"WV","unit":"Huntington District","lat":38.42,"lon":-82.45,"grp":"conus|usace","cls":"base","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"louisville-district","base":"Louisville District","st":"KY","unit":"Louisville District","lat":38.25,"lon":-85.76,"grp":"conus|usace","cls":"base","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"nashville-district","base":"Nashville District","st":"TN","unit":"Nashville District","lat":36.16,"lon":-86.78,"grp":"conus|usace","cls":"base","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"pittsburgh-district","base":"Pittsburgh District","st":"PA","unit":"Pittsburgh District","lat":40.44,"lon":-79.99,"grp":"conus|usace","cls":"base","parent":"great-lakes-ohio-river-div-cincinnati"},{"id":"st-paul-district","base":"St. Paul District","st":"MN","unit":"St. Paul District","lat":44.95,"lon":-93.09,"grp":"conus|usace","cls":"base","parent":"mississippi-valley-div-vicksburg"},{"id":"rock-island-district","base":"Rock Island District","st":"IL","unit":"Rock Island District","lat":41.51,"lon":-90.58,"grp":"conus|usace","cls":"base","parent":"mississippi-valley-div-vicksburg"},{"id":"st-louis-district","base":"St. Louis District","st":"MO","unit":"St. Louis District","lat":38.63,"lon":-90.2,"grp":"conus|usace","cls":"base","parent":"mississippi-valley-div-vicksburg"},{"id":"memphis-district","base":"Memphis District","st":"TN","unit":"Memphis District","lat":35.15,"lon":-90.05,"grp":"conus|usace","cls":"base","parent":"mississippi-valley-div-vicksburg"},{"id":"vicksburg-district","base":"Vicksburg District","st":"MS","unit":"Vicksburg District","lat":32.35,"lon":-90.88,"grp":"conus|usace","cls":"base","parent":"mississippi-valley-div-vicksburg"},{"id":"new-orleans-district","base":"New Orleans District","st":"LA","unit":"New Orleans District","lat":29.95,"lon":-90.07,"grp":"conus|usace","cls":"base","parent":"mississippi-valley-div-vicksburg"},{"id":"baltimore-district","base":"Baltimore District","st":"MD","unit":"Baltimore District","lat":39.29,"lon":-76.61,"grp":"conus|usace","cls":"base","parent":"north-atlantic-div-brooklyn"},{"id":"new-england-district","base":"New England District","st":"MA","unit":"New England District","lat":42.46,"lon":-71.35,"grp":"conus|usace","cls":"base","parent":"north-atlantic-div-brooklyn"},{"id":"new-york-district","base":"New York District","st":"NY","unit":"New York District","lat":40.71,"lon":-74.01,"grp":"conus|usace","cls":"base","parent":"north-atlantic-div-brooklyn"},{"id":"norfolk-district","base":"Norfolk District","st":"VA","unit":"Norfolk District","lat":36.85,"lon":-76.29,"grp":"conus|usace","cls":"base","parent":"north-atlantic-div-brooklyn"},{"id":"philadelphia-district","base":"Philadelphia District","st":"PA","unit":"Philadelphia District","lat":39.95,"lon":-75.17,"grp":"conus|usace","cls":"base","parent":"north-atlantic-div-brooklyn"},{"id":"kansas-city-district","base":"Kansas City District","st":"MO","unit":"Kansas City District","lat":39.1,"lon":-94.58,"grp":"conus|usace","cls":"base","parent":"northwestern-div-portland"},{"id":"omaha-district","base":"Omaha District","st":"NE","unit":"Omaha District","lat":41.26,"lon":-95.93,"grp":"conus|usace","cls":"base","parent":"northwestern-div-portland"},{"id":"portland-district","base":"Portland District","st":"OR","unit":"Portland District","lat":45.52,"lon":-122.68,"grp":"conus|usace","cls":"base","parent":"northwestern-div-portland"},{"id":"seattle-district","base":"Seattle District","st":"WA","unit":"Seattle District","lat":47.61,"lon":-122.33,"grp":"conus|usace","cls":"base","parent":"northwestern-div-portland"},{"id":"walla-walla-district","base":"Walla Walla District","st":"WA","unit":"Walla Walla District","lat":46.06,"lon":-118.34,"grp":"conus|usace","cls":"base","parent":"northwestern-div-portland"},{"id":"charleston-district","base":"Charleston District","st":"SC","unit":"Charleston District","lat":32.78,"lon":-79.93,"grp":"conus|usace","cls":"base","parent":"south-atlantic-div-atlanta"},{"id":"jacksonville-district","base":"Jacksonville District","st":"FL","unit":"Jacksonville District","lat":30.33,"lon":-81.66,"grp":"conus|usace","cls":"base","parent":"south-atlantic-div-atlanta"},{"id":"mobile-district","base":"Mobile District","st":"AL","unit":"Mobile District","lat":30.69,"lon":-88.04,"grp":"conus|usace","cls":"base","parent":"south-atlantic-div-atlanta"},{"id":"savannah-district","base":"Savannah District","st":"GA","unit":"Savannah District","lat":32.08,"lon":-81.09,"grp":"conus|usace","cls":"base","parent":"south-atlantic-div-atlanta"},{"id":"wilmington-district","base":"Wilmington District","st":"NC","unit":"Wilmington District","lat":34.23,"lon":-77.94,"grp":"conus|usace","cls":"base","parent":"south-atlantic-div-atlanta"},{"id":"albuquerque-district","base":"Albuquerque District","st":"NM","unit":"Albuquerque District","lat":35.08,"lon":-106.65,"grp":"conus|usace","cls":"base","parent":"south-pacific-div-san-francisco"},{"id":"los-angeles-district","base":"Los Angeles District","st":"CA","unit":"Los Angeles District","lat":34.05,"lon":-118.24,"grp":"conus|usace","cls":"base","parent":"south-pacific-div-san-francisco"},{"id":"sacramento-district","base":"Sacramento District","st":"CA","unit":"Sacramento District","lat":38.58,"lon":-121.49,"grp":"conus|usace","cls":"base","parent":"south-pacific-div-san-francisco"},{"id":"san-francisco-district","base":"San Francisco District","st":"CA","unit":"San Francisco District","lat":37.77,"lon":-122.42,"grp":"conus|usace","cls":"base","parent":"south-pacific-div-san-francisco"},{"id":"little-rock-district","base":"Little Rock District","st":"AR","unit":"Little Rock District","lat":34.75,"lon":-92.29,"grp":"conus|usace","cls":"base","parent":"southwestern-div-dallas"},{"id":"tulsa-district","base":"Tulsa District","st":"OK","unit":"Tulsa District","lat":36.15,"lon":-95.99,"grp":"conus|usace","cls":"base","parent":"southwestern-div-dallas"},{"id":"fort-worth-district","base":"Fort Worth District","st":"TX","unit":"Fort Worth District","lat":32.76,"lon":-97.33,"grp":"conus|usace","cls":"base","parent":"southwestern-div-dallas"},{"id":"galveston-district","base":"Galveston District","st":"TX","unit":"Galveston District","lat":29.3,"lon":-94.8,"grp":"conus|usace","cls":"base","parent":"southwestern-div-dallas"},{"id":"europe-district","base":"Europe District","st":"Germany","unit":"Europe District","lat":50.08,"lon":8.24,"grp":"eur|usace","cls":"base","parent":"north-atlantic-div-brooklyn"},{"id":"far-east-district","base":"Far East District","st":"Korea","unit":"Far East District","lat":36.97,"lon":127.03,"grp":"kj|usace","cls":"base","parent":"pacific-ocean-div-fort-shafter"},{"id":"japan-engineer-district","base":"Japan Engineer District","st":"Japan","unit":"Japan Engineer District","lat":35.49,"lon":139.4,"grp":"kj|usace","cls":"base","parent":"pacific-ocean-div-fort-shafter"},{"id":"alaska-district","base":"Alaska District","st":"AK","unit":"Alaska District","lat":61.25,"lon":-149.8,"grp":"guardInset|usace","cls":"base","parent":"pacific-ocean-div-fort-shafter"},{"id":"honolulu-district","base":"Honolulu District","st":"HI","unit":"Honolulu District","lat":21.36,"lon":-157.9,"grp":"pi|usace","cls":"base","parent":"pacific-ocean-div-fort-shafter"},{"id":"uscentcom-macdill-afb","base":"USCENTCOM (MacDill AFB)","st":"FL","unit":null,"lat":27.85,"lon":-82.5,"grp":"conus|ext","cls":"base","parent":null},{"id":"ussouthcom-doral","base":"USSOUTHCOM (Doral)","st":"FL","unit":null,"lat":25.81,"lon":-80.34,"grp":"conus|ext","cls":"base","parent":null},{"id":"usnorthcom-peterson-sfb","base":"USNORTHCOM (Peterson SFB)","st":"CO","unit":"263rd Army Air & Missile Defense Command (AAMDC)","lat":38.82,"lon":-104.7,"grp":"conus|ext","cls":"base","parent":"usasmdc-redstone-huntsville"},{"id":"usindopacom-camp-smith","base":"USINDOPACOM (Camp Smith)","st":"HI","unit":null,"lat":21.39,"lon":-157.91,"grp":"pi|ext","cls":"base","parent":null},{"id":"useucom-stuttgart","base":"USEUCOM (Stuttgart)","st":"Germany","unit":null,"lat":48.74,"lon":9.1,"grp":"eur|ext","cls":"base","parent":null},{"id":"usafricom-stuttgart","base":"USAFRICOM (Stuttgart)","st":"Germany","unit":null,"lat":48.78,"lon":9.18,"grp":"eur|ext","cls":"base","parent":null},{"id":"ustranscom-scott-afb","base":"USTRANSCOM (Scott AFB)","st":"IL","unit":null,"lat":38.54,"lon":-89.85,"grp":"conus|ext","cls":"base","parent":null},{"id":"usspacecom-peterson-sfb","base":"USSPACECOM (Peterson SFB)","st":"CO","unit":null,"lat":38.82,"lon":-104.7,"grp":"conus|ext","cls":"base","parent":null},{"id":"usstratcom-offutt-afb","base":"USSTRATCOM (Offutt AFB)","st":"NE","unit":null,"lat":41.12,"lon":-95.91,"grp":"conus|ext","cls":"base","parent":null},{"id":"ussocom-macdill-afb","base":"USSOCOM (MacDill AFB)","st":"FL","unit":null,"lat":27.85,"lon":-82.5,"grp":"conus|ext","cls":"base","parent":null},{"id":"nato-shape-mons","base":"NATO SHAPE (Mons)","st":"Belgium","unit":null,"lat":50.44,"lon":3.99,"grp":"eur|ext","cls":"base","parent":null},{"id":"mnc-ne-szczecin","base":"MNC-NE (Szczecin)","st":"Poland","unit":null,"lat":53.43,"lon":14.55,"grp":"eur|ext","cls":"base","parent":null},{"id":"cjtf-hoa-camp-lemonnier","base":"CJTF-HOA (Camp Lemonnier)","st":"Djibouti","unit":null,"lat":11.54,"lon":43.15,"grp":"eur|ext","cls":"base","parent":null},{"id":"uscybercom-fort-meade","base":"USCYBERCOM (Fort Meade)","st":"MD","unit":null,"lat":39.11,"lon":-76.77,"grp":"conus|ext","cls":"base","parent":null},{"id":"nsa-css-fort-meade","base":"NSA / CSS (Fort Meade)","st":"MD","unit":null,"lat":39.11,"lon":-76.77,"grp":"conus|ext","cls":"base","parent":null},{"id":"nsa-georgia-fort-gordon","base":"NSA-Georgia (Fort Gordon)","st":"GA","unit":null,"lat":33.42,"lon":-82.15,"grp":"conus|ext","cls":"base","parent":null},{"id":"nga-springfield","base":"NGA (Springfield)","st":"VA","unit":null,"lat":38.74,"lon":-77.19,"grp":"conus|ext","cls":"base","parent":null},{"id":"the-pentagon-hqda-cio-g-6","base":"The Pentagon (HQDA · CIO/G-6)","st":"VA","unit":null,"lat":38.87,"lon":-77.06,"grp":"ncr|ext","cls":"base","parent":null},{"id":"shape-saceur-mons","base":"SHAPE / SACEUR (Mons)","st":"Belgium","unit":"11th Missile Defense Battery","lat":50.5,"lon":3.96,"grp":"eur|ext","cls":"base","parent":"sembach"},{"id":"austin-t2com-hq","base":"Austin (T2COM HQ)","st":"TX","unit":"T2COM","lat":30.27,"lon":-97.74,"grp":"conus","cls":"hq","parent":"the-pentagon"},{"id":"army-research-laboratory-adelphi","base":"Army Research Laboratory (Adelphi)","st":"MD","unit":"Army Research Laboratory (ARL)","lat":39,"lon":-76.96,"grp":"conus","cls":"hq","parent":"aberdeen-proving-ground"},{"id":"soldier-center-natick","base":"Soldier Center (Natick)","st":"MA","unit":"Soldier Center (SC)","lat":42.28,"lon":-71.35,"grp":"conus","cls":"hq","parent":"aberdeen-proving-ground"},{"id":"335th-signal-command-east-point","base":"335th Signal Command (East Point)","st":"GA","unit":"335th Signal Command (Theater)","lat":33.68,"lon":-84.44,"grp":"conus","cls":"hq","parent":"shaw-afb"},{"id":"national-ground-intelligence-center-charlottesville","base":"National Ground Intelligence Center (Charlottesville)","st":"VA","unit":"National Ground Intelligence Center (NGIC)","lat":38.03,"lon":-78.48,"grp":"conus","cls":"hq","parent":"fort-belvoir"},{"id":"usasmdc-redstone-huntsville","base":"USASMDC (Redstone/Huntsville)","st":"AL","unit":"USASMDC","lat":34.68,"lon":-86.65,"grp":"conus","cls":"hq","parent":"the-pentagon"},{"id":"usace-hq-washington-dc","base":"USACE HQ (Washington, DC)","st":"DC","unit":"USACE","lat":38.87,"lon":-77.02,"grp":"ncr","cls":"hq","parent":"the-pentagon"},{"id":"great-lakes-ohio-river-div-cincinnati","base":"Great Lakes & Ohio River Div (Cincinnati)","st":"OH","unit":"Great Lakes & Ohio River Division (LRD)","lat":39.1,"lon":-84.51,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"mississippi-valley-div-vicksburg","base":"Mississippi Valley Div (Vicksburg)","st":"MS","unit":"Mississippi Valley Division (MVD)","lat":32.35,"lon":-90.88,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"northwestern-div-portland","base":"Northwestern Div (Portland)","st":"OR","unit":"Northwestern Division (NWD)","lat":45.52,"lon":-122.68,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"south-atlantic-div-atlanta","base":"South Atlantic Div (Atlanta)","st":"GA","unit":"South Atlantic Division (SAD)","lat":33.75,"lon":-84.39,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"south-pacific-div-san-francisco","base":"South Pacific Div (San Francisco)","st":"CA","unit":"South Pacific Division (SPD)","lat":37.77,"lon":-122.42,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"southwestern-div-dallas","base":"Southwestern Div (Dallas)","st":"TX","unit":"Southwestern Division (SWD)","lat":32.78,"lon":-96.8,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"transatlantic-div-winchester","base":"Transatlantic Div (Winchester)","st":"VA","unit":"Transatlantic Division (TAD)","lat":39.19,"lon":-78.16,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"north-atlantic-div-brooklyn","base":"North Atlantic Div (Brooklyn)","st":"NY","unit":"North Atlantic Division (NAD)","lat":40.69,"lon":-73.99,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"pacific-ocean-div-fort-shafter","base":"Pacific Ocean Div (Fort Shafter)","st":"HI","unit":"Pacific Ocean Division (POD)","lat":21.36,"lon":-157.9,"grp":"pi|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"caribbean-district-san-juan","base":"Caribbean District (San Juan)","st":"PR","unit":"Caribbean District","lat":18.47,"lon":-66.11,"grp":"guardInset|usace","cls":"base","parent":"south-atlantic-div-atlanta"},{"id":"engineer-r-d-center-vicksburg","base":"Engineer R&D Center (Vicksburg)","st":"MS","unit":"Engineer R&D Center (ERDC)","lat":32.3,"lon":-90.86,"grp":"conus|usace","cls":"base","parent":"usace-hq-washington-dc"},{"id":"camp-atterbury","base":"Camp Atterbury","st":"IN","unit":"157th Infantry Brigade","lat":39.33,"lon":-86.03,"grp":"guard","cls":"guard","parent":"fort-knox"},{"id":"muscatatuck-urban-training-center","base":"Muscatatuck Urban Training Center","st":"IN","unit":null,"lat":38.94,"lon":-85.99,"grp":"guard","cls":"guard","parent":null},{"id":"camp-shelby","base":"Camp Shelby","st":"MS","unit":"177th Armored Brigade","lat":31.2,"lon":-89.2,"grp":"guard","cls":"guard","parent":"fort-knox"},{"id":"camp-blanding","base":"Camp Blanding","st":"FL","unit":null,"lat":29.95,"lon":-81.98,"grp":"guard","cls":"guard","parent":null},{"id":"camp-grayling","base":"Camp Grayling","st":"MI","unit":null,"lat":44.65,"lon":-84.71,"grp":"guard","cls":"guard","parent":null},{"id":"camp-ripley","base":"Camp Ripley","st":"MN","unit":null,"lat":46.09,"lon":-94.36,"grp":"guard","cls":"guard","parent":null},{"id":"camp-roberts","base":"Camp Roberts","st":"CA","unit":null,"lat":35.79,"lon":-120.75,"grp":"guard","cls":"guard","parent":null},{"id":"camp-san-luis-obispo","base":"Camp San Luis Obispo","st":"CA","unit":null,"lat":35.33,"lon":-120.73,"grp":"guard","cls":"guard","parent":null},{"id":"camp-williams","base":"Camp Williams","st":"UT","unit":"807th Theater Medical Command","lat":40.43,"lon":-111.92,"grp":"guard","cls":"guard","parent":"fort-bragg"},{"id":"gowen-field","base":"Gowen Field","st":"ID","unit":null,"lat":43.56,"lon":-116.24,"grp":"guard","cls":"guard","parent":null},{"id":"orchard-combat-training-center","base":"Orchard Combat Training Center","st":"ID","unit":null,"lat":43.31,"lon":-116.02,"grp":"guard","cls":"guard","parent":null},{"id":"camp-guernsey","base":"Camp Guernsey","st":"WY","unit":null,"lat":42.27,"lon":-104.74,"grp":"guard","cls":"guard","parent":null},{"id":"camp-gruber","base":"Camp Gruber","st":"OK","unit":null,"lat":35.65,"lon":-95.15,"grp":"guard","cls":"guard","parent":null},{"id":"fort-chaffee","base":"Fort Chaffee","st":"AR","unit":null,"lat":35.3,"lon":-94.3,"grp":"guard","cls":"guard","parent":null},{"id":"camp-robinson","base":"Camp Robinson","st":"AR","unit":null,"lat":34.85,"lon":-92.3,"grp":"guard","cls":"guard","parent":null},{"id":"camp-beauregard","base":"Camp Beauregard","st":"LA","unit":null,"lat":31.33,"lon":-92.38,"grp":"guard","cls":"guard","parent":null},{"id":"camp-swift","base":"Camp Swift","st":"TX","unit":null,"lat":30.19,"lon":-97.29,"grp":"guard","cls":"guard","parent":null},{"id":"camp-mabry","base":"Camp Mabry","st":"TX","unit":"36th Infantry Division","lat":30.31,"lon":-97.76,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"camp-bowie","base":"Camp Bowie","st":"TX","unit":null,"lat":31.7,"lon":-98.99,"grp":"guard","cls":"guard","parent":null},{"id":"camp-dodge","base":"Camp Dodge","st":"IA","unit":null,"lat":41.7,"lon":-93.72,"grp":"guard","cls":"guard","parent":null},{"id":"camp-perry","base":"Camp Perry","st":"OH","unit":null,"lat":41.54,"lon":-83.02,"grp":"guard","cls":"guard","parent":null},{"id":"camp-edwards","base":"Camp Edwards","st":"MA","unit":null,"lat":41.66,"lon":-70.54,"grp":"guard","cls":"guard","parent":null},{"id":"camp-johnson","base":"Camp Johnson","st":"VT","unit":null,"lat":44.53,"lon":-73.19,"grp":"guard","cls":"guard","parent":null},{"id":"camp-murray","base":"Camp Murray","st":"WA","unit":null,"lat":47.11,"lon":-122.57,"grp":"guard","cls":"guard","parent":null},{"id":"camp-rilea","base":"Camp Rilea","st":"OR","unit":null,"lat":46.12,"lon":-123.93,"grp":"guard","cls":"guard","parent":null},{"id":"camp-navajo","base":"Camp Navajo","st":"AZ","unit":null,"lat":35.18,"lon":-111.85,"grp":"guard","cls":"guard","parent":null},{"id":"fort-custer","base":"Fort Custer","st":"MI","unit":null,"lat":42.31,"lon":-85.3,"grp":"guard","cls":"guard","parent":null},{"id":"fort-indiantown-gap","base":"Fort Indiantown Gap","st":"PA","unit":"28th Infantry Division","lat":40.43,"lon":-76.57,"grp":"guard","cls":"guard","parent":"arlington"},{"id":"fort-pickett-barfoot","base":"Fort Pickett (Barfoot)","st":"VA","unit":null,"lat":37.05,"lon":-77.95,"grp":"guard","cls":"guard","parent":null},{"id":"fort-hunter-liggett","base":"Fort Hunter Liggett","st":"CA","unit":"USAG Fort Hunter Liggett","lat":35.98,"lon":-121.24,"grp":"conus","cls":"base","parent":"fort-bragg"},{"id":"parks-reserve-forces-training-area","base":"Parks Reserve Forces Training Area","st":"CA","unit":"91st Training Division (Operations)","lat":37.72,"lon":-121.89,"grp":"conus","cls":"base","parent":"fort-knox"},{"id":"mot-sunny-point","base":"MOT Sunny Point","st":"NC","unit":"832nd Transportation Battalion","lat":33.99,"lon":-77.96,"grp":"conus","cls":"base","parent":"jblm"},{"id":"mot-concord","base":"MOT Concord","st":"CA","unit":"834th Transportation Battalion","lat":38.05,"lon":-122.03,"grp":"conus","cls":"base","parent":"jblm"},{"id":"pohakuloa-training-area","base":"Pohakuloa Training Area","st":"HI","unit":"USAG Pohakuloa","lat":19.7,"lon":-155.53,"grp":"pi","cls":"base","parent":"fort-shafter-schofield-hawaii"},{"id":"crane-army-ammunition-activity","base":"Crane Army Ammunition Activity","st":"IN","unit":"Crane Army Ammunition Activity","lat":38.86,"lon":-86.83,"grp":"oib","cls":"depot","parent":"rock-island-arsenal"},{"id":"sembach-kaserne","base":"Sembach Kaserne","st":"DE","unit":null,"lat":49.5,"lon":7.86,"grp":"eur","cls":"base","parent":null},{"id":"landstuhl","base":"Landstuhl","st":"DE","unit":"Landstuhl Regional Medical Center","lat":49.41,"lon":7.55,"grp":"eur","cls":"base","parent":"sembach"},{"id":"coleman-barracks","base":"Coleman Barracks","st":"DE","unit":"Army Field Support Battalion-Mannheim","lat":49.56,"lon":8.46,"grp":"eur","cls":"base","parent":"kaiserslautern"},{"id":"camp-kosciuszko","base":"Camp Kosciuszko","st":"PL","unit":"V Corps Headquarters (Forward)","lat":52.41,"lon":16.93,"grp":"eur","cls":"base","parent":"fort-knox"},{"id":"powidz","base":"Powidz","st":"PL","unit":"Army Field Support Battalion-Poland","lat":52.44,"lon":17.85,"grp":"eur","cls":"base","parent":"kaiserslautern"},{"id":"drawsko-pomorskie-training-area","base":"Drawsko Pomorskie Training Area","st":"PL","unit":null,"lat":53.53,"lon":15.81,"grp":"eur","cls":"base","parent":null},{"id":"novo-selo-training-area","base":"Novo Selo Training Area","st":"BG","unit":"U.S. Army Garrison Black Sea","lat":42.72,"lon":26.35,"grp":"eur","cls":"base","parent":"sembach"},{"id":"camp-bondsteel","base":"Camp Bondsteel","st":"XK","unit":null,"lat":42.36,"lon":21.24,"grp":"eur","cls":"base","parent":null},{"id":"mk-air-base","base":"MK Air Base","st":"RO","unit":"U.S. Army Garrison Black Sea","lat":44.36,"lon":28.49,"grp":"eur","cls":"base","parent":"sembach"},{"id":"camp-carroll","base":"Camp Carroll","st":"KR","unit":"Materiel Support Command-Korea (MSC-K)","lat":36.03,"lon":128.4,"grp":"kj","cls":"base","parent":"usag-daegu"},{"id":"k-16-air-base","base":"K-16 Air Base","st":"KR","unit":"2nd Battalion, 2nd Aviation Regiment (2nd CAB)","lat":37.44,"lon":127.11,"grp":"kj","cls":"base","parent":"camp-humphreys"},{"id":"sagami-general-depot","base":"Sagami General Depot","st":"JP","unit":"38th Air Defense Artillery Brigade","lat":35.57,"lon":139.4,"grp":"kj","cls":"base","parent":"fort-shafter-schofield-hawaii"},{"id":"camp-buehring","base":"Camp Buehring","st":"KW","unit":"Theater Aviation Task Force (Rotational CAB), Camp Buehring","lat":29.66,"lon":47.76,"grp":"swa","cls":"base","parent":"camp-arifjan"},{"id":"camp-as-sayliyah","base":"Camp As Sayliyah","st":"QA","unit":"Area Support Group-Qatar","lat":25.26,"lon":51.39,"grp":"swa","cls":"base","parent":"shaw-afb"},{"id":"camp-mujuk","base":"Camp Mujuk","st":"KR","unit":null,"lat":36.03,"lon":129.36,"grp":"kj","cls":"base","parent":null},{"id":"yokohama-north-dock","base":"Yokohama North Dock","st":"JP","unit":"836th Transportation Battalion","lat":35.46,"lon":139.64,"grp":"kj","cls":"base","parent":"scott-afb"},{"id":"rose-barracks-vilseck","base":"Rose Barracks (Vilseck)","st":"DE","unit":"2nd Cavalry Regiment","lat":49.63,"lon":11.79,"grp":"eur","cls":"base","parent":"fort-knox"},{"id":"zagan-aps-2-site","base":"Zagan APS-2 Site","st":"PL","unit":null,"lat":51.61,"lon":15.3,"grp":"eur","cls":"base","parent":null},{"id":"dulmen-aps-2-site","base":"Dülmen APS-2 Site","st":"DE","unit":"Army Field Support Battalion-Benelux","lat":51.83,"lon":7.28,"grp":"eur","cls":"base","parent":"kaiserslautern"},{"id":"camp-lemonnier","base":"Camp Lemonnier","st":"DJ","unit":null,"lat":11.55,"lon":43.15,"grp":"eur","cls":"base","parent":null}];
 
 /* ══════════ module: m1-geom ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1583,36 +1667,8 @@ function fitGlobeToSites(list, tightenBias){
 // M4 public alias per the A-ORG-2 work order; the ported name above stays canonical.
 
 // v15.14.0: zoom keys animate (180ms easeOut) and repeat on hold; keyboard +/- reuses .click()
-function _zoomAnim(f){ const z0=GlobeState.zoom, zT=Math.max(1.0,Math.min(16,z0*f));
-  const t0=performance.now(), dur=180;
-  GlobeState.spin=false;
-  const gen=++_camGen;                       // a zoom step cancels a fly mid-flight (deviation 2)
-  GlobeState._fly=false;
-  (function step(now){
-    if(gen!==_camGen) return;
-    if(GlobeState.dragging || GlobeState._pinching){ cameraCancel(); return; }
-    const p=Math.min(1,(now-t0)/dur), ez=1-(1-p)*(1-p);
-    GlobeState.zoom=z0+(zT-z0)*ez; globeMark(); if(p<1) requestAnimationFrame(step); })(t0);
-}
-
-// Animated zoom step anchored at a screen point: ×f toward client coords (cx,cy),
-// diving the camera at that point exactly like the source's wheel/double-tap zooms
-// (per-frame focal anchor through GlobeState._applyDrag — deviation 6). Omit cx/cy
-// (zoomAt — the focal-anchored zoom step — was cut at M1 integration: zero call
-// sites; the M1 zoom pills use _zoomAnim via _wireZoomHold. Recover from git
-// history when a consumer arrives.)
-
-// Zoom button wiring: click animates ×f; press-and-hold (300ms) repeats ×1.06 per
-// 50ms tick. The shell passes its own buttons (A-ORG-1 used #globeZoomIn/#globeZoomOut
-// at f=1.35 / 1/1.35). addEventListener only — no pointer capture.
-function _wireZoomHold(btn, f){
-  if(!btn) return;
-  btn.onclick=()=>_zoomAnim(f);
-  let ht=null, rt=null;
-  btn.addEventListener('pointerdown', ()=>{ ht=setTimeout(()=>{ rt=setInterval(()=>{ cameraCancel(); GlobeState.zoom=Math.max(1.0,Math.min(16,GlobeState.zoom*(f>1?1.06:1/1.06))); globeMark(); },50); },300); });
-  const stop=()=>{ clearTimeout(ht); clearInterval(rt); ht=rt=null; };
-  btn.addEventListener('pointerup',stop); btn.addEventListener('pointerleave',stop); btn.addEventListener('pointercancel',stop);
-}
+// (_zoomAnim/_wireZoomHold cut at v0.6.0 — the zoom buttons retired with the
+// rail; pinch, wheel and double-tap own zoom. Recover from git history.)
 
 // Reset view — A-ORG-1's home camera, hoisted from its two inline call sites
 // ('h'/'0' key and the recenter FAB): CONUS at ease. Home flies, never snaps.
@@ -1750,63 +1806,36 @@ function siteById(id){ if(id==null) return null; return _siteIndex().get(id)||nu
 // Direct children of a site (fresh array — callers may sort/splice for their UI).
 function childrenOf(id){ _siteIndex(); return (_kidIdx.get(id)||[]).slice(); }
 
-// ---- COMMAND FAMILIES (v0.2.0) — color-by-branch so locations read at a glance.
-// A site's family = the ancestor one hop below its root, mapped through
-// FAM_ANCHOR; grp overrides for guard/oib. Colors are LUMINOUS data hues for the
-// Orbit ground (machine-checked ≥3.7:1 on the land slab) — data categories, not
-// theme chrome, so they live here rather than in the token layer.
-const FAM_META={
-  hqda:      {c:'242,238,226', n:'HQDA & DRUs'},
-  land:      {c:'245,215,110', n:'Land Forces'},
-  theater:   {c:'255,143,192', n:'Theaters & COCOMs'},
-  futures:   {c:'201,160,255', n:'Futures & Training'},
-  materiel:  {c:'232,180,90',  n:'Materiel & Sustainment'},
-  engineers: {c:'255,153,80',  n:'Engineers'},
-  guard:     {c:'168,179,154', n:'National Guard'},
-  oib:       {c:'217,195,106', n:'Industrial Base'},
-  other:     {c:'176,168,148', n:'Other'},
+// ---- MARKER CLASSES (v0.6.0, owner directive: sharp and clean like A-ORG-1's
+// legend) — Base · HQ · Depot · Guard. cls rides each site row (carried verbatim
+// from A-ORG-1's marker classing); the colors are the A-ORG-1 glass-reticle
+// palette re-inked for Lumen.
+const CLS_META={
+  base:  { c:'242,234,216', n:'Base'  },
+  hq:    { c:'255,215,122', n:'HQ'    },
+  depot: { c:'192,138,78',  n:'Depot' },
+  guard: { c:'150,144,124', n:'Guard' },
 };
-const FAM_ANCHOR={
-  'the-pentagon':'hqda','fort-mcnair':'hqda','west-point':'hqda','fort-belvoir':'hqda',
-  'fort-bragg':'land','fort-meade':'land',
-  'austin-t2com-hq':'futures','fort-eustis':'futures','fort-leavenworth':'futures',
-  'redstone-arsenal':'materiel','aberdeen-proving-ground':'materiel','detroit-arsenal':'materiel','picatinny-arsenal':'materiel',
-  'usace-hq-washington-dc':'engineers',
-  'wiesbaden':'theater','fort-shafter-schofield-hawaii':'theater','shaw-afb':'theater','fort-gordon':'theater','usasmdc-redstone-huntsville':'theater',
-  'usindopacom-camp-smith':'theater','uscentcom-macdill-afb':'theater','ussouthcom-doral':'theater','useucom-stuttgart':'theater','ussocom-macdill-afb':'theater',
-  'usstratcom-offutt-afb':'theater','usspacecom-peterson-sfb':'theater','usnorthcom-peterson-sfb':'theater','uscybercom-fort-meade':'theater','nsa-css-fort-meade':'theater',
-  'usafricom-stuttgart':'theater','ustranscom-scott-afb':'theater','nsa-georgia-fort-gordon':'theater',
-  'arlington':'hqda','the-pentagon-hqda-cio-g-6':'hqda',
-};
-let _famCache=null;
-function famOf(id){
-  if(!_famCache) _famCache=new Map();
-  if(_famCache.has(id)) return _famCache.get(id);
-  const s0=siteById(id); let key='other';
-  if(s0){
-    if(s0.grp==='guard'||s0.grp==='guardInset') key='guard';
-    else if(s0.grp==='oib') key='oib';
-    else{
-      let cur=s0, below=s0; const seen=new Set([s0.id]);
-      while(cur && cur.parent!=null){ const p=siteById(cur.parent); if(!p||seen.has(p.id)) break; seen.add(p.id); below=cur; cur=p; }
-      key=FAM_ANCHOR[below.id]||FAM_ANCHOR[cur?cur.id:'']||'other';
-    }
-  }
-  _famCache.set(id,key); return key;
+function clsOf(id){
+  const s0=siteById(id); if(!s0) return 'base';
+  if(s0.cls && CLS_META[s0.cls]) return s0.cls;
+  if(s0.grp==='guard'||s0.grp==='guardInset') return 'guard';
+  if(s0.grp==='oib') return 'depot';
+  return 'base';
 }
-try{ window.famOf=famOf; }catch(_){}
+try{ window.clsOf=clsOf; }catch(_){}
 
 // ---- Legend / layer list — swatch · name · count; tap toggles the family ------
 function renderLegend(){
   const el=document.getElementById('legendPanel'); if(!el) return;
   const off=GlobeState._famOff||(GlobeState._famOff=new Set());
-  const counts={}; for(const st of _sitesArr()){ const k=famOf(st.id); counts[k]=(counts[k]||0)+1; }
+  const counts={}; for(const st of _sitesArr()){ const k=clsOf(st.id); counts[k]=(counts[k]||0)+1; }
   let h='<div class="lg-head">Layers</div>';
-  for(const k of Object.keys(FAM_META)){
+  for(const k of Object.keys(CLS_META)){
     if(!counts[k]) continue;
     h+='<button type="button" class="lg-row'+(off.has(k)?' off':'')+'" data-fam="'+k+'">'
-      +'<span class="lg-sw" style="background:rgb('+FAM_META[k].c+')"></span>'
-      +'<span class="lg-nm">'+FAM_META[k].n+'</span><span class="lg-ct">'+counts[k]+'</span></button>';
+      +'<span class="lg-sw" style="background:rgb('+CLS_META[k].c+')"></span>'
+      +'<span class="lg-nm">'+CLS_META[k].n+'</span><span class="lg-ct">'+counts[k]+'</span></button>';
   }
   el.innerHTML=h;
 }
@@ -1814,8 +1843,6 @@ try{ window.renderLegend=renderLegend; }catch(_){}
 if(!window.__lgWired){ window.__lgWired=true;
   document.addEventListener('click', function(e){
     if(!e.target||!e.target.closest) return;
-    const b=e.target.closest('#legendBtn');
-    if(b){ const p=document.getElementById('legendPanel'); if(p){ if(p.hidden) renderLegend(); p.hidden=!p.hidden; } return; }
     const r=e.target.closest('.lg-row');
     if(r){ const k=r.getAttribute('data-fam');
       const off=GlobeState._famOff||(GlobeState._famOff=new Set());
@@ -1976,6 +2003,9 @@ function drawSubtleArcs(ctx, m, arcs, rgb, width, alpha, arrow){
 
 // ---- Arc families under the dots (PORT of drawGlobeLinks) ----------------------
 function drawGlobeLinks(ctx, m){
+  // brief thumbnail = chain dots only (A-ORG-1 law: non-brief link arcs are
+  // skipped entirely in brief — an arc to a culled dot ends on empty sphere)
+  try{ if(document.body.classList.contains('brief-mode')) return; }catch(_){}
   const T=_mTok();
   // Child web first (subtle, thin, static — hints the connection without a bright
   // tangle; the highlighted dots carry the "these belong to this site" meaning).
@@ -1996,8 +2026,8 @@ function _gChromeZones(m){
     const cr=(cv && cv.getBoundingClientRect) ? cv.getBoundingClientRect() : null;
     if(cr && cr.width>0 && cr.height>0){
       const kx=W/cr.width, ky=H/cr.height, live=[], PAD=4;
-      const sels=['#searchPill','#searchResults','#dossier','#stageBar',
-                  '#clockTL','#clockTR','#clockBL','#clockBR','#cmdBar','#toolRail'];
+      const sels=['#searchPill','#searchResults','#dossier','#titleBar',
+                  '#clockTL','#clockTR','#navGlobe'];
       for(const s of sels){
         const el=document.querySelector(s); if(!el) continue;
         const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
@@ -2050,6 +2080,10 @@ function drawGlobeMarkers(ctx, m){
   const zb=Math.min(2.4, 1 + (GlobeState.zoom-1)*0.14);   // dots grow a little as you zoom in
   const rScale=Math.min(2.1, 0.85+zb*0.16);
   const bodyFont=T.body;
+  // BRIEF CULL (v0.6.0, A-ORG-1 L17488 law): in brief mode the globe is a 118px
+  // thumbnail of the CHAIN — only brief-set members draw (empty set → clean sphere).
+  let briefOn=false; try{ briefOn=document.body.classList.contains('brief-mode'); }catch(_){}
+  const bfSet=briefOn ? new Set((typeof BRIEF!=='undefined'&&BRIEF.hqs)||[]) : null;
 
   for(const inst of _sitesArr()){
     if(inst.lat==null||inst.lon==null) continue;
@@ -2061,46 +2095,55 @@ function drawGlobeMarkers(ctx, m){
     const isUp=!!(upSet && upSet.has(inst.id));
     const isDown=!!(downSet && downSet.has(inst.id));
     const onChain=isSel||isUp||isDown;
-    const isGuard=(inst.grp==='guard'||inst.grp==='guardInset');
-    const fam=famOf(inst.id);
-    // v0.2.0 FAMILY FILTER: a toggled-off family vanishes (chain members stay —
-    // the selected picture always outranks the layer list).
-    if(!onChain && GlobeState._famOff && GlobeState._famOff.has(fam)) continue;
-    // v0.2.0 COLOR-BY-FAMILY: the branch hue is the base identity; selection and
-    // lineage overrides keep the one-brain grammar (accent sel/down, amber up).
-    const col = isSel||isDown ? T.accent : (isUp ? T.signal : (FAM_META[fam]||FAM_META.other).c);
-    // v0.2.0 ECHELON SIZE: roots read largest, hubs (sites with subordinates)
-    // next, leaves standard, guard smallest.
-    const isRoot=(inst.parent==null), isHub=!isRoot&&(_kidIdx&&_kidIdx.has(inst.id));
-    const dotR=(isSel?3.6:(onChain?3.0:(isRoot?3.3:(isHub?2.9:(isGuard?2.0:2.4)))))*rScale;
+    const cls=clsOf(inst.id);
+    const isGuard=(cls==='guard');
+    if(bfSet && !bfSet.has(inst.id)) continue;   // brief: chain members only
+    // class filter (legend): chain members stay — the picture outranks the layers
+    if(!onChain && GlobeState._famOff && GlobeState._famOff.has(cls)) continue;
+    // CLUSTERS (A-ORG-1 §3.4, gate 1.6 · 44px grid): at world zoom, ordinary
+    // sites divert into count badges; the badge pass draws after this loop.
+    // (never in brief — badges would bury the 118px thumbnail)
+    if(!briefOn && GlobeState.zoom<1.6 && !onChain){
+      (GlobeState._clu||(GlobeState._clu=[])).push({x:sx, y:sy, lat:inst.lat, lon:inst.lon, c:(CLS_META[cls]||CLS_META.base).c});
+      GlobeState._screen.push({inst, sx, sy, depth:p[2]});
+      continue;
+    }
+    const col=(isSel||isDown) ? T.accent : (isUp ? T.signal : (CLS_META[cls]||CLS_META.base).c);
+    const zb2=Math.min(2.1, 0.85+zb*0.16);
+    const dotR=((isSel?3.6:(onChain?3.0:(cls==='hq'?3.4:(isGuard?2.0:2.5)))))*zb2;
+    const rr=dotR*1.16;
 
-    // selection pulse rings — the ring pair breathes on m2's sel-keyed throttle
-    // (deviation 3: no dirty-marking here).
     if(isSel){
-      const pr=5.0 + Math.sin(tnow*2.4 + sx*0.05)*0.9;
-      ctx.beginPath(); ctx.arc(sx,sy, pr+dotR, 0, Math.PI*2);
-      ctx.strokeStyle='rgba('+T.accent+','+(0.7*fade)+')'; ctx.lineWidth=1.6; ctx.stroke();
-      ctx.beginPath(); ctx.arc(sx,sy, pr+dotR+3, 0, Math.PI*2);
-      ctx.strokeStyle='rgba('+T.accent+','+(0.25*fade)+')'; ctx.lineWidth=1.2; ctx.stroke();
+      // A-ORG-1's breathing diamond + compass spokes — the selected org owns the map
+      const d=7.5+Math.sin(tnow*2.4)*0.8;
+      ctx.save(); ctx.translate(sx,sy); ctx.rotate(Math.PI/4);
+      ctx.strokeStyle='rgba('+T.accent+','+(0.95*fade)+')'; ctx.lineWidth=1.8;
+      ctx.strokeRect(-d,-d,d*2,d*2); ctx.rotate(-Math.PI/4);
+      ctx.beginPath();
+      ctx.moveTo(-d-4,0); ctx.lineTo(-d+1,0); ctx.moveTo(d-1,0); ctx.lineTo(d+4,0);
+      ctx.moveTo(0,-d-4); ctx.lineTo(0,-d+1); ctx.moveTo(0,d-1); ctx.lineTo(0,d+4);
+      ctx.strokeStyle='rgba('+T.accent+','+(0.8*fade)+')'; ctx.lineWidth=1.3; ctx.stroke();
+      ctx.restore();
     }
 
-    // GLASS RETICLE — halo, dark glass interior, thin neon stroke, bright core.
-    // The halo is a low-alpha oversized fill, deliberately NOT ctx.shadowBlur: a real
-    // shadow on ~276 markers costs a blur pass each and drops frames on a phone.
-    const rr=dotR*1.16;                               // stroke shapes read smaller than fills
-    ctx.globalAlpha=(onChain?0.22:0.10)*fade;
-    ctx.fillStyle='rgb('+col+')';
-    ctx.beginPath(); ctx.arc(sx, sy, rr*1.7, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha=fade*(isGuard&&!onChain?0.85:1);
+    // GLASS RETICLE, SHARP (A-ORG-1 recipe, halo deleted per owner: dark interior
+    // disc + one thin ring + bright core; HQ adds one concentric ring; no glow,
+    // no shadowBlur — ~270 markers must hold phone frames).
+    ctx.globalAlpha=fade*(isGuard&&!onChain?0.8:1);
     ctx.beginPath(); ctx.arc(sx, sy, rr, 0, Math.PI*2);
-    ctx.fillStyle='rgba('+T.ground+',0.78)'; ctx.fill();      // dark glass interior
-    ctx.lineWidth=onChain?1.8:1.5; ctx.strokeStyle='rgb('+col+')'; ctx.stroke();   // thin neon frame
+    ctx.fillStyle='rgba(8,7,4,.85)'; ctx.fill();
+    ctx.lineWidth=onChain?1.6:1.25; ctx.strokeStyle='rgb('+col+')'; ctx.stroke();
     ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.9, rr*0.34), 0, Math.PI*2);
-    ctx.fillStyle='rgb('+col+')'; ctx.fill();                 // bright core
+    ctx.fillStyle='rgb('+col+')'; ctx.fill();
+    if(cls==='hq' && !isSel){
+      ctx.lineWidth=1.1; ctx.strokeStyle='rgb('+col+')'; ctx.globalAlpha=0.9*fade;
+      ctx.beginPath(); ctx.arc(sx, sy, rr+2.8, 0, Math.PI*2); ctx.stroke();
+    }
     ctx.globalAlpha=1;
 
     // chain-member labels draw at ANY zoom — the picture is the product (deviation 7).
-    if(onChain && !GlobeState._namesOff){
+    // (not in brief: no legible type at 118px — the dots carry the shape alone)
+    if(onChain && !briefOn && !GlobeState._namesOff){
       const _nm=inst.unit||inst.base||inst.id;
       const _fs=(m.w<560?12:11);
       ctx.save();
@@ -2157,11 +2200,51 @@ function drawGlobeMarkers(ctx, m){
   }
 }
 
+// ---- CLUSTER BADGES (A-ORG-1 §3.4, single-pass port): 44px screen grid,
+// active below zoom 1.6; badge = glass disc + accent ring + halo ring + reticle
+// ticks + count. Tap eases past the gate at the badge's centroid. ------------
+function drawClusters(ctx, m){
+  const T=_mTok();
+  if(GlobeState.zoom>=1.6 || !GlobeState._clu || !GlobeState._clu.length){ GlobeState._cluHits=null; GlobeState._clu=null; return; }
+  const gm=new Map();
+  for(const c of GlobeState._clu){
+    const k=((c.x/44)|0)+':'+((c.y/44)|0);
+    let g=gm.get(k); if(!g){ g={x:0,y:0,la:0,lo:0,n:0}; gm.set(k,g); }
+    g.x+=c.x; g.y+=c.y; g.la+=c.lat; g.lo+=c.lon; g.n++; g.c=c.c;
+  }
+  GlobeState._cluHits=[];
+  ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
+  gm.forEach(function(g){
+    const cx=g.x/g.n, cy=g.y/g.n;
+    if(g.n===1){
+      ctx.beginPath(); ctx.arc(cx,cy,2.2,0,Math.PI*2);
+      ctx.fillStyle='rgb('+(g.c||T.accent)+')'; ctx.globalAlpha=.85; ctx.fill(); ctx.globalAlpha=1;
+      return;
+    }
+    const r=Math.min(15, 7+Math.log2(g.n)*2.6);
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle='rgba(8,7,4,.66)'; ctx.fill();
+    ctx.strokeStyle='rgba('+T.accent+',.85)'; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,r+3.5,0,Math.PI*2);
+    ctx.strokeStyle='rgba('+T.accent+',.28)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx-r-7,cy); ctx.lineTo(cx-r-2,cy); ctx.moveTo(cx+r+2,cy); ctx.lineTo(cx+r+7,cy);
+    ctx.moveTo(cx,cy-r-7); ctx.lineTo(cx,cy-r-2); ctx.moveTo(cx,cy+r+2); ctx.lineTo(cx,cy+r+7);
+    ctx.strokeStyle='rgba('+T.accent+',.5)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba('+T.text+',.95)';
+    ctx.font='700 9px '+T.body;
+    ctx.fillText(String(g.n), cx, cy+0.5);
+    GlobeState._cluHits.push({x:cx, y:cy, r:r+8, lat:g.la/g.n, lon:g.lo/g.n});
+  });
+  ctx.restore(); GlobeState._clu=null;
+}
+
 // ---- m2 hook: links under, markers over (A-ORG-1 drawGlobe order, ~L16798) -----
 function drawMarkersHook(ctx, m){
   _selSyncCheck();
   drawGlobeLinks(ctx, m);
   drawGlobeMarkers(ctx, m);
+  drawClusters(ctx, m);
 }
 
 // ---- Tap hit-test for m3 (PORT of handleGlobeTap's best-dot loop) --------------
@@ -2573,12 +2656,12 @@ function _searchEntries(){
   _srEntries=[];
   for(const s of arr){
     if(!s || s.id==null) continue;
-    const base=String(s.base||s.id), unit=String(s.unit||''), full=String(s.unitFull||''), st=String(s.st||'');
+    const base=String(s.base||s.id), unit=String(s.unit||''), st=String(s.st||'');
     _srEntries.push({
       id:s.id, base:base,
       sub:(unit?unit:'')+((unit&&st)?' · ':'')+st,          // "III Armored Corps · TX"
-      baseF:_srFold(base), unitF:_srFold(unit), fullF:_srFold(full), stF:_srFold(st),
-      allF:_srFold(base+' '+unit+' '+full+' '+st)
+      baseF:_srFold(base), unitF:_srFold(unit), stF:_srFold(st),
+      allF:_srFold(base+' '+unit+' '+st)
     });
   }
   _srSrc=arr;
@@ -2605,7 +2688,6 @@ function sfsResults(q){
     else if(e.unitF && e.unitF===q) s2=50;
     else if(e.unitF && e.unitF.indexOf(q)===0) s2=44;
     else if(e.unitF && tk.test(e.unitF)) s2=38;
-    else if(e.fullF && tk.test(e.fullF)) s2=30;
     else if(e.stF && e.stF===q) s2=26;
     else if(e.stF && tk.test(e.stF)) s2=22;
     else if(e.allF.indexOf(q)>=0) s2=10;
@@ -2623,7 +2705,18 @@ function sfsResults(q){
 // res = {list,total,q} from sfsResults, or null/'' query → dropdown folds shut.
 let _sfsHi=0;   // keyboard highlight over the (at most two) rows — deviation 5
 
+function _srFuse(){
+  const dd=document.getElementById('searchResults');
+  const p=document.getElementById('searchPill');
+  const open=!!(dd && dd.innerHTML);
+  if(dd) dd.classList.toggle('sr-open', open);
+  if(p)  p.classList.toggle('sr-open', open);
+}
 function sfsRender(res){
+  _sfsPaint(res);
+  _srFuse();                                   // pill + results fuse into one surface when open
+}
+function _sfsPaint(res){
   const dd=document.getElementById('searchResults'); if(!dd) return;
   _sfsHi=0;
   if(!res || !res.q || res.q.length<2){ dd.innerHTML=''; return; }
@@ -2644,7 +2737,11 @@ function sfsRender(res){
 }
 
 // ---- THE select (mission contract; deviation 6 — m5 lazy-follows sel) ----------
+// v0.6.0: delegates to the canonical selectSite (s4) so a search pick rides the
+// SAME rails as every other pick — trail crumb, SELECT-clock auto-fill, brief
+// re-render. The inline body below is only the boot-order fallback (s4 absent).
 function searchSelect(id){
+  if(typeof selectSite==='function'){ selectSite(id); return; }
   const s=(typeof siteById==='function') ? siteById(id) : null;
   if(!s) return;
   GlobeState.sel=s.id;
@@ -2886,13 +2983,14 @@ function _odEscA(v){ return String(v).replace(/"/g,'&quot;').replace(/</g,'&lt;'
 // Every selection path lands here: m3 tap → tapAtScreen → selectSite; search rows
 // → searchSelect (sets sel + flies, then the showDossier hook — same net effect,
 // same order); dossier crumb/child rows + ✕ + Clear pill → the delegate below.
-function selectSite(id){
+function selectSite(id, o){
   if(id==null){
     GlobeState.sel=null;
     if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
     // arcs drop NOW (deviation 6); m5's lazy follow re-confirms next frame.
     try{ if(typeof _syncSelArcs==='function') _syncSelArcs(null); }catch(_){}
     try{ _trailClear(); }catch(_){}
+    try{ if(typeof autoFillSelect==='function') autoFillSelect(null); }catch(_){}   // an auto zone dies with its selection
     hideDossier();
     return;
   }
@@ -2901,11 +2999,13 @@ function selectSite(id){
   GlobeState.sel=s.id;
   if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
   const _inBrief=(function(){ try{ return document.body.classList.contains('brief-mode'); }catch(_){ return false; } })();
-  if(!_inBrief && typeof flyToLatLon==='function' && s.lat!=null && s.lon!=null){
+  if(!(o&&o.keepCam) && !_inBrief && typeof flyToLatLon==='function' && s.lat!=null && s.lon!=null){
     // the base-dossier fly (~L15089): never zoom OUT to meet a selection
+    // (keepCam: saved-view recall owns the camera — the fly must not eat it)
     try{ flyToLatLon(s.lat, s.lon, Math.max(GlobeState.zoom||1, 2.6)); }catch(_){}
   }
   try{ _trailPush(s.id); }catch(_){}
+  try{ if(typeof autoFillSelect==='function') autoFillSelect(s); }catch(_){}   // SELECT clock follows the selection (manual pick wins)
   showDossier(s.id);
   if(_inBrief){ try{ renderBrief(); }catch(_){} }
 }
@@ -2914,9 +3014,6 @@ function selectSite(id){
 function setMode(m){
   const brief=(m==='brief');
   document.body.classList.toggle('brief-mode', brief);
-  document.querySelectorAll('#modeSeg .ms-b').forEach(function(b){
-    b.classList.toggle('on', b.getAttribute('data-mode')===(brief?'brief':'map'));
-  });
   if(brief) renderBrief();
   try{                                            // the sheet follows the mode
     const host=document.getElementById('dossier');
@@ -3000,10 +3097,17 @@ try{ window.selectSite=selectSite; }catch(_){}   // mission: expose the brain gl
 
 // ---- m3's tap hook (m3-input deviation 4 boundary — DECLARED HERE) -------------
 function tapAtScreen(x, y){
+  if(GlobeState._navSwallow){ GlobeState._navSwallow=false; return; }   // that tap only closed the nav ring
+  if(document.body && document.body.classList.contains('brief-mode')){
+    try{ setMode('map'); }catch(_){} return;       // the mini globe is the way back
+  }
+  const hits=GlobeState._cluHits;
+  if(hits){ for(const h of hits){ const dx=x-h.x, dy=y-h.y;
+    if(dx*dx+dy*dy<=h.r*h.r){ try{ flyToLatLon(h.lat, h.lon, 2.4); }catch(_){} return; } } }
   const s=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
   if(s && s.id!=null) selectSite(s.id);
   // no-hit: selection survives (A-ORG-1 ~L17929 only hid the tip) — clearing is
-  // a deliberate act (✕ on the card, or the stage bar's Clear pill).
+  // a deliberate act (✕ on the card, or the nav ring's Clear).
 }
 
 // ---- The card (PORT of renderBaseDossier's grammar — render only, no state) ----
@@ -3074,7 +3178,6 @@ function _odRender(s){
 
   // owning unit + its expansion sub-line
   if(s.unit)     h+='<div class="od-unit">'+_odEsc(s.unit)+'</div>';
-  if(s.unitFull) h+='<div class="od-unit-full">'+_odEsc(s.unitFull)+'</div>';
 
   // stats line (bd-stats grammar ~L15087)
   const recN=(typeof recCount==='function')?recCount(s.id):0;
@@ -3104,10 +3207,9 @@ function _odRender(s){
   // (deviations 3-4; gold voice = m5's parent-chain arcs).
   if(chain.length){
     h+='<div class="od-sec od-sec-up">Command line <b>'+chain.length+'</b></div>';
-    let owner=s.parentUnit;                        // the unit at hop 0 that owns THIS site
     for(let i=0;i<chain.length;i++){
       const p=chain[i];
-      const label=owner||p.unit||'';
+      const label=p.unit||'';                      // lightweight law: the hop's own headline unit
       const sub=label+(p.st?((label?' · ':'')+p.st):'');
       h+='<button class="od-crumb" type="button" data-odsel="'+_odEscA(p.id)+'">'
         +'<i class="od-hop">↑</i>'
@@ -3115,7 +3217,6 @@ function _odRender(s){
         +'<span class="od-sp"></span>'
         +(p.parent==null?'<span class="od-crumb-tag">HQ</span>':'')
         +'</button>';
-      owner=p.parentUnit;                          // hop N+1 owns hop N via ITS parentUnit
     }
   }else{
     h+='<div class="od-sec od-sec-up">Command line</div>'
@@ -3254,6 +3355,21 @@ if(!window._odWired){
     if(rc0){ _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
     const rd=e.target.closest('[data-rcdel]');
     if(rd){ const id=GlobeState.sel; if(id){ recRemove(id,_odTab,parseInt(rd.getAttribute('data-rcdel'),10)); _rcForm=null; showDossier(id); } return; }
+    const sc=e.target.closest('[data-svcap]');
+    if(sc){ svCapture(); _svOpenSheet(); return; }
+    const sg=e.target.closest('[data-svgo]');
+    if(sg){ svRecall(parseInt(sg.getAttribute('data-svgo'),10)); return; }
+    const sr=e.target.closest('[data-svrm]');
+    if(sr){ svRemove(parseInt(sr.getAttribute('data-svrm'),10)); return; }
+    const sx=e.target.closest('[data-svclose]');
+    if(sx){ if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
+    const tp=e.target.closest('[data-tzpick]');
+    if(tp){ const r=CLOCK_REGIONS[parseInt(tp.getAttribute('data-tzpick'),10)];
+      if(r) pickZone(r.tz, r.name); _tzOpenSheet(); return; }
+    const tl=e.target.closest('[data-tzclear]');
+    if(tl){ window._setSelZone(null); _tzOpenSheet(); return; }
+    const tx=e.target.closest('[data-tzclose]');
+    if(tx){ if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
     const ba=e.target.closest('[data-bfadd]');
     if(ba){ bfAdd(ba.getAttribute('data-bfadd')); return; }
     const br=e.target.closest('[data-bfrm]');
@@ -3436,6 +3552,23 @@ function _rdbOpen(){
         };
       }catch(_){}
       try{
+        const tv=_rdb.transaction('kv','readonly');
+        const gv=tv.objectStore('kv').get('views');
+        gv.onsuccess=function(){ const v=gv.result&&gv.result.v; if(Array.isArray(v)) SAVEDV=v; };
+      }catch(_){}
+      try{
+        const tzx=_rdb.transaction('kv','readonly');
+        const gz=tzx.objectStore('kv').get('selZone');
+        gz.onsuccess=function(){
+          const v=gz.result&&gz.result.v;
+          // manual picks only ever land here; a zone set before the load finished wins
+          if(v && v.tz && !window._selZone){
+            window._selZone={tz:v.tz, label:v.label};
+            try{ const b=document.getElementById('clockTR'); if(b) b.__k=null; tickClocks(); }catch(_){}
+          }
+        };
+      }catch(_){}
+      try{
         const tk=_rdb.transaction('kv','readonly');
         const gb=tk.objectStore('kv').get('brief');
         gb.onsuccess=function(){
@@ -3473,6 +3606,53 @@ function bfNote(id, text){
   try{ renderBrief(); }catch(_){}
 }
 try{ window.Brief={ add:bfAdd, remove:bfRemove, note:bfNote, has:bfHas, list:function(){ return BRIEF.hqs.slice(); } }; }catch(_){}
+
+// ---- SAVED VIEWS (v0.6.0) — camera + selection + mode, recalled in one tap ----
+let SAVEDV=[];
+function _svSave(){ try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'views', v:SAVEDV}); } }catch(_){} }
+function svCapture(){
+  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
+  SAVEDV.unshift({
+    n: sel ? sel.base : ('View '+(SAVEDV.length+1)),
+    yaw:GlobeState.yaw, pitch:GlobeState.pitch, zoom:GlobeState.zoom,
+    sel:GlobeState.sel, brief:document.body.classList.contains('brief-mode'),
+    ts:Date.now(),
+  });
+  if(SAVEDV.length>24) SAVEDV.pop();
+  _svSave();
+}
+function svRecall(i){
+  const v=SAVEDV[i]; if(!v) return;
+  try{
+    GlobeState.yaw=v.yaw; GlobeState.pitch=v.pitch; GlobeState.zoom=v.zoom;
+    if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ();
+    globeMark();
+  }catch(_){}
+  if(v.sel && siteById(v.sel)) selectSite(v.sel, {keepCam:true}); else selectSite(null);
+  try{ setMode(v.brief?'brief':'map'); }catch(_){}
+}
+function svRemove(i){ SAVEDV.splice(i,1); _svSave(); _svOpenSheet(); }
+function _svOpenSheet(){
+  const host=document.getElementById('dossier'); if(!host) return;
+  _odInjectCSS();
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">Saved views</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-svclose="1" aria-label="Close">✕</button></div>';
+  h+='<button class="rc-add" type="button" data-svcap="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save current view</button>';
+  SAVEDV.forEach(function(v,i){
+    h+='<div class="rc-row">'
+      +'<button class="rc-top sv-go" type="button" data-svgo="'+i+'">'+_odEsc(v.n)+'</button>'
+      +'<span class="rc-sub">'+(v.brief?'brief · ':'')+new Date(v.ts).toLocaleDateString()+'</span>'
+      +'<button class="od-ico rc-dots" type="button" data-svrm="'+i+'" aria-label="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>'
+      +'</div>';
+  });
+  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
+  host.innerHTML=h;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add(_kept==='dz-full'?'dz-full':'dz-half');
+  host.hidden=false;
+}
+try{ window.Views={ capture:svCapture, recall:svRecall, remove:svRemove, list:function(){ return SAVEDV.slice(); }, open:_svOpenSheet }; }catch(_){}
 function recBackup(){
   const out={v:1, app:'A-ORG-2', generated:new Date().toISOString(), records:RECORDS};
   _xpDownload('a-org-2-records-'+_xpStamp()+'.json','application/json',JSON.stringify(out,null,1));
@@ -3513,10 +3693,10 @@ function buildSnapshot(scope){
   if(sel && scope!=='all'){
     rows=[sel].concat(chain, kids);
   } else {
-    rows=_sitesArr().filter(function(st){ return !off.has(famOf(st.id)); });
+    rows=_sitesArr().filter(function(st){ return !off.has(clsOf(st.id)); });
   }
   const seen=new Set(); rows=rows.filter(function(r){ if(!r||seen.has(r.id)) return false; seen.add(r.id); return true; });
-  const famCounts={}; rows.forEach(function(r){ const k=famOf(r.id); famCounts[k]=(famCounts[k]||0)+1; });
+  const famCounts={}; rows.forEach(function(r){ const k=clsOf(r.id); famCounts[k]=(famCounts[k]||0)+1; });
   let img=null;
   try{ const cv=document.getElementById('globeCanvas'); if(cv&&cv.toDataURL) img=cv.toDataURL('image/png'); }catch(_){}
   const cam=(function(){ try{ return {zoom:GlobeState.zoom, yaw:GlobeState.yaw, pitch:GlobeState.pitch}; }catch(_){ return {}; } })();
@@ -3527,10 +3707,10 @@ function buildSnapshot(scope){
            scope: sel&&scope!=='all' ? 'selection-family' : 'all-visible' },
     camera:cam,
     selection: sel ? { id:sel.id, chainUp:chain.map(function(c){return c.id;}), children:kids.map(function(k){return k.id;}) } : null,
-    filters:{ familiesOff:Array.from(off) },
-    families:famCounts,
-    sites:rows.map(function(r){ return { id:r.id, base:r.base, st:r.st, unit:r.unit, unitFull:r.unitFull||null,
-      lat:r.lat, lon:r.lon, grp:r.grp, parent:r.parent, parentUnit:r.parentUnit||null, family:famOf(r.id) }; }),
+    filters:{ classesOff:Array.from(off) },
+    classes:famCounts,
+    sites:rows.map(function(r){ return { id:r.id, base:r.base, st:r.st, unit:r.unit,
+      lat:r.lat, lon:r.lon, grp:r.grp, parent:r.parent, cls:clsOf(r.id) }; }),
     extras:{ brief:(BRIEF.hqs.length?{hqs:BRIEF.hqs.slice(), ann:JSON.parse(JSON.stringify(BRIEF.ann))}:null),
       records:(function(){                     // the datastore rides every export
       const out={}; if(typeof recordOf==='function') rows.forEach(function(r){ const rec=recordOf(r.id); if(rec && recCount(r.id)) out[r.id]=rec; });
@@ -3634,10 +3814,11 @@ function _xpDossierBody(sn){
       h+='</table>';
     }
   }
-  h+='<h2>All sites in scope</h2><table><tr><th>Base</th><th>Unit</th><th>Loc</th><th>Family</th><th>Reports to</th><th>Records</th></tr>';
+  h+='<h2>All sites in scope</h2><table><tr><th>Base</th><th>Unit</th><th>Loc</th><th>Class</th><th>Reports to</th><th>Records</th></tr>';
   sn.sites.forEach(function(r){
     const rc=(sn.extras&&sn.extras.records&&sn.extras.records[r.id])?(sn.extras.records[r.id].people.length+sn.extras.records[r.id].specs.length+sn.extras.records[r.id].notes.length+sn.extras.records[r.id].links.length):0;
-    h+='<tr><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td><td>'+esc(r.family)+'</td><td>'+esc(r.parentUnit||(r.parent?String(r.parent):''))+'</td><td>'+(rc||'')+'</td></tr>';
+    const pU=(function(){ const p=r.parent?siteById(r.parent):null; return p?(p.unit||p.base):''; })();
+    h+='<tr><td>'+esc(r.base)+'</td><td>'+esc(r.unit||'')+'</td><td>'+esc(r.st||'')+'</td><td>'+esc(r.cls)+'</td><td>'+esc(pU)+'</td><td>'+(rc||'')+'</td></tr>';
   });
   h+='</table>';
   return h;
@@ -3700,122 +3881,180 @@ if(!window.__xpWired){ window.__xpWired=true;
 
 /* ══════════ module: s5-clocks ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
-// s5-clocks.js — A-ORG-2 shell: FOUR CORNER ZONE CLOCKS (charter D4: corner clocks
-// only, the time console is retired). #clockTL local · #clockTR Zulu/UTC ·
-// #clockBL Europe/Berlin · #clockBR Asia/Seoul, each a tiny mono HH:MM over its
-// zone label. Repaint happens exactly on minute boundaries (setTimeout armed to
-// the next :00), instantly on visibility/focus wake, and never while the user is
-// typing in an input.
+// s5-clocks.js — A-ORG-2 shell: THE LCD PAIR (v0.6.0 owner directive C: "time in
+// LCD format with ability to select the zone"). Two 7-segment cells on the stage:
+//   #clockTL  LOCAL  — the platform zone, named (EDT/CST…), never an offset.
+//   #clockTR  SELECT — any of 12 theater zones; auto-fills from every selection
+//                      (nearest region to the selected site), manual pick always
+//                      wins. Idle face: ◷ / SELECT. Tap = zone sheet.
 // (PORTED from A-ORG-1 index.html — the source is truth; names kept where ported.)
 //
-// Ported from A-ORG-1 (function/state names kept where the code came across):
-//   militaryTime        (~L14070)  24h "HH:MM" via Intl.DateTimeFormat formatToParts
-//                                  ('en-GB', hour12:false), the '24'→'00' hour fix,
-//                                  padStart, and the '--:--' failure face. Verbatim.
-//   tickClocks + __k    (~L18799)  the clock repaint brain and its per-element
-//                                  write-dedupe: key the rendered string on el.__k
-//                                  and touch innerHTML ONLY when the face changed
-//                                  (a no-op minute costs zero DOM writes).
-//   __tzLbl label law   (~L18829, v12.3 owner)  the LOCAL cell shows the zone's
-//                                  short NAME when the platform has one (EDT/CST…),
-//                                  else the zone's own city — NEVER a Zulu/UTC
-//                                  offset. Cached once on window.__tzLbl.
-//   __lastMin latch     (~L22216)  minute-boundary refresh: repaint only when
-//                                  getMinutes() rolled over; the latch is set even
-//                                  when the paint is skipped (typing), so a skipped
-//                                  minute stays skipped until the NEXT boundary.
-//   typing guard        (~L22220)  ae=document.activeElement; tagName INPUT or
-//                                  TEXTAREA → skip the repaint. Verbatim.
-//   wake idiom + __visT (~L22186)  visibilitychange(!hidden)/focus → reset
-//                                  __lastMin=-1 and repaint IMMEDIATELY (throttled
-//                                  background tabs snap current the moment you
-//                                  return); __visT is the wiring once-guard. The
-//                                  source wake bypasses the typing guard (it only
-//                                  ever protected panels that CONTAINED inputs);
-//                                  kept — these chips hold no inputs.
-//   time-over-label     (~L5160 .stage-clock .bar-time, ~L4293 .bt-t/.bt-z)  the
-//                                  stage-corner clock grammar: digits stacked over
-//                                  a micro uppercase zone label → .ck-t/.ck-z.
-//   boot idiom          (~L23544)  addEventListener('load', setTimeout(try{}catch))
-//                                  + once-guard (s3-search _srBooted precedent).
+// Ported from A-ORG-1 (consult report 1 recovered the seg7 geometry from
+// ada3f5d~1 — HEAD lost .sg-a…g to the v22.27.1 dead-code purge):
+//   SEG7_MAP/seg7Digit/seg7HTML (~L13380/18599)  the font-free digit: 12×21px box,
+//                                  seven clip-path bars, lit = accent + 4px glow.
+//   civilianTime         (~L18780)  12h "hh:mm"+AM/PM via formatToParts, leading-
+//                                  zero hours (LCD digits always 2+2), '--:--' face.
+//   _selZone/_setSelZone (~L13366)  SELECT state {tz,label,auto} + repaint kick.
+//   CLOCK_REGIONS + nearest-region auto-fill (v18.3, ~L22576)  the 12 anchors and
+//                                  the dateline-safe dlon wrap; manual > auto;
+//                                  clearing the selection clears an auto zone.
+//   tickClocks + __k     (~L18799)  per-element write-dedupe: innerHTML only when
+//                                  the face key changed (minute boundaries).
+//   __tzLbl label law    (~L18829, v12.3 owner)  zone NAME or nothing on LOCAL.
+//   cell grammar         (~L4290 .bar-time)  digits row (.bt-t) + AM/PM chip
+//                                  (.bt-ap, wears the LCD's own light — v8.1.2)
+//                                  over a tracked uppercase zone line (.bt-z).
 //
-// NEW (A-ORG-2 contracts, no direct A-ORG-1 counterpart):
-//   CLOCK_ZONES          the four fixed corner cells (mission contract). A-ORG-1's
-//                        corners were LOCAL + a selection-driven SELECT cell backed
-//                        by CLOCK_REGIONS; D4 fixes them to local/Zulu/Berlin/Seoul.
-//   initClocks()         shell boot hook: resolve local tz + label, inject CSS,
-//                        first paint, arm the boundary timer, wire wake. Self-arms
-//                        on 'load' (once-guarded) like every s-module.
-//   _ckArm()/_ckBeat()   the setTimeout-to-boundary pair (see deviation 1).
-//
-// DEVIATIONS (everything changed vs. A-ORG-1, and why):
-//   1. setTimeout-TO-BOUNDARY replaces the source's 1s __secT interval (mission
-//      contract). A-ORG-1 ticked every second because seconds were on display
-//      (.ts-ss); these faces show minutes only, so the timer sleeps until the next
-//      wall-clock :00 (60000 − Date.now()%60000, +40ms landing guard) and re-arms
-//      after each beat. The ported __lastMin latch makes an early fire a no-op and
-//      the fresh re-arm computes the corrected remainder — self-healing drift.
-//   2. Plain tabular HH:MM text instead of seg7HTML LCD markup — the seg7 engine
-//      is not ported to A-ORG-2 and tiny glass chips want plain mono digits.
-//   3. esc() renamed _ckEsc (single-script concat law: s3 already renamed its copy
-//      _srEsc; duplicate top-level declarations would silently override).
-//   4. The LOCAL label falls back to the literal 'LOCAL' when __tzLbl computes
-//      empty (the source banner just omitted the label; a corner chip with no
-//      label would read as a mystery number).
-//   5. tickClocks walks the fixed 4-cell table, not the source's [data-tz] scan +
-//      barLocal/barTimeSel/tbLive branches — those surfaces are retired (D4).
-//   6. No GlobeState.dirty anywhere — clocks are DOM chrome, not canvas; the
-//      render loop is never touched (doctrine).
+// DEVIATIONS (vs. A-ORG-1, and why):
+//   1. setTimeout-TO-BOUNDARY kept from the v0.1.0 module (no seconds on display;
+//      the timer sleeps to the next :00). _setSelZone repaints instantly by
+//      nulling the cell's __k and calling tickClocks directly.
+//   2. Zone state persists in the kv store ('selZone', manual picks only) — the
+//      boot law bans localStorage reads; auto zones never survive boot anyway
+//      (no selection justifies them). _rdbOpen loads it post-paint.
+//   3. The zone sheet rides the dossier host (the _svOpenSheet precedent) — no
+//      new surface, same grip/detent/close grammar. Rows: LOCAL-clear + 12
+//      regions with live faces; tapping the pinned row clears (source toggle).
+//   4. seg7 scale rides CSS zoom on .seg7 (the A-ORG-1 scaling law): .92 phone,
+//      1.05 desktop.
 //
 // Exports (top-level — the final assembly concatenates into ONE <script>):
-//   CLOCK_ZONES, militaryTime, tickClocks, initClocks,
-//   _ckArm, _ckBeat, _ckWake, _ckEsc, _ckInjectCSS
-//   window state: __lastMin (boundary latch) · __ckT (armed timeout) ·
-//                 __visT (wake wiring once-guard) · __tzLbl (local label cache)
+//   SEG7_MAP, seg7Digit, seg7HTML, civilianTime, CLOCK_REGIONS,
+//   nearRegion, autoFillSelect, pickZone, tickClocks, initClocks, _tzOpenSheet,
+//   _ckArm, _ckBeat, _ckWake, _ckEsc, _ckInjectCSS, _selSave
+//   window state: _selZone (SELECT zone) · __lastMin · __ckT · __visT · __tzLbl
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// ---- The four corner cells (mission contract: TL local · TR Zulu · BL Berlin ·
-//      BR Seoul). TL's tz stays undefined until initClocks resolves it — an
-//      undefined timeZone means "platform local" to Intl, so even a failed
-//      resolve renders the right time under the fallback label. ----------------
-const CLOCK_ZONES = [
-  { id:'clockTL', tz:undefined,        label:'LOCAL'  },
-  { id:'clockTR', tz:'UTC',            label:'ZULU'   },
-  { id:'clockBL', tz:'Europe/Berlin',  label:'BERLIN' },
-  { id:'clockBR', tz:'Asia/Seoul',     label:'SEOUL'  },
-];
-
-// Current military (24h) time string "HHMM" for an IANA zone.
-// (PORTED verbatim ~L14070 — including the '24'→'00' fix and the failure faces.)
-function militaryTime(tz, date, colon){
-  date = date || new Date();
-  try{
-    const f=new Intl.DateTimeFormat('en-GB',{timeZone:tz, hour:'2-digit', minute:'2-digit', hour12:false});
-    const parts=f.formatToParts(date); let hh='00',mm='00';
-    parts.forEach(p=>{ if(p.type==='hour')hh=p.value; if(p.type==='minute')mm=p.value; });
-    if(hh==='24') hh='00';
-    hh=hh.padStart(2,'0'); mm=mm.padStart(2,'0');
-    return colon ? hh+':'+mm : hh+mm;
-  }catch(e){ return colon?'--:--':'----'; }
+// ---- seg7 engine (PORTED verbatim; geometry from ada3f5d~1 L982-988) ----------
+const SEG7_MAP={'0':'abcdef','1':'bc','2':'abged','3':'abgcd','4':'fgbc','5':'afgcd','6':'afgedc','7':'abc','8':'abcdefg','9':'abcfgd','-':'g',' ':''};
+function seg7Digit(ch){
+  const on=SEG7_MAP[ch]!==undefined?SEG7_MAP[ch]:'';
+  let s='<span class="seg7-d">';
+  ['a','b','c','d','e','f','g'].forEach(function(g){ s+='<i class="sg sg-'+g+(on.indexOf(g)>=0?' on':'')+'"></i>'; });
+  return s+'</span>';
+}
+function seg7HTML(str){
+  let s='<span class="seg7">';
+  for(const ch of String(str)) s+= ch===':' ? '<span class="seg7-colon"><i></i><i></i></span>' : seg7Digit(ch);
+  return s+'</span>';
 }
 
-// text-body escape (A-ORG-1 esc ~L14030, renamed — deviation 3)
+// 12h civilian face for an IANA zone (PORTED ~L18780: leading-zero hours — the
+// LCD always shows 2+2 digits; '--:--' failure face maps to segment g / blank).
+function civilianTime(tz, d){
+  d=d||new Date();
+  try{
+    const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'numeric',minute:'2-digit',hour12:true}).formatToParts(d);
+    let hh='12',mm='00',ap='AM';
+    p.forEach(function(x){ if(x.type==='hour')hh=x.value; if(x.type==='minute')mm=x.value; if(x.type==='dayPeriod')ap=x.value.toUpperCase(); });
+    return {time:hh.padStart(2,'0')+':'+mm, ap:ap};
+  }catch(_){ return {time:'--:--', ap:''}; }
+}
+
+// text-body escape (A-ORG-1 esc ~L14030, renamed — s3 precedent)
 function _ckEsc(v){ return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ---- SELECT zone vocabulary (PORTED v18.3 ~L13729: 12 theater anchors) --------
+const CLOCK_REGIONS=[
+  {name:'Hawaii',     tz:'Pacific/Honolulu',    ll:[21.3,-157.9]},
+  {name:'Alaska',     tz:'America/Anchorage',   ll:[61.2,-149.9]},
+  {name:'US Pacific', tz:'America/Los_Angeles', ll:[47.1,-122.6]},
+  {name:'US Mountain',tz:'America/Denver',      ll:[38.8,-104.8]},
+  {name:'US Central', tz:'America/Chicago',     ll:[31.1,-97.8]},
+  {name:'US Eastern', tz:'America/New_York',    ll:[35.1,-79.0]},
+  {name:'CET',        tz:'Europe/Berlin',       ll:[50.1,8.2]},
+  {name:'E. Europe',  tz:'Europe/Warsaw',       ll:[52.2,21.0]},
+  {name:'SW Asia',    tz:'Asia/Kuwait',         ll:[29.3,48.0]},
+  {name:'Korea',      tz:'Asia/Seoul',          ll:[37.5,127.0]},
+  {name:'Japan',      tz:'Asia/Tokyo',          ll:[35.5,139.4]},
+  {name:'Guam',       tz:'Pacific/Guam',        ll:[13.5,144.8]},
+];
+window._selZone=null;                 // {tz,label,auto?} | null — kv-loaded post-paint
+
+// persist MANUAL picks only ('selZone' in kv — deviation 2); auto zones are
+// session-scoped by law (a persisted auto zone would outlive its selection).
+function _selSave(){
+  try{
+    if(!_rdb) return;
+    const tx=_rdb.transaction('kv','readwrite');
+    const z=window._selZone;
+    if(z && !z.auto) tx.objectStore('kv').put({k:'selZone', v:{tz:z.tz, label:z.label}});
+    else tx.objectStore('kv').delete('selZone');
+  }catch(_){}
+}
+window._setSelZone=function(z, o){
+  window._selZone=z||null;
+  // auto-fill traffic never touches storage (o.ephemeral) — otherwise a pre-kv-load
+  // auto pass could delete a persisted manual pick before the load restores it
+  if(!(o&&o.ephemeral)) _selSave();
+  try{ const b=document.getElementById('clockTR'); if(b) b.__k=null; }catch(_){}
+  try{ tickClocks(); }catch(_){}
+};
+
+// nearest theater region (PORTED exact: dlon wrapped ±180, lon scaled by
+// cos(mean lat) — dateline-safe; min squared-degrees wins)
+function nearRegion(lat, lon){
+  let best=null, bs=1e9;
+  CLOCK_REGIONS.forEach(function(r){
+    const dlat=lat-r.ll[0], dlon=((lon-r.ll[1]+540)%360)-180;
+    const s=dlat*dlat + Math.pow(dlon*Math.cos(((lat+r.ll[0])/2)*Math.PI/180), 2);
+    if(s<bs){ bs=s; best=r; }
+  });
+  return best;
+}
+
+// called from every selection: manual pick wins (early return); clearing the
+// selection clears an auto zone (PORTED precedence law)
+function autoFillSelect(site){
+  if(window._selZone && !window._selZone.auto) return;
+  if(!site || site.lat==null){ if(window._selZone && window._selZone.auto) window._setSelZone(null, {ephemeral:true}); return; }
+  const r=nearRegion(site.lat, site.lon);
+  if(r) window._setSelZone({tz:r.tz, label:r.name.toUpperCase().slice(0,12), auto:true}, {ephemeral:true});
+}
+
+// manual pick (zone sheet row): toggle-off on repeat — but tapping the row an
+// AUTO zone currently shows PINS it manual (the natural gesture is "keep this")
+function pickZone(tz, label){
+  const cur=window._selZone;
+  if(cur && cur.tz===tz && !cur.auto) window._setSelZone(null);
+  else window._setSelZone({tz:tz, label:String(label).toUpperCase().slice(0,12)});
+}
+
 // ---- The repaint brain (PORTED name + __k write-dedupe ~L18799) ---------------
-// One Date() per beat feeds all four faces; a cell whose rendered string did not
-// change costs nothing (el.__k key check — the source's exact idiom).
+// One Date() feeds both faces; a cell whose key did not change costs nothing.
 function tickClocks(){
   const now=new Date();
-  for(let i=0;i<CLOCK_ZONES.length;i++){
-    const z=CLOCK_ZONES[i];
-    const el=document.getElementById(z.id); if(!el) continue;
-    const t=militaryTime(z.tz, now, true);
-    const key=t+'|'+z.label;
-    if(el.__k!==key){ el.__k=key;
-      el.innerHTML='<span class="ck-t">'+t+'</span><span class="ck-z">'+_ckEsc(z.label)+'</span>';
+  try{
+    const el=document.getElementById('clockTL');
+    if(el){
+      const c=civilianTime(undefined, now);          // undefined tz = platform local
+      const lbl=window.__tzLbl||'LOCAL';
+      const key=c.time+'|'+c.ap+'|'+lbl;
+      if(el.__k!==key){ el.__k=key;
+        el.innerHTML='<span class="bt-t">'+seg7HTML(c.time)
+          +(c.ap?'<span class="bt-ap">'+c.ap+'</span>':'')
+          +'</span><span class="bt-z">'+_ckEsc(lbl)+'</span>';
+      }
     }
-  }
+  }catch(_){}
+  try{
+    const bs=document.getElementById('clockTR');
+    if(bs){
+      const z=window._selZone;
+      if(z && z.tz){
+        const c=civilianTime(z.tz, now);
+        const key=c.time+'|'+c.ap+'|'+z.tz+'|'+z.label;
+        if(bs.__k!==key){ bs.__k=key;
+          bs.innerHTML='<span class="bt-t">'+seg7HTML(c.time)
+            +(c.ap?'<span class="bt-ap">'+c.ap+'</span>':'')
+            +'</span><span class="bt-z">'+_ckEsc(z.label)+'</span>';
+        }
+      } else if(bs.__k!=='idle'){ bs.__k='idle';
+        bs.innerHTML='<span class="bt-t bt-idle">◷</span><span class="bt-z">SELECT</span>';
+      }
+    }
+  }catch(_){}
 }
 
 // ---- Minute-boundary beat (latch + typing guard PORTED ~L22216-22225) ---------
@@ -3833,22 +4072,45 @@ function _ckBeat(){
   _ckArm();
 }
 
-// setTimeout-to-boundary (deviation 1): sleep until just past the next :00.
-// +40ms landing guard — timers can fire a few ms early; landing past the boundary
-// guarantees getMinutes() has rolled over (and if one still lands early, the
-// __lastMin latch no-ops it and the re-arm computes the tiny corrected remainder).
+// setTimeout-to-boundary: sleep until just past the next :00 (+40ms landing
+// guard; an early fire no-ops on the latch and the re-arm self-corrects).
 function _ckArm(){
   try{ clearTimeout(window.__ckT); }catch(_){}
   window.__ckT=setTimeout(_ckBeat, 60000-(Date.now()%60000)+40);
 }
 
 // ---- Wake (PORTED ~L22186): throttled background tabs snap current on return.
-// Resets the latch, repaints immediately (source wake bypasses the typing guard —
-// these chips contain no inputs, so a repaint can never eat a keystroke), and
-// re-arms: a hidden tab's timer can be minutes late, so re-anchor to the clock.
 function _ckWake(){
   try{ window.__lastMin=-1; tickClocks(); }catch(_){}
   _ckArm();
+}
+
+// ---- Zone sheet (deviation 3: rides the dossier host, _svOpenSheet grammar).
+// Rows: LOCAL/clear on top, then the 12 regions with live faces; the pinned
+// row wears the accent. Delegate rungs live in the s4 one-delegate.
+function _tzOpenSheet(){
+  const host=document.getElementById('dossier'); if(!host) return;
+  _odInjectCSS();
+  const now=new Date();
+  const cur=window._selZone;
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">Time zones</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-tzclose="1" aria-label="Close">✕</button></div>';
+  h+='<div class="rc-row tz-row"><button class="rc-top'+(!cur?' tz-on':'')+'" type="button" data-tzclear="1">'
+    +'Local'+ (window.__tzLbl?' · '+_ckEsc(window.__tzLbl):'')
+    +'<span class="tz-hh">'+_ckEsc((function(){ const c=civilianTime(undefined,now); return c.time+' '+c.ap; })())+'</span></button></div>';
+  CLOCK_REGIONS.forEach(function(r,i){
+    const c=civilianTime(r.tz, now);
+    const on=cur && cur.tz===r.tz;
+    h+='<div class="rc-row tz-row"><button class="rc-top'+(on?' tz-on':'')+'" type="button" data-tzpick="'+i+'">'
+      +_ckEsc(r.name)+(on&&cur.auto?' · auto':'')
+      +'<span class="tz-hh">'+_ckEsc(c.time+' '+c.ap)+'</span></button></div>';
+  });
+  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
+  host.innerHTML=h;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add(_kept==='dz-full'?'dz-full':'dz-half');
+  host.hidden=false;
 }
 
 // ---- Boot (A-ORG-1 load+setTimeout idiom ~L23544; s3 _srBooted once-guard) ----
@@ -3857,23 +4119,25 @@ let _ckBooted=false;
 function initClocks(){
   if(_ckBooted) return;
   _ckBooted=true;
-  // LOCAL cell: resolve the platform zone + the v12.3 label law (~L18829) —
-  // the zone's short NAME (EDT/CST…) else its city; NEVER a Zulu/UTC offset.
+  // LOCAL label: the v12.3 law (~L18829) — the zone's short NAME (EDT/CST…)
+  // else its city; NEVER a Zulu/UTC offset.
   try{
-    const ltz=Intl.DateTimeFormat().resolvedOptions().timeZone;
-    CLOCK_ZONES[0].tz=ltz;
     if(window.__tzLbl===undefined){
+      const ltz=Intl.DateTimeFormat().resolvedOptions().timeZone;
       let z=''; try{ z=(new Intl.DateTimeFormat([], {timeZoneName:'short'}).formatToParts(new Date()).find(function(p){ return p.type==='timeZoneName'; })||{}).value||''; }catch(_){}
       if(!z || /GMT|UTC/i.test(z)) z=(String(ltz).split('/').pop()||'').replace(/_/g,' ');
       if(/GMT|UTC|^Etc\b/i.test(z)) z='';   // a zone NAME or nothing — never an offset marker
       window.__tzLbl=z;
     }
-    if(window.__tzLbl) CLOCK_ZONES[0].label=window.__tzLbl;   // empty → 'LOCAL' (deviation 4)
   }catch(_){}
   _ckInjectCSS();
   window.__lastMin=new Date().getMinutes();   // first paint owns the current minute
   tickClocks();
   _ckArm();
+  try{
+    const b=document.getElementById('clockTR');
+    if(b && !b.__tzWired){ b.__tzWired=1; b.addEventListener('click', function(){ try{ _tzOpenSheet(); }catch(_){} }); }
+  }catch(_){}
   try{ if(!window.__visT){ window.__visT=1;
     document.addEventListener('visibilitychange', function(){ if(!document.hidden) _ckWake(); });
     window.addEventListener('focus', _ckWake);
@@ -3882,24 +4146,39 @@ function initClocks(){
 
 addEventListener('load', function(){ setTimeout(function(){ try{ initClocks(); }catch(_){} }, 0); });
 
-// ---- CSS (construction-phase injection, s3 precedent; tokens only; phone-first;
-//      grammar ported from .stage-clock .bar-time ~L5160 + .bt-t/.bt-z ~L4293).
-//      .clock stays a CLASS selector so s1's .clock:empty{display:none} law still
-//      out-specifies it — pre-boot empty chips show no dead chrome. No fixed
-//      positioning, no transforms — the chips sit where s1-tokens.css put them. --
+// ---- CSS (construction-phase injection, s3 precedent; tokens only; the exact
+//      A-ORG-1 seg7 geometry — keep .sg-a…g greppable-literal: A-ORG-1 lost them
+//      to a dead-code purge that could not see 'sg-'+g. Scale rides CSS zoom on
+//      .seg7 (the scaling law), never font-size. .clock static rules (position,
+//      glass) still apply; this layer re-voices the interior for the LCD pair. --
 function _ckInjectCSS(){
   if(document.getElementById('s5ClockCSS')) return;      // the final-assembly no-op guard
   const st=document.createElement('style'); st.id='s5ClockCSS';
   st.textContent=
-    '.clock{display:flex;flex-direction:column;align-items:center;gap:3px}'+
-    /* tiny mono digits — brighter than the chip's dim base so time reads first */
-    '.ck-t{font:700 12px/1 var(--mono,ui-monospace,Menlo,monospace);'+
-      'font-variant-numeric:tabular-nums;letter-spacing:.06em;color:var(--text,#e7edf2)}'+
-    /* micro zone label — the .bt-z voice: uppercase, tracked wide, faint */
-    '.ck-z{font:700 7.5px/1 var(--mono,ui-monospace,Menlo,monospace);'+
-      'letter-spacing:.16em;color:var(--faint,#5c6b76)}'+
-    /* desktop layer ONLY — a touch more presence in the true corners */
-    '@media(min-width:1100px){.ck-t{font-size:13px}.ck-z{font-size:8px}}';
+    '.clock{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 13px}'+
+    '.bt-t{display:inline-flex;align-items:center;gap:2px;font:800 22px/1 var(--body);color:var(--accent)}'+ /* font sizes only the idle ◷ glyph */
+    '.bt-ap{font:800 9.5px var(--body);letter-spacing:.04em;color:var(--accent);'+
+      'text-shadow:0 0 4px rgba(var(--accent-rgb),.6);margin-left:2px}'+
+    '.bt-z{font:800 9px/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}'+
+    /* ── seg7 engine — 12×21px digits, seven clip-path bars, no font ── */
+    '.seg7{display:inline-flex;align-items:center;gap:3px;zoom:.92}'+
+    '.seg7-d{position:relative;display:inline-block;width:12px;height:21px;vertical-align:middle}'+
+    '.seg7-d .sg{position:absolute;display:block;background:transparent}'+   /* unlit = nothing (v4.8.1 law) */
+    '.seg7-d .sg.on{background:var(--accent);box-shadow:0 0 4px rgba(var(--accent-rgb),.6)}'+
+    '.sg-a{top:0;left:1.6px;right:1.6px;height:2.4px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}'+
+    '.sg-g{top:9.3px;left:1.6px;right:1.6px;height:2.4px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}'+
+    '.sg-d{bottom:0;left:1.6px;right:1.6px;height:2.4px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}'+
+    '.sg-f{top:1.6px;left:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
+    '.sg-b{top:1.6px;right:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
+    '.sg-e{bottom:1.6px;left:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
+    '.sg-c{bottom:1.6px;right:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
+    '.seg7-colon{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;height:21px;padding:0 1px}'+
+    '.seg7-colon i{width:2.6px;height:2.6px;border-radius:1px;background:var(--accent);box-shadow:0 0 4px rgba(var(--accent-rgb),.6)}'+
+    /* zone sheet rows: name left, live face right; pinned wears the accent */
+    '.tz-row .rc-top{display:flex;align-items:center;gap:8px;flex:1;max-width:none;min-height:44px}'+
+    '.tz-hh{margin-left:auto;font:700 11px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:.06em;color:var(--dim)}'+
+    '.tz-on{color:var(--accent)}.tz-on .tz-hh{color:var(--accent)}'+
+    '@media(min-width:1100px){.seg7{zoom:1.05}}';
   document.head.appendChild(st);
 }
 
@@ -3936,43 +4215,106 @@ function bootShell(){
     try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
   });
 
-  // DOCK 2 wiring — zoom (tap steps, hold repeats), FRAME (fit family when
-  // selected, home view when not: Reset and Fit are ONE control by law), puck.
+  // NAV GLOBE (v0.6.0) — tap opens the hidden ring; hold 3s flips the room.
+  // Consult hardening: window-level up/cancel (a drag off the button still ends
+  // the press), pointer-id guard, outside-press swallow (closing the ring never
+  // selects through it), Escape closes. No pointer capture (reliability law).
   try{
-    if(typeof _wireZoomHold==='function'){
-      _wireZoomHold(document.getElementById('zoomInBtn'), 1.35);
-      _wireZoomHold(document.getElementById('zoomOutBtn'), 1/1.35);
+    var ng=document.getElementById('navGlobe');
+    var _nvOpen=false, _nvHold=null, _nvT0=0, _nvX=0, _nvY=0, _nvFired=false, _nvRAF=null, _nvId=null;
+    var _ring=document.querySelector('#nvRing circle');
+    var _ringLen=2*Math.PI*33;
+    var _nvRingReset=function(){ if(_ring) _ring.style.strokeDashoffset=_ringLen; };
+    if(_ring){ _ring.style.strokeDasharray=_ringLen; _nvRingReset(); }
+    window._nvSet=function(open){
+      _nvOpen=open;
+      document.body.classList.toggle('nav-open', open);
+      try{ ng.setAttribute('aria-expanded', open?'true':'false'); }catch(_){}
+      var bk=document.getElementById('navSat-back');
+      if(bk) bk.disabled=((GlobeState._trail||[]).length<2);
+      var cl=document.getElementById('navSat-clear');
+      if(cl) cl.disabled=(GlobeState.sel==null);
+    };
+    var _holdTick=function(){
+      if(!_nvHold) return;
+      var p=Math.min(1,(performance.now()-_nvT0)/3000);
+      if(_ring) _ring.style.strokeDashoffset=String(_ringLen*(1-p));
+      if(p>=1){
+        _nvHold=null; _nvFired=true; _nvRingReset();
+        try{ setMode(document.body.classList.contains('brief-mode')?'map':'brief'); }catch(_){}
+        try{ window._nvSet(false); }catch(_){}   // the ring never survives a mode flip
+        try{ navigator.vibrate&&navigator.vibrate(30); }catch(_){}
+        return;
+      }
+      _nvRAF=requestAnimationFrame(_holdTick);
+    };
+    if(ng){
+      ng.addEventListener('pointerdown', function(e){
+        _nvFired=false; _nvId=e.pointerId; _nvT0=performance.now(); _nvX=e.clientX; _nvY=e.clientY;
+        _nvHold=true; _nvRAF=requestAnimationFrame(_holdTick);
+      });
+      window.addEventListener('pointermove', function(e){
+        if(_nvHold && e.pointerId===_nvId && Math.hypot(e.clientX-_nvX, e.clientY-_nvY)>12){
+          _nvHold=null; cancelAnimationFrame(_nvRAF); _nvRingReset();
+        }
+      });
+      var _nvEnd=function(e){
+        if(e.pointerId!==_nvId) return;
+        var held=_nvHold; _nvHold=null; _nvId=null;
+        cancelAnimationFrame(_nvRAF); _nvRingReset();
+        if(_nvFired){ _nvFired=false; return; }          // the 3s flip consumed this press
+        if(held && e.type==='pointerup') _nvSet(!_nvOpen);   // short press = toggle the ring
+      };
+      window.addEventListener('pointerup', _nvEnd);
+      window.addEventListener('pointercancel', _nvEnd);
+      ng.addEventListener('click', function(e){ e.preventDefault(); });   // pointerup owns it
     }
-  }catch(_){}
-  try{
-    var fb=document.getElementById('railFrame');
-    if(fb) fb.addEventListener('click', function(){
-      try{
-        if(GlobeState.sel && typeof fitGlobeToSites==='function'){
-          var fam=[GlobeState.sel];
-          if(typeof parentChainOf==='function') fam=fam.concat(parentChainOf(GlobeState.sel));
-          if(typeof childrenOf==='function') fam=fam.concat(childrenOf(GlobeState.sel));
-          fitGlobeToSites(fam);
-        } else if(typeof resetGlobeView==='function') resetGlobeView();
-      }catch(_){}
+    // outside press: close the ring AND swallow that tap before the canvas turns
+    // it into a selection (capture phase beats m3's pointerdown; tapAtScreen
+    // consumes the flag; window pointerup clears it so a swallowed DRAG never
+    // poisons the next gesture).
+    document.addEventListener('pointerdown', function(e){
+      if(_nvOpen && e.target && e.target.closest && !e.target.closest('#navDock')){
+        _nvSet(false); GlobeState._navSwallow=true;
+      }
+    }, true);
+    window.addEventListener('pointerup', function(){ setTimeout(function(){ GlobeState._navSwallow=false; },0); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && _nvOpen) _nvSet(false); });
+    document.addEventListener('keydown', function(e){
+      var ae=document.activeElement;
+      var typing=!!(ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable));
+      var k=(e.key==='k'||e.key==='K') && (e.metaKey||e.ctrlKey);
+      var slash=e.key==='/' && !e.metaKey && !e.ctrlKey && !e.altKey && !typing;
+      if(!k && !slash) return;
+      var si=document.getElementById('searchInput');
+      if(si){ si.focus(); try{ si.select(); }catch(_){} e.preventDefault(); }
     });
-  }catch(_){}
-  try{
-    var pk=document.getElementById('railPuck');
-    if(pk) pk.addEventListener('click', function(){ document.body.classList.toggle('rail-min'); });
+    document.addEventListener('click', function(e){
+      if(!e.target||!e.target.closest) return;
+      if(e.target.closest('#navSat-home')){ _nvSet(false);
+        try{
+          if(GlobeState.sel && typeof fitGlobeToSites==='function'){
+            var fam=[GlobeState.sel].concat(parentChainOf(GlobeState.sel)).concat(childrenOf(GlobeState.sel));
+            fitGlobeToSites(fam);
+          } else resetGlobeView();
+        }catch(_){} return; }
+      if(e.target.closest('#navSat-back')){ _nvSet(false);
+        try{
+          var t=GlobeState._trail||[];
+          if(t.length>1){ t.pop(); var prev=t.pop(); if(prev!=null) selectSite(prev); }
+        }catch(_){} return; }
+      if(e.target.closest('#navSat-clear')){ _nvSet(false); try{ selectSite(null); }catch(_){} return; }
+      if(e.target.closest('#navSat-saved')){ _nvSet(false); try{ _svOpenSheet(); }catch(_){} return; }
+    });
   }catch(_){}
 
-  // DOCK 1 wiring — MAP⇄BRIEF seg + the ⋯ menu (version + diagnostics live here).
-  try{
-    document.querySelectorAll('#modeSeg .ms-b').forEach(function(b){
-      b.addEventListener('click', function(){ try{ setMode(b.getAttribute('data-mode')); }catch(_){} });
-    });
-  }catch(_){}
+  // ⋯ MENU (version · layers · records backup/restore · diagnostics).
   try{
     window._renderAppMenu=function(){
       var m=document.getElementById('appMenu'); if(!m) return;
       var _rn=0; try{ for(var k in RECORDS) _rn+=recCount(k); }catch(_){}
       m.innerHTML='<div class="am-row am-ver">A-ORG-2 '+APP_VERSION+' · '+APP_UPDATED+'</div>'
+        +'<button class="am-row" type="button" data-am="layers">Layers</button>'
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
         +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
@@ -3988,6 +4330,10 @@ function bootShell(){
       if(!e.target||!e.target.closest) return;
       var d=e.target.closest('[data-am="diag"]');
       if(d){ try{ window._diagDump&&_diagDump(); }catch(_){} var m=document.getElementById('appMenu'); if(m) m.hidden=true; return; }
+      var ly=e.target.closest('[data-am="layers"]');
+      if(ly){ var mL=document.getElementById('appMenu'); if(mL) mL.hidden=true;
+        var p=document.getElementById('legendPanel');
+        if(p){ if(p.hidden) renderLegend(); p.hidden=!p.hidden; } return; }
       var bk=e.target.closest('[data-am="backup"]');
       if(bk){ try{ recBackup(); }catch(_){} var m2=document.getElementById('appMenu'); if(m2) m2.hidden=true; return; }
       var rst=e.target.closest('[data-am="restore"]');

@@ -16,7 +16,7 @@ globalThis._parentMap=null;
 globalThis._buildParentMap=function(){ _parentMap=new Map(); (function w(n){ (n.children||[]).forEach(c=>{ _parentMap.set(c,n); w(c); }); })(ARMY_DATA); };
 eval([AD,INST].map(t=>t.replace(/^const /,'globalThis.')).join('\n')+'\n'+FNS.join('\n'));
 
-const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const slug=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');   // NFD fold — MUST match data-lint.js (the derivation is the contract)
 _buildParentMap();
 const sites=[];
 const byInst=new Map();

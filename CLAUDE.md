@@ -21,8 +21,14 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
    (suite grows with M2-M4: store, brief, PDF golden-file).
 
 ## Data law
-- data/sites.json is the map layer: { id, base, unit, lat, lon, grp, parent }. The parent
-  pointer IS the link model. No other relationship data exists in A-ORG-2.
+- data/sites.json v2 is the map layer: { id, base, st, lat, lon, grp, cls, unit, parent }
+  — the FULL A-ORG-1 roster carried over LIGHTWEIGHT (owner directive 20 Aug: no leader
+  prose, no tenants, no descriptions — ever). The parent pointer IS the link model.
+  cls ∈ base|hq|depot|guard. NOTE: grp folds A-ORG-1's kind as 'grp|kind' on 71 rows
+  (e.g. 'conus|usace') — never consume grp as a plain enum.
+- The inline SITES literal in index.html must stay row-for-row identical to
+  data/sites.json (data-lint checks; regenerate with tools/extract-sites.js, whose slug
+  MUST match data-lint's — NFD diacritics fold included; the derivation is the contract).
 - The datastore (M2) is IndexedDB, schema-versioned, exported/restored as one JSON file.
 
 ## Working style
@@ -30,21 +36,30 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - The globe engine is PORTED from A-ORG-1, not rewritten — its math survived 22 major
   versions; treat regressions against A-ORG-1 behavior as bugs.
 
-## Backlog (M1 close-out → M2 inputs)
-1. **Fat fields to runtime**: unitFull/parentUnit/tenants stay in data/sites.json only;
-   s3's fullF search rung and s4's crumb sub-labels sleep until the M2 datastore seeds
-   them. Wire the seed, then delete this line.
-2. **ASCC parent convention split** (SME hold): USARPAC/USARCENT/ARCYBER chain to COCOM
-   sites; USAREUR-AF/USAWHC chain to HQDA. Pick one rule in the M2 data pass.
-3. **Verify with sources**: 'Combined Arms Command (CAC)' naming (vs Combined Arms
-   Center) across 6 rows; USAASC in austin-t2com-hq tenants; usnorthcom-peterson's
-   263rd AAMDC tenant; camp-mujuk / camp-as-sayliyah retention (owner call).
-4. **Label density**: COCOM landmark labels crowd the CONUS view at low zoom — label
+## Backlog (v0.6.0 audit close-out → next data pass)
+1. **ASCC parent convention split** (SME hold): USARPAC/USARCENT/ARCYBER chain to COCOM
+   sites; USAREUR-AF/USAWHC chain to HQDA. Pick one rule in the next data pass.
+2. **Verify with sources**: 'Combined Arms Command (CAC)' naming (vs Combined Arms
+   Center); camp-mujuk / camp-as-sayliyah retention (owner call).
+3. **Label density**: COCOM landmark labels crowd the CONUS view at low zoom — label
    tiering pass (A-ORG-1's zoom-tier idiom is in the port, needs tuning).
-5. **grp metadata**: fort-buchanan (PR) and fort-wainwright-greely-alaska carry
+4. **grp metadata**: fort-buchanan (PR) and fort-wainwright-greely-alaska carry
    grp=conus; inert on a sphere, but decide the vocabulary before any flat inset ships.
-6. Upstream A-ORG-1 fix to send back: Detroit Arsenal latitude (42.59 → 42.49) at its
-   index.html:12147.
+5. Upstream A-ORG-1 fix to send back: Detroit Arsenal latitude (42.59 → 42.49) at its
+   index.html:12147. (A-ORG-2 carries the corrected 42.49 as a documented deviation.)
+6. **A-ORG-1 upstream data questions surfaced by the v0.6.0 carryover audit** (roster is
+   verbatim A-ORG-1 by owner law; flag, don't edit without owner sign-off): `sembach`
+   (spine, coords ~100 km west near Luxembourg) vs `sembach-kaserne` (correct coords, no
+   spine) look like one installation twice; suspect coords vs the retired v1 set on
+   mainz-kastel (49.3,9.6 ≈ Heilbronn), vilseck (49.1,12.4), yuma-pg, camp-buehring,
+   torii-station. hohenfels-jmrc was re-parented to grafenwohr-vilseck (v1 pointer broke
+   in the NFD id rename) — already applied.
+7. **Dropped at the v0.6.0 wipe** (in v1, not in A-ORG-1 — intentional under 'carry over
+   A-ORG-1 entirely'): fort-mcnair, eglin-afb, nas-jrb-new-orleans-belle-chasse. Restore
+   only if the owner asks.
+8. **Cluster centroid is a raw lat/lon average** — dateline-unsafe if a 44px cell ever
+   straddles ±180° (no current data does). Use the nearRegion dlon-wrap idiom if Pacific
+   sites densify.
 
 ## v0.2.0 — the committed identity + the export contract
 - **ORBIT is THE look** (owner references, 20 Aug): deep-space navy, luminous
@@ -73,3 +88,16 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   inside the form). renderBrief: one tier-law block per HQ, four echelons, exact
   CSS connectors. extras.brief rides the Snapshot; dossier exports grew the
   tiered Brief section.
+
+## v0.6.0 — the A-ORG-1 carryover (consult-team build)
+- RADIAL NAV is the control law: home/back/clear/saved hidden INSIDE #navGlobe,
+  tap = pop-out ring, hold 3 s (#nvRing progress) = MAP ⇄ BRIEF, ring self-closes
+  on flip. No pointer capture; outside-tap swallow via GlobeState._navSwallow.
+- selectSite(id, o) is the ONE selection rail (searchSelect delegates; o.keepCam
+  for saved-view recall). Every pick feeds trail + SELECT-clock auto-fill.
+- LCD pair: seg7 engine (keep .sg-a…g greppable-literal — a dead-code purge ate
+  them in A-ORG-1), #clockTL LOCAL + #clockTR SELECT; zone state in kv 'selZone'
+  (manual picks only; auto traffic is ephemeral and never touches storage).
+- Markers: sharp glass reticle (no halo/shadowBlur in the dot pass), cls colors;
+  zoom<1.6 clusters into count badges (never in brief). Brief thumbnail draws
+  chain members only; drawGlobeLinks early-returns in brief.
