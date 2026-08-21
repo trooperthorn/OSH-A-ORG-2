@@ -118,3 +118,19 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   untappable by design.
 - App icon = the Lumen mark (gold wireframe globe + lit chain on black);
   icon-512/192/180 + icon-maskable-512, manifest + theme-color #060504.
+
+## v0.8.0 — the holistic pass (owner directive, 21 Aug: no more 1-by-1 edits)
+- NO OVERCAST, ever: --land stays near-black (17,14,9), --world-glow stays 0.
+  Gold linework carries the map; any wash that survives a zoom level is a bug.
+- Zoom span 1..28 (wheel/pinch/double-tap all clamp 28); page pinch-zoom is
+  LOCKED (viewport maximum-scale=1) — chrome can no longer be scaled/clipped.
+- THE RING is the control surface: back(undo) · clear · zoom− · zoom+ · saved ·
+  layers on a 165°→15° arc, r=100. Home is retired. Back pops GlobeState._undo
+  (snapshots pushed by selectSite/_dblZoom/cluster-fly/svRecall; o.noUndo guards
+  restore paths). Zoom sats keep the ring open (rocker).
+- CHROME LAW: the wordmark stands alone (no tiles, no ⋯). Maintenance = wordmark
+  long-press → #appMenu (version · backup · restore · diagnostics). Layers lives
+  in the ring. Chrome YIELDS (body.gesturing fades floats) during globe gestures.
+- COMPACT CARD LAW: the org card face is ONE row; every action nests behind ⊕
+  (brief ★ · subordinate · details ▤ — 40px circles that must stay clear of the
+  FAB column); detail/tabs render only behind ▤. New selection = compact again.

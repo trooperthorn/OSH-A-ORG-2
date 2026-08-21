@@ -2,7 +2,7 @@
 <html lang="en" data-app-theme="lumen">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>A-ORG-2</title>
 <!-- PWA / installable-app support -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -159,12 +159,14 @@
   --glass-lo:rgba(8,7,4,.95);
   --spec:rgba(255,240,200,.09);
   --drop:0 10px 26px -10px rgba(0,0,0,.7);
-  /* world paint — black ocean, warm-lit land, bright gold coasts, soft warm limb */
-  --ocean-hi:#0B0A07;
-  --ocean-lo:#040302;
-  --land:46,40,24;
+  /* world paint (v0.8.0 owner: NO overcast — the wash and the limb halo were
+     A-ORG-1 carryovers and are gone). True-black space, near-black land a
+     whisper above the ocean, bright gold linework carries the whole map. */
+  --ocean-hi:#080706;
+  --ocean-lo:#030302;
+  --land:17,14,9;
   --coast:240,220,140;
-  --world-glow:1;
+  --world-glow:0;
 }
 
 /* ─── 2 · RESET + THE STAGE (the globe IS the page) ────────────────────────── */
@@ -239,7 +241,7 @@ body{
 /* z ladder: stage 0 · clocks 10 · stage bar 25 · top edge 20 · results 30 ·
    dossier 40 · errToast 120 · sbxNote 130 (A-ORG-1's toast z, kept). */
 
-/* TITLE BAND — the wordmark, top center; corner tiles carry decor + the ⋯ menu */
+/* TITLE BAND — the wordmark alone, top center (v0.8.0: tiles retired; long-press = maintenance) */
 #titleBar{
   position:absolute; z-index:22;
   top:calc(env(safe-area-inset-top,0px) + 6px);
@@ -256,14 +258,14 @@ body{
   filter:drop-shadow(0 1px 0 rgba(0,0,0,.65)) drop-shadow(0 0 12px rgba(var(--accent-rgb),.30));
 }
 @media(min-width:1100px){ #wordmark{font-size:21px} }
-.tb-tile{
-  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  flex:none; width:40px; height:40px; border-radius:12px; color:var(--faint);
-  display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
-  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec);
-}
-span.tb-tile{cursor:default; color:var(--accent)}
+#wordmark{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none }
+
+/* CHROME YIELDS (v0.8.0 automation): while a gesture is moving the globe, every
+   floating surface steps back so the world owns the screen; it breathes back in
+   the moment the hand lifts. Pure CSS response to one body flag. */
+body.gesturing #titleBar, body.gesturing #searchPill, body.gesturing .clock,
+body.gesturing #briefStage, body.gesturing #legendPanel{opacity:.22; transition:opacity .2s ease}
+#titleBar, #searchPill, .clock, #briefStage, #legendPanel{transition:opacity .3s ease}
 
 /* SEARCH — standalone, one job, search-engine calm */
 #searchPill{
@@ -326,6 +328,11 @@ span.tb-tile{cursor:default; color:var(--accent)}
   border-radius:var(--r-card); padding:6px 16px 14px;
 }
 #dossier.dz-peek{max-height:112px; overflow:hidden}
+#dossier.dz-peek.fan-open{max-height:208px}   /* the ⊕ rail needs its spring room */
+/* fan out = card UP: while the rail is sprung, the whole card lifts clear of
+   the globe button's circle — no pop-out can hide under the FAB at ANY width
+   (audit: ▤ was unreachable at ≤360px when the card sat in the FAB band) */
+#dossier.fan-open{bottom:calc(env(safe-area-inset-bottom,0px) + 122px)}
 #dossier.dz-peek::after{content:''; position:absolute; left:0; right:0; bottom:0; height:26px;
   background:linear-gradient(180deg, rgba(0,0,0,0), var(--glass-lo)); pointer-events:none;
   border-radius:0 0 var(--r-card) var(--r-card)}
@@ -373,10 +380,14 @@ span.tb-tile{cursor:default; color:var(--accent)}
 body.nav-open .nv-sat{opacity:1; pointer-events:auto}
 body.nav-open .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
 /* symmetric arc over the globe button: 150° · 110° · 70° · 30°, r=86px from its center */
-#navSat-home {left:calc(-24px - 74.5px); bottom:calc(34px + 43px  - 24px)}
-#navSat-back {left:calc(-24px - 29.4px); bottom:calc(34px + 80.8px - 24px)}
-#navSat-clear{left:calc(-24px + 29.4px); bottom:calc(34px + 80.8px - 24px)}
-#navSat-saved{left:calc(-24px + 74.5px); bottom:calc(34px + 43px  - 24px)}
+/* six satellites on a 165°→15° arc, r=100 (30° steps — symmetric, no overlap);
+   zoom− / zoom+ crown the top center so the thumb can rock between them */
+#navSat-back  {left:calc(-24px - 96.6px); bottom:calc(34px + 25.9px - 24px)}
+#navSat-clear {left:calc(-24px - 70.7px); bottom:calc(34px + 70.7px - 24px)}
+#navSat-zoomout{left:calc(-24px - 25.9px); bottom:calc(34px + 96.6px - 24px)}
+#navSat-zoomin {left:calc(-24px + 25.9px); bottom:calc(34px + 96.6px - 24px)}
+#navSat-saved {left:calc(-24px + 70.7px); bottom:calc(34px + 70.7px - 24px)}
+#navSat-layers{left:calc(-24px + 96.6px); bottom:calc(34px + 25.9px - 24px)}
 body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,215,110,.35), inset 0 1px 0 var(--spec)}
 
 /* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
@@ -662,12 +673,11 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 <!-- minimal top edge: search pill + theme switch -->
 <!-- TITLE BAND — the designed wordmark, top center (A-ORG-1 carryover); the ⋯
      menu lives in its right corner tile. -->
+<!-- v0.8.0 owner: the wordmark stands alone — no corner tiles. Maintenance
+     (version · backup · restore · diagnostics) hides behind a LONG-PRESS on
+     the wordmark; everything pertinent lives in the globe button's ring. -->
 <header id="titleBar">
-  <span class="tb-tile" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3.5 3.4 3.5 14.6 0 18M12 3c-3.5 3.4-3.5 14.6 0 18"></path></svg></span>
   <h1 id="wordmark">A&thinsp;-&thinsp;O&thinsp;R&thinsp;G&thinsp;-&thinsp;2</h1>
-  <button id="menuBtn" class="tb-tile" type="button" aria-label="Menu">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
-  </button>
 </header>
 
 <!-- SEARCH — standalone, one job (map is the default room; modes flip on the globe button) -->
@@ -681,11 +691,16 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <!-- NAV GLOBE — the centerpiece. Tap: the hidden nav ring pops out (small
      symmetric circles). Hold 3s: MAP ⇄ BRIEF (progress ring charges). -->
+<!-- v0.8.0 ring (owner): back = undo one step · clear · zoom− · zoom+ · saved ·
+     layers (the one pertinent ⋯ resident — map control belongs in the ring).
+     Home is gone (redundant: back walks you out of anywhere). -->
 <nav id="navDock" aria-label="Navigation">
-  <button id="navSat-home"  class="nv-sat glass" type="button" aria-label="Home"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"></path><path d="M5 9v11h14V9"></path></svg></button>
-  <button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Back"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
-  <button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+  <button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear selection"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <button id="navSat-zoomout" class="nv-sat glass" type="button" aria-label="Zoom out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+  <button id="navSat-zoomin" class="nv-sat glass" type="button" aria-label="Zoom in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
   <button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
+  <button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button>
   <button id="navGlobe" type="button" aria-expanded="false" aria-label="Navigation — tap for controls, hold to switch mode">
     <svg id="nvRing" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="33" fill="none"></circle></svg>
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3.5 3.4 3.5 14.6 0 18M12 3c-3.5 3.4-3.5 14.6 0 18"></path></svg>
@@ -720,6 +735,25 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.8.0 • THE HOLISTIC PASS (owner directive, 21 Aug — six edits weighed as
+//            one system, not one-by-one). OVERCAST KILLED: the olive land wash
+//            and the limb halo (both A-ORG-1 carryovers) are gone — true-black
+//            space, near-black land, gold linework carries the map at every
+//            zoom. FORMATS: zoom span widened 16→28; page pinch-zoom locked
+//            (maximum-scale=1 — the thing that was clipping the clocks in
+//            Safari). RING REBUILT: back (a real one-step UNDO over camera +
+//            selection) · clear · zoom− · zoom+ · saved · layers, six symmetric
+//            circles; Home retired (redundant — with it fitGlobeToSites/
+//            resetGlobeView/geoAngularSep left the codebase). CHROME
+//            CONSOLIDATED: corner tiles deleted; the wordmark stands alone and
+//            long-press opens maintenance (version · backup · restore ·
+//            diagnostics); Layers — the one pertinent ⋯ resident — moved into
+//            the ring. COMPACT CARD: the org sheet is one row (name · state ·
+//            ⊕ · export · ✕); ⊕ fans out nested pop-outs (brief ★ ·
+//            subordinate · details ▤) exactly like the nav ring; stats lines,
+//            sub-lines, standing buttons: deleted. AUTOMATION: chrome yields
+//            (fades) while the globe is being dragged/pinched and returns on
+//            release. Smoke probes rewritten to the new contracts.
 //   v0.7.1 • THE STAR NET MARK (owner directive, 21 Aug: "brand new icon and
 //            idea" — nothing pulled back from A-ORG-1). App icon rebuilt from
 //            an original concept round of five (echelon monogram · star net ·
@@ -865,7 +899,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.7.1';
+const APP_VERSION = 'v0.8.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -1337,8 +1371,8 @@ function smoothFallbackOnce(){
 //     beyond the canvas passed in (+ window listeners). Plain sloppy-mode JS, no
 //     classes, no modules. Nothing here draws; every visual change routes through
 //     GlobeState.dirty (globeMark) and the render loop's dirty gate.
-//   - Zoom clamps as in source: wheel Math.max(1.0, Math.min(16, …)), pinch
-//     Math.max(1.0, Math.min(16, …)), double-tap Math.min(16, z0*2) with the
+//   - Zoom clamps: wheel/pinch Math.max(1.0, Math.min(28, …)), double-tap
+//     Math.min(28, z0*2) — span widened 16→28 at v0.8.0 (owner: deeper zoom-in)
 //     at-max reset to 2.0. Radius law via GlobeState.baseK (0.72 fallback).
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1442,7 +1476,13 @@ function setupGlobeInteraction(cv){
     try{ if(typeof cameraCancel==='function') cameraCancel(); }catch(_){}   // don't fight a live fly tween
     const m=globeMetrics(cv), r=cv.getBoundingClientRect();
     const ox=(e.clientX-r.left)-m.cx, oy=(e.clientY-r.top)-m.cy;
-    const z0=GlobeState.zoom, zT=(z0>=15.9)?2.0:Math.min(16, z0*2);
+    // one gesture, one entry: a double-tap ON a marker already pushed via the
+    // first tap's select ms ago — don't charge the dive a second Back press
+    try{
+      const _u=GlobeState._undo, _lastTs=(_u&&_u.length)?(_u[_u.length-1].ts||0):0;
+      if(typeof _undoPush==='function' && !(performance.now()-_lastTs<450)) _undoPush();
+    }catch(_){}
+    const z0=GlobeState.zoom, zT=(z0>=27.9)?2.0:Math.min(28, z0*2);
     const t0=performance.now(), dur=260;
     let zPrev=z0;
     (function step(now){
@@ -1467,7 +1507,7 @@ function setupGlobeInteraction(cv){
     const m=globeMetrics(cv), r=cv.getBoundingClientRect();
     const ox=(e.clientX-r.left)-m.cx, oy=(e.clientY-r.top)-m.cy;
     const z0=GlobeState.zoom;
-    const z1=Math.max(1.0, Math.min(16, z0*Math.exp(-e.deltaY*0.0015)));
+    const z1=Math.max(1.0, Math.min(28, z0*Math.exp(-e.deltaY*0.0015)));
     if(z1===z0) return;
     GlobeState.zoom=z1;
     const k=z1/z0;
@@ -1491,7 +1531,7 @@ function setupGlobeInteraction(cv){
         const m=globeMetrics(cv), r=cv.getBoundingClientRect();
         const ox=(c[0]-r.left)-m.cx, oy=(c[1]-r.top)-m.cy;
         const z0=GlobeState.zoom;
-        const z1=Math.max(1.0, Math.min(16, z0*(d/pinchPrevD)));
+        const z1=Math.max(1.0, Math.min(28, z0*(d/pinchPrevD)));
         GlobeState.zoom=z1;
         const k=z1/z0;
         if(GlobeState._applyDrag){
@@ -1555,7 +1595,7 @@ function globeGlideStep(dt){
 //                               Hoisted here as resetGlobeView() — see deviation 4.
 //
 // OWNERSHIP (concatenation law — no duplicate top-level declarations):
-//   - DECLARED HERE: flyToLatLon, fitGlobeToSites, geoAngularSep,
+//   - DECLARED HERE: flyToLatLon (fitGlobeToSites/geoAngularSep cut v0.8.0),
 //     _zoomAnim, _wireZoomHold, resetGlobeView, cameraCancel. (zoomAt and the
 //     fitToSites alias were cut at M1 integration — zero call sites.)
 //   - USED, declared elsewhere: GlobeState (shell), globeMark + _rebuildGlobeQ +
@@ -1625,14 +1665,7 @@ function cameraCancel(){
   GlobeState._fly=false;
 }
 
-// Angular separation (degrees) between two lat/lon points.
-function geoAngularSep(lat1,lon1,lat2,lon2){
-  const d=Math.PI/180;
-  const a=[Math.cos(lat1*d)*Math.cos(lon1*d), Math.cos(lat1*d)*Math.sin(lon1*d), Math.sin(lat1*d)];
-  const b=[Math.cos(lat2*d)*Math.cos(lon2*d), Math.cos(lat2*d)*Math.sin(lon2*d), Math.sin(lat2*d)];
-  let dot=a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; dot=Math.max(-1,Math.min(1,dot));
-  return Math.acos(dot)/d;
-}
+// (geoAngularSep cut at v0.8.0 with fitGlobeToSites — its only caller.)
 
 // Generalized fly-to: rotate the globe so (lat,lon) faces the viewer and zoom in.
 // onArrive (optional) runs when the animation completes (not when cancelled).
@@ -1675,47 +1708,9 @@ function flyToLatLon(lat, lon, zoom, onArrive){
 
 // Frame the camera to fit a set of sites (by averaging their 3-D vectors so it's
 // correct across the date line) and pick a zoom from their angular spread.
-// list: Array or Set of site objects from data/sites.json ({lat, lon, ...}); id
-// strings are resolved against a global SITES array when one exists (deviation 5).
-function fitGlobeToSites(list, tightenBias){
-  if(!list) return;
-  const arr = (typeof Set!=='undefined' && list instanceof Set) ? Array.from(list) : list;
-  if(!arr || !arr.length) return;
-  const pts=[];
-  arr.forEach(s=>{
-    let it=s;
-    if(typeof s==='string'){
-      it=null;
-      if(typeof SITES!=='undefined' && SITES && SITES.length){
-        for(let i=0;i<SITES.length;i++){ if(SITES[i].id===s){ it=SITES[i]; break; } }
-      }
-    }
-    if(it && it.lat!=null && it.lon!=null) pts.push(it);
-  });
-  if(!pts.length) return;
-  const d=Math.PI/180; let x=0,y=0,z=0;
-  pts.forEach(p=>{ x+=Math.cos(p.lat*d)*Math.cos(p.lon*d); y+=Math.cos(p.lat*d)*Math.sin(p.lon*d); z+=Math.sin(p.lat*d); });
-  const L=Math.hypot(x,y,z)||1;
-  const cLat=Math.asin(Math.max(-1,Math.min(1,z/L)))/d, cLon=Math.atan2(y,x)/d;
-  // max angular separation from the centroid → spread
-  let maxSep=0;
-  pts.forEach(p=>{ maxSep=Math.max(maxSep, geoAngularSep(cLat,cLon,p.lat,p.lon)); });
-  let zoom = maxSep>120 ? 1.05 : maxSep>80 ? 1.3 : maxSep>45 ? 1.7 : maxSep>20 ? 2.3 : (pts.length===1? 3.2 : 2.8);
-  if(tightenBias) zoom*=tightenBias;
-  flyToLatLon(cLat, cLon, Math.max(1.0, Math.min(14, zoom)));
-}
-
-// M4 public alias per the A-ORG-2 work order; the ported name above stays canonical.
-
-// v15.14.0: zoom keys animate (180ms easeOut) and repeat on hold; keyboard +/- reuses .click()
-// (_zoomAnim/_wireZoomHold cut at v0.6.0 — the zoom buttons retired with the
-// rail; pinch, wheel and double-tap own zoom. Recover from git history.)
-
-// Reset view — A-ORG-1's home camera, hoisted from its two inline call sites
-// ('h'/'0' key and the recenter FAB): CONUS at ease. Home flies, never snaps.
-function resetGlobeView(){
-  flyToLatLon(38, -98, 2.3);
-}
+// (fitGlobeToSites and resetGlobeView cut at v0.8.0 — the Home satellite
+// retired by owner decree ("redundant"), and with it their last call sites.
+// Recover from git history if a frame-to-set gesture ever returns.)
 
 
 /* ══════════ module: m5-markers ══════════ */
@@ -3168,7 +3163,23 @@ function _odEscA(v){ return String(v).replace(/"/g,'&quot;').replace(/</g,'&lt;'
 // Every selection path lands here: m3 tap → tapAtScreen → selectSite; search rows
 // → searchSelect (sets sel + flies, then the showDossier hook — same net effect,
 // same order); dossier crumb/child rows + ✕ + Clear pill → the delegate below.
+// UNDO SPINE (v0.8.0 owner: back = undo one step). Every discrete navigation
+// act — a pick, a clear, a double-tap dive, a cluster fly, a recall — pushes
+// the camera+selection it is about to replace. The ring's back pops one.
+function _undoPush(){
+  try{
+    const u=GlobeState._undo||(GlobeState._undo=[]);
+    const last=u[u.length-1];
+    const cur={yaw:GlobeState.yaw, pitch:GlobeState.pitch, zoom:GlobeState.zoom,
+      sel:GlobeState.sel, brief:document.body.classList.contains('brief-mode'),
+      ts:performance.now()};
+    if(last && last.sel===cur.sel && Math.abs(last.yaw-cur.yaw)<1e-4
+       && Math.abs(last.pitch-cur.pitch)<1e-4 && Math.abs(last.zoom-cur.zoom)<1e-3) return;
+    u.push(cur); if(u.length>24) u.shift();
+  }catch(_){}
+}
 function selectSite(id, o){
+  if(!(o&&o.noUndo)) _undoPush();
   if(id==null){
     GlobeState.sel=null;
     if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
@@ -3293,7 +3304,7 @@ function tapAtScreen(x, y){
   }
   const hits=GlobeState._cluHits;
   if(hits){ for(const h of hits){ const dx=x-h.x, dy=y-h.y;
-    if(dx*dx+dy*dy<=h.r*h.r){ try{ flyToLatLon(h.lat, h.lon, 2.4); }catch(_){} return; } } }
+    if(dx*dx+dy*dy<=h.r*h.r){ try{ _undoPush(); flyToLatLon(h.lat, h.lon, 2.4); }catch(_){} return; } } }
   const s=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
   if(s && s.id!=null) selectSite(s.id);
   // no-hit: selection survives (A-ORG-1 ~L17929 only hid the tip) — clearing is
@@ -3308,11 +3319,14 @@ function showDossier(id){
   }
   const s=(typeof siteById==='function') ? siteById(id) : null;
   if(!s){ hideDossier(); return; }
+  // a NEW org resets the pop-out state — the card always arrives compact
+  if(id!==_odLastId){ _odLastId=id; _odFan=false; _odShowRec=false; _odTab='ov'; _rcForm=null; }
   _odInjectCSS();                                  // order-safe if a select lands before 'load'
   const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1]||'peek';
   host.innerHTML=_odRender(s);
   host.classList.remove('dz-peek','dz-half','dz-full');
   host.classList.add('dz-'+_kept);                 // selection keeps the current detent; first open peeks
+  host.classList.toggle('fan-open', _odFan);
   host.hidden=false;
   try{ host.setAttribute('aria-label', s.base+' — dossier'); }catch(_){}
   host.scrollTop=0;                                // deviation 7: whole card into view
@@ -3323,13 +3337,21 @@ function hideDossier(){
   const host=document.getElementById('dossier'); if(!host) return;
   host.hidden=true;
   host.innerHTML='';
+  // v0.8.0 audit: a closed card forgets everything — the NEXT card always
+  // arrives compact and peeked, even for the same org after a clear.
+  _odLastId=null; _odFan=false; _odShowRec=false;
+  host.classList.remove('dz-half','dz-full','fan-open'); host.classList.add('dz-peek');
   try{ host.setAttribute('aria-label','Dossier'); }catch(_){}
   _odStageClearSync(false);
 }
 
-// sheet tab + inline-form state (v0.4.0 datastore). Tab sticks across
-// selections — adding people to many orgs in a row is the workflow.
+// sheet tab + inline-form state (v0.4.0 datastore). The v0.8.0 compact card
+// resets tab/fan/detail state on every NEW org and on close (showDossier /
+// hideDossier) — every card arrives compact; depth is always re-requested.
 let _odTab='ov';
+let _odFan=false;        // ⊕ pop-out rail open?
+let _odShowRec=false;    // ▤ detail/records area expanded?
+let _odLastId=null;      // the org the card state belongs to
 let _rcForm=null;                                   // {kind, idx|null} — one open form at a time
 const RC_KINDS={
   people:{ n:'People', f1:'Name', f2:'Role / section', k1:'name', k2:'role' },
@@ -3338,6 +3360,8 @@ const RC_KINDS={
   links:{  n:'Links',  f1:'Label', f2:'URL',            k1:'label', k2:'url' },
 };
 function _odSetTab(t){ _odTab=t; _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); }
+// harness hook (smoke drives the compact card's pop-out state; not UI surface)
+try{ window._odUI={ fan:function(v){ _odFan=!!v; }, rec:function(v){ _odShowRec=!!v; } }; }catch(_){}
 try{ window._odSetTab=_odSetTab; }catch(_){}
 
 function _odRender(s){
@@ -3358,34 +3382,36 @@ function _odRender(s){
     }
     h+='</div>';
   }
+  // v0.8.0 COMPACT CARD (owner law: a fraction of the size, information hidden
+  // — nested pop-outs like the nav ring). One row: name · state · ⊕ · export · ✕.
+  // ⊕ fans out the actions (brief ★ · subordinate ⌥ · records ▤); ▤ expands the
+  // tabbed detail in place. No stat lines, no sub-lines, no standing buttons.
+  // the pop-out rail RIDES ABOVE the name row (it springs upward from ⊕ like
+  // the nav ring) — audit law: the bottom band belongs to the globe button on
+  // narrow phones, so nothing tappable may render beneath the head row.
+  h+='<div class="od-fan'+(_odFan?' open':'')+'">'
+    +(bfHas(s.id)
+      ?'<button class="od-pop on" type="button" data-bfrm="'+_odEscA(s.id)+'" aria-label="Remove from brief"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>'
+      :'<button class="od-pop" type="button" data-bfadd="'+_odEscA(s.id)+'" aria-label="Add to brief"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>')
+    +'<button class="od-pop" type="button" data-orgadd="'+_odEscA(s.id)+'" aria-label="Add subordinate"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="6" r="2.6"></circle><path d="M12 9v3M12 12l-5 4M12 12l5 4"></path><circle cx="7" cy="18" r="2.2"></circle><circle cx="17" cy="18" r="2.2"></circle></svg></button>'
+    +'<button class="od-pop'+(_odShowRec?' on':'')+'" type="button" data-odrec="1" aria-label="Details and records"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>'
+    +'</div>';
+
   h+='<div class="od-head od-head-slim">'
-    +'<div class="od-name">'+_odEsc(s.base)+'</div>'
+    +'<div class="od-name">'+_odEsc(s.unit||s.base)+'</div>'
     +(s.st?'<span class="bd-state">'+_odEsc(s.st)+'</span>':'')
     +'<span class="od-sp"></span>'
+    +'<button class="od-ico od-plus'+(_odFan?' on':'')+'" type="button" data-odfan="1" aria-label="Actions" aria-expanded="'+(_odFan?'true':'false')+'"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>'
     +'<button class="od-ico" id="exportBtn" type="button" aria-label="Export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>'
     +'<button class="od-ico od-ico-x" type="button" data-odclose="1" aria-label="Clear selection">✕</button>'
     +'</div>';
 
-  // owning unit + its expansion sub-line
-  if(s.unit)     h+='<div class="od-unit">'+_odEsc(s.unit)+'</div>';
+  if(!_odShowRec) return h;
 
-  // stats line (bd-stats grammar ~L15087)
-  const recN=(typeof recCount==='function')?recCount(s.id):0;
-  h+='<div class="bd-stats">'
-    +(chain.length?('<span>'+chain.length+(chain.length===1?' hop':' hops')+' up the chain</span>'):'')
-    +'<span>'+kids.length+' subordinate '+(kids.length===1?'site':'sites')+'</span>'
-    +(recN?('<span>'+recN+' record'+(recN===1?'':'s')+'</span>'):'')
-    +'</div>';
-
-  // ── tabs (v0.4.0): Overview + the four record kinds; body renders one tab ──
+  // ── the hidden detail (▤): Overview + the four record kinds ──
   const rec=(typeof recordOf==='function')?recordOf(s.id):null;
   const cnt=function(k){ return rec?rec[k].length:0; };
   if(_odTab!=='ov' && !RC_KINDS[_odTab]) _odTab='ov';
-  h+=bfHas(s.id)
-    ?'<button class="bf-act in" type="button" data-bfrm="'+_odEscA(s.id)+'">In the brief · remove</button>'
-    :'<button class="bf-act" type="button" data-bfadd="'+_odEscA(s.id)+'">Add to brief</button>';
-  // v0.7.0: subordinates can be added at the MAP level too (owner directive)
-  h+='<button class="bf-act in" type="button" data-orgadd="'+_odEscA(s.id)+'">+ Subordinate</button>';
   h+='<div class="od-tabs">'
     +'<button type="button" class="od-tab'+(_odTab==='ov'?' on':'')+'" data-odtab="ov">Overview</button>'
     +Object.keys(RC_KINDS).map(function(k){
@@ -3497,7 +3523,7 @@ function _bfObjSheet(id){
   const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
   host.innerHTML=h;
   host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add(_kept==='dz-full'?'dz-full':'dz-half');
+  host.classList.add(_kept==='full'?'dz-full':'dz-half');
   host.hidden=false;
   try{ host.setAttribute('aria-label', name); }catch(_){}
 }
@@ -3560,6 +3586,15 @@ if(!window._odWired){
     if(x){ selectSite(null); return; }
     const tb=e.target.closest('[data-odtab]');
     if(tb){ _odSetTab(tb.getAttribute('data-odtab')); return; }
+    const fn=e.target.closest('[data-odfan]');
+    if(fn){ _odFan=!_odFan; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
+    const dr=e.target.closest('[data-odrec]');
+    if(dr){ _odShowRec=!_odShowRec;
+      if(_odShowRec){ _odTab='ov';
+        const hst=document.getElementById('dossier');
+        if(hst && hst.classList.contains('dz-peek')){ hst.classList.remove('dz-peek'); hst.classList.add('dz-half'); }
+      }
+      if(GlobeState.sel) showDossier(GlobeState.sel); return; }
     const ra=e.target.closest('[data-rcadd]');
     if(ra){ _rcForm={kind:ra.getAttribute('data-rcadd'), idx:null}; if(GlobeState.sel) showDossier(GlobeState.sel);
       try{ const f=document.getElementById('rcF1'); f&&f.focus(); }catch(_){} return; }
@@ -3589,7 +3624,11 @@ if(!window._odWired){
     const ba=e.target.closest('[data-bfadd]');
     if(ba){ bfAdd(ba.getAttribute('data-bfadd')); return; }
     const br=e.target.closest('[data-bfrm]');
-    if(br){ _bfAnnEdit=null; bfRemove(br.getAttribute('data-bfrm')); hideDossier(); return; }
+    if(br){ _bfAnnEdit=null; bfRemove(br.getAttribute('data-bfrm'));
+      // map: bfRemove re-rendered the card in place (star flips back); only the
+      // brief-room popup closes (its subject may have left the chain entirely)
+      if(document.body.classList.contains('brief-mode')) hideDossier();
+      return; }
     const be=e.target.closest('[data-bfannedit]');
     if(be){ const id=be.getAttribute('data-bfannedit'); _bfAnnEdit=id; _orgForm=null; _bfObjSheet(id);
       try{ const f=document.getElementById('rcF1'); f&&f.focus(); }catch(_){} return; }
@@ -3602,7 +3641,11 @@ if(!window._odWired){
     const bo=e.target.closest('[data-bfobj]');
     if(bo){ _bfAnnEdit=null; _orgForm=null; _bfObjSheet(bo.getAttribute('data-bfobj')); return; }
     const ox=e.target.closest('[data-objx]');
-    if(ox){ _bfAnnEdit=null; _orgForm=null; hideDossier(); return; }
+    if(ox){ _bfAnnEdit=null; _orgForm=null;
+      // in map mode the popup sits over a live selection — closing restores its card
+      if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel);
+      else hideDossier();
+      return; }
     const cm=e.target.closest('[data-chmin]');
     if(cm){ if(!e.target.closest('#exportBtn')) document.body.classList.toggle('chart-min'); return; }
     const oa=e.target.closest('[data-orgadd]');
@@ -3684,16 +3727,22 @@ function _odInjectCSS(){
       'transform:translate(-50%,-50%)}'+
     '.od-ico-x{color:var(--danger,#ff6d5a)}'+
     '.od-ico:active{filter:brightness(1.25)}'+
-    /* owning unit + expansion */
-    '.od-unit{margin:8px 2px 0;color:var(--text,#e7edf2);'+
-      'font:700 13.5px/1.35 var(--body,system-ui,sans-serif)}'+
-    '.od-unit-full{margin:2px 2px 0;color:var(--dim,#8b98a5);'+
-      'font:500 11.5px/1.45 var(--body,system-ui,sans-serif)}'+
-    /* stats line (~L1229) */
-    '.bd-stats{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 2px 0;'+
-      'color:var(--dim,#8b98a5);font:600 11px/1.4 var(--body,system-ui,sans-serif)}'+
-    '.bd-stats .bd-hint{margin-left:auto;font-weight:500;font-style:italic;'+
-      'color:var(--faint,#5C7690)}'+
+    /* v0.8.0 compact card: the ⊕ pop-out rail (ring grammar — small circles
+       that spring out; the card face carries a name and nothing else) */
+    '.od-plus.on{color:var(--accent,#F5D76E);box-shadow:0 0 0 1.5px var(--accent,#F5D76E)}'+
+    /* three 40px circles + gaps stay LEFT of the center globe button's column —
+       the FAB is always on top, so nothing tappable may live under it */
+    '.od-fan{display:flex;gap:10px;max-height:0;overflow:hidden;padding:0 2px;'+
+      'transition:max-height .18s ease,padding .18s ease}'+
+    '.od-fan.open{max-height:60px;padding:9px 2px 4px}'+
+    '.od-pop{flex:none;width:40px;height:40px;border:0;cursor:pointer;border-radius:50%;'+
+      'display:inline-flex;align-items:center;justify-content:center;color:var(--dim,#8b98a5);'+
+      'background:linear-gradient(180deg,var(--glass-hi,#1A160E),var(--glass-lo,#080704));'+
+      'box-shadow:0 0 0 1px var(--line,rgba(148,170,180,.18)),inset 0 1px 0 var(--spec,rgba(255,240,200,.09));'+
+      'transform:scale(.55);opacity:0;transition:transform .18s ease,opacity .14s ease}'+
+    '.od-fan.open .od-pop{transform:scale(1);opacity:1}'+
+    '.od-pop.on{color:var(--accent,#F5D76E);box-shadow:0 0 0 1.5px var(--accent,#F5D76E)}'+
+    '.od-pop:active{filter:brightness(1.3)}'+
     /* section headers (~L2213-2214) — voices match the arc families (deviation 8) */
     '.od-sec{display:flex;align-items:center;gap:8px;position:relative;'+
       'margin:16px 2px 8px;padding-bottom:3px;text-transform:uppercase;'+
@@ -3907,12 +3956,15 @@ function svCapture(){
 }
 function svRecall(i){
   const v=SAVEDV[i]; if(!v) return;
+  try{ _undoPush(); }catch(_){}
+  try{ cameraCancel(); }catch(_){}
+  GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState.spin=false;
   try{
     GlobeState.yaw=v.yaw; GlobeState.pitch=v.pitch; GlobeState.zoom=v.zoom;
     if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ();
     globeMark();
   }catch(_){}
-  if(v.sel && siteById(v.sel)) selectSite(v.sel, {keepCam:true}); else selectSite(null);
+  if(v.sel && siteById(v.sel)) selectSite(v.sel, {keepCam:true, noUndo:true}); else selectSite(null, {noUndo:true});
   try{ setMode(v.brief?'brief':'map'); }catch(_){}
 }
 function svRemove(i){ SAVEDV.splice(i,1); _svSave(); _svOpenSheet(); }
@@ -3933,7 +3985,7 @@ function _svOpenSheet(){
   const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
   host.innerHTML=h;
   host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add(_kept==='dz-full'?'dz-full':'dz-half');
+  host.classList.add(_kept==='full'?'dz-full':'dz-half');
   host.hidden=false;
 }
 try{ window.Views={ capture:svCapture, recall:svRecall, remove:svRemove, list:function(){ return SAVEDV.slice(); }, open:_svOpenSheet }; }catch(_){}
@@ -4394,7 +4446,7 @@ function _tzOpenSheet(){
   const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
   host.innerHTML=h;
   host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add(_kept==='dz-full'?'dz-full':'dz-half');
+  host.classList.add(_kept==='full'?'dz-full':'dz-half');
   host.hidden=false;
 }
 
@@ -4484,6 +4536,28 @@ function bootShell(){
   // call is guarded: during construction a module may not be concatenated yet.
   var cv=document.getElementById('globeCanvas');
   if(cv){
+    // chrome-yield automation (v0.8.0, audit-tuned): the flag arms only once a
+    // press actually MOVES (>8px) — a plain tap never blinks the chrome — and
+    // wheel counts only when it zooms (ctrl/meta, matching the zoom handler).
+    try{
+      var _gyT=null, _gyPend=false, _gyX=0, _gyY=0;
+      var _gyOn=function(){ clearTimeout(_gyT); document.body.classList.add('gesturing'); };
+      var _gyOff=function(){ _gyPend=false; clearTimeout(_gyT);
+        _gyT=setTimeout(function(){ document.body.classList.remove('gesturing'); }, 420); };
+      cv.addEventListener('pointerdown', function(e){ _gyPend=true; _gyX=e.clientX; _gyY=e.clientY; });
+      window.addEventListener('pointermove', function(e){
+        if(_gyPend && Math.hypot(e.clientX-_gyX, e.clientY-_gyY)>8){ _gyPend=false; _gyOn(); }
+      });
+      cv.addEventListener('wheel', function(e){
+        if(e.ctrlKey||e.metaKey){ _gyOn(); _gyOff();
+          // ring rocker stays honest while wheel-zooming with the ring out
+          try{ if(document.body.classList.contains('nav-open')) window._nvSet(true); }catch(_){}
+        }
+      }, {passive:true});
+      window.addEventListener('pointerup', _gyOff);
+      window.addEventListener('pointercancel', _gyOff);
+      window.addEventListener('touchend', _gyOff, {passive:true});
+    }catch(_){}
     try{ if(typeof setupGlobeInteraction==='function') setupGlobeInteraction(cv); }catch(_){}
     try{ if(typeof smoothFallbackOnce==='function') smoothFallbackOnce(); }catch(_){}
     try{ if(typeof startGlobeLoop==='function') startGlobeLoop(cv); }catch(_){}
@@ -4516,9 +4590,13 @@ function bootShell(){
       document.body.classList.toggle('nav-open', open);
       try{ ng.setAttribute('aria-expanded', open?'true':'false'); }catch(_){}
       var bk=document.getElementById('navSat-back');
-      if(bk) bk.disabled=((GlobeState._trail||[]).length<2);
+      if(bk) bk.disabled=!((GlobeState._undo||[]).length);
       var cl=document.getElementById('navSat-clear');
       if(cl) cl.disabled=(GlobeState.sel==null);
+      var zo=document.getElementById('navSat-zoomout');
+      if(zo) zo.disabled=(GlobeState.zoom<=1.01);
+      var zi=document.getElementById('navSat-zoomin');
+      if(zi) zi.disabled=(GlobeState.zoom>=27.9);
     };
     var _holdTick=function(){
       if(!_nvHold) return;
@@ -4576,49 +4654,80 @@ function bootShell(){
     });
     document.addEventListener('click', function(e){
       if(!e.target||!e.target.closest) return;
-      if(e.target.closest('#navSat-home')){ _nvSet(false);
+      // BACK = undo one step (owner law): restore the last camera+selection
+      // snapshot. Stays OPEN — undo invites repeats.
+      if(e.target.closest('#navSat-back')){
         try{
-          if(GlobeState.sel && typeof fitGlobeToSites==='function'){
-            var fam=[GlobeState.sel].concat(parentChainOf(GlobeState.sel)).concat(childrenOf(GlobeState.sel));
-            fitGlobeToSites(fam);
-          } else resetGlobeView();
-        }catch(_){} return; }
-      if(e.target.closest('#navSat-back')){ _nvSet(false);
-        try{
-          var t=GlobeState._trail||[];
-          if(t.length>1){ t.pop(); var prev=t.pop(); if(prev!=null) selectSite(prev); }
-        }catch(_){} return; }
+          var st=(GlobeState._undo||[]).pop();
+          if(st){
+            // kill any live camera writer FIRST — a fly tween or flick-glide
+            // would silently re-steer the restored camera (audit finding 1)
+            try{ cameraCancel(); }catch(_){}
+            GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState.spin=false;
+            GlobeState.yaw=st.yaw; GlobeState.pitch=st.pitch; GlobeState.zoom=st.zoom;
+            try{ if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ(); }catch(_){}
+            try{ globeMark(); }catch(_){}
+            if(st.sel!=null && siteById(st.sel)) selectSite(st.sel, {keepCam:true, noUndo:true});
+            else selectSite(null, {noUndo:true});
+            try{ var wantBrief=!!st.brief, isBrief=document.body.classList.contains('brief-mode');
+              if(wantBrief!==isBrief) setMode(wantBrief?'brief':'map'); }catch(_){}
+          }
+        }catch(_){}
+        _nvSet(true); return; }
       if(e.target.closest('#navSat-clear')){ _nvSet(false); try{ selectSite(null); }catch(_){} return; }
+      // ZOOM ± stay open — the ring is a zoom rocker while it's out.
+      if(e.target.closest('#navSat-zoomout')){
+        try{ GlobeState.zoom=Math.max(1.0, GlobeState.zoom/1.45); globeMark(); }catch(_){}
+        _nvSet(true); return; }
+      if(e.target.closest('#navSat-zoomin')){
+        try{ GlobeState.zoom=Math.min(28, GlobeState.zoom*1.45); globeMark(); }catch(_){}
+        _nvSet(true); return; }
       if(e.target.closest('#navSat-saved')){ _nvSet(false); try{ _svOpenSheet(); }catch(_){} return; }
+      if(e.target.closest('#navSat-layers')){ _nvSet(false);
+        try{
+          var p=document.getElementById('legendPanel');
+          if(p){ if(p.hidden) renderLegend(); p.hidden=!p.hidden; }
+        }catch(_){} return; }
     });
   }catch(_){}
 
-  // ⋯ MENU (version · layers · records backup/restore · diagnostics).
+  // MAINTENANCE SHEET (v0.8.0: the ⋯ tile is gone — long-press the wordmark).
+  // version · records backup/restore · diagnostics · site count. Layers moved
+  // to the globe button's ring (it's map control, not maintenance).
   try{
     window._renderAppMenu=function(){
       var m=document.getElementById('appMenu'); if(!m) return;
       var _rn=0; try{ for(var k in RECORDS) _rn+=recCount(k); }catch(_){}
       m.innerHTML='<div class="am-row am-ver">A-ORG-2 '+APP_VERSION+' · '+APP_UPDATED+'</div>'
-        +'<button class="am-row" type="button" data-am="layers">Layers</button>'
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
         +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
         +'<div class="am-row am-ver">'+((typeof SITES!=='undefined'&&SITES)?SITES.length:0)+' sites</div>';
     };
-    var mb=document.getElementById('menuBtn');
-    if(mb) mb.addEventListener('click', function(){
-      var m=document.getElementById('appMenu'); if(!m) return;
-      if(m.hidden) _renderAppMenu();
-      m.hidden=!m.hidden;
-    });
+    // long-press (600ms) on the wordmark — the quiet maintenance door; a plain
+    // tap does nothing (the mark is identity, not a control).
+    var wm=document.getElementById('wordmark');
+    if(wm && !wm.__amWired){ wm.__amWired=1;
+      var _amT=null, _amX=0, _amY=0;
+      wm.addEventListener('pointerdown', function(e){
+        _amX=e.clientX; _amY=e.clientY;
+        clearTimeout(_amT);
+        _amT=setTimeout(function(){
+          var m=document.getElementById('appMenu'); if(!m) return;
+          _renderAppMenu(); m.hidden=false;
+        }, 600);
+      });
+      window.addEventListener('pointermove', function(e){
+        if(_amT && Math.hypot(e.clientX-_amX, e.clientY-_amY)>12){ clearTimeout(_amT); _amT=null; }
+      });
+      ['pointerup','pointercancel'].forEach(function(ev){
+        window.addEventListener(ev, function(){ clearTimeout(_amT); _amT=null; });
+      });
+    }
     document.addEventListener('click', function(e){
       if(!e.target||!e.target.closest) return;
       var d=e.target.closest('[data-am="diag"]');
       if(d){ try{ window._diagDump&&_diagDump(); }catch(_){} var m=document.getElementById('appMenu'); if(m) m.hidden=true; return; }
-      var ly=e.target.closest('[data-am="layers"]');
-      if(ly){ var mL=document.getElementById('appMenu'); if(mL) mL.hidden=true;
-        var p=document.getElementById('legendPanel');
-        if(p){ if(p.hidden) renderLegend(); p.hidden=!p.hidden; } return; }
       var bk=e.target.closest('[data-am="backup"]');
       if(bk){ try{ recBackup(); }catch(_){} var m2=document.getElementById('appMenu'); if(m2) m2.hidden=true; return; }
       var rst=e.target.closest('[data-am="restore"]');
@@ -4639,7 +4748,7 @@ function bootShell(){
         }catch(_){}
         return; }
       var m=document.getElementById('appMenu');
-      if(m&&!m.hidden&&!e.target.closest('#appMenu')&&!e.target.closest('#menuBtn')) m.hidden=true;
+      if(m&&!m.hidden&&!e.target.closest('#appMenu')&&!e.target.closest('#wordmark')) m.hidden=true;
     });
   }catch(_){}
 

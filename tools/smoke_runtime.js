@@ -217,12 +217,14 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(GlobeState.baseK!==0.72){ fails++; console.log('✗ baseK '+GlobeState.baseK+' on phone stub (radius law wants 0.72)'); }
     else console.log('  ✓ GlobeState spine (baseK 0.72 phone, zoom '+GlobeState.zoom+')');
   }
-  // v0.3.0: version lives in the ⋯ menu — probe the menu render instead.
-  { const mb=IDS['menuBtn'], am=IDS['appMenu'];
-    if(!mb||!am){ fails++; console.log('✗ menu dock missing (#menuBtn/#appMenu)'); }
+  // v0.8.0: the ⋯ tile is gone — maintenance rides a wordmark long-press; the
+  // sheet itself (#appMenu) must still render version/backup/restore/diag.
+  { const wm=IDS['wordmark'], am=IDS['appMenu'];
+    if(!wm||!am){ fails++; console.log('✗ maintenance door missing (#wordmark/#appMenu)'); }
     else { try{ global._renderAppMenu&&global._renderAppMenu(); }catch(_){}
-      if(am.innerHTML.indexOf('A-ORG-2')<0){ fails++; console.log('✗ ⋯ menu did not stamp APP_VERSION'); }
-      else console.log('  ✓ ⋯ menu stamps version: ok'); } }
+      if(am.innerHTML.indexOf('A-ORG-2')<0 || am.innerHTML.indexOf('data-am="diag"')<0){ fails++; console.log('✗ maintenance sheet did not stamp version/diag'); }
+      else if(am.innerHTML.indexOf('data-am="layers"')>=0){ fails++; console.log('✗ Layers still in the maintenance sheet (moved to the ring at v0.8.0)'); }
+      else console.log('  ✓ maintenance sheet stamps version (wordmark long-press door)'); } }
 
   // ── PROBE: search index + ranking + render (s3) ──
   try{
@@ -257,9 +259,12 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     const host=IDS['dossier'];
     if(!global.GlobeState || GlobeState.sel!=='fort-bragg'){ fails++; console.log('✗ selectSite: GlobeState.sel = '+(global.GlobeState?GlobeState.sel:'(no GlobeState)')); }
     if(global.GlobeState && GlobeState.dirty!==true){ fails++; console.log('✗ selectSite did not set GlobeState.dirty'); }
-    if(!host || host.hidden!==false || host.innerHTML.indexOf('Fort Bragg')<0){
-      fails++; console.log('✗ selectSite: #dossier not populated (hidden='+(host&&host.hidden)+', '+(host?host.innerHTML.length:0)+' chars)');
-    } else console.log('  ✓ selectSite(fort-bragg): #dossier populated ('+host.innerHTML.length+' chars), dirty re-armed, sel='+GlobeState.sel);
+    // v0.8.0 compact card: title = unit||base (USAWHC), one row + hidden pop-outs
+    if(!host || host.hidden!==false || host.innerHTML.indexOf('USAWHC')<0 || host.innerHTML.indexOf('data-odfan')<0){
+      fails++; console.log('✗ selectSite: compact card not populated (hidden='+(host&&host.hidden)+', '+(host?host.innerHTML.length:0)+' chars)');
+    } else if(host.innerHTML.indexOf('od-tabs')>=0 || host.innerHTML.indexOf('bd-stats')>=0){
+      fails++; console.log('✗ compact card leaks detail (tabs/stats visible before ▤)');
+    } else console.log('  ✓ selectSite(fort-bragg): compact card ('+host.innerHTML.length+' chars), pop-outs nested, dirty re-armed');
   }catch(e){ fails++; console.log('✗ SELECT probe: '+e.message); console.log((e.stack||'').split('\n').slice(0,3).join('\n')); }
   // fly-to queued frames from the select — run a few (ported post-probe drain)
   { let fr2=0; while(rafQ.length && fr2<4){ const cb=rafQ.shift(); fr2++;
@@ -310,11 +315,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     global.Records.add('fort-bragg','specs',{label:'Runway', value:'10,000 ft'});
     if(global.Records.count('fort-bragg')!==2){ fails++; console.log('✗ RECORDS count wrong: '+global.Records.count('fort-bragg')); }
     global.selectSite('fort-bragg');
+    global._odUI.rec(true);                 // ▤ pop-out opens the detail area (v0.8.0)
     global._odSetTab('people');
     const host=IDS['dossier'];
     if(host.innerHTML.indexOf('Mercer')<0 || host.innerHTML.indexOf('People · 1')<0){ fails++; console.log('✗ RECORDS tab did not render the person'); }
-    else console.log('  ✓ records: add + tab render (People · 1, row present)');
+    else console.log('  ✓ records: add + tab render behind ▤ (People · 1, row present)');
     global._odSetTab('ov');
+    global._odUI.rec(false);
     const sn2=global.buildSnapshot();
     const rr=sn2.extras && sn2.extras.records && sn2.extras.records['fort-bragg'];
     if(!rr || rr.people.length!==1){ fails++; console.log('✗ SNAPSHOT extras.records missing the record'); }
