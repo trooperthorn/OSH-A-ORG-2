@@ -231,7 +231,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(typeof global._searchEntries!=='function') throw new Error('_searchEntries not declared (s3-search absent from boot)');
     const n=global._searchEntries().length;
     const wantN=(function(){ try{ return JSON.parse(fs.readFileSync(__dirname+'/../data/sites.json','utf8')).sites.length; }catch(_){ return null; } })();
-    if(wantN!=null && n!==wantN){ fails++; console.log('✗ SEARCH index '+n+' entries but data/sites.json has '+wantN+' — the inline SITES payload is stale or truncated'); }
+    const wantOrgs=(function(){ try{ return JSON.parse(fs.readFileSync(__dirname+'/../data/orgs.json','utf8')).orgs.filter(o=>o.lvl>=3).length; }catch(_){ return 0; } })();
+    if(wantN!=null && n!==wantN+wantOrgs){ fails++; console.log('✗ SEARCH index '+n+' entries, want '+wantN+' sites + '+wantOrgs+' orgs — a payload is stale or truncated'); }
     else if(!(n>200)){ fails++; console.log('✗ SEARCH index too small: '+n+' entries (contract: >200 sites)'); }
     else console.log('  ✓ search index built: '+n+' sites');
     const res=(typeof global.sfsResults==='function')? global.sfsResults('bragg') : null;
@@ -347,14 +348,17 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(global.Brief.list().length!==2){ fails++; console.log('✗ BRIEF set wrong: '+global.Brief.list().join()); }
     // custom subordinate org (map-level add path uses the same API)
     const org=global.Orgs.add('1st Test Brigade','fort-bragg','fort-campbell');
-    if(!org || global.Orgs.of('fort-bragg').length!==1){ fails++; console.log('✗ ORGS add failed'); }
+    if(!org || org.parent!=='usawhc' || global.Orgs.of('usawhc').length!==1){
+      fails++; console.log('✗ ORGS add failed (site parent must normalize to the primary org): '+JSON.stringify(org)); }
     global.setMode('brief');
     // chain map: both HQ trees + the custom org riding its own base
     const C=global._briefChainMap();
-    if(!C.nodes['fort-bragg'] || !C.nodes['the-pentagon'] || C.order.length<10){
-      fails++; console.log('✗ CHAIN map thin: '+C.order.length+' nodes'); }
+    // v0.11.0: chain keys are ORG ids — fort-bragg's primary is USAWHC, the
+    // Pentagon site's primary is PIT (the A-ORG-1 world)
+    if(!C.nodes['usawhc'] || C.order.length<10){
+      fails++; console.log('✗ CHAIN map thin/wrong keys: '+C.order.length+' nodes, usawhc='+(!!C.nodes['usawhc'])); }
     const on=C.nodes[org.id];
-    if(!on || on.tier!==2 || on.parent!=='fort-bragg' || !on.custom || on.lat==null){
+    if(!on || on.tier!==2 || on.parent!=='usawhc' || !on.custom || on.lat==null){
       fails++; console.log('✗ CHAIN custom org node wrong: '+JSON.stringify(on)); }
     // chart card: compact chips (incl. the custom), no old tree boxes
     const bs2=IDS['briefStage'];
@@ -377,8 +381,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if((lg.innerHTML.match(/data-vw=/g)||[]).length!==3){ fails++; console.log('✗ LEGEND view toggles missing'); }
     // snapshot + export still carry the brief (+ orgs)
     const sn3=global.buildSnapshot();
-    if(!sn3.extras.brief || sn3.extras.brief.hqs.length!==2 || sn3.extras.brief.ann['fort-bragg']!=='Main effort'){
-      fails++; console.log('✗ SNAPSHOT extras.brief wrong'); }
+    if(!sn3.extras.brief || sn3.extras.brief.hqs.length!==2 || sn3.extras.brief.ann['usawhc']!=='Main effort'){
+      fails++; console.log('✗ SNAPSHOT extras.brief wrong (org-keyed): '+JSON.stringify(sn3.extras.brief&&sn3.extras.brief.ann)); }
     if(!sn3.extras.orgs || sn3.extras.orgs.length!==1){ fails++; console.log('✗ SNAPSHOT extras.orgs missing'); }
     const body3=global._xpDossierBody(sn3);
     if(body3.indexOf('Main effort')<0 || body3.indexOf('Brief — 2 HQs')<0){ fails++; console.log('✗ EXPORT body missing brief section'); }

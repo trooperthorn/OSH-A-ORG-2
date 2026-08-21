@@ -149,3 +149,24 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - _bfFrame(): chain growth in the brief room reflies to hold the whole chain;
   _xpPulse(): the chart export button glows twice on growth. Both fire from
   bfAdd/orgAdd; both no-op outside the brief room.
+
+## v0.11.0 — the A-ORG-1 spine (owner directive, 21 Aug)
+- **THE ORG TREE IS LAW**: data/orgs.json + the inline A1ORGS literal carry the
+  full A-ORG-1 reporting structure VERBATIM — 1,403 orgs, 9 levels, HQDA apex →
+  ACOMs · ASCCs · DRUs · PAE/CPEs · NGB. {id, name, parent, lvl, root, site}.
+  Never edit org rows by hand; they are A-ORG-1's own data (FORSCOM absent
+  because A-ORG-1's USAWHC subsumed it — owner's source of truth). Sites are
+  geo anchors; orgs are the spine. window._OG (byId/kids/atSite/eff) is built
+  once by _ogBuild(); helpers orgOf/ogKids/ogEffSite/ogAtSite/ogPrimary/
+  ogChainUp are the ONLY way to read the tree.
+- Selection carries GlobeState.selOrg (org id) beside sel (site id); search
+  rows 'og:…' route through selectSite(effSite,{orgId}). Brief hqs/ann and
+  custom-org parents key by ORG id — kv migrations rewrote old site-id data
+  once (no duplicates, owner law).
+- **INTERIOR-MESH BORDERS**: _topoInteriorMesh() draws only arcs shared by ≥2
+  geometries — coasts belong to the land layer ALONE. Any border pass that
+  re-strokes a coastline is the double-trace bug returning.
+- **THE MARK**: logo.svg (solid gold sphere · 70% lit / 20% black terminator /
+  10% #FFB35C depot-orange crescent) is the globe logo AND the #navGlobe face
+  (inlined, ids lgGold/lgVig/lgLit). The app ICON stays the owner-chosen Star
+  Net (icon-*.png) — two marks, two jobs; do not swap either without the owner.

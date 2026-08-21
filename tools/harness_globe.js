@@ -160,15 +160,30 @@ if(!fails){
 
   // ── 3. SELECTION ARCS + THE DOT LOOP over a parent+children site, faced center ──
   try{
-    // independent expectation straight from the JSON (never from the code under test)
+    // independent expectation straight from the JSONs (never from the code under
+    // test) — v0.11.0: the ORG TREE (data/orgs.json) is the structure.
     const byId=new Map(SITES_JSON.map(s=>[s.id,s]));
+    const ORGS_JSON=JSON.parse(fs.readFileSync(path.join(ROOT,'data/orgs.json'),'utf8')).orgs;
+    const oById=new Map(ORGS_JSON.map(o=>[o.id,o]));
     const loc=s=>s&&s.lat!=null&&s.lon!=null;
-    function expUp(s){ const out=[],seen=new Set([s.id]); let cur=s,from=s;
-      while(cur&&cur.parent!=null&&!seen.has(cur.parent)){ seen.add(cur.parent); const p=byId.get(cur.parent); if(!p) break;
-        if(loc(p)){ if(!(p.lat===from.lat&&p.lon===from.lon)) out.push(p.id); from=p; } cur=p; } return out; }
-    function expDown(s){ return SITES_JSON.filter(c=>c.parent===s.id&&loc(c)&&!(c.lat===s.lat&&c.lon===s.lon)).map(c=>c.id); }
-    const sel=SITES_JSON.find(s=>loc(s)&&expUp(s).length>0&&expDown(s).length>0);
-    if(!sel) throw new Error('sites.json has no located site with both a located parent and located children');
+    function oEff(oid){ let c=oById.get(oid),h=0; while(c&&h<=8){ if(c.site) return c.site; c=oById.get(c.parent); h++; } return null; }
+    function primary(siteId){ const a=ORGS_JSON.filter(o=>o.site===siteId); if(!a.length) return null; let b=a[0]; for(const o of a){ if(o.lvl<b.lvl) b=o; } return b; }
+    function expUp(s){ const po=primary(s.id); if(!po) return [];
+      const out=[]; let from=s; let c=oById.get(po.id); const seen=new Set([po.id]);
+      while(c&&c.parent&&!seen.has(c.parent)){ seen.add(c.parent); c=oById.get(c.parent); if(!c) break;
+        const ps=byId.get(oEff(c.id)||''); if(!ps||!loc(ps)) continue;
+        if(ps.id!==from.id && !(ps.lat===from.lat&&ps.lon===from.lon)){ out.push(ps.id); from=ps; } }
+      return out; }
+    function expDown(s){ const po=primary(s.id); if(!po) return [];
+      const seenK=new Set(); const out=[];
+      for(const c of ORGS_JSON.filter(o=>o.parent===po.id)){
+        const sid=oEff(c.id); if(!sid||seenK.has(sid)) continue; seenK.add(sid);
+        const cs=byId.get(sid); if(!cs||!loc(cs)) continue;
+        if(cs.lat===s.lat&&cs.lon===s.lon) continue;
+        out.push(cs.id);
+      } return out; }
+    const sel=SITES_JSON.find(s=>loc(s)&&primary(s.id)&&expUp(s).length>0&&expDown(s).length>0);
+    if(!sel) throw new Error('no located site whose primary org has located ancestors and children');
     const UP=expUp(sel), DOWN=expDown(sel);
 
     // face the selected site: q rotates its unit vector onto +z (depth → 1)
@@ -181,6 +196,7 @@ if(!fails){
     if(!(dSel>0.999)) throw new Error('face-quaternion failed: sel depth '+dSel);
 
     GS.sel=sel.id;
+    GS.selOrg=primary(sel.id).id;                          // the selection's chain driver (v0.11.0)
     G._syncSelArcs(sel.id);
     const up=GS._hqArc||[], down=GS._cmdLinkArcs||[];
     if(up.length!==UP.length||down.length!==DOWN.length){
