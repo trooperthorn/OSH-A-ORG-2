@@ -264,7 +264,7 @@ body{
    floating surface steps back so the world owns the screen; it breathes back in
    the moment the hand lifts. Pure CSS response to one body flag. */
 body.gesturing #titleBar, body.gesturing #searchPill, body.gesturing .clock,
-body.gesturing #briefStage, body.gesturing #legendPanel{opacity:.22; transition:opacity .2s ease}
+body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
 #titleBar, #searchPill, .clock, #briefStage, #legendPanel{transition:opacity .3s ease}
 
 /* SEARCH — standalone, one job, search-engine calm */
@@ -645,6 +645,38 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 }
 .bf-ann{display:block; margin-top:4px; font:600 10px/1.35 var(--body); font-style:normal; color:var(--signal)}
 
+
+/* ═══ THE ANCHORED CALLOUT (v0.9.0): identity at the pin, depth in the sheet ═══ */
+#calloutCard{
+  position:absolute; z-index:38; width:236px;
+  padding:10px 12px 11px; border-radius:14px;
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
+  transition:opacity .12s ease;
+}
+#calloutCard[hidden]{display:none}
+.co-head{display:flex; align-items:center; gap:8px}
+.co-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:800 13px/1.25 var(--body); color:var(--text)}
+.co-x{flex:none; appearance:none; -webkit-appearance:none; border:0; background:none; cursor:pointer;
+  width:26px; height:26px; margin:-4px -6px 0 0; border-radius:50%; color:var(--danger);
+  font:700 12px/1 var(--body); position:relative}
+.co-x::after{content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%)}
+.co-sub{margin-top:2px; font:600 10.5px/1.35 var(--body); color:var(--dim);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.co-acts{display:flex; gap:9px; padding-top:9px}
+.co-acts:empty{display:none}
+.co-pop{flex:none; width:36px; height:36px; border:0; cursor:pointer; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center; color:var(--dim);
+  background:var(--panel-2);
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
+.co-pop.on{color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
+.co-pop:active{filter:brightness(1.3)}
+.co-tail{position:absolute; left:50%; bottom:-6px; width:12px; height:12px;
+  background:var(--glass-lo); transform:rotate(45deg);
+  box-shadow:1px 1px 0 0 var(--line)}
+#calloutCard.co-below .co-tail{bottom:auto; top:-6px; box-shadow:-1px -1px 0 0 var(--line)}
+
 /* ═══ GOOGLE-FEEL FUSION — open results and the pill become ONE surface ═══ */
 #searchPill.sr-open{border-radius:24px 24px 0 0}
 #searchResults.sr-open{
@@ -722,6 +754,10 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 <!-- dossier: THE drawer (single-brain law — one drawer) -->
 <section id="dossier" class="glass card" role="dialog" aria-label="Dossier" hidden></section>
 
+<!-- THE ANCHORED CALLOUT (v0.9.0 owner references): the popup lives AT the dot —
+     caret tail on the marker, tracks it every dirty frame, flips to fit. -->
+<div id="calloutCard" hidden></div>
+
 <!-- (tool rail retired at v0.6.0 — nav lives in the globe button; zoom is gesture-native) -->
 
 <!-- BRIEF stage — full screen when body.brief-mode; precise CSS lines, tier law. -->
@@ -735,6 +771,18 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.9.0 • THE ANCHORED CALLOUT (owner reference set, 21 Aug: pop-ups that
+//            never obstruct the view). Selecting any dot — map reticle or
+//            brief chain node — now opens a small glass callout BESIDE the
+//            marker with a caret tail pointing at it: org name, base · state,
+//            and the three nested action circles (★ brief · subordinate ·
+//            ▤ details). It TRACKS its dot on every dirty frame as the globe
+//            turns, flips above/below to fit, fades on the far hemisphere,
+//            and yields during gestures like the rest of the chrome. Depth
+//            stays on demand: ▤ summons the tabbed bottom sheet; forms
+//            (subordinate · annotate) keep the sheet; chart chips anchor the
+//            same callout. ✕ clears the selection; Escape closes. The sheet
+//            no longer auto-opens on selection — the map owns the screen.
 //   v0.8.0 • THE HOLISTIC PASS (owner directive, 21 Aug — six edits weighed as
 //            one system, not one-by-one). OVERCAST KILLED: the olive land wash
 //            and the limb halo (both A-ORG-1 carryovers) are gone — true-black
@@ -899,7 +947,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.8.0';
+const APP_VERSION = 'v0.9.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -1165,7 +1213,9 @@ function startGlobeLoop(cv){
     if(GlobeState.sel!=null){
       if(!GlobeState._lp || performance.now()-GlobeState._lp>70){ GlobeState.dirty=true; GlobeState._lp=performance.now(); }
     }
-    if(GlobeState.dirty){ drawGlobe(cv, ctx); GlobeState.dirty=false; }
+    if(GlobeState.dirty){ drawGlobe(cv, ctx); GlobeState.dirty=false;
+      try{ if(window._coTrack) _coTrack(); }catch(_){}   // the callout rides its dot
+    }
     GlobeState.raf=requestAnimationFrame(frame);
   }
   if(GlobeState.raf) cancelAnimationFrame(GlobeState.raf);
@@ -1176,6 +1226,7 @@ function startGlobeLoop(cv){
 
 function drawGlobe(cv, ctx){
   const m=globeMetrics(cv);
+  GlobeState.__mCss=m;                                  // css-px metrics for DOM anchors (callout)
   _setGlobeRot(GlobeState.rotLon, GlobeState.rotLat);   // camera matrix once per frame
   ctx.setTransform(m.dpr,0,0,m.dpr,0,0);
   ctx.clearRect(0,0,m.w,m.h);
@@ -3187,6 +3238,7 @@ function selectSite(id, o){
     try{ if(typeof _syncSelArcs==='function') _syncSelArcs(null); }catch(_){}
     try{ _trailClear(); }catch(_){}
     try{ if(typeof autoFillSelect==='function') autoFillSelect(null); }catch(_){}   // an auto zone dies with its selection
+    try{ calloutHide(); }catch(_){}
     hideDossier();
     return;
   }
@@ -3202,7 +3254,9 @@ function selectSite(id, o){
   }
   try{ _trailPush(s.id); }catch(_){}
   try{ if(typeof autoFillSelect==='function') autoFillSelect(s); }catch(_){}   // SELECT clock follows the selection (manual pick wins)
-  showDossier(s.id);
+  // v0.9.0 (owner references): identity arrives AT the dot — the sheet only on ▤
+  try{ hideDossier(); }catch(_){}
+  try{ calloutShow(s.id); }catch(_){ showDossier(s.id); }
   if(_inBrief){ try{ renderBrief(); }catch(_){} }
 }
 
@@ -3221,6 +3275,7 @@ function setMode(m){
     if(host){ if(brief){ hideDossier(); } else if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); }
   }catch(_){}
   try{ GlobeState.__bfC=null; }catch(_){}
+  try{ calloutHide(); }catch(_){}
   try{ if(typeof globeMark==='function') globeMark(); }catch(_){}
 }
 try{ window.setMode=setMode; }catch(_){}
@@ -3299,7 +3354,7 @@ function tapAtScreen(x, y){
     // v0.7.0: the brief globe is the destination — a chain dot opens its popup;
     // empty sphere does nothing (hold the globe button 3s to return to map).
     const bs=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
-    if(bs && bs.id!=null){ _bfAnnEdit=null; _orgForm=null; try{ _bfObjSheet(bs.id); }catch(_){} }
+    if(bs && bs.id!=null){ _bfAnnEdit=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){} }
     return;
   }
   const hits=GlobeState._cluHits;
@@ -3461,6 +3516,95 @@ function _odRender(s){
   }
   return h;
 }
+
+
+// ═══ THE ANCHORED CALLOUT (v0.9.0 owner references): the popup lives AT the
+// dot. Identity + nested action circles beside the marker; a caret tail points
+// at it; it tracks the dot on every dirty frame and hides on the far side.
+// Depth (tabs/records/forms) stays in the sheet — summoned by ▤ only. ─────────
+let _coId=null;            // the anchored org (site or custom) — null = hidden
+let _coAt=null;            // fixed screen anchor (chart chips); null = track the dot
+function calloutShow(id, at){
+  _coId=id; _coAt=at||null;
+  _coRender();
+  _coPlace();
+}
+function calloutHide(){
+  _coId=null; _coAt=null;
+  const c=document.getElementById('calloutCard'); if(c) c.hidden=true;
+}
+function _coRefresh(){ if(_coId!=null){ _coRender(); _coPlace(); } }
+function _coRender(){
+  const c=document.getElementById('calloutCard'); if(!c) return;
+  const o=(typeof orgById==='function')?orgById(_coId):null;
+  const s=o?null:siteById(_coId);
+  if(!o && !s){ calloutHide(); return; }
+  const esc=_odEsc, escA=_odEscA;
+  const name=o?o.name:(s.unit||s.base);
+  const sub=o?('Custom org'+(o.base&&siteById(o.base)?(' · '+siteById(o.base).base):''))
+            :(s.base+(s.st?(' · '+s.st):''));
+  const nrec=(s&&typeof recCount==='function')?recCount(_coId):0;
+  const brief=document.body.classList.contains('brief-mode');
+  let h='<div class="co-head"><div class="co-name">'+esc(name)+'</div>'
+    +'<button class="co-x" type="button" data-cox="1" aria-label="Clear selection">✕</button></div>'
+    +'<div class="co-sub">'+esc(sub)+(nrec?(' · '+nrec+' rec'):'')+'</div>';
+  h+='<div class="co-acts">';
+  if(s){
+    h+=bfHas(_coId)
+      ?'<button class="co-pop on" type="button" data-bfrm="'+escA(_coId)+'" aria-label="Remove from brief"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>'
+      :'<button class="co-pop" type="button" data-bfadd="'+escA(_coId)+'" aria-label="Add to brief"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>';
+  }
+  h+='<button class="co-pop" type="button" data-orgadd="'+escA(_coId)+'" aria-label="Add subordinate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="6" r="2.6"></circle><path d="M12 9v3M12 12l-5 4M12 12l5 4"></path><circle cx="7" cy="18" r="2.2"></circle><circle cx="17" cy="18" r="2.2"></circle></svg></button>';
+  if(s) h+='<button class="co-pop" type="button" data-codetail="'+escA(_coId)+'" aria-label="Details and records"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>';
+  if(brief && s) h+='<button class="co-pop" type="button" data-govmap="'+escA(_coId)+'" aria-label="Show on map"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg></button>';
+  if(o) h+='<button class="co-pop" type="button" data-orgrm="'+escA(o.id)+'" aria-label="Delete org"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>';
+  h+='</div><i class="co-tail" aria-hidden="true"></i>';
+  c.innerHTML=h;
+  c.hidden=false;
+}
+// screen anchor: chart chips pass a fixed point; dots re-project every frame
+function _coAnchor(){
+  if(_coAt) return _coAt;
+  const o=(typeof orgById==='function')?orgById(_coId):null;
+  let lat=null, lon=null;
+  if(o){
+    const C=GlobeState.__bfC, n=C&&C.nodes?C.nodes[_coId]:null;
+    if(n){ lat=n.lat; lon=n.lon; }
+    else if(o.base){ const b=siteById(o.base); if(b){ lat=b.lat; lon=b.lon; } }
+  } else {
+    const s=siteById(_coId); if(s){ lat=s.lat; lon=s.lon; }
+  }
+  if(lat==null||lon==null) return null;
+  const m=GlobeState.__mCss; if(!m) return null;
+  try{
+    const p=_projectLonLat(lon, lat, m);
+    if(p[2]<0) return {back:true};
+    return {x:p[0], y:p[1]};
+  }catch(_){ return null; }
+}
+function _coPlace(){
+  const c=document.getElementById('calloutCard');
+  if(!c || _coId==null || c.hidden) return;
+  try{
+    const a=_coAnchor();
+    if(!a || a.back){ c.style.opacity='0'; c.style.pointerEvents='none'; return; }
+    c.style.opacity=''; c.style.pointerEvents='auto';
+    const vw=window.innerWidth||390, vh=window.innerHeight||844;
+    const w=c.offsetWidth||236, hgt=c.offsetHeight||110;
+    const x=Math.max(8, Math.min(a.x-w/2, vw-w-8));
+    // above the dot by default; below when the top chrome would eat it; never
+    // over the dot itself, never under the globe button band when avoidable
+    let above=(a.y-hgt-18)>=112;
+    let y=above ? a.y-hgt-18 : a.y+18;
+    if(!above && (y+hgt)>(vh-128)){ y=Math.max(112, a.y-hgt-18); above=true; }
+    c.classList.toggle('co-below', !above);
+    c.style.left=Math.round(x)+'px'; c.style.top=Math.round(y)+'px';
+    const t=c.querySelector('.co-tail');
+    if(t) t.style.left=Math.max(12, Math.min(a.x-x-6, w-24))+'px';
+  }catch(_){}
+}
+window._coTrack=function(){ try{ if(_coId!=null && !_coAt) _coPlace(); }catch(_){} };
+try{ window.Callout={ show:calloutShow, hide:calloutHide, id:function(){ return _coId; } }; }catch(_){}
 
 // ---- THE OBJECT POPUP (v0.7.0 owner law: hierarchy objects are compact — the
 // object shows almost nothing; the popup shows everything). One sheet for chain
@@ -3639,7 +3783,21 @@ if(!window._odWired){
     if(bc){ const id=_bfAnnEdit; _bfAnnEdit=null; if(id) _bfObjSheet(id); return; }
     // ---- v0.7.0 object popup + chart + custom orgs ----
     const bo=e.target.closest('[data-bfobj]');
-    if(bo){ _bfAnnEdit=null; _orgForm=null; _bfObjSheet(bo.getAttribute('data-bfobj')); return; }
+    if(bo){ _bfAnnEdit=null; _orgForm=null;
+      const r=bo.getBoundingClientRect();
+      calloutShow(bo.getAttribute('data-bfobj'), {x:r.left+r.width/2, y:r.bottom+4});
+      return; }
+    const cx0=e.target.closest('[data-cox]');
+    if(cx0){ selectSite(null); return; }
+    const cd=e.target.closest('[data-codetail]');
+    if(cd){ const id=cd.getAttribute('data-codetail');
+      calloutHide();
+      _odLastId=id;                      // lock BEFORE the render — its new-id reset must not eat these flags
+      _odFan=false; _odShowRec=true; _odTab='ov'; _rcForm=null;
+      const hst=document.getElementById('dossier');
+      showDossier(id);
+      if(hst && hst.classList.contains('dz-peek')){ hst.classList.remove('dz-peek'); hst.classList.add('dz-half'); }
+      return; }
     const ox=e.target.closest('[data-objx]');
     if(ox){ _bfAnnEdit=null; _orgForm=null;
       // in map mode the popup sits over a live selection — closing restores its card
@@ -3649,7 +3807,7 @@ if(!window._odWired){
     const cm=e.target.closest('[data-chmin]');
     if(cm){ if(!e.target.closest('#exportBtn')) document.body.classList.toggle('chart-min'); return; }
     const oa=e.target.closest('[data-orgadd]');
-    if(oa){ const id=oa.getAttribute('data-orgadd'); _orgForm={parent:id}; _bfAnnEdit=null; _bfObjSheet(id);
+    if(oa){ const id=oa.getAttribute('data-orgadd'); try{ calloutHide(); }catch(_){} _orgForm={parent:id}; _bfAnnEdit=null; _bfObjSheet(id);
       try{ const f=document.getElementById('ogF1'); f&&f.focus(); }catch(_){} return; }
     const os=e.target.closest('[data-orgsave]');
     if(os){ const pid=os.getAttribute('data-orgsave');
@@ -3666,7 +3824,7 @@ if(!window._odWired){
     const oc=e.target.closest('[data-orgcancel]');
     if(oc){ const id=oc.getAttribute('data-orgcancel'); _orgForm=null; _bfObjSheet(id); return; }
     const od0=e.target.closest('[data-orgrm]');
-    if(od0){ orgRemove(od0.getAttribute('data-orgrm')); hideDossier(); return; }
+    if(od0){ orgRemove(od0.getAttribute('data-orgrm')); try{ calloutHide(); }catch(_){} hideDossier(); return; }
     const gm=e.target.closest('[data-govmap]');
     if(gm){ const id=gm.getAttribute('data-govmap'); try{ setMode('map'); }catch(_){} selectSite(id); return; }
     const t=e.target.closest('[data-odsel]');
@@ -3893,14 +4051,18 @@ function bfAdd(id){
   BRIEF.hqs.push(id); _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
-  try{ if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
+  try{ if(typeof _coRefresh==='function') _coRefresh(); }catch(_){}
+  try{ const d=document.getElementById('dossier');
+    if(GlobeState.sel && d && !d.hidden && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
 }
 function bfRemove(id){
   const i=BRIEF.hqs.indexOf(id); if(i<0) return;
   BRIEF.hqs.splice(i,1); delete BRIEF.ann[id]; _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
-  try{ if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
+  try{ if(typeof _coRefresh==='function') _coRefresh(); }catch(_){}
+  try{ const d=document.getElementById('dossier');
+    if(GlobeState.sel && d && !d.hidden && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
 }
 function bfNote(id, text){
   text=String(text||'').slice(0,80).trim();
@@ -4642,7 +4804,11 @@ function bootShell(){
       }
     }, true);
     window.addEventListener('pointerup', function(){ setTimeout(function(){ GlobeState._navSwallow=false; },0); });
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && _nvOpen) _nvSet(false); });
+    document.addEventListener('keydown', function(e){
+      if(e.key!=='Escape') return;
+      if(_nvOpen){ _nvSet(false); return; }
+      try{ if(typeof calloutHide==='function') calloutHide(); }catch(_){}
+    });
     document.addEventListener('keydown', function(e){
       var ae=document.activeElement;
       var typing=!!(ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable));

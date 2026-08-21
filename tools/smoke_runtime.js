@@ -259,12 +259,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     const host=IDS['dossier'];
     if(!global.GlobeState || GlobeState.sel!=='fort-bragg'){ fails++; console.log('✗ selectSite: GlobeState.sel = '+(global.GlobeState?GlobeState.sel:'(no GlobeState)')); }
     if(global.GlobeState && GlobeState.dirty!==true){ fails++; console.log('✗ selectSite did not set GlobeState.dirty'); }
-    // v0.8.0 compact card: title = unit||base (USAWHC), one row + hidden pop-outs
-    if(!host || host.hidden!==false || host.innerHTML.indexOf('USAWHC')<0 || host.innerHTML.indexOf('data-odfan')<0){
-      fails++; console.log('✗ selectSite: compact card not populated (hidden='+(host&&host.hidden)+', '+(host?host.innerHTML.length:0)+' chars)');
-    } else if(host.innerHTML.indexOf('od-tabs')>=0 || host.innerHTML.indexOf('bd-stats')>=0){
-      fails++; console.log('✗ compact card leaks detail (tabs/stats visible before ▤)');
-    } else console.log('  ✓ selectSite(fort-bragg): compact card ('+host.innerHTML.length+' chars), pop-outs nested, dirty re-armed');
+    // v0.9.0 anchored callout: identity arrives AT the dot; the sheet stays down
+    const co=IDS['calloutCard'];
+    if(!co || co.hidden!==false || co.innerHTML.indexOf('USAWHC')<0 || co.innerHTML.indexOf('data-codetail')<0){
+      fails++; console.log('✗ selectSite: callout not populated (hidden='+(co&&co.hidden)+', '+(co?co.innerHTML.length:0)+' chars)');
+    } else if(host && host.hidden!==true){
+      fails++; console.log('✗ selectSite auto-opened the sheet (callout era: sheet only on ▤)');
+    } else console.log('  ✓ selectSite(fort-bragg): anchored callout ('+co.innerHTML.length+' chars), sheet held back, dirty re-armed');
   }catch(e){ fails++; console.log('✗ SELECT probe: '+e.message); console.log((e.stack||'').split('\n').slice(0,3).join('\n')); }
   // fly-to queued frames from the select — run a few (ported post-probe drain)
   { let fr2=0; while(rafQ.length && fr2<4){ const cb=rafQ.shift(); fr2++;
@@ -292,10 +293,12 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!lg || lg.innerHTML.indexOf('lg-row')<0){ fails++; console.log('✗ LEGEND did not render rows'); }
       else console.log('  ✓ legend rows rendered');
     }
-    global.selectSite('fort-stewart');   // second stop → crumbs appear in the sheet header
+    global.selectSite('fort-stewart');   // second stop → crumbs appear once ▤ opens the sheet
+    global.showDossier('fort-stewart');
     const dz=IDS['dossier'];
-    if(!dz || dz.innerHTML.indexOf('sh-crumb')<0){ fails++; console.log('✗ TRAIL crumbs missing from the sheet header after two selections'); }
-    else console.log('  ✓ trail crumbs render in the sheet header');
+    if(!dz || dz.innerHTML.indexOf('sh-crumb')<0){ fails++; console.log('✗ TRAIL crumbs missing from the ▤ sheet after two selections'); }
+    else console.log('  ✓ trail crumbs render in the ▤ sheet header');
+    global.hideDossier();
     if(typeof global.setMode==='function'){
       global.setMode('brief');
       const bs=IDS['briefStage'];
@@ -315,7 +318,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     global.Records.add('fort-bragg','specs',{label:'Runway', value:'10,000 ft'});
     if(global.Records.count('fort-bragg')!==2){ fails++; console.log('✗ RECORDS count wrong: '+global.Records.count('fort-bragg')); }
     global.selectSite('fort-bragg');
-    global._odUI.rec(true);                 // ▤ pop-out opens the detail area (v0.8.0)
+    global.showDossier('fort-bragg');       // ▤ path: the sheet locks to the org first
+    global._odUI.rec(true);                 // then the detail area opens (v0.8.0)
     global._odSetTab('people');
     const host=IDS['dossier'];
     if(host.innerHTML.indexOf('Mercer')<0 || host.innerHTML.indexOf('People · 1')<0){ fails++; console.log('✗ RECORDS tab did not render the person'); }

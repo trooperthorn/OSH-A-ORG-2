@@ -134,3 +134,10 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - COMPACT CARD LAW: the org card face is ONE row; every action nests behind ⊕
   (brief ★ · subordinate · details ▤ — 40px circles that must stay clear of the
   FAB column); detail/tabs render only behind ▤. New selection = compact again.
+
+## v0.9.0 — the anchored callout (owner reference set)
+- Selection identity lives AT the dot: #calloutCard (z 38) with caret tail,
+  tracked per dirty frame via GlobeState.__mCss + _coTrack; far side = faded.
+  ✕ clears; ▤ opens the sheet (the ONLY auto-surface law: nothing opens the
+  bottom sheet on plain selection anymore). Chart chips anchor the same card
+  (fixed point). Forms stay in the sheet. Callout joins the gesture-yield set.
