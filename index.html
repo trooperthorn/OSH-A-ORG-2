@@ -6,7 +6,7 @@
 <title>A-ORG-2</title>
 <!-- PWA / installable-app support -->
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0A111C">
+<meta name="theme-color" content="#060504">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -382,14 +382,45 @@ body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,21
 /* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
    black ink, the page warms, a gold frame bounds the stage, the map chrome
    yields. Same grammar, different light. */
+/* THE CHART CARD (v0.7.0 owner reversal: the brief is built ON the globe; the
+   tree SUPPLEMENTS it) — a compact floating card of hierarchy chips over the
+   full-screen chain globe. Minimize (–) collapses it to a "⌗ CHART" tab. */
 #briefStage{display:none}
 body.brief-mode #briefStage{
-  display:block; position:absolute; z-index:15;
-  left:0; right:0; top:calc(env(safe-area-inset-top,0px) + 112px);   /* below the search pill */
-  bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
+  display:block; position:absolute; z-index:16;
+  left:var(--safe-l); top:calc(env(safe-area-inset-top,0px) + 112px);
+  width:min(300px, 76vw); max-height:44vh;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  padding:18px 14px calc(18px + 110px);   /* the chain never hides under the globe button */
+  padding:10px 12px 12px; border-radius:var(--r-card);
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
 }
+body.brief-mode.chart-min #briefStage{
+  width:auto; max-height:none; overflow:visible; padding:0; background:none; box-shadow:none;
+}
+body.chart-min #briefStage > :not(.ch-head){display:none}
+body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
+.ch-head{display:flex; align-items:center; gap:8px; width:100%; border:none; background:none;
+  margin:0 0 4px; padding:2px 0; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  font:800 10.5px/1 var(--body); letter-spacing:.22em; color:var(--faint); text-align:left}
+.ch-head .ch-n{margin-left:auto; letter-spacing:.06em; color:var(--dim)}
+.ch-col{padding:7px 0 2px; box-shadow:0 -1px 0 var(--line)}
+.ch-col:first-of-type{box-shadow:none}
+.ch-row{display:flex; flex-wrap:wrap; gap:5px; padding:2.5px 0 2.5px var(--ch-ind,0px)}
+.ch-chip{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  padding:5px 9px; border-radius:8px; max-width:100%;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:800 10.5px/1.2 var(--body); background:var(--panel-2);
+}
+.ch-t1{box-shadow:0 0 0 1.4px var(--t1); color:var(--t1)}
+.ch-t2{box-shadow:0 0 0 1.2px var(--t2); color:var(--t2)}
+.ch-t3{box-shadow:0 0 0 1.2px var(--t3); color:var(--t3)}
+.ch-t4{box-shadow:0 0 0 1.2px var(--t4); color:var(--t4)}
+.ch-chip.on{background:var(--accent-wash)}
+.ch-more{font:700 9.5px/1 var(--mono); letter-spacing:.08em; color:var(--faint); padding:2px 0 2px var(--ch-ind,0px)}
 body.brief-mode{
   /* THE INVERTED ROOM — brief flips the scheme (owner law: map = main, brief =
      inverted). Values only; the canvas keeps map paint because it reads tokens
@@ -408,35 +439,13 @@ body.brief-mode{
 }
 body.brief-mode::before{content:''; position:absolute; inset:6px; border-radius:20px;  /* body is the non-scrolling 100dvh anchor — absolute is fixed here, and the no-fixed law holds */
   box-shadow:0 0 0 1.5px var(--accent); pointer-events:none; z-index:14}
-body.brief-mode #wordmark{background:linear-gradient(180deg,#3A2E08 0%,#8A6D00 60%,#B9973E 100%); -webkit-background-clip:text; background-clip:text}
-body.brief-mode .clock, body.brief-mode #legendPanel{display:none}
-/* MINI GLOBE — the one canvas, shrunk to a live thumbnail; the chain picture
-   stays visible in the corner. Tap = back to the map. */
-body.brief-mode #globeCanvas{
-  position:absolute; z-index:16; left:auto; top:auto;
-  right:calc(var(--safe-r) + 2px); bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
-  width:118px; height:118px; border-radius:50%;
-  box-shadow:0 0 0 1.5px var(--accent), var(--drop); background:#060504;
-}
-.bf-empty{max-width:340px; margin:16vh auto 0; padding:22px; text-align:center;
-  display:flex; flex-direction:column; gap:8px}
-.bf-empty b{font:800 16px/1.3 var(--body)}
-.bf-empty span{font:500 13px/1.5 var(--body); color:var(--dim)}
-.bf-col{display:flex; flex-direction:column; align-items:center; gap:0; max-width:760px; margin:0 auto}
-.bf-row{display:flex; flex-wrap:wrap; justify-content:center; gap:10px}
-.bf-rail{width:1.5px; height:26px; background:rgba(240,220,140,.4)}
-.bf-box{
-  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  background:var(--panel); border-radius:12px; padding:12px 15px; text-align:left;
-  display:flex; flex-direction:column; gap:3px; min-height:44px;
-}
-.bf-box b{font:800 12.5px/1.25 var(--body)}
-.bf-box span{font:600 10px/1.3 var(--body); color:var(--dim)}
-.bf-t1{box-shadow:0 0 0 1.6px var(--t1)} .bf-t1 b{color:var(--t1)}
-.bf-t2{box-shadow:0 0 0 1.4px var(--t2)} .bf-t2 b{color:var(--t2)}
-.bf-t3{box-shadow:0 0 0 1.4px var(--t3)} .bf-t3 b{color:var(--t3)}
-.bf-t4{box-shadow:0 0 0 1.4px var(--t4)} .bf-t4 b{color:var(--t4)}
-.bf-more{font:700 10px/1 var(--mono); letter-spacing:.1em; color:var(--faint); padding:8px 0}
+/* v0.7.0: the wordmark keeps its gold — in brief the globe stays the full-screen
+   ground (dark), so ink gradients would vanish. The clocks yield; the legend
+   STAYS reachable (names/dots/lines toggles serve the brief picture too). */
+body.brief-mode .clock{display:none}
+.bf-empty{padding:8px 2px 6px; text-align:left; display:flex; flex-direction:column; gap:8px}
+.bf-empty b{font:800 13px/1.3 var(--body)}
+.bf-empty span{font:500 11.5px/1.5 var(--body); color:var(--dim)}
 
 /* corner clocks — glass chips, mono + tabular numerals, readouts only.
    TL/TR sit under the top edge; BL/BR above the stage bar. Empty = hidden
@@ -532,6 +541,9 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 .lg-row.off{opacity:.38}
 .lg-row.off .lg-nm{text-decoration:line-through}
 .lg-sw{flex:none; width:11px; height:11px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.lg-sw-vw{box-shadow:none; background:none; display:flex; align-items:center; justify-content:center;
+  font:800 10px/1 var(--mono); color:var(--accent)}
+.lg-head-2{margin-top:6px; padding-top:8px; box-shadow:0 -1px 0 var(--line)}
 .lg-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .lg-ct{flex:none; font:700 10.5px/1 var(--mono); color:var(--faint)}
 
@@ -611,14 +623,16 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 }
 .bf-act.in{background:none; color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
 .bf-act:active{filter:brightness(1.1)}
+.rc-acts{flex-wrap:wrap; gap:8px; min-height:0; padding-top:10px}
+.rc-acts .bf-act{min-height:40px; padding:0 14px; font-size:12px}
+.rc-acts:empty{display:none}
+.ob-sp{height:92px}
 .bf-addsel{
   appearance:none; -webkit-appearance:none; border:0; margin:4px auto 0; cursor:pointer;
   min-height:48px; padding:0 22px; border-radius:var(--r-pill); background:var(--accent);
   color:#141006; font:800 13px/1 var(--body);
 }
-.bf-box.on{background:var(--accent-wash)}
 .bf-ann{display:block; margin-top:4px; font:600 10px/1.35 var(--body); font-style:normal; color:var(--signal)}
-.bf-box{max-width:340px}
 
 /* ═══ GOOGLE-FEEL FUSION — open results and the pill become ONE surface ═══ */
 #searchPill.sr-open{border-radius:24px 24px 0 0}
@@ -706,6 +720,26 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.7.0 • THE BRIEF IS BUILT ON THE GLOBE (owner correction, 21 Aug: "the
+//            whole intent is to build these structures on the globe with
+//            connecting lines — the tree is to supplement"). Brief mode now
+//            keeps the FULL-SCREEN globe and draws the chain on it: white dots
+//            wearing tier rings (L1 white · L2 cools · L3 warms · L4 roses),
+//            tier-colored great-circle connectors grouped deepest-first,
+//            tier-colored labels. The tree became the CHART CARD — a compact
+//            floating supplement of acronym chips (minimal on the object,
+//            everything in its popup), minimizable to a ⌗ CHART tab. OBJECTS:
+//            tap any chain dot or chip → the object popup (location, records,
+//            annotation, actions). SUBORDINATES: build custom orgs under any
+//            parent from the popup or the map card — name + optional base
+//            (datalist of all 276); they draw in the chain at their base,
+//            persist in kv 'orgs', lead their chart row, ride
+//            Snapshot.extras.orgs. TOGGLES (completed requirement): Names ·
+//            Dots · Lines rows in the Layers panel, honored in both rooms.
+//            APP ICON: rebuilt to the Lumen mark — gold wireframe globe on
+//            black with a lit command chain (512/192/180 + maskable);
+//            manifest and theme-color follow (#060504). Smoke grew the
+//            brief-on-globe probe chain.
 //   v0.6.0 • THE A-ORG-1 CARRYOVER (owner directive, 20 Aug — consult team of 10
 //            read the source; findings in this build). RADIAL NAV: the four
 //            controls (home · back · clear · saved) live INSIDE the bottom-center
@@ -824,8 +858,8 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.6.0';
-const APP_UPDATED = '20 August 2026';
+const APP_VERSION = 'v0.7.0';
+const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
 // PORTED from A-ORG-1 ~L13906. Orientation is stored as two plain angles — yaw
@@ -1831,6 +1865,13 @@ function renderLegend(){
   const off=GlobeState._famOff||(GlobeState._famOff=new Set());
   const counts={}; for(const st of _sitesArr()){ const k=clsOf(st.id); counts[k]=(counts[k]||0)+1; }
   let h='<div class="lg-head">Layers</div>';
+  // VIEW toggles (v0.7.0 owner directive): names · dots · lines, both rooms.
+  [['names','Names','_namesOff'],['dots','Dots','_dotsOff'],['lines','Lines','_linesOff']].forEach(function(v){
+    h+='<button type="button" class="lg-row'+(GlobeState[v[2]]?' off':'')+'" data-vw="'+v[0]+'">'
+      +'<span class="lg-sw lg-sw-vw">'+(v[0]==='names'?'A':(v[0]==='dots'?'●':'◜'))+'</span>'
+      +'<span class="lg-nm">'+v[1]+'</span><span class="lg-ct">'+(GlobeState[v[2]]?'off':'on')+'</span></button>';
+  });
+  h+='<div class="lg-head lg-head-2">Classes</div>';
   for(const k of Object.keys(CLS_META)){
     if(!counts[k]) continue;
     h+='<button type="button" class="lg-row'+(off.has(k)?' off':'')+'" data-fam="'+k+'">'
@@ -1844,9 +1885,16 @@ if(!window.__lgWired){ window.__lgWired=true;
   document.addEventListener('click', function(e){
     if(!e.target||!e.target.closest) return;
     const r=e.target.closest('.lg-row');
-    if(r){ const k=r.getAttribute('data-fam');
-      const off=GlobeState._famOff||(GlobeState._famOff=new Set());
-      if(off.has(k)) off.delete(k); else off.add(k);
+    if(r){
+      const vw=r.getAttribute('data-vw');
+      if(vw){                                            // view toggles: names · dots · lines
+        const flag={names:'_namesOff', dots:'_dotsOff', lines:'_linesOff'}[vw];
+        if(flag) GlobeState[flag]=!GlobeState[flag];
+      } else {
+        const k=r.getAttribute('data-fam');
+        const off=GlobeState._famOff||(GlobeState._famOff=new Set());
+        if(off.has(k)) off.delete(k); else off.add(k);
+      }
       renderLegend();
       if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
       return; }
@@ -2003,9 +2051,10 @@ function drawSubtleArcs(ctx, m, arcs, rgb, width, alpha, arrow){
 
 // ---- Arc families under the dots (PORT of drawGlobeLinks) ----------------------
 function drawGlobeLinks(ctx, m){
-  // brief thumbnail = chain dots only (A-ORG-1 law: non-brief link arcs are
-  // skipped entirely in brief — an arc to a culled dot ends on empty sphere)
-  try{ if(document.body.classList.contains('brief-mode')) return; }catch(_){}
+  // v0.7.0: in brief the chain connectors ARE the link layer (A-ORG-1 law:
+  // non-brief arcs are skipped entirely in brief); Lines toggle gates both rooms.
+  try{ if(document.body.classList.contains('brief-mode')){ drawBriefArcs(ctx, m); return; } }catch(_){}
+  if(GlobeState._linesOff) return;
   const T=_mTok();
   // Child web first (subtle, thin, static — hints the connection without a bright
   // tangle; the highlighted dots carry the "these belong to this site" meaning).
@@ -2080,10 +2129,14 @@ function drawGlobeMarkers(ctx, m){
   const zb=Math.min(2.4, 1 + (GlobeState.zoom-1)*0.14);   // dots grow a little as you zoom in
   const rScale=Math.min(2.1, 0.85+zb*0.16);
   const bodyFont=T.body;
-  // BRIEF CULL (v0.6.0, A-ORG-1 L17488 law): in brief mode the globe is a 118px
-  // thumbnail of the CHAIN — only brief-set members draw (empty set → clean sphere).
+  // v0.7.0 REVERSAL (A-ORG-1 L17488 law): brief mode hands the full-screen globe
+  // to the chain renderer — only the brief structures draw; everything else waits
+  // in map mode. Dots toggle silences the map reticles (and their hit-tests).
   let briefOn=false; try{ briefOn=document.body.classList.contains('brief-mode'); }catch(_){}
-  const bfSet=briefOn ? new Set((typeof BRIEF!=='undefined'&&BRIEF.hqs)||[]) : null;
+  if(briefOn){ drawBriefNodes(ctx, m); return; }
+  // Dots toggle: markers, badges and their hit-tests go quiet; the selection's
+  // chain labels stay (Names owns text). A dot that isn't drawn can't be tapped.
+  const dotsOff=!!GlobeState._dotsOff;
 
   for(const inst of _sitesArr()){
     if(inst.lat==null||inst.lon==null) continue;
@@ -2097,15 +2150,15 @@ function drawGlobeMarkers(ctx, m){
     const onChain=isSel||isUp||isDown;
     const cls=clsOf(inst.id);
     const isGuard=(cls==='guard');
-    if(bfSet && !bfSet.has(inst.id)) continue;   // brief: chain members only
     // class filter (legend): chain members stay — the picture outranks the layers
     if(!onChain && GlobeState._famOff && GlobeState._famOff.has(cls)) continue;
     // CLUSTERS (A-ORG-1 §3.4, gate 1.6 · 44px grid): at world zoom, ordinary
     // sites divert into count badges; the badge pass draws after this loop.
-    // (never in brief — badges would bury the 118px thumbnail)
-    if(!briefOn && GlobeState.zoom<1.6 && !onChain){
-      (GlobeState._clu||(GlobeState._clu=[])).push({x:sx, y:sy, lat:inst.lat, lon:inst.lon, c:(CLS_META[cls]||CLS_META.base).c});
-      GlobeState._screen.push({inst, sx, sy, depth:p[2]});
+    if(GlobeState.zoom<1.6 && !onChain){
+      if(!dotsOff){
+        (GlobeState._clu||(GlobeState._clu=[])).push({x:sx, y:sy, lat:inst.lat, lon:inst.lon, c:(CLS_META[cls]||CLS_META.base).c});
+        GlobeState._screen.push({inst, sx, sy, depth:p[2]});
+      }
       continue;
     }
     const col=(isSel||isDown) ? T.accent : (isUp ? T.signal : (CLS_META[cls]||CLS_META.base).c);
@@ -2113,7 +2166,7 @@ function drawGlobeMarkers(ctx, m){
     const dotR=((isSel?3.6:(onChain?3.0:(cls==='hq'?3.4:(isGuard?2.0:2.5)))))*zb2;
     const rr=dotR*1.16;
 
-    if(isSel){
+    if(isSel && !dotsOff){
       // A-ORG-1's breathing diamond + compass spokes — the selected org owns the map
       const d=7.5+Math.sin(tnow*2.4)*0.8;
       ctx.save(); ctx.translate(sx,sy); ctx.rotate(Math.PI/4);
@@ -2129,21 +2182,22 @@ function drawGlobeMarkers(ctx, m){
     // GLASS RETICLE, SHARP (A-ORG-1 recipe, halo deleted per owner: dark interior
     // disc + one thin ring + bright core; HQ adds one concentric ring; no glow,
     // no shadowBlur — ~270 markers must hold phone frames).
-    ctx.globalAlpha=fade*(isGuard&&!onChain?0.8:1);
-    ctx.beginPath(); ctx.arc(sx, sy, rr, 0, Math.PI*2);
-    ctx.fillStyle='rgba(8,7,4,.85)'; ctx.fill();
-    ctx.lineWidth=onChain?1.6:1.25; ctx.strokeStyle='rgb('+col+')'; ctx.stroke();
-    ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.9, rr*0.34), 0, Math.PI*2);
-    ctx.fillStyle='rgb('+col+')'; ctx.fill();
-    if(cls==='hq' && !isSel){
-      ctx.lineWidth=1.1; ctx.strokeStyle='rgb('+col+')'; ctx.globalAlpha=0.9*fade;
-      ctx.beginPath(); ctx.arc(sx, sy, rr+2.8, 0, Math.PI*2); ctx.stroke();
+    if(!dotsOff){
+      ctx.globalAlpha=fade*(isGuard&&!onChain?0.8:1);
+      ctx.beginPath(); ctx.arc(sx, sy, rr, 0, Math.PI*2);
+      ctx.fillStyle='rgba(8,7,4,.85)'; ctx.fill();
+      ctx.lineWidth=onChain?1.6:1.25; ctx.strokeStyle='rgb('+col+')'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.9, rr*0.34), 0, Math.PI*2);
+      ctx.fillStyle='rgb('+col+')'; ctx.fill();
+      if(cls==='hq' && !isSel){
+        ctx.lineWidth=1.1; ctx.strokeStyle='rgb('+col+')'; ctx.globalAlpha=0.9*fade;
+        ctx.beginPath(); ctx.arc(sx, sy, rr+2.8, 0, Math.PI*2); ctx.stroke();
+      }
+      ctx.globalAlpha=1;
     }
-    ctx.globalAlpha=1;
 
     // chain-member labels draw at ANY zoom — the picture is the product (deviation 7).
-    // (not in brief: no legible type at 118px — the dots carry the shape alone)
-    if(onChain && !briefOn && !GlobeState._namesOff){
+    if(onChain && !GlobeState._namesOff){
       const _nm=inst.unit||inst.base||inst.id;
       const _fs=(m.w<560?12:11);
       ctx.save();
@@ -2158,7 +2212,7 @@ function drawGlobeMarkers(ctx, m){
       ctx.restore();
     }
 
-    GlobeState._screen.push({inst, sx, sy, depth:p[2]});
+    if(!dotsOff) GlobeState._screen.push({inst, sx, sy, depth:p[2]});
   }
 
   // Tiny labels for the rest, zoom-gated (keeps world view clean).
@@ -2237,6 +2291,130 @@ function drawClusters(ctx, m){
     GlobeState._cluHits.push({x:cx, y:cy, r:r+8, lat:g.la/g.n, lon:g.lo/g.n});
   });
   ctx.restore(); GlobeState._clu=null;
+}
+
+// ═══ THE BRIEF ON THE GLOBE (v0.7.0 owner reversal) — the chain is BUILT on the
+// sphere: white dots wearing tier rings, tier-colored great-circle connectors,
+// tier-colored labels. The chart card only supplements this picture.
+// (A-ORG-1 recipe, consult 6: dot spec L17589, arcs L16849, streams L21656 —
+// stream families re-keyed to the Lumen tier law: L2 cools NEVER green.) ────────
+const BF_STREAMS={
+  1:['255,255,255','232,238,255'],
+  2:['111,199,232','178,102,255','70,120,255','0,205,255','150,160,255'],
+  3:['255,201,92','255,150,50','255,120,80','255,190,110'],
+  4:['255,143,192','230,70,160','255,120,150'],
+};
+// short label for chain nodes + chart chips: '(WSMR)' captures beat everything;
+// else standard military short forms (Inf · Abn · Bde · Cmd …) beat truncation.
+const _BF_SHORT={Infantry:'Inf',Armored:'Armd',Airborne:'Abn',Division:'Div',Brigade:'Bde',
+  Battalion:'Bn',Command:'Cmd',Support:'Spt',Mountain:'Mtn',Military:'Mil',Theater:'Thtr',
+  Mission:'Msn',Regiment:'Regt',Artillery:'Arty',Medical:'Med',Cavalry:'Cav',Intelligence:'Intel',
+  Ammunition:'Ammo',Depot:'Dep',Arsenal:'Ars',Training:'Trng',Readiness:'Rdns',General:'Gen'};
+function _bfAbbr(name){
+  const s=String(name||'');
+  const p=s.match(/\(([A-Za-z0-9&\- ]{2,10})\)/); if(p) return p[1];
+  const cap=s.split(/\s+/).find(function(w){ return w.length>=2&&w.length<=7&&w===w.toUpperCase()&&/[A-Z]/.test(w); });
+  if(cap) return cap.replace(/[.,]$/,'');
+  const short=s.split(/\s+/).map(function(w){ return _BF_SHORT[w]||w; }).join(' ');
+  return short.length>18 ? short.slice(0,17)+'…' : short;
+}
+// The chain map: every node reachable from the brief HQs, four echelons deep,
+// sites AND custom orgs. A custom without its own base rides its parent's point.
+function _briefChainMap(){
+  const out={nodes:{}, order:[]};
+  if(typeof BRIEF==='undefined' || !BRIEF.hqs || !BRIEF.hqs.length) return out;
+  const kidIx={};
+  for(const st of _sitesArr()){ if(st.parent!=null) (kidIx[st.parent]||(kidIx[st.parent]=[])).push(st); }
+  const orgIx={};
+  if(typeof ORGS!=='undefined') for(const o of ORGS) (orgIx[o.parent]||(orgIx[o.parent]=[])).push(o);
+  const tierN={1:0,2:0,3:0,4:0};
+  const seen=new Set();
+  BRIEF.hqs.forEach(function(hid){
+    const hq=siteById(hid); if(!hq) return;
+    const q=[{n:hq, custom:false, tier:1, pk:null}];
+    while(q.length){
+      const c=q.shift(); const key=c.n.id;
+      if(seen.has(key)) continue; seen.add(key);
+      const fam=BF_STREAMS[c.tier];
+      const shade=fam[tierN[c.tier]++ % fam.length];
+      let lat=null, lon=null;
+      if(c.custom){
+        const b=c.n.base?siteById(c.n.base):null;
+        if(b){ lat=b.lat; lon=b.lon; }
+        else { const p=out.nodes[c.pk]; if(p){ lat=p.lat; lon=p.lon; } }
+      } else { lat=c.n.lat; lon=c.n.lon; }
+      out.nodes[key]={id:key, tier:c.tier, shade:shade, parent:c.pk, root:hid, lat:lat, lon:lon,
+        name:(c.custom?c.n.name:(c.n.unit||c.n.base)), custom:!!c.custom};
+      out.order.push(key);
+      if(c.tier>=4) continue;
+      (kidIx[key]||[]).forEach(function(k){ q.push({n:k, custom:false, tier:c.tier+1, pk:key}); });
+      (orgIx[key]||[]).forEach(function(o){ q.push({n:o, custom:true, tier:c.tier+1, pk:key}); });
+    }
+  });
+  return out;
+}
+// Connectors: grouped by parent shade + child tier; per-level width/alpha
+// (A-ORG-1 L16878), deepest first so bright trunks paint on top.
+function drawBriefArcs(ctx, m){
+  GlobeState.__bfC=_briefChainMap();                 // links draw first each frame — nodes reuse this
+  if(GlobeState._linesOff) return;
+  const C=GlobeState.__bfC, groups={};
+  for(const key of C.order){
+    const n=C.nodes[key]; if(!n.parent||n.lat==null) continue;
+    const pn=C.nodes[n.parent]; if(!pn||pn.lat==null) continue;
+    if(Math.abs(pn.lat-n.lat)<1e-6 && Math.abs(pn.lon-n.lon)<1e-6) continue;   // same point: no zero arc
+    const gk=pn.shade+'|'+n.tier;
+    (groups[gk]||(groups[gk]={shade:pn.shade, tier:n.tier, arcs:[]}))
+      .arcs.push({from:{lon:pn.lon,lat:pn.lat}, to:{lon:n.lon,lat:n.lat}});
+  }
+  const W={2:2.8,3:2.1,4:1.8}, A={2:.9,3:.85,4:.8};
+  Object.keys(groups).map(function(k){ return groups[k]; })
+    .sort(function(a,b){ return b.tier-a.tier; })
+    .forEach(function(g){ drawSubtleArcs(ctx, m, g.arcs, g.shade, W[g.tier]||1.8, A[g.tier]||0.8); });
+}
+// Chain dots + labels (A-ORG-1 chain dot spec: solid white, tier ring, HQ halo
+// ring; labels tier-colored over a dark halo, collision-placed).
+function drawBriefNodes(ctx, m){
+  const T=_mTok();
+  const C=GlobeState.__bfC||(GlobeState.__bfC=_briefChainMap());
+  const zb=Math.min(2.4, 1 + (GlobeState.zoom-1)*0.14);
+  const zb2=Math.min(2.1, 0.85+zb*0.16);
+  const dotsOff=!!GlobeState._dotsOff, namesOff=!!GlobeState._namesOff;
+  for(const key of C.order){
+    const n=C.nodes[key];
+    if(n.lat==null||n.lon==null) continue;
+    const p=_projectLonLat(n.lon, n.lat, m);
+    if(p[2]<0) continue;
+    const sx=p[0], sy=p[1], fade=Math.max(0.3, p[2]);
+    const dotR=(n.tier===1?3.4:(n.tier===2?3.0:2.7))*zb2;
+    if(!dotsOff){
+      ctx.globalAlpha=fade;
+      ctx.beginPath(); ctx.arc(sx, sy, dotR, 0, Math.PI*2);
+      ctx.fillStyle='#ffffff'; ctx.fill();
+      ctx.lineWidth=1.0; ctx.strokeStyle='rgba(8,7,4,.9)'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx, sy, dotR+3.4, 0, Math.PI*2);
+      ctx.lineWidth=(n.tier===1?2.2:1.6);
+      ctx.strokeStyle='rgba('+n.shade+','+(n.tier===1?0.95:0.88)+')'; ctx.stroke();
+      if(n.tier===1){
+        ctx.beginPath(); ctx.arc(sx, sy, dotR+6.6, 0, Math.PI*2);
+        ctx.lineWidth=1.1; ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+      GlobeState._screen.push({inst:{id:key, base:n.name, lat:n.lat, lon:n.lon, _bf:true}, sx:sx, sy:sy, depth:p[2]});
+    }
+    if(!namesOff){
+      const nm=_bfAbbr(n.name);
+      const fs=(m.w<560?12:11);
+      ctx.save(); ctx.textBaseline='middle'; ctx.font='800 '+fs+'px '+T.body;
+      const tw=ctx.measureText(nm).width;
+      const pos=_placeGlobeLabel(ctx, sx, sy, tw, m, GlobeState.__gLbl, {gap:dotR+7, h:14});
+      if(pos){
+        ctx.lineWidth=(fs>11?3.6:3.2); ctx.strokeStyle='rgba('+T.ground+',.9)'; ctx.strokeText(nm, pos.x, pos.y);
+        ctx.fillStyle='rgba('+n.shade+',1)'; ctx.fillText(nm, pos.x, pos.y);
+      }
+      ctx.restore();
+    }
+  }
 }
 
 // ---- m2 hook: links under, markers over (A-ORG-1 drawGlobe order, ~L16798) -----
@@ -3014,11 +3192,17 @@ function selectSite(id, o){
 function setMode(m){
   const brief=(m==='brief');
   document.body.classList.toggle('brief-mode', brief);
+  // the globe picture is the hero (owner law): the chart supplement arrives
+  // MINIMIZED every time brief opens — one tap on ⌗ CHART expands it
+  if(brief) document.body.classList.add('chart-min');
   if(brief) renderBrief();
   try{                                            // the sheet follows the mode
     const host=document.getElementById('dossier');
-    if(host){ if(brief){ _odInjectCSS(); _bfSheetShow(host); } else if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); }
+    // v0.7.0: brief opens on the GLOBE picture — no sheet until an object is
+    // tapped (chain dot or chart chip); map restores the selection card.
+    if(host){ if(brief){ hideDossier(); } else if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); }
   }catch(_){}
+  try{ GlobeState.__bfC=null; }catch(_){}
   try{ if(typeof globeMark==='function') globeMark(); }catch(_){}
 }
 try{ window.setMode=setMode; }catch(_){}
@@ -3029,49 +3213,44 @@ try{ window.setMode=setMode; }catch(_){}
 // warms · L4 roses; green never touches brief data. Boxes carry the org's
 // record count; annotations (≤80 chars) ride under their box in the signal
 // voice (chrome, not tier data).
+// v0.7.0: the CHART CARD — the tree SUPPLEMENTS the globe picture. Compact chips
+// only (owner law: minimal on the object, everything in the popup); minimize (⌗)
+// collapses the card to its tab. Chips open the object popup.
 function renderBrief(){
   const el=document.getElementById('briefStage'); if(!el) return;
   const esc=_odEsc, escA=_odEscA;
+  let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
+    +'<span class="ch-n">'+(BRIEF.hqs.length?(BRIEF.hqs.length+' HQ'+(BRIEF.hqs.length===1?'':'s')):'')+'</span>'
+    +'<span class="od-ico" id="exportBtn" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
+    +'</button>';
   if(!BRIEF.hqs.length){
     const sel=GlobeState.sel?siteById(GlobeState.sel):null;
-    el.innerHTML='<div class="bf-empty glass card"><b>The brief is empty</b>'
+    h+='<div class="bf-empty"><b>The brief is empty</b>'
       +(sel?('<button type="button" class="bf-addsel" data-bfadd="'+escA(sel.id)+'">Add '+esc(sel.base)+'</button>')
             :'<span>Pick an organization on the map, then add it here.</span>')
       +'</div>';
-    return;
+    el.innerHTML=h; return;
   }
-  const box=function(st,tier){
-    const n=(typeof recCount==='function')?recCount(st.id):0;
-    const tcls='bf-t'+tier;
-    const on=(GlobeState.sel===st.id);
-    return '<button type="button" class="bf-box '+tcls+(on?' on':'')+'" data-odsel="'+escA(st.id)+'">'
-      +'<b>'+esc(st.unit||st.base)+'</b><span>'+esc(st.base)+(st.st?(' · '+esc(st.st)):'')+(n?(' · '+n+' rec'):'')+'</span>'
-      +(BRIEF.ann[st.id]?('<i class="bf-ann">'+esc(BRIEF.ann[st.id])+'</i>'):'')
-      +'</button>';
-  };
-  let h='';
+  const C=_briefChainMap();
+  const CAP={1:4,2:8,3:10,4:12};
   BRIEF.hqs.forEach(function(hid){
-    const hq=siteById(hid); if(!hq) return;
-    const kids=childrenOf(hid).sort(function(a,b){ return String(a.base).localeCompare(String(b.base)); });
-    h+='<div class="bf-col">';
-    h+='<div class="bf-row">'+box(hq,1)+'</div>';
-    if(kids.length){
-      h+='<div class="bf-rail"></div>';
-      h+='<div class="bf-row">'+kids.slice(0,6).map(function(k){ return box(k,2); }).join('')+'</div>';
-      if(kids.length>6) h+='<div class="bf-more">+'+(kids.length-6)+' more</div>';
-      const g=[]; kids.slice(0,6).forEach(function(k){ childrenOf(k.id).forEach(function(x){ g.push(x); }); });
-      if(g.length){
-        h+='<div class="bf-rail"></div>';
-        h+='<div class="bf-row">'+g.slice(0,8).map(function(x){ return box(x,3); }).join('')+'</div>';
-        if(g.length>8) h+='<div class="bf-more">+'+(g.length-8)+' more</div>';
-        const gg=[]; g.slice(0,8).forEach(function(x){ childrenOf(x.id).forEach(function(y){ gg.push(y); }); });
-        if(gg.length){
-          h+='<div class="bf-rail"></div>';
-          h+='<div class="bf-row">'+gg.slice(0,10).map(function(y){ return box(y,4); }).join('')+'</div>';
-          if(gg.length>10) h+='<div class="bf-more">+'+(gg.length-10)+' more</div>';
-        }
-      }
-    }
+    const sub={1:[],2:[],3:[],4:[]};
+    C.order.forEach(function(k){ const n=C.nodes[k]; if(n.root===hid) sub[n.tier].push(n); });
+    if(!sub[1].length) return;
+    // user-built orgs never fall off the cap — they lead their tier row
+    [2,3,4].forEach(function(t){ sub[t].sort(function(a,b){ return (b.custom?1:0)-(a.custom?1:0); }); });
+    h+='<div class="ch-col">';
+    [1,2,3,4].forEach(function(t){
+      if(!sub[t].length) return;
+      const ind=(t-1)*10;
+      h+='<div class="ch-row" style="--ch-ind:'+ind+'px">'
+        +sub[t].slice(0,CAP[t]).map(function(n){
+          const tcls='ch-t'+t;                             // quote-adjacent for dead-lint's dynamic guard
+          return '<button type="button" class="ch-chip '+tcls+(GlobeState.sel===n.id?' on':'')+'" data-bfobj="'+escA(n.id)+'" title="'+escA(n.name)+'">'+esc(_bfAbbr(n.name))+'</button>';
+        }).join('')
+        +'</div>';
+      if(sub[t].length>CAP[t]) h+='<div class="ch-more" style="--ch-ind:'+ind+'px">+'+(sub[t].length-CAP[t])+' more</div>';
+    });
     h+='</div>';
   });
   el.innerHTML=h;
@@ -3099,7 +3278,11 @@ try{ window.selectSite=selectSite; }catch(_){}   // mission: expose the brain gl
 function tapAtScreen(x, y){
   if(GlobeState._navSwallow){ GlobeState._navSwallow=false; return; }   // that tap only closed the nav ring
   if(document.body && document.body.classList.contains('brief-mode')){
-    try{ setMode('map'); }catch(_){} return;       // the mini globe is the way back
+    // v0.7.0: the brief globe is the destination — a chain dot opens its popup;
+    // empty sphere does nothing (hold the globe button 3s to return to map).
+    const bs=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
+    if(bs && bs.id!=null){ _bfAnnEdit=null; _orgForm=null; try{ _bfObjSheet(bs.id); }catch(_){} }
+    return;
   }
   const hits=GlobeState._cluHits;
   if(hits){ for(const h of hits){ const dx=x-h.x, dy=y-h.y;
@@ -3114,7 +3297,7 @@ function tapAtScreen(x, y){
 function showDossier(id){
   const host=document.getElementById('dossier'); if(!host) return;
   if(document.body && document.body.classList && document.body.classList.contains('brief-mode')){
-    _odInjectCSS(); _bfSheetShow(host); return;    // brief mode: the sheet is the brief manifest
+    _bfObjSheet(id); return;                       // brief mode: the sheet is the object popup
   }
   const s=(typeof siteById==='function') ? siteById(id) : null;
   if(!s){ hideDossier(); return; }
@@ -3194,6 +3377,8 @@ function _odRender(s){
   h+=bfHas(s.id)
     ?'<button class="bf-act in" type="button" data-bfrm="'+_odEscA(s.id)+'">In the brief · remove</button>'
     :'<button class="bf-act" type="button" data-bfadd="'+_odEscA(s.id)+'">Add to brief</button>';
+  // v0.7.0: subordinates can be added at the MAP level too (owner directive)
+  h+='<button class="bf-act in" type="button" data-orgadd="'+_odEscA(s.id)+'">+ Subordinate</button>';
   h+='<div class="od-tabs">'
     +'<button type="button" class="od-tab'+(_odTab==='ov'?' on':'')+'" data-odtab="ov">Overview</button>'
     +Object.keys(RC_KINDS).map(function(k){
@@ -3244,46 +3429,70 @@ function _odRender(s){
   return h;
 }
 
-// ---- brief manifest sheet (v0.5.0) — members · annotate · remove · export ----
-let _bfAnnEdit=null;                                 // site id with the annotation form open
-function _bfSheetShow(host){
-  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1]||'peek';
-  host.innerHTML=_bfSheetRender();
-  host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add('dz-'+_kept);
-  host.hidden=false;
-  try{ host.setAttribute('aria-label','Brief'); }catch(_){}
-}
-function _bfSheetRender(){
+// ---- THE OBJECT POPUP (v0.7.0 owner law: hierarchy objects are compact — the
+// object shows almost nothing; the popup shows everything). One sheet for chain
+// dots, chart chips, and custom orgs, in either room. ---------------------------
+let _bfAnnEdit=null;                                 // id with the annotation form open
+let _orgForm=null;                                   // {parent} when add-subordinate is open
+function _bfObjSheet(id){
+  const host=document.getElementById('dossier'); if(!host) return;
+  _odInjectCSS();
   const esc=_odEsc, escA=_odEscA;
+  const o=(typeof orgById==='function')?orgById(id):null;
+  const s=o?null:siteById(id);
+  if(!o && !s) return;
+  const name=o?o.name:(s.unit||s.base);
+  const nrec=(s && typeof recCount==='function')?recCount(id):0;
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
-  h+='<div class="od-head od-head-slim">'
-    +'<div class="od-name">Brief · '+BRIEF.hqs.length+' HQ'+(BRIEF.hqs.length===1?'':'s')+'</div>'
-    +'<span class="od-sp"></span>'
-    +'<button class="od-ico" id="exportBtn" type="button" aria-label="Export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>'
-    +'</div>';
-  BRIEF.hqs.forEach(function(id){
-    const st=siteById(id); if(!st) return;
+  h+='<div class="od-head od-head-slim"><div class="od-name">'+esc(name)+'</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>';
+  h+='<div class="rc-row"><span class="rc-sub">'
+    +(o ? ('Custom org'+(o.base&&siteById(o.base)?(' · '+esc(siteById(o.base).base)):''))
+        : esc(s.base+(s.st?(' · '+s.st):'')))
+    +(nrec?(' · '+nrec+' record'+(nrec===1?'':'s')):'')
+    +'</span></div>';
+  // annotation (sites in the brief wear callouts on their blocks + exports)
+  if(s){
     if(_bfAnnEdit===id){
       h+='<div class="rc-form">'
         +'<input class="rc-in" id="rcF1" type="text" maxlength="80" placeholder="Callout (80 max)" value="'+escA(BRIEF.ann[id]||'')+'">'
-        +'<div class="rc-btns">'
-        +'<button class="rc-del" type="button" data-bfrm="'+escA(id)+'">Remove HQ</button>'
-        +'<span class="od-sp"></span>'
+        +'<div class="rc-btns"><span class="od-sp"></span>'
         +'<button class="rc-cancel" type="button" data-bfanncancel="1">Cancel</button>'
         +'<button class="rc-save" type="button" data-bfannsave="'+escA(id)+'">Save</button>'
         +'</div></div>';
-      return;
+    } else if(BRIEF.ann[id]){
+      h+='<div class="rc-row"><i class="bf-ann">'+esc(BRIEF.ann[id])+'</i>'
+        +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(id)+'" aria-label="Edit callout"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
+        +'</div>';
     }
-    h+='<div class="rc-row">'
-      +'<span class="rc-top">'+esc(st.unit||st.base)+'</span>'
-      +'<span class="rc-sub">'+esc(BRIEF.ann[id]||st.base)+'</span>'
-      +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(id)+'" aria-label="Annotate"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
-      +'</div>';
-  });
-  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
-  if(sel && !bfHas(sel.id)) h+='<button class="rc-add" type="button" data-bfadd="'+escA(sel.id)+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Add '+esc(sel.base)+'</button>';
-  return h;
+  }
+  // add-subordinate: the inline two-field form (name · base), datalist-backed
+  if(_orgForm && _orgForm.parent===id){
+    h+='<div class="rc-form">'
+      +'<input class="rc-in" id="ogF1" type="text" maxlength="60" placeholder="Organization name">'
+      +'<input class="rc-in" id="ogF2" type="text" list="orgBaseList" placeholder="Base (optional — else rides '+escA(_bfAbbr(name))+')">'
+      +'<datalist id="orgBaseList">'+_sitesArr().map(function(b){ return '<option value="'+escA(b.base)+'"></option>'; }).join('')+'</datalist>'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-orgcancel="'+escA(id)+'">Cancel</button>'
+      +'<button class="rc-save" type="button" data-orgsave="'+escA(id)+'">Add</button>'
+      +'</div></div>';
+  } else {
+    h+='<button class="rc-add" type="button" data-orgadd="'+escA(id)+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Add subordinate</button>';
+  }
+  // action rail: annotate (sites w/o callout yet) · map jump · remove
+  h+='<div class="rc-row rc-acts">';
+  if(s && !BRIEF.ann[id] && _bfAnnEdit!==id) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(id)+'">Annotate</button>';
+  if(s) h+='<button class="bf-act in" type="button" data-govmap="'+escA(id)+'">Show on map</button>';
+  if(s && bfHas(id)) h+='<button class="bf-act in" type="button" data-bfrm="'+escA(id)+'">Remove HQ</button>';
+  if(o) h+='<button class="bf-act in" type="button" data-orgrm="'+escA(id)+'">Delete org</button>';
+  h+='</div>';
+  h+='<div class="ob-sp" aria-hidden="true"></div>';   // the globe button floats over this band, never over a control
+  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
+  host.innerHTML=h;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add(_kept==='dz-full'?'dz-full':'dz-half');
+  host.hidden=false;
+  try{ host.setAttribute('aria-label', name); }catch(_){}
 }
 
 // ---- record tab body (v0.4.0): rows · one add/edit form · delete ------------
@@ -3373,16 +3582,43 @@ if(!window._odWired){
     const ba=e.target.closest('[data-bfadd]');
     if(ba){ bfAdd(ba.getAttribute('data-bfadd')); return; }
     const br=e.target.closest('[data-bfrm]');
-    if(br){ _bfAnnEdit=null; bfRemove(br.getAttribute('data-bfrm')); return; }
+    if(br){ _bfAnnEdit=null; bfRemove(br.getAttribute('data-bfrm')); hideDossier(); return; }
     const be=e.target.closest('[data-bfannedit]');
-    if(be){ _bfAnnEdit=be.getAttribute('data-bfannedit');
-      const hst=document.getElementById('dossier'); if(hst) _bfSheetShow(hst);
+    if(be){ const id=be.getAttribute('data-bfannedit'); _bfAnnEdit=id; _orgForm=null; _bfObjSheet(id);
       try{ const f=document.getElementById('rcF1'); f&&f.focus(); }catch(_){} return; }
     const bs=e.target.closest('[data-bfannsave]');
-    if(bs){ const f=document.getElementById('rcF1'); bfNote(bs.getAttribute('data-bfannsave'), f?f.value:'');
-      _bfAnnEdit=null; const hst=document.getElementById('dossier'); if(hst) _bfSheetShow(hst); return; }
+    if(bs){ const id=bs.getAttribute('data-bfannsave'); const f=document.getElementById('rcF1');
+      bfNote(id, f?f.value:''); _bfAnnEdit=null; _bfObjSheet(id); return; }
     const bc=e.target.closest('[data-bfanncancel]');
-    if(bc){ _bfAnnEdit=null; const hst=document.getElementById('dossier'); if(hst) _bfSheetShow(hst); return; }
+    if(bc){ const id=_bfAnnEdit; _bfAnnEdit=null; if(id) _bfObjSheet(id); return; }
+    // ---- v0.7.0 object popup + chart + custom orgs ----
+    const bo=e.target.closest('[data-bfobj]');
+    if(bo){ _bfAnnEdit=null; _orgForm=null; _bfObjSheet(bo.getAttribute('data-bfobj')); return; }
+    const ox=e.target.closest('[data-objx]');
+    if(ox){ _bfAnnEdit=null; _orgForm=null; hideDossier(); return; }
+    const cm=e.target.closest('[data-chmin]');
+    if(cm){ if(!e.target.closest('#exportBtn')) document.body.classList.toggle('chart-min'); return; }
+    const oa=e.target.closest('[data-orgadd]');
+    if(oa){ const id=oa.getAttribute('data-orgadd'); _orgForm={parent:id}; _bfAnnEdit=null; _bfObjSheet(id);
+      try{ const f=document.getElementById('ogF1'); f&&f.focus(); }catch(_){} return; }
+    const os=e.target.closest('[data-orgsave]');
+    if(os){ const pid=os.getAttribute('data-orgsave');
+      const f1=document.getElementById('ogF1'), f2=document.getElementById('ogF2');
+      const nm=f1?f1.value:''; let baseId=null;
+      if(f2 && f2.value.trim()){
+        const want=f2.value.trim().toLowerCase();
+        const hit=_sitesArr().find(function(b){ return String(b.base).toLowerCase()===want; });
+        if(hit) baseId=hit.id;
+      }
+      const made=orgAdd(nm, pid, baseId);
+      _orgForm=null;
+      if(made) _bfObjSheet(pid); return; }
+    const oc=e.target.closest('[data-orgcancel]');
+    if(oc){ const id=oc.getAttribute('data-orgcancel'); _orgForm=null; _bfObjSheet(id); return; }
+    const od0=e.target.closest('[data-orgrm]');
+    if(od0){ orgRemove(od0.getAttribute('data-orgrm')); hideDossier(); return; }
+    const gm=e.target.closest('[data-govmap]');
+    if(gm){ const id=gm.getAttribute('data-govmap'); try{ setMode('map'); }catch(_){} selectSite(id); return; }
     const t=e.target.closest('[data-odsel]');
     if(t){ selectSite(t.getAttribute('data-odsel')); return; }
     // detent stepping: the grip cycles peek → half → full → peek; tapping the
@@ -3557,6 +3793,15 @@ function _rdbOpen(){
         gv.onsuccess=function(){ const v=gv.result&&gv.result.v; if(Array.isArray(v)) SAVEDV=v; };
       }catch(_){}
       try{
+        const to=_rdb.transaction('kv','readonly');
+        const go=to.objectStore('kv').get('orgs');
+        go.onsuccess=function(){
+          const v=go.result&&go.result.v;
+          if(Array.isArray(v)){ ORGS=v.filter(function(o){ return o&&o.id&&o.name&&o.parent; }); }
+          try{ if(document.body.classList.contains('brief-mode')){ renderBrief(); globeMark(); } }catch(_){}
+        };
+      }catch(_){}
+      try{
         const tzx=_rdb.transaction('kv','readonly');
         const gz=tzx.objectStore('kv').get('selZone');
         gz.onsuccess=function(){
@@ -3591,13 +3836,15 @@ function bfAdd(id){
   if(!siteById(id) || bfHas(id)) return;
   BRIEF.hqs.push(id); _bfSave();
   try{ renderBrief(); }catch(_){}
-  try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  try{ if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
 }
 function bfRemove(id){
   const i=BRIEF.hqs.indexOf(id); if(i<0) return;
   BRIEF.hqs.splice(i,1); delete BRIEF.ann[id]; _bfSave();
   try{ renderBrief(); }catch(_){}
-  try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  try{ if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
 }
 function bfNote(id, text){
   text=String(text||'').slice(0,80).trim();
@@ -3606,6 +3853,36 @@ function bfNote(id, text){
   try{ renderBrief(); }catch(_){}
 }
 try{ window.Brief={ add:bfAdd, remove:bfRemove, note:bfNote, has:bfHas, list:function(){ return BRIEF.hqs.slice(); } }; }catch(_){}
+
+// ---- CUSTOM SUBORDINATE ORGS (v0.7.0 owner directive) — user-built children on
+// any parent (site or custom org), added from the tree popup or the map card.
+// {id:'org-…', name, parent, base|null} — base names the site whose coordinates
+// the node LIVES at on the globe; no base → it rides its nearest located
+// ancestor. Persisted in kv 'orgs'; rides Snapshot.extras.orgs.
+let ORGS=[];
+function _orgSave(){ try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'orgs', v:ORGS}); } }catch(_){} }
+function orgById(id){ for(let i=0;i<ORGS.length;i++) if(ORGS[i].id===id) return ORGS[i]; return null; }
+function orgKidsOf(pid){ return ORGS.filter(function(o){ return o.parent===pid; }); }
+function orgAdd(name, parent, base){
+  name=String(name||'').trim().slice(0,60); if(!name) return null;
+  if(!siteById(parent) && !orgById(parent)) return null;
+  const id='org-'+Date.now().toString(36)+'-'+(ORGS.length+1);
+  const o={id:id, name:name, parent:parent, base:(base&&siteById(base))?base:null};
+  ORGS.push(o); _orgSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  return o;
+}
+function orgRemove(id){
+  const i=ORGS.findIndex(function(o){ return o.id===id; }); if(i<0) return;
+  const dead=ORGS[i]; ORGS.splice(i,1);
+  // children of the removed node climb to its parent — a delete never strands a branch
+  ORGS.forEach(function(o){ if(o.parent===id) o.parent=dead.parent; });
+  _orgSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+}
+try{ window.Orgs={ add:orgAdd, remove:orgRemove, of:orgKidsOf, byId:orgById, list:function(){ return ORGS.slice(); } }; }catch(_){}
 
 // ---- SAVED VIEWS (v0.6.0) — camera + selection + mode, recalled in one tap ----
 let SAVEDV=[];
@@ -3712,6 +3989,7 @@ function buildSnapshot(scope){
     sites:rows.map(function(r){ return { id:r.id, base:r.base, st:r.st, unit:r.unit,
       lat:r.lat, lon:r.lon, grp:r.grp, parent:r.parent, cls:clsOf(r.id) }; }),
     extras:{ brief:(BRIEF.hqs.length?{hqs:BRIEF.hqs.slice(), ann:JSON.parse(JSON.stringify(BRIEF.ann))}:null),
+      orgs:((typeof ORGS!=='undefined'&&ORGS.length)?JSON.parse(JSON.stringify(ORGS)):null),   // custom subordinates ride too (v0.7.0)
       records:(function(){                     // the datastore rides every export
       const out={}; if(typeof recordOf==='function') rows.forEach(function(r){ const rec=recordOf(r.id); if(rec && recCount(r.id)) out[r.id]=rec; });
       return out; })() },

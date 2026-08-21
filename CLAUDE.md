@@ -101,3 +101,20 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - Markers: sharp glass reticle (no halo/shadowBlur in the dot pass), cls colors;
   zoom<1.6 clusters into count badges (never in brief). Brief thumbnail draws
   chain members only; drawGlobeLinks early-returns in brief.
+
+## v0.7.0 — the brief is built ON the globe (owner correction, 21 Aug)
+- Brief mode keeps the FULL-SCREEN globe; the chain draws on it (white dots +
+  tier rings, tier-stream arcs via drawBriefArcs/drawBriefNodes, BF_STREAMS —
+  L2 cools NEVER green). _briefChainMap() walks BRIEF.hqs → sites + ORGS four
+  echelons deep; __bfC refreshes per frame in the links pass.
+- The tree is the CHART CARD (#briefStage): compact _bfAbbr chips, arrives
+  MINIMIZED (chart-min), never the hero. Objects show almost nothing; the
+  OBJECT POPUP (_bfObjSheet) shows everything — tap a chain dot or a chip.
+- Custom subordinate orgs: window.Orgs (kv 'orgs'), added from the popup or the
+  map card (+ Subordinate), located at their base or their parent; they lead
+  their chart row and ride Snapshot.extras.orgs.
+- View toggles: Names · Dots · Lines rows in the Layers panel (GlobeState
+  _namesOff/_dotsOff/_linesOff), honored in both rooms; an undrawn dot is
+  untappable by design.
+- App icon = the Lumen mark (gold wireframe globe + lit chain on black);
+  icon-512/192/180 + icon-maskable-512, manifest + theme-color #060504.
