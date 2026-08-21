@@ -378,7 +378,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     // view toggles exist in the legend and flip flags
     global.renderLegend();
     const lg=IDS['legendPanel'];
-    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==3){ fails++; console.log('✗ LEGEND view toggles missing'); }
+    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==4 || lg.innerHTML.indexOf('data-vw="usace"')<0){
+      fails++; console.log('✗ LEGEND view toggles missing (want names/usace/dots/lines)'); }
     // snapshot + export still carry the brief (+ orgs)
     const sn3=global.buildSnapshot();
     if(!sn3.extras.brief || sn3.extras.brief.hqs.length!==2 || sn3.extras.brief.ann['usawhc']!=='Main effort'){

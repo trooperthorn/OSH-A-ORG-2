@@ -776,6 +776,19 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.12.0 • MAP CONTROL (owner directive, 21 Aug). USACE IS A CLASS: the 52
+//            engineer districts (grp '…|usace') now class as USACE — their own
+//            legend swatch, their own layer filter, and a dedicated "USACE
+//            names" toggle in the view rows so those names can go quiet
+//            without silencing the rest of the map (the Washington HQ stays
+//            an HQ). ✕ CLEARS ALL: the ring's clear button now wipes every
+//            piece of transient map content — selection + arcs + callout,
+//            the sheet, trail crumbs, search text + results, and any open
+//            panels (view toggles and stored work — brief, records, custom
+//            orgs — are not content and stay). NAMES FOLLOW THE PICK: with
+//            Names (or USACE names) off, a selected command string still
+//            shows its names — the chain labels ride the selection, not the
+//            toggle.
 //   v0.11.0 • THE A-ORG-1 SPINE (owner directive, 21 Aug). THE ORG TREE: the
 //            full A-ORG-1 reporting structure — 1,403 organizations, nine
 //            levels, HQDA to battalion — extracted verbatim from A-ORG-1 and
@@ -986,7 +999,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.11.0';
+const APP_VERSION = 'v0.12.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -1972,17 +1985,21 @@ function siteById(id){ if(id==null) return null; return _siteIndex().get(id)||nu
 // site-spine kid index feeds nothing. ogKids/ogChainUp own the chain now.)
 
 // ---- MARKER CLASSES (v0.6.0, owner directive: sharp and clean like A-ORG-1's
-// legend) — Base · HQ · Depot · Guard. cls rides each site row (carried verbatim
-// from A-ORG-1's marker classing); the colors are the A-ORG-1 glass-reticle
-// palette re-inked for Lumen.
+// legend) — Base · HQ · Depot · USACE · Guard. cls rides each site row (carried
+// verbatim from A-ORG-1's marker classing); the colors are the A-ORG-1 glass-
+// reticle palette re-inked for Lumen. USACE (v0.12.0 owner directive) is DERIVED
+// from the grp fold ('conus|usace' …) so the 52 district rows stay verbatim —
+// only usace-hq-washington-dc stays hq (it hosts the command).
 const CLS_META={
   base:  { c:'242,234,216', n:'Base'  },
   hq:    { c:'255,215,122', n:'HQ'    },
   depot: { c:'192,138,78',  n:'Depot' },
+  usace: { c:'196,176,138', n:'USACE' },
   guard: { c:'150,144,124', n:'Guard' },
 };
 function clsOf(id){
   const s0=siteById(id); if(!s0) return 'base';
+  if(String(s0.grp||'').split('|')[1]==='usace') return 'usace';
   if(s0.cls && CLS_META[s0.cls]) return s0.cls;
   if(s0.grp==='guard'||s0.grp==='guardInset') return 'guard';
   if(s0.grp==='oib') return 'depot';
@@ -1997,9 +2014,10 @@ function renderLegend(){
   const counts={}; for(const st of _sitesArr()){ const k=clsOf(st.id); counts[k]=(counts[k]||0)+1; }
   let h='<div class="lg-head">Layers</div>';
   // VIEW toggles (v0.7.0 owner directive): names · dots · lines, both rooms.
-  [['names','Names','_namesOff'],['dots','Dots','_dotsOff'],['lines','Lines','_linesOff']].forEach(function(v){
+  [['names','Names','_namesOff'],['usace','USACE names','_usaceOff'],
+   ['dots','Dots','_dotsOff'],['lines','Lines','_linesOff']].forEach(function(v){
     h+='<button type="button" class="lg-row'+(GlobeState[v[2]]?' off':'')+'" data-vw="'+v[0]+'">'
-      +'<span class="lg-sw lg-sw-vw">'+(v[0]==='names'?'A':(v[0]==='dots'?'●':'◜'))+'</span>'
+      +'<span class="lg-sw lg-sw-vw">'+(v[0]==='names'?'A':(v[0]==='usace'?'U':(v[0]==='dots'?'●':'◜')))+'</span>'
       +'<span class="lg-nm">'+v[1]+'</span><span class="lg-ct">'+(GlobeState[v[2]]?'off':'on')+'</span></button>';
   });
   h+='<div class="lg-head lg-head-2">Classes</div>';
@@ -2019,7 +2037,7 @@ if(!window.__lgWired){ window.__lgWired=true;
     if(r){
       const vw=r.getAttribute('data-vw');
       if(vw){                                            // view toggles: names · dots · lines
-        const flag={names:'_namesOff', dots:'_dotsOff', lines:'_linesOff'}[vw];
+        const flag={names:'_namesOff', usace:'_usaceOff', dots:'_dotsOff', lines:'_linesOff'}[vw];
         if(flag) GlobeState[flag]=!GlobeState[flag];
       } else {
         const k=r.getAttribute('data-fam');
@@ -2326,8 +2344,9 @@ function drawGlobeMarkers(ctx, m){
       ctx.globalAlpha=1;
     }
 
-    // chain-member labels draw at ANY zoom — the picture is the product (deviation 7).
-    if(onChain && !GlobeState._namesOff){
+    // chain-member labels draw at ANY zoom AND through the Names/USACE toggles —
+    // a selected command string keeps its names (v0.12.0 owner directive).
+    if(onChain){
       const _nm=inst.unit||inst.base||inst.id;
       const _fs=(m.w<560?12:11);
       ctx.save();
@@ -2363,6 +2382,7 @@ function drawGlobeMarkers(ctx, m){
     for(const s of _lblQ){
       const inst=s.inst;
       if(clsOf(inst.id)==='guard' && GlobeState.zoom<6.5) continue;   // guard names arrive only deep in
+      if(GlobeState._usaceOff && clsOf(inst.id)==='usace') continue;   // USACE names toggled off
       if(s.depth<0.25) continue;
       if(cmdSites && cmdSites.has(inst.id)) continue; // chain labels already drew in the dot loop
       // ZOOM LADDER (v0.10.0 tune — owner: COCOM labels crowded CONUS): density
@@ -3456,6 +3476,22 @@ function _trailPush(id){
 }
 // (back = tapping a crumb; the dedicated _trailBack retired with the Back pill)
 function _trailClear(){ GlobeState._trail=[]; _trailRender(); }
+
+// v0.12.0 owner directive: the ring's ✕ clears ALL content/selections on the map —
+// selection (arcs + callout via selectSite(null)), sheet, trail crumbs, search,
+// and any open panels. View toggles and stored data (brief, records, custom orgs)
+// are settings and work product, not map content; they stay.
+function clearAll(){
+  try{ selectSite(null); }catch(_){}
+  try{ hideDossier(); }catch(_){}
+  try{ _trailClear(); }catch(_){}
+  try{ const i=document.getElementById('searchInput'); if(i) i.value=''; }catch(_){}
+  try{ const r=document.getElementById('searchResults'); if(r){ r.innerHTML=''; r.classList.remove('sr-open'); } }catch(_){}
+  try{ ['legendPanel','exportSheet','appMenu'].forEach(function(id){
+    const p=document.getElementById(id); if(p) p.hidden=true; }); }catch(_){}
+  try{ globeMark(); }catch(_){}
+}
+try{ window.clearAll=clearAll; }catch(_){}
 function _trailRender(){
   // crumbs render inside the sheet header (_odRender reads GlobeState._trail);
   // the standalone trail bar retired with the control law.
@@ -5139,7 +5175,7 @@ function bootShell(){
           }
         }catch(_){}
         _nvSet(true); return; }
-      if(e.target.closest('#navSat-clear')){ _nvSet(false); try{ selectSite(null); }catch(_){} return; }
+      if(e.target.closest('#navSat-clear')){ _nvSet(false); try{ clearAll(); }catch(_){} return; }
       // ZOOM ± stay open — the ring is a zoom rocker while it's out.
       if(e.target.closest('#navSat-zoomout')){
         try{ GlobeState._touched=true; GlobeState.zoom=Math.max(1.0, GlobeState.zoom/1.45); globeMark(); }catch(_){}

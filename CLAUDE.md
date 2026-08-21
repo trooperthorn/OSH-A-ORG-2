@@ -170,3 +170,15 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   10% #FFB35C depot-orange crescent) is the globe logo AND the #navGlobe face
   (inlined, ids lgGold/lgVig/lgLit). The app ICON stays the owner-chosen Star
   Net (icon-*.png) — two marks, two jobs; do not swap either without the owner.
+
+## v0.12.0 — map control (owner directive, 21 Aug)
+- **USACE is a class**, DERIVED in clsOf() from the grp fold (split('|')[1]===
+  'usace' → 52 district rows; usace-hq-washington-dc stays hq). The data rows
+  remain verbatim A-ORG-1 — never write 'usace' into cls in sites.json.
+- View toggles are FOUR rows: Names · USACE names (_usaceOff) · Dots · Lines.
+- **Chain labels outrank the toggles**: onChain labels draw regardless of
+  _namesOff/_usaceOff — a selected command string always shows its names.
+  Only the zoom-ladder (tiny label) pass obeys the toggles.
+- clearAll() is the ring ✕: selection/arcs/callout, sheet, trail, search,
+  open panels. It NEVER touches view toggles or stored data (brief, records,
+  custom orgs).
