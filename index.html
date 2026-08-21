@@ -432,6 +432,9 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 .ch-t4{box-shadow:0 0 0 1.2px var(--t4); color:var(--t4)}
 .ch-chip.on{background:var(--accent-wash)}
 .ch-more{font:700 9.5px/1 var(--mono); letter-spacing:.08em; color:var(--faint); padding:2px 0 2px var(--ch-ind,0px)}
+/* the quiet offer (v0.10.0): the chain grew — export glows twice, says nothing */
+@keyframes xpPulse{0%,100%{box-shadow:0 0 0 1px var(--line)} 35%{box-shadow:0 0 0 2px var(--accent), 0 0 14px rgba(var(--accent-rgb),.55)}}
+.xp-pulse{animation:xpPulse 1.4s ease 2; color:var(--accent)}
 body.brief-mode{
   /* THE INVERTED ROOM — brief flips the scheme (owner law: map = main, brief =
      inverted). Values only; the canvas keeps map paint because it reads tokens
@@ -771,6 +774,18 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.10.0 • THE INTUITION PASS (owner "go" on the automation roadmap).
+//            LABEL DENSITY: names arrive BY ECHELON as room appears — roots
+//            at 2.4, HQs 2.6, depots 3.2, bases 3.8, insets 4.2 (+0.7 on
+//            phones); guard names only past 6.5. The CONUS crowd is gone
+//            (backlog item closed). SESSION MEMORY: the app reopens exactly
+//            where you left it — camera, selection, and room persist to kv
+//            'session' (change-gated writes every 2.5s) and restore
+//            post-paint unless a hand is already on the globe. AUTO-FRAMING:
+//            growing the chain while the brief room is open gently reflies
+//            the globe to hold the whole picture. THE QUIET OFFER: when the
+//            chain grows, the chart's export button pulses gold twice — no
+//            copy, just the next step glowing.
 //   v0.9.0 • THE ANCHORED CALLOUT (owner reference set, 21 Aug: pop-ups that
 //            never obstruct the view). Selecting any dot — map reticle or
 //            brief chain node — now opens a small glass callout BESIDE the
@@ -947,7 +962,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.9.0';
+const APP_VERSION = 'v0.10.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2284,13 +2299,15 @@ function drawGlobeMarkers(ctx, m){
     const _lblQ=Array.from(GlobeState._screen).sort(function(a,b){ return _lblPr(a)-_lblPr(b); });
     for(const s of _lblQ){
       const inst=s.inst;
-      if(inst.grp==='guard') continue;                // skip guard to reduce clutter
+      if(inst.grp==='guard' && GlobeState.zoom<6.5) continue;   // guard names arrive only deep in
       if(s.depth<0.25) continue;
       if(cmdSites && cmdSites.has(inst.id)) continue; // chain labels already drew in the dot loop
-      // ZOOM LADDER — density arrives as the room for it does; phones climb it 0.7
-      // later because a narrow canvas has far less room per name.
+      // ZOOM LADDER (v0.10.0 tune — owner: COCOM labels crowded CONUS): density
+      // arrives BY ECHELON as the room for it does — roots first, then HQs,
+      // depots, bases, insets; phones climb 0.7 later (less room per name).
       const _mzb=(m.w<700)?0.7:0;
-      const _need=(inst.parent==null?2.0:(inst.grp==='oib'?2.8:(inst.grp==='guardInset'?3.6:3.2)))+_mzb;
+      const _cls=clsOf(inst.id);
+      const _need=(inst.parent==null?2.4:(_cls==='hq'?2.6:(_cls==='depot'?3.2:(inst.grp==='guardInset'?4.2:3.8))))+_mzb;
       if(GlobeState.zoom < _need) continue;
       if(s.sx<1||s.sx>m.w-1||s.sy<1||s.sy>m.h-1) continue;   // off-map dot — don't orphan its label
       ctx.font='600 9.5px '+bodyFont;
@@ -2301,7 +2318,7 @@ function drawGlobeMarkers(ctx, m){
       ctx.shadowColor='rgba('+T.ground+',.9)'; ctx.shadowBlur=3; ctx.shadowOffsetY=1;
       ctx.lineWidth=2.2; ctx.strokeStyle='rgba('+T.ground+',.78)'; ctx.strokeText(name, _pl.x, _pl.y);
       ctx.shadowBlur=0; ctx.shadowOffsetY=0;
-      ctx.fillStyle='rgba('+(inst.grp==='oib'?T.signal:T.text)+',.92)'; ctx.fillText(name, _pl.x, _pl.y);
+      ctx.fillStyle='rgba('+(clsOf(inst.id)==='depot'?T.signal:T.text)+',.92)'; ctx.fillText(name, _pl.x, _pl.y);
     }
     ctx.restore();
   }
@@ -4007,6 +4024,24 @@ function _rdbOpen(){
         gv.onsuccess=function(){ const v=gv.result&&gv.result.v; if(Array.isArray(v)) SAVEDV=v; };
       }catch(_){}
       try{
+        const ts2=_rdb.transaction('kv','readonly');
+        const gs2=ts2.objectStore('kv').get('session');
+        gs2.onsuccess=function(){
+          const v=gs2.result&&gs2.result.v;
+          // restore only an untouched boot — never fight a hand already on the globe
+          if(!v || GlobeState._touched || GlobeState.sel!=null) return;
+          try{
+            if(typeof v.yaw==='number'){ GlobeState.yaw=v.yaw; GlobeState.pitch=v.pitch||0;
+              GlobeState.zoom=Math.max(1, Math.min(28, v.zoom||1.5));
+              if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ();
+              globeMark(); }
+            if(v.sel && siteById(v.sel)) selectSite(v.sel, {keepCam:true, noUndo:true});
+            if(v.brief) setMode('brief');
+            _ssLast=JSON.stringify(v);
+          }catch(_){}
+        };
+      }catch(_){}
+      try{
         const to=_rdb.transaction('kv','readonly');
         const go=to.objectStore('kv').get('orgs');
         go.onsuccess=function(){
@@ -4046,12 +4081,49 @@ function _bfSave(){
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'brief', v:{hqs:BRIEF.hqs, ann:BRIEF.ann}}); } }catch(_){}
 }
 function bfHas(id){ return BRIEF.hqs.indexOf(id)>=0; }
+
+// v0.10.0 AUTOMATION: when the chain GROWS while the brief room is open, the
+// globe gently reframes to hold the whole picture, and the chart's export
+// button pulses once — the app offers the next step without saying a word.
+function _bfFrame(){
+  try{
+    if(!document.body.classList.contains('brief-mode')) return;
+    const C=_briefChainMap(); if(!C.order.length) return;
+    const d=Math.PI/180; let x=0,y=0,z=0,n=0; const pts=[];
+    C.order.forEach(function(k){ const nd=C.nodes[k];
+      if(nd.lat==null||nd.lon==null) return;
+      pts.push(nd);
+      x+=Math.cos(nd.lat*d)*Math.cos(nd.lon*d); y+=Math.cos(nd.lat*d)*Math.sin(nd.lon*d); z+=Math.sin(nd.lat*d); n++;
+    });
+    if(!n) return;
+    const L=Math.hypot(x,y,z)||1;
+    const cLat=Math.asin(Math.max(-1,Math.min(1,z/L)))/d, cLon=Math.atan2(y,x)/d;
+    let maxSep=0;
+    pts.forEach(function(p){
+      const a=[Math.cos(cLat*d)*Math.cos(cLon*d),Math.cos(cLat*d)*Math.sin(cLon*d),Math.sin(cLat*d)];
+      const b=[Math.cos(p.lat*d)*Math.cos(p.lon*d),Math.cos(p.lat*d)*Math.sin(p.lon*d),Math.sin(p.lat*d)];
+      let dot=a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; dot=Math.max(-1,Math.min(1,dot));
+      maxSep=Math.max(maxSep, Math.acos(dot)/d);
+    });
+    const zoom = maxSep>120?1.05 : maxSep>80?1.3 : maxSep>45?1.7 : maxSep>20?2.3 : (n===1?3.2:2.8);
+    flyToLatLon(cLat, cLon, Math.max(1.0, Math.min(14, zoom)));
+  }catch(_){}
+}
+function _xpPulse(){
+  try{
+    const b=document.querySelector('#briefStage #exportBtn'); if(!b) return;
+    b.classList.remove('xp-pulse'); void b.offsetWidth;   // restart the beat
+    b.classList.add('xp-pulse');
+    setTimeout(function(){ try{ b.classList.remove('xp-pulse'); }catch(_){} }, 2900);
+  }catch(_){}
+}
 function bfAdd(id){
   if(!siteById(id) || bfHas(id)) return;
   BRIEF.hqs.push(id); _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
   try{ if(typeof _coRefresh==='function') _coRefresh(); }catch(_){}
+  try{ _bfFrame(); _xpPulse(); }catch(_){}
   try{ const d=document.getElementById('dossier');
     if(GlobeState.sel && d && !d.hidden && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
 }
@@ -4072,6 +4144,27 @@ function bfNote(id, text){
 }
 try{ window.Brief={ add:bfAdd, remove:bfRemove, note:bfNote, has:bfHas, list:function(){ return BRIEF.hqs.slice(); } }; }catch(_){}
 
+
+// v0.10.0 SESSION MEMORY: the app reopens exactly where you left it. The room
+// (camera · selection · mode) writes to kv 'session' every few seconds, only
+// when something changed; _rdbOpen restores it post-paint unless a hand is
+// already on the globe. No boot reads — the IndexedDB law holds.
+let _ssLast='';
+function _ssTick(){
+  try{
+    if(!_rdb) return;
+    const s={ yaw:+GlobeState.yaw.toFixed(4), pitch:+GlobeState.pitch.toFixed(4),
+      zoom:+GlobeState.zoom.toFixed(3), sel:GlobeState.sel,
+      brief:document.body.classList.contains('brief-mode') };
+    const j=JSON.stringify(s);
+    if(j===_ssLast) return;
+    _ssLast=j;
+    const tx=_rdb.transaction('kv','readwrite');
+    tx.objectStore('kv').put({k:'session', v:s});
+  }catch(_){}
+}
+try{ setInterval(_ssTick, 2500); }catch(_){}
+
 // ---- CUSTOM SUBORDINATE ORGS (v0.7.0 owner directive) — user-built children on
 // any parent (site or custom org), added from the tree popup or the map card.
 // {id:'org-…', name, parent, base|null} — base names the site whose coordinates
@@ -4089,6 +4182,7 @@ function orgAdd(name, parent, base){
   ORGS.push(o); _orgSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
+  try{ _bfFrame(); _xpPulse(); }catch(_){}
   return o;
 }
 function orgRemove(id){
@@ -4706,7 +4800,7 @@ function bootShell(){
       var _gyOn=function(){ clearTimeout(_gyT); document.body.classList.add('gesturing'); };
       var _gyOff=function(){ _gyPend=false; clearTimeout(_gyT);
         _gyT=setTimeout(function(){ document.body.classList.remove('gesturing'); }, 420); };
-      cv.addEventListener('pointerdown', function(e){ _gyPend=true; _gyX=e.clientX; _gyY=e.clientY; });
+      cv.addEventListener('pointerdown', function(e){ _gyPend=true; _gyX=e.clientX; _gyY=e.clientY; GlobeState._touched=true; });
       window.addEventListener('pointermove', function(e){
         if(_gyPend && Math.hypot(e.clientX-_gyX, e.clientY-_gyY)>8){ _gyPend=false; _gyOn(); }
       });

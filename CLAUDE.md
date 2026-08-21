@@ -41,8 +41,8 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
    sites; USAREUR-AF/USAWHC chain to HQDA. Pick one rule in the next data pass.
 2. **Verify with sources**: 'Combined Arms Command (CAC)' naming (vs Combined Arms
    Center); camp-mujuk / camp-as-sayliyah retention (owner call).
-3. **Label density**: COCOM landmark labels crowd the CONUS view at low zoom — label
-   tiering pass (A-ORG-1's zoom-tier idiom is in the port, needs tuning).
+3. ~~Label density~~ — DONE at v0.10.0 (echelon ladder: roots 2.4 · hq 2.6 ·
+   depot 3.2 · base 3.8 · inset 4.2, +0.7 phone; guard past 6.5).
 4. **grp metadata**: fort-buchanan (PR) and fort-wainwright-greely-alaska carry
    grp=conus; inert on a sphere, but decide the vocabulary before any flat inset ships.
 5. Upstream A-ORG-1 fix to send back: Detroit Arsenal latitude (42.59 → 42.49) at its
@@ -141,3 +141,11 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   ✕ clears; ▤ opens the sheet (the ONLY auto-surface law: nothing opens the
   bottom sheet on plain selection anymore). Chart chips anchor the same card
   (fixed point). Forms stay in the sheet. Callout joins the gesture-yield set.
+
+## v0.10.0 — the intuition pass (automation roadmap, owner "go")
+- Labels arrive by echelon (ladder above); guard names only past zoom 6.5.
+- Session memory: kv 'session' (change-gated 2.5s interval), restored in
+  _rdbOpen post-paint ONLY on an untouched boot (GlobeState._touched guard).
+- _bfFrame(): chain growth in the brief room reflies to hold the whole chain;
+  _xpPulse(): the chart export button glows twice on growth. Both fire from
+  bfAdd/orgAdd; both no-op outside the brief room.
