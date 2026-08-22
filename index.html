@@ -270,7 +270,7 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 /* SEARCH — standalone, one job, search-engine calm */
 #searchPill{
   position:absolute; z-index:20;
-  top:calc(env(safe-area-inset-top,0px) + 58px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 96px);   /* v0.14.0: thumb reach — clear of the globe button */
   left:max(var(--safe-l), calc(50% - 300px)); right:max(var(--safe-r), calc(50% - 300px));
   display:flex; align-items:center; gap:10px;
   min-height:48px; padding:0 18px; border-radius:var(--r-pill);
@@ -297,7 +297,7 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 /* search results — SCROLL CONTAINER: inset math only, never transformed */
 #searchResults{
   position:absolute; z-index:30;
-  top:calc(env(safe-area-inset-top,0px) + 112px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 144px);   /* opens UPWARD, flush on the pill */
   left:max(var(--safe-l), calc(50% - 300px)); right:max(var(--safe-r), calc(50% - 300px));
   max-height:44vh; max-height:48dvh;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
@@ -400,7 +400,7 @@ body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,21
 #briefStage{display:none}
 body.brief-mode #briefStage{
   display:block; position:absolute; z-index:16;
-  left:var(--safe-l); top:calc(env(safe-area-inset-top,0px) + 112px);
+  left:var(--safe-l); top:calc(env(safe-area-inset-top,0px) + 58px);
   width:min(300px, 76vw); max-height:44vh;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   padding:10px 12px 12px; border-radius:var(--r-card);
@@ -493,8 +493,8 @@ body.brief-mode .clock{display:none}
   white-space:nowrap;
 }
 .clock:empty{display:none}
-#clockTL{top:calc(env(safe-area-inset-top,0px) + 116px); left:var(--safe-l)}
-#clockTR{top:calc(env(safe-area-inset-top,0px) + 116px); right:var(--safe-r);
+#clockTL{top:calc(env(safe-area-inset-top,0px) + 58px); left:var(--safe-l)}
+#clockTR{top:calc(env(safe-area-inset-top,0px) + 58px); right:var(--safe-r);
   pointer-events:auto; cursor:pointer; border:none; -webkit-tap-highlight-color:transparent}
 #clockTR:active{filter:brightness(1.35)}
 
@@ -535,7 +535,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   /* top edge centers; corners come free for the clocks */
   #searchPill{left:0; right:0; width:560px; margin-inline:auto}
   #searchResults{left:0; right:0; width:560px; margin-inline:auto;
-    top:calc(env(safe-area-inset-top,0px) + 70px); max-height:60vh; max-height:60dvh}
+    bottom:calc(env(safe-area-inset-bottom,0px) + 160px); max-height:60vh; max-height:60dvh}
   #themeSwitch{top:calc(env(safe-area-inset-top,0px) + 12px); right:24px}
   /* clocks take the true corners */
   /* below the title tiles — the SELECT cell is a live button and must never
@@ -702,10 +702,9 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 #calloutCard.co-below .co-tail{bottom:auto; top:-6px; box-shadow:-1px -1px 0 0 var(--line)}
 
 /* ═══ GOOGLE-FEEL FUSION — open results and the pill become ONE surface ═══ */
-#searchPill.sr-open{border-radius:24px 24px 0 0}
+#searchPill.sr-open{border-radius:0 0 24px 24px}
 #searchResults.sr-open{
-  top:calc(env(safe-area-inset-top,0px) + 106px);
-  border-radius:0 0 24px 24px; padding:6px 4px 8px;
+  border-radius:24px 24px 0 0; padding:8px 4px 6px;
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--line), var(--drop);
 }
 #searchResults .sr-row.hi{background:var(--accent-wash); box-shadow:inset 0 0 0 1.5px var(--accent)}
@@ -759,8 +758,10 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   <button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button>
   <button id="navGlobe" type="button" aria-expanded="false" aria-label="Navigation — tap for controls, hold to switch mode">
     <svg id="nvRing" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="33" fill="none"></circle></svg>
-    <!-- the Lumen globe mark (v0.11.0): 70% illuminated gold · 20% black terminator · 10% depot-orange rim. Source asset: logo.svg -->
-    <svg width="64" height="64" viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="lgGold" x1="0.18" y1="0.08" x2="0.82" y2="0.96"><stop offset="0" stop-color="#FFF4CC"></stop><stop offset="0.42" stop-color="#F5D76E"></stop><stop offset="1" stop-color="#C9A548"></stop></linearGradient><radialGradient id="lgVig" cx="0.42" cy="0.38" r="0.72"><stop offset="0" stop-color="#8C6E28" stop-opacity="0"></stop><stop offset="0.78" stop-color="#8C6E28" stop-opacity="0"></stop><stop offset="1" stop-color="#8C6E28" stop-opacity="0.32"></stop></radialGradient><clipPath id="lgLit"><path d="M 256 66 A 190 190 0 0 0 256 446 A 114 190 0 0 0 256 66 Z"></path></clipPath></defs><g transform="rotate(16 256 256)"><circle cx="256" cy="256" r="190" fill="url(#lgGold)"></circle><g clip-path="url(#lgLit)"><g fill="none" stroke="#A8862F" stroke-width="4.5" stroke-opacity="0.8"><ellipse cx="256" cy="256" rx="70" ry="190"></ellipse><path d="M 66 256 A 190 44 0 0 0 446 256"></path></g><circle cx="256" cy="256" r="190" fill="url(#lgVig)"></circle></g><path d="M 256 66 A 190 190 0 0 1 256 446 A 114 190 0 0 0 256 66 Z" fill="#1A1409"></path><path d="M 256 66 A 190 190 0 0 1 256 446 A 176 190 0 0 0 256 66 Z" fill="#FFB35C"></path></g></svg>
+    <!-- the Lumen globe mark (v0.14.0 enhanced): 70% illuminated gold · 20% black
+         terminator · 10% depot-orange rim — engraved graticule + specular, no cartoon.
+         Source asset: logo.svg (the app icon is this same mark on the button tile) -->
+    <svg width="64" height="64" viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="lgG" x1="0.18" y1="0.08" x2="0.82" y2="0.96"><stop offset="0" stop-color="#FFF6D8"></stop><stop offset="0.34" stop-color="#F3D26A"></stop><stop offset="0.72" stop-color="#D4A94E"></stop><stop offset="1" stop-color="#A57F2C"></stop></linearGradient><radialGradient id="lgSp" cx="0.34" cy="0.24" r="0.5"><stop offset="0" stop-color="#FFFDF2" stop-opacity="0.55"></stop><stop offset="1" stop-color="#FFFDF2" stop-opacity="0"></stop></radialGradient><radialGradient id="lgRim" cx="0.88" cy="0.62" r="0.5"><stop offset="0" stop-color="#FFB35C" stop-opacity="0.22"></stop><stop offset="1" stop-color="#FFB35C" stop-opacity="0"></stop></radialGradient><radialGradient id="lgV" cx="0.42" cy="0.38" r="0.72"><stop offset="0.7" stop-color="#6E541C" stop-opacity="0"></stop><stop offset="1" stop-color="#6E541C" stop-opacity="0.42"></stop></radialGradient><clipPath id="lgC"><path d="M 256 66 A 190 190 0 0 0 256 446 A 114 190 0 0 0 256 66 Z"></path></clipPath></defs><g transform="rotate(16 256 256)"><circle cx="256" cy="256" r="190" fill="url(#lgG)"></circle><g clip-path="url(#lgC)"><g fill="none" stroke="#8F7326" stroke-width="2.6" stroke-opacity="0.6"><ellipse cx="256" cy="256" rx="70" ry="190"></ellipse><ellipse cx="256" cy="256" rx="132" ry="190"></ellipse><path d="M 66 256 A 190 44 0 0 0 446 256"></path><path d="M 82 180 A 174 40 0 0 0 430 180"></path><path d="M 82 332 A 174 40 0 0 0 430 332"></path></g><circle cx="256" cy="256" r="190" fill="url(#lgSp)"></circle><circle cx="256" cy="256" r="190" fill="url(#lgRim)"></circle><circle cx="256" cy="256" r="190" fill="url(#lgV)"></circle></g><path d="M 256 66 A 190 190 0 0 1 256 446 A 114 190 0 0 0 256 66 Z" fill="#14100A"></path><path d="M 256 66 A 190 190 0 0 1 256 446 A 180 190 0 0 0 256 66 Z" fill="#FFB35C"></path></g></svg>
   </button>
 </nav>
 
@@ -796,6 +797,18 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.14.0 • THE GLOBE IS THE LOGO (owner directive, 22 Aug). The mark was
+//            re-cut past the cartoon read: full engraved graticule (three
+//            meridians · three parallels), four-stop gold, soft specular,
+//            depot-orange rim light, edge vignette — same 70/20/10 law. It
+//            faces the navigation button AND is now the app icon: the home-
+//            screen tile is the nav button itself (black tile · gold ring ·
+//            the globe), replacing the Star Net set; logo.svg is the master.
+//            SEARCH MOVED TO THE BOTTOM: the pill sits above the globe button
+//            in thumb reach, results open upward, and the pill lifts itself
+//            above the phone keyboard (visualViewport, bottom-inset writes —
+//            no transforms on scroll containers). The clocks rise into the
+//            vacated top band; the brief chart follows.
 //   v0.13.1 • PICKER FILTER (owner "Go"). Long subordinate lists (ARNG's 61
 //            states) get a filter box: type a few letters, the list collapses
 //            live, tap +. The query survives the add-tap re-render so several
@@ -1040,7 +1053,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.13.1';
+const APP_VERSION = 'v0.14.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -3182,6 +3195,24 @@ function searchSelect(id){
     try{ flyToLatLon(s.lat, s.lon, Math.max(GlobeState.zoom||1, 2.6)); }catch(_){}
   }
   try{ if(typeof showDossier==='function') showDossier(s.id); }catch(_){}
+}
+
+// ---- bottom search vs the phone keyboard (v0.14.0) ----------------------------
+if(!window.__sbKbWired){ window.__sbKbWired=true;
+  try{
+    const vv=window.visualViewport;
+    const _sbLift=function(){
+      const p=document.getElementById('searchPill'), r=document.getElementById('searchResults');
+      if(!p) return;
+      const kb=vv?Math.max(0, window.innerHeight - vv.height - vv.offsetTop):0;
+      const on=document.activeElement && document.activeElement.id==='searchInput' && kb>40;
+      p.style.bottom=on?((kb+12)+'px'):'';
+      if(r) r.style.bottom=on?((kb+60)+'px'):'';
+    };
+    if(vv){ vv.addEventListener('resize', _sbLift); vv.addEventListener('scroll', _sbLift); }
+    document.addEventListener('focusin', function(){ setTimeout(_sbLift, 80); });
+    document.addEventListener('focusout', function(){ setTimeout(_sbLift, 120); });
+  }catch(_){}
 }
 
 // ---- Field lookup (shell contract names the PILL; the input lives inside) ------

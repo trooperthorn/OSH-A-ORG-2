@@ -166,10 +166,11 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - **INTERIOR-MESH BORDERS**: _topoInteriorMesh() draws only arcs shared by ≥2
   geometries — coasts belong to the land layer ALONE. Any border pass that
   re-strokes a coastline is the double-trace bug returning.
-- **THE MARK**: logo.svg (solid gold sphere · 70% lit / 20% black terminator /
-  10% #FFB35C depot-orange crescent) is the globe logo AND the #navGlobe face
-  (inlined, ids lgGold/lgVig/lgLit). The app ICON stays the owner-chosen Star
-  Net (icon-*.png) — two marks, two jobs; do not swap either without the owner.
+- **THE MARK**: logo.svg (engraved gold sphere · 70% lit / 20% black terminator
+  / 10% #FFB35C rim, full graticule since v0.14.0) is THE identity: the
+  #navGlobe face (inlined, ids lgG/lgSp/lgRim/lgV/lgC) AND the app icon —
+  icon-*.png render the nav button itself (black tile · gold ring · globe).
+  Star Net retired at v0.14.0 by owner directive ("logo should be globe").
 
 ## v0.12.0 — map control (owner directive, 21 Aug)
 - **USACE is a class**, DERIVED in clsOf() from the grp fold (split('|')[1]===
@@ -199,3 +200,10 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   search opens _bfObjSheet (build grammar), never selectSite.
 - Snapshot extras.brief={mem, hqs(roots), ann, hide, rows[]} — exporters print
   rows (the built picture), never a tree walk of their own.
+
+## v0.14.0 — globe identity + bottom search (owner directive, 22 Aug)
+- Search pill is BOTTOM-anchored (+96px above safe bottom, clear of the FAB);
+  #searchResults opens UPWARD (bottom +152px). The keyboard lift writes
+  bottom-insets via visualViewport — NEVER transforms (#searchResults is a
+  scroll container; the no-transform law holds). Clocks + brief chart live at
+  top +58px now.
