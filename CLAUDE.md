@@ -166,11 +166,14 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - **INTERIOR-MESH BORDERS**: _topoInteriorMesh() draws only arcs shared by ≥2
   geometries — coasts belong to the land layer ALONE. Any border pass that
   re-strokes a coastline is the double-trace bug returning.
-- **THE MARK**: logo.svg (engraved gold sphere · 70% lit / 20% black terminator
-  / 10% #FFB35C rim, full graticule since v0.14.0) is THE identity: the
-  #navGlobe face (inlined, ids lgG/lgSp/lgRim/lgV/lgC) AND the app icon —
-  icon-*.png render the nav button itself (black tile · gold ring · globe).
-  Star Net retired at v0.14.0 by owner directive ("logo should be globe").
+- **THE MARK** (v0.15.0): logo.svg is a REAL-GEOGRAPHY glossy globe — actual
+  continents projected orthographically from data/land-110m.json (Atlantic-
+  centered, LAM -35 / PHI 18), gold land on black ocean, gold graticule,
+  #FFB35C rim, vignette + specular. Regenerate with
+  scratchpad logo/geo/{project,final,build-assets}.js. It is BOTH the app icon
+  (globe fills the black tile) and the #navGlobe face (<img src="logo.svg">,
+  referenced not inlined — logo.svg is in sw.js ASSETS for offline). The
+  v0.14.0 crescent and the Star Net icon are retired. No blue, no green — ever.
 
 ## v0.12.0 — map control (owner directive, 21 Aug)
 - **USACE is a class**, DERIVED in clsOf() from the grp fold (split('|')[1]===

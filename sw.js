@@ -2,9 +2,9 @@
 // cross-origin requests are NEVER touched; same-origin install is per-asset
 // fault-tolerant and backfills on runtime misses; every respondWith ends in a
 // concrete Response. CACHE moves with APP_VERSION (ship-lint enforces).
-const CACHE = 'a-org-2-v0-14-0';
+const CACHE = 'a-org-2-v0-15-0';
 const ASSETS = [
-  './', './index.html', './manifest.webmanifest',
+  './', './index.html', './manifest.webmanifest', './logo.svg',
   './data/land-110m.json', './data/land-50m.json',
   './data/states-10m.json', './data/countries-110m.json',
   './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'

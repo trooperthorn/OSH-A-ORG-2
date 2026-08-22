@@ -370,6 +370,7 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
   color:var(--accent); display:flex; align-items:center; justify-content:center;
   touch-action:none; user-select:none; -webkit-user-select:none;
 }
+#nvMark{pointer-events:none; display:block; -webkit-user-drag:none}
 #nvRing{position:absolute; inset:1px; pointer-events:none; transform:rotate(-90deg)}
 #nvRing circle{stroke:var(--signal); stroke-width:3; stroke-linecap:round; transition:none}
 .nv-sat{
@@ -758,10 +759,11 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   <button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button>
   <button id="navGlobe" type="button" aria-expanded="false" aria-label="Navigation — tap for controls, hold to switch mode">
     <svg id="nvRing" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="33" fill="none"></circle></svg>
-    <!-- the Lumen globe mark (v0.14.0 enhanced): 70% illuminated gold · 20% black
-         terminator · 10% depot-orange rim — engraved graticule + specular, no cartoon.
-         Source asset: logo.svg (the app icon is this same mark on the button tile) -->
-    <svg width="64" height="64" viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="lgG" x1="0.18" y1="0.08" x2="0.82" y2="0.96"><stop offset="0" stop-color="#FFF6D8"></stop><stop offset="0.34" stop-color="#F3D26A"></stop><stop offset="0.72" stop-color="#D4A94E"></stop><stop offset="1" stop-color="#A57F2C"></stop></linearGradient><radialGradient id="lgSp" cx="0.34" cy="0.24" r="0.5"><stop offset="0" stop-color="#FFFDF2" stop-opacity="0.55"></stop><stop offset="1" stop-color="#FFFDF2" stop-opacity="0"></stop></radialGradient><radialGradient id="lgRim" cx="0.88" cy="0.62" r="0.5"><stop offset="0" stop-color="#FFB35C" stop-opacity="0.22"></stop><stop offset="1" stop-color="#FFB35C" stop-opacity="0"></stop></radialGradient><radialGradient id="lgV" cx="0.42" cy="0.38" r="0.72"><stop offset="0.7" stop-color="#6E541C" stop-opacity="0"></stop><stop offset="1" stop-color="#6E541C" stop-opacity="0.42"></stop></radialGradient><clipPath id="lgC"><path d="M 256 66 A 190 190 0 0 0 256 446 A 114 190 0 0 0 256 66 Z"></path></clipPath></defs><g transform="rotate(16 256 256)"><circle cx="256" cy="256" r="190" fill="url(#lgG)"></circle><g clip-path="url(#lgC)"><g fill="none" stroke="#8F7326" stroke-width="2.6" stroke-opacity="0.6"><ellipse cx="256" cy="256" rx="70" ry="190"></ellipse><ellipse cx="256" cy="256" rx="132" ry="190"></ellipse><path d="M 66 256 A 190 44 0 0 0 446 256"></path><path d="M 82 180 A 174 40 0 0 0 430 180"></path><path d="M 82 332 A 174 40 0 0 0 430 332"></path></g><circle cx="256" cy="256" r="190" fill="url(#lgSp)"></circle><circle cx="256" cy="256" r="190" fill="url(#lgRim)"></circle><circle cx="256" cy="256" r="190" fill="url(#lgV)"></circle></g><path d="M 256 66 A 190 190 0 0 1 256 446 A 114 190 0 0 0 256 66 Z" fill="#14100A"></path><path d="M 256 66 A 190 190 0 0 1 256 446 A 180 190 0 0 0 256 66 Z" fill="#FFB35C"></path></g></svg>
+    <!-- the Lumen globe mark (v0.15.0): real-geography glossy globe — gold continents
+         on black ocean, gold graticule, orange rim (owner reference, 22 Aug). Same
+         asset as the app icon. logo.svg is same-origin + sw-cached (offline-safe);
+         referenced not inlined to keep index.html lean (the 45 KB land path). -->
+    <img id="nvMark" src="logo.svg" width="60" height="60" alt="" aria-hidden="true" draggable="false">
   </button>
 </nav>
 
@@ -797,6 +799,17 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.15.0 • THE REAL-GEOGRAPHY GLOBE (owner reference, 22 Aug). The mark is
+//            now a glossy lit sphere with the ACTUAL continents — projected
+//            orthographically from the app's own land-110m data, Atlantic-
+//            centered — in Lumen: gold continents (lit top-left → deep) on a
+//            black ocean, thin gold graticule, depot-orange rim light, edge
+//            vignette + specular. Chosen from a four-treatment round against
+//            the owner's reference image. It is the app icon (globe filling
+//            the tile, per the reference framing) AND the navigation-button
+//            face (same logo.svg, referenced not inlined; sw-cached, offline-
+//            safe). The v0.14.0 crescent mark and the Star Net icon are
+//            retired.
 //   v0.14.0 • THE GLOBE IS THE LOGO (owner directive, 22 Aug). The mark was
 //            re-cut past the cartoon read: full engraved graticule (three
 //            meridians · three parallels), four-stop gold, soft specular,
@@ -1053,7 +1066,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.14.0';
+const APP_VERSION = 'v0.15.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
