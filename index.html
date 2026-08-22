@@ -446,6 +446,7 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 .bf-eye.off{color:var(--faint); opacity:.5}
 .ch-col.ch-off .ch-chip{opacity:.45}
 .bf-subhead{font:700 9.5px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--faint); padding:9px 0 3px}
+.bf-subfilter{margin:2px 0 6px}
 .bf-sub{max-height:264px; overflow-y:auto; margin:0 0 4px}
 .bf-sub .rc-row{min-height:44px; padding:4px 2px}
 .bf-subadd{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin-left:auto; flex:0 0 auto;
@@ -795,6 +796,10 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.13.1 • PICKER FILTER (owner "Go"). Long subordinate lists (ARNG's 61
+//            states) get a filter box: type a few letters, the list collapses
+//            live, tap +. The query survives the add-tap re-render so several
+//            picks in a row need one typed filter; a new subject clears it.
 //   v0.13.0 • THE HAND-BUILT BRIEF (owner correction, 22 Aug: "this is broken").
 //            The v0.11.0 walker auto-dumped every starred HQ's ENTIRE A-ORG-1
 //            subtree onto the brief globe — three stars buried CONUS. Gone.
@@ -1035,7 +1040,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.13.0';
+const APP_VERSION = 'v0.13.1';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -3931,11 +3936,16 @@ function _bfObjSheet(id){
     const kidsAll=tk.map(function(k){ return {id:k.id, name:k.name, custom:false}; })
       .concat(ck.map(function(k){ return {id:k.id, name:k.name, custom:true}; }));
     if(kidsAll.length){
-      h+='<div class="bf-subhead">Subordinates · '+kidsAll.length+'</div><div class="bf-sub">';
+      if(window._bfSubFor!==id){ window._bfSubFor=id; window._bfSubQ=''; }   // new subject: fresh filter
+      const q=_srFold(window._bfSubQ||'');
+      h+='<div class="bf-subhead">Subordinates · '+kidsAll.length+'</div>';
+      if(kidsAll.length>8) h+='<input class="rc-in bf-subfilter" id="bfSubQ" type="text" placeholder="Filter '+kidsAll.length+' subordinates" value="'+escA(window._bfSubQ||'')+'" autocomplete="off">';
+      h+='<div class="bf-sub">';
       kidsAll.forEach(function(k){
         const isM=bfHas(k.id);
         const hs2=k.custom?null:siteById(ogEffSite(k.id)||'');
-        h+='<div class="rc-row"><span class="rc-top">'+esc(k.name)+(k.custom?' *':'')+'</span>'
+        const fold=_srFold(k.name+' '+(hs2?hs2.base:''));
+        h+='<div class="rc-row" data-bfsn="'+escA(fold)+'"'+((q && fold.indexOf(q)<0)?' hidden':'')+'><span class="rc-top">'+esc(k.name)+(k.custom?' *':'')+'</span>'
           +(hs2?('<span class="rc-sub">'+esc(hs2.base)+'</span>'):'')
           +'<button class="bf-subadd'+(isM?' in':'')+'" type="button" data-bfsub="'+escA(k.id)+'" data-bfhost="'+escA(id)+'" aria-label="'+(isM?'Remove from brief':'Add to brief')+'">'+(isM?'✓':'+')+'</button>'
           +'</div>';
@@ -3973,6 +3983,17 @@ function _bfObjSheet(id){
 }
 
 // ---- record tab body (v0.4.0): rows · one add/edit form · delete ------------
+if(!window.__bfSubWired){ window.__bfSubWired=true;
+  document.addEventListener('input', function(e){
+    if(!e.target || e.target.id!=='bfSubQ') return;
+    window._bfSubQ=e.target.value||'';
+    const q=_srFold(window._bfSubQ);
+    document.querySelectorAll('#dossier .bf-sub .rc-row').forEach(function(r){
+      r.hidden=!!(q && String(r.getAttribute('data-bfsn')||'').indexOf(q)<0);
+    });
+  });
+}
+
 function _rcRender(id, kind){
   const K=RC_KINDS[kind]; const rec=recordOf(id); const items=rec?rec[kind]:[];
   let h='';
