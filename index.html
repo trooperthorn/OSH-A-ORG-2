@@ -375,7 +375,7 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 #nvRing circle{stroke:var(--signal); stroke-width:3; stroke-linecap:round; transition:none}
 .nv-sat{
   appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  position:relative; width:48px; height:48px; border-radius:50%; padding:0; flex:0 0 auto;
+  position:relative; width:44px; height:44px; border-radius:50%; padding:0; flex:0 0 auto;
   display:flex; align-items:center; justify-content:center; color:var(--text);
 }
 .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
@@ -385,15 +385,14 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 #navRow{
   position:absolute; z-index:43;
   left:max(var(--safe-l),12px); right:max(var(--safe-r),12px);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
-  max-width:440px; margin-inline:auto;
-  display:flex; align-items:center; justify-content:space-between; gap:8px;
-  opacity:0; transform:translateY(12px); pointer-events:none;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 14px);   /* the globe's own band */
+  height:68px;
+  display:flex; align-items:center; justify-content:space-between;
+  opacity:0; transform:translateY(10px); pointer-events:none;
   transition:opacity .18s ease, transform .18s ease;
 }
+.nv-side{display:flex; align-items:center; gap:8px}       /* three buttons per side, flanking the globe */
 body.nav-open #navRow{opacity:1; transform:none; pointer-events:auto}
-body.nav-open #searchPill{transform:translateY(-58px)}   /* clear the row (pill isn't a scroll container — transform is legal) */
-#searchPill{transition:opacity .3s ease, transform .2s ease}
 body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,215,110,.35), inset 0 1px 0 var(--spec)}
 
 /* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
@@ -693,6 +692,11 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-x::after{content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%)}
 .co-sub{margin-top:2px; font:600 10.5px/1.35 var(--body); color:var(--dim);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.co-rel{margin-top:6px; font:600 10.5px/1.4 var(--body); color:var(--dim);
+  display:flex; flex-wrap:wrap; align-items:center; gap:3px}
+.co-relsep{margin:0 5px; color:var(--faint)}
+.co-up{color:var(--signal); font-weight:800; margin-right:1px}   /* solid orange = reports-to */
+.co-dn{color:var(--accent); font-weight:800; margin-right:1px}   /* dashed yellow = subordinates */
 .co-acts{display:flex; gap:9px; padding-top:9px}
 .co-acts:empty{display:none}
 .co-pop{flex:none; width:36px; height:36px; border:0; cursor:pointer; border-radius:50%;
@@ -757,12 +761,16 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 <!-- MAP CONTROL ROW (v0.16.0 owner: left-to-right under the search bar, not a
      circle — maximizes space). Same six controls + IDs; the ring is now a row. -->
 <div id="navRow" aria-label="Map controls">
-  <button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
-  <button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear selection"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
-  <button id="navSat-zoomout" class="nv-sat glass" type="button" aria-label="Zoom out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-  <button id="navSat-zoomin" class="nv-sat glass" type="button" aria-label="Zoom in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
-  <button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
-  <button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button>
+  <div class="nv-side">
+    <button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+    <button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear selection"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    <button id="navSat-zoomout" class="nv-sat glass" type="button" aria-label="Zoom out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+  </div>
+  <div class="nv-side">
+    <button id="navSat-zoomin" class="nv-sat glass" type="button" aria-label="Zoom in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+    <button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
+    <button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button>
+  </div>
 </div>
 
 <nav id="navDock" aria-label="Navigation">
@@ -808,6 +816,17 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.17.0 • FLANKING CONTROLS + LEGIBLE CONNECTIONS (owner, 22 Aug).
+//            (1) The nav controls now flank the globe button in the bottom
+//            band — three to the bottom-LEFT, three to the bottom-RIGHT (the
+//            empty corners the owner circled) — instead of a single row above
+//            it; the zoom rocker straddles the globe. (2) Map connection lines
+//            were an illegible gold tangle with no meaning. Now the two
+//            families read as different things: SUBORDINATES fan out as dashed,
+//            dim yellow spurs; REPORTS-TO is one solid, bright orange line up
+//            to the parent with an arrowhead — and the callout spells it out in
+//            words ("↑ Reports to <parent> · ↓ <N> subordinates"), the glyphs
+//            colored to match the lines.
 //   v0.16.0 • THE CONTROL ROW (owner, 22 Aug: with search at the bottom, the
 //            globe's pop-outs go LEFT-TO-RIGHT under the search bar, not a
 //            circle — maximize space). The nav ring's six controls (back ·
@@ -1083,7 +1102,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.16.0';
+const APP_VERSION = 'v0.17.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2245,7 +2264,7 @@ function _selSyncCheck(){
 
 // ---- Great-circle arcs (PORT of drawSubtleArcs — sampling verbatim) ------------
 // Lightweight arc drawer: thin, semi-transparent, glow only past alpha 0.5.
-function drawSubtleArcs(ctx, m, arcs, rgb, width, alpha, arrow){
+function drawSubtleArcs(ctx, m, arcs, rgb, width, alpha, arrow, dash){
   function slerpPts(aLon,aLat,bLon,bLat,segs){
     const a=lonLatToVec(aLon,aLat), b=lonLatToVec(bLon,bLat);
     let dot=a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; dot=Math.max(-1,Math.min(1,dot));
@@ -2258,6 +2277,7 @@ function drawSubtleArcs(ctx, m, arcs, rgb, width, alpha, arrow){
   }
   ctx.save();
   ctx.lineWidth=(width||0.7); ctx.strokeStyle='rgba('+rgb+','+(alpha!=null?alpha:0.28)+')'; ctx.lineCap='round';
+  if(dash) ctx.setLineDash(dash);   // dashed = subordinate spurs; solid = chain of command
   if((alpha||0)>0.5){ ctx.shadowColor='rgba('+rgb+',0.85)'; ctx.shadowBlur=7; }
   arcs.forEach(arc=>{
     const pts=slerpPts(arc.from.lon,arc.from.lat, arc.to.lon,arc.to.lat, 40);
@@ -2288,14 +2308,15 @@ function drawGlobeLinks(ctx, m){
   try{ if(document.body.classList.contains('brief-mode')){ drawBriefArcs(ctx, m); return; } }catch(_){}
   if(GlobeState._linesOff) return;
   const T=_mTok();
-  // Child web first (subtle, thin, static — hints the connection without a bright
-  // tangle; the highlighted dots carry the "these belong to this site" meaning).
+  // v0.17.0 — the two families now read as DIFFERENT things (owner: the lines
+  // were illegible / meaningless). SUBORDINATES = dashed, dim, thin yellow spurs
+  // fanning OUT to each direct command. REPORTS-TO = one solid, bright orange
+  // line UP to the parent, with an arrowhead. The callout spells both out in words.
   if(GlobeState._cmdLinkArcs && GlobeState._cmdLinkArcs.length){
-    drawSubtleArcs(ctx, m, GlobeState._cmdLinkArcs, T.accent, 1.25, 0.5);
+    drawSubtleArcs(ctx, m, GlobeState._cmdLinkArcs, T.accent, 1.3, 0.5, false, [2.5,5]);
   }
-  // CHAIN TO HQ over the web — the gold lineage always reads while drilling around.
   if(GlobeState._hqArc && GlobeState._hqArc.length){
-    drawSubtleArcs(ctx, m, GlobeState._hqArc, T.signal, 2.2, 0.92);
+    drawSubtleArcs(ctx, m, GlobeState._hqArc, T.signal, 2.4, 0.95, true);
   }
 }
 
@@ -3878,6 +3899,16 @@ function _coRender(){
     +'<button class="co-x" type="button" data-cox="1" aria-label="Clear selection">✕</button></div>'
     +'<div class="co-sub">'+esc(sub)+(nrec?(' · '+nrec+' rec'):'')+'</div>';
   const briefSubj = ag ? ag.id : (sOg ? sOg.id : null);   // what ★ adds — always an ORG
+  // CONNECTION SUMMARY (map): tell the user, in words, what the arcs mean.
+  if(!brief && briefSubj && typeof orgOf==='function'){
+    let parentName=null;
+    try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parentName=anc.name; break; } } }catch(_){}
+    const kids=(typeof ogKids==='function')?ogKids(briefSubj).length:0;
+    const bits=[];
+    if(parentName) bits.push('<span class="co-up">↑</span> Reports to '+esc(_bfAbbr(parentName)));
+    if(kids) bits.push('<span class="co-dn">↓</span> '+kids+' subordinate'+(kids===1?'':'s'));
+    if(bits.length) h+='<div class="co-rel">'+bits.join('<span class="co-relsep">·</span>')+'</div>';
+  }
   h+='<div class="co-acts">';
   if(briefSubj){
     h+=bfHas(briefSubj)

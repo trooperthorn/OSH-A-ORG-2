@@ -210,3 +210,14 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   bottom-insets via visualViewport — NEVER transforms (#searchResults is a
   scroll container; the no-transform law holds). Clocks + brief chart live at
   top +58px now.
+
+## v0.17.0 — flanking controls + legible connections (owner, 22 Aug)
+- Nav controls FLANK the globe: #navRow is two .nv-side groups (back·clear·
+  zoomout | zoomin·saved·layers) at the globe's own bottom band (bottom+14,
+  height 68, justify space-between), filling the bottom-left/right corners.
+  No pill lift anymore. Buttons 44px. Same IDs/handlers.
+- Map selection arcs are semantic now: _cmdLinkArcs (subordinates) draw DASHED
+  dim yellow (T.accent, [2.5,5]); _hqArc (reports-to) draws SOLID bright orange
+  (T.signal) with an arrowhead. drawSubtleArcs gained a `dash` param (8th).
+  The callout carries a .co-rel summary ("↑ Reports to X · ↓ N subordinates",
+  glyphs colored --signal/--accent) — never touch the no-blue/no-green law.
