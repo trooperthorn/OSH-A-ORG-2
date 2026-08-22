@@ -231,7 +231,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(typeof global._searchEntries!=='function') throw new Error('_searchEntries not declared (s3-search absent from boot)');
     const n=global._searchEntries().length;
     const wantN=(function(){ try{ return JSON.parse(fs.readFileSync(__dirname+'/../data/sites.json','utf8')).sites.length; }catch(_){ return null; } })();
-    const wantOrgs=(function(){ try{ return JSON.parse(fs.readFileSync(__dirname+'/../data/orgs.json','utf8')).orgs.filter(o=>o.lvl>=3).length; }catch(_){ return 0; } })();
+    const wantOrgs=(function(){ try{ const cats={acoms:1,asccs:1,drus:1,'acquisition-paes-cpes':1};
+      return JSON.parse(fs.readFileSync(__dirname+'/../data/orgs.json','utf8')).orgs.filter(o=>!cats[o.id]).length; }catch(_){ return 0; } })();
     if(wantN!=null && n!==wantN+wantOrgs){ fails++; console.log('✗ SEARCH index '+n+' entries, want '+wantN+' sites + '+wantOrgs+' orgs — a payload is stale or truncated'); }
     else if(!(n>200)){ fails++; console.log('✗ SEARCH index too small: '+n+' entries (contract: >200 sites)'); }
     else console.log('  ✓ search index built: '+n+' sites');
@@ -338,39 +339,55 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     }
   }catch(e){ fails++; console.log('✗ RECORDS probe: '+e.message); }
 
-  // ── PROBE: v0.7.0 brief ON the globe — chain map, chart chips, object popup,
-  //           custom orgs, view toggles, snapshot, export ──
+  // ── PROBE: v0.13.0 the HAND-BUILT brief — members only, derived L1-L4,
+  //           group eyes + depth filter, picker, snapshot rows, export ──
   try{
     if(!global.Brief) throw new Error('Brief API not exposed');
-    global.Brief.add('fort-bragg');
-    global.Brief.add('the-pentagon');
+    global.Brief.add('fort-bragg');                     // → usawhc, ONE member — no subtree
     global.Brief.note('fort-bragg','Main effort');
-    if(global.Brief.list().length!==2){ fails++; console.log('✗ BRIEF set wrong: '+global.Brief.list().join()); }
-    // custom subordinate org (map-level add path uses the same API)
+    if(global.Brief.list().join()!=='usawhc'){ fails++; console.log('✗ BRIEF star must add ONE org: '+global.Brief.list().join()); }
+    // custom subordinate built under a member joins the brief on its own
     const org=global.Orgs.add('1st Test Brigade','fort-bragg','fort-campbell');
     if(!org || org.parent!=='usawhc' || global.Orgs.of('usawhc').length!==1){
       fails++; console.log('✗ ORGS add failed (site parent must normalize to the primary org): '+JSON.stringify(org)); }
+    if(!global.Brief.has(org.id)){ fails++; console.log('✗ custom under a member did not join the brief'); }
+    // hand-built tree levels: AMC (new L1) + its real kid ASC (derived L2)
+    global.Brief.add('amc'); global.Brief.add('asc');
     global.setMode('brief');
-    // chain map: both HQ trees + the custom org riding its own base
     const C=global._briefChainMap();
-    // v0.11.0: chain keys are ORG ids — fort-bragg's primary is USAWHC, the
-    // Pentagon site's primary is PIT (the A-ORG-1 world)
-    if(!C.nodes['usawhc'] || C.order.length<10){
-      fails++; console.log('✗ CHAIN map thin/wrong keys: '+C.order.length+' nodes, usawhc='+(!!C.nodes['usawhc'])); }
+    if(C.order.length!==4){ fails++; console.log('✗ CHAIN not members-only: '+C.order.length+' nodes (want 4)'); }
+    if(!C.nodes['usawhc'] || C.nodes['usawhc'].tier!==1){ fails++; console.log('✗ usawhc not L1'); }
     const on=C.nodes[org.id];
     if(!on || on.tier!==2 || on.parent!=='usawhc' || !on.custom || on.lat==null){
       fails++; console.log('✗ CHAIN custom org node wrong: '+JSON.stringify(on)); }
-    // chart card: compact chips (incl. the custom), no old tree boxes
+    if(!C.nodes['asc'] || C.nodes['asc'].tier!==2 || C.nodes['asc'].parent!=='amc'){
+      fails++; console.log('✗ derived level wrong for asc: '+JSON.stringify(C.nodes['asc'])); }
+    // depth filter: L1 only → asc drops, amc stays
+    global.Brief.depth(1);
+    const C3=global._briefChainMap();
+    if(C3.nodes['asc'] || !C3.nodes['amc']){ fails++; console.log('✗ depth filter broken'); }
+    global.Brief.depth(4);
+    // group eye: hiding AMC drops its whole component from the globe map
+    global.Brief.eye('amc');
+    const C4=global._briefChainMap();
+    if(C4.nodes['amc'] || C4.nodes['asc'] || !C4.nodes['usawhc']){ fails++; console.log('✗ group eye broken'); }
+    global.Brief.eye('amc');
+    // chart: group headers with eyes, depth control, the custom chip
+    global.renderBrief();
     const bs2=IDS['briefStage'];
-    const chips=(bs2.innerHTML.match(/ch-chip/g)||[]).length;
-    if(chips<6){ fails++; console.log('✗ CHART chips: '+chips+' (want ≥6)'); }
-    if(bs2.innerHTML.indexOf('bf-box')>=0){ fails++; console.log('✗ old bf-box tree still renders'); }
+    if((bs2.innerHTML.match(/data-bfeye=/g)||[]).length!==2){ fails++; console.log('✗ CHART group eyes: want 2 L1 groups'); }
+    if(bs2.innerHTML.indexOf('data-bfdepth')<0){ fails++; console.log('✗ CHART depth control missing'); }
     if(bs2.innerHTML.indexOf('data-bfobj="'+org.id+'"')<0){ fails++; console.log('✗ custom org missing from chart'); }
-    // object popup: annotation + actions + add-subordinate entry
+    if(bs2.innerHTML.indexOf('bf-box')>=0){ fails++; console.log('✗ old bf-box tree still renders'); }
+    // object popup: annotation + SUBORDINATES PICKER (one-tap real tree kids)
     global._bfObjSheet('fort-bragg');
     const host2=IDS['dossier'];
     if(host2.innerHTML.indexOf('Main effort')<0 || host2.innerHTML.indexOf('data-orgadd')<0
        || host2.innerHTML.indexOf('data-govmap')<0){ fails++; console.log('✗ OBJECT popup incomplete'); }
+    if(host2.innerHTML.indexOf('Remove from brief')<0){ fails++; console.log('✗ member popup lacks Remove from brief'); }
+    global._bfObjSheet('amc');
+    if(host2.innerHTML.indexOf('data-bfsub="asc"')<0 || host2.innerHTML.indexOf('data-bfsub="cecom"')<0){
+      fails++; console.log('✗ SUBORDINATES picker missing real tree kids'); }
     global._bfObjSheet(org.id);
     if(host2.innerHTML.indexOf('data-orgrm')<0 || host2.innerHTML.indexOf('Custom org')<0){
       fails++; console.log('✗ OBJECT popup (custom) incomplete'); }
@@ -380,16 +397,18 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     const lg=IDS['legendPanel'];
     if((lg.innerHTML.match(/data-vw=/g)||[]).length!==4 || lg.innerHTML.indexOf('data-vw="usace"')<0){
       fails++; console.log('✗ LEGEND view toggles missing (want names/usace/dots/lines)'); }
-    // snapshot + export still carry the brief (+ orgs)
+    // snapshot carries the BUILT rows; the export prints exactly those
     const sn3=global.buildSnapshot();
-    if(!sn3.extras.brief || sn3.extras.brief.hqs.length!==2 || sn3.extras.brief.ann['usawhc']!=='Main effort'){
-      fails++; console.log('✗ SNAPSHOT extras.brief wrong (org-keyed): '+JSON.stringify(sn3.extras.brief&&sn3.extras.brief.ann)); }
+    const xb=sn3.extras.brief;
+    if(!xb || xb.mem.length!==4 || xb.rows.length!==4 || xb.hqs.length!==2 || xb.ann['usawhc']!=='Main effort'){
+      fails++; console.log('✗ SNAPSHOT extras.brief wrong: '+JSON.stringify(xb&&{mem:xb.mem.length,rows:xb.rows&&xb.rows.length,hqs:xb.hqs})); }
     if(!sn3.extras.orgs || sn3.extras.orgs.length!==1){ fails++; console.log('✗ SNAPSHOT extras.orgs missing'); }
     const body3=global._xpDossierBody(sn3);
-    if(body3.indexOf('Main effort')<0 || body3.indexOf('Brief — 2 HQs')<0){ fails++; console.log('✗ EXPORT body missing brief section'); }
-    if(!fails) console.log('  ✓ brief-on-globe: chain map + chart chips + popup + custom org + toggles + snapshot + export');
+    if(body3.indexOf('Main effort')<0 || body3.indexOf('Brief — 4 organizations')<0 || body3.indexOf('L2')<0){
+      fails++; console.log('✗ EXPORT body missing built-brief section'); }
+    if(!fails) console.log('  ✓ hand-built brief: members-only map + levels + eye/depth + picker + snapshot rows + export');
     global.Orgs.remove(org.id);
-    global.Brief.remove('the-pentagon'); global.Brief.remove('fort-bragg');
+    global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');
   }catch(e){ fails++; console.log('✗ BRIEF probe: '+e.message); }
 

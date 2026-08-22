@@ -182,3 +182,20 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - clearAll() is the ring ✕: selection/arcs/callout, sheet, trail, search,
   open panels. It NEVER touches view toggles or stored data (brief, records,
   custom orgs).
+
+## v0.13.0 — the hand-built brief (owner correction, 22 Aug: "this is broken")
+- **NO AUTO-SUBTREES, EVER.** BRIEF.mem lists exactly the orgs the owner added
+  (★ adds ONE; the popup's Subordinates picker adds real tree kids one tap at
+  a time). _briefChainMap() renders members only; levels are DERIVED (nearest
+  added ancestor; L1 = none). Re-introducing a recursive ogKids walk into the
+  brief render path is THE bug the owner called broken — never bring it back.
+- BRIEF={mem, ann, hide}; kv migrates legacy {hqs}→{mem} once. bfRemove
+  CASCADES (added subordinates leave with their ancestor). Custom orgs created
+  under a member auto-join (orgAdd → bfAdd).
+- Chart: one .ch-col per L1 group — eye (data-bfeye, persisted in hide) shows/
+  hides that component; bf-depth L1-L4 control (GlobeState._bfDepth, ephemeral)
+  gates globe + chart. Brief.eye/Brief.depth are the API.
+- Rooms are SEPARATE: map selection never writes to the brief; brief-room
+  search opens _bfObjSheet (build grammar), never selectSite.
+- Snapshot extras.brief={mem, hqs(roots), ann, hide, rows[]} — exporters print
+  rows (the built picture), never a tree walk of their own.

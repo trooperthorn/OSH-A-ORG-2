@@ -433,6 +433,25 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 .ch-t4{box-shadow:0 0 0 1.2px var(--t4); color:var(--t4)}
 .ch-chip.on{background:var(--accent-wash)}
 .ch-more{font:700 9.5px/1 var(--mono); letter-spacing:.08em; color:var(--faint); padding:2px 0 2px var(--ch-ind,0px)}
+/* v0.13.0 THE HAND-BUILT BRIEF: echelon depth control · per-HQ group eyes */
+.bf-depth{display:flex; gap:4px; padding:5px 0 7px}
+.bf-dep{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin:0;
+  font:700 9.5px/1 var(--mono); letter-spacing:.06em; padding:6px 10px; border-radius:8px;
+  background:rgba(0,0,0,.35); color:var(--faint); box-shadow:0 0 0 1px var(--line)}
+.bf-dep.on{color:var(--accent); background:var(--accent-wash)}
+.ch-grp{display:flex; align-items:center; gap:6px; padding:2px 0}
+.ch-gn{font:700 9.5px/1 var(--mono); color:var(--faint); margin-left:auto}
+.bf-eye{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin:0; background:none;
+  color:var(--dim); width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:50%}
+.bf-eye.off{color:var(--faint); opacity:.5}
+.ch-col.ch-off .ch-chip{opacity:.45}
+.bf-subhead{font:700 9.5px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--faint); padding:9px 0 3px}
+.bf-sub{max-height:264px; overflow-y:auto; margin:0 0 4px}
+.bf-sub .rc-row{min-height:44px; padding:4px 2px}
+.bf-subadd{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin-left:auto; flex:0 0 auto;
+  width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,.35); box-shadow:0 0 0 1px var(--line);
+  color:var(--accent); display:flex; align-items:center; justify-content:center; font:800 16px/1 var(--body)}
+.bf-subadd.in{background:var(--accent-wash); box-shadow:0 0 0 1px var(--accent); font-size:13px}
 /* the quiet offer (v0.10.0): the chain grew — export glows twice, says nothing */
 @keyframes xpPulse{0%,100%{box-shadow:0 0 0 1px var(--line)} 35%{box-shadow:0 0 0 2px var(--accent), 0 0 14px rgba(var(--accent-rgb),.55)}}
 .xp-pulse{animation:xpPulse 1.4s ease 2; color:var(--accent)}
@@ -776,6 +795,23 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.13.0 • THE HAND-BUILT BRIEF (owner correction, 22 Aug: "this is broken").
+//            The v0.11.0 walker auto-dumped every starred HQ's ENTIRE A-ORG-1
+//            subtree onto the brief globe — three stars buried CONUS. Gone.
+//            The brief now shows ONLY organizations the owner explicitly
+//            added: ★ adds exactly one org; its real subordinates are added
+//            ONE TAP AT A TIME from the popup's Subordinates picker (the true
+//            A-ORG-1 kids — the same organizations the map knows). Levels are
+//            DERIVED: an added org nests under its nearest added ancestor —
+//            L1 HQs, L2/L3/L4 as built. THE CHART shows that hierarchy per
+//            group with tier colors, an EYE per L1 group (show or hide that
+//            component of the brief), and an L1-L4 depth control. Removing an
+//            org removes its added subordinates with it. Map and brief are
+//            fully separate rooms: map selection never touches the brief;
+//            search in the brief room opens the org popup to BUILD, not a map
+//            selection. Custom orgs created under a brief member join it.
+//            Exports print exactly what was built (snapshot rows). Storage
+//            migrates {hqs}→{mem} in place — no duplicates, owner law.
 //   v0.12.0 • MAP CONTROL (owner directive, 21 Aug). USACE IS A CLASS: the 52
 //            engineer districts (grp '…|usace') now class as USACE — their own
 //            legend swatch, their own layer filter, and a dedicated "USACE
@@ -999,7 +1035,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.12.0';
+const APP_VERSION = 'v0.13.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2471,41 +2507,51 @@ function _bfAbbr(name){
   const short=s.split(/\s+/).map(function(w){ return _BF_SHORT[w]||w; }).join(' ');
   return short.length>18 ? short.slice(0,17)+'…' : short;
 }
-// The chain map: every node reachable from the brief HQs, four echelons deep,
-// sites AND custom orgs. A custom without its own base rides its parent's point.
-function _briefChainMap(){
-  // v0.11.0: the chain walks the A-ORG-1 ORG TREE (BRIEF.hqs = org ids). Every
-  // node draws at its effective site; user-built customs graft onto their org.
+// v0.13.0 THE HAND-BUILT BRIEF (owner directive: no auto-subtrees, EVER — the
+// v0.11.0 walker dumped whole A-ORG-1 commands onto the globe). The chain map
+// now renders ONLY orgs the owner explicitly added (BRIEF.mem). Levels are
+// DERIVED: an added org nests under its nearest added ancestor in the tree
+// (L1 = no added ancestor). opts.all ignores the view filters (group eyes +
+// echelon depth) — the chart and exports see everything; the globe sees the
+// filtered picture.
+function _bfParentOf(id){
+  const c=(typeof orgById==='function')?orgById(id):null; if(c) return c.parent;
+  const t=(typeof orgOf==='function')?orgOf(id):null; return t?t.parent:null;
+}
+function _briefChainMap(opts){
   const out={nodes:{}, order:[]};
-  if(typeof BRIEF==='undefined' || !BRIEF.hqs || !BRIEF.hqs.length) return out;
-  const orgIx={};
-  if(typeof ORGS!=='undefined') for(const o of ORGS) (orgIx[o.parent]||(orgIx[o.parent]=[])).push(o);
+  if(typeof BRIEF==='undefined' || !BRIEF.mem || !BRIEF.mem.length) return out;
+  const all=!!(opts&&opts.all);
+  const memIx={}; BRIEF.mem.forEach(function(m,i){ memIx[m]=i; });
+  const hid=new Set(BRIEF.hide||[]);
+  const depth=all?4:(GlobeState._bfDepth||4);
+  // nearest ADDED ancestor per member (custom chains climb into the tree)
+  const near={};
+  BRIEF.mem.forEach(function(id){
+    let p=_bfParentOf(id), hops=0, hit=null;
+    while(p && ++hops<40){ if(memIx[p]!=null){ hit=p; break; } p=_bfParentOf(p); }
+    near[id]=hit;
+  });
+  const lvlOf=function(id){ let l=1,c=near[id],g=0; while(c!=null&&++g<40){ l++; c=near[c]; } return l; };
+  const rootOf=function(id){ let c=id,g=0; while(near[c]!=null&&++g<40){ c=near[c]; } return c; };
   const tierN={1:0,2:0,3:0,4:0};
-  const seen=new Set();
-  BRIEF.hqs.forEach(function(hid){
-    const hq=(typeof orgOf==='function')?orgOf(hid):null; if(!hq) return;
-    const q=[{n:hq, custom:false, tier:1, pk:null}];
-    while(q.length){
-      const c=q.shift(); const key=c.n.id;
-      if(seen.has(key)) continue; seen.add(key);
-      const fam=BF_STREAMS[c.tier];
-      const shade=fam[tierN[c.tier]++ % fam.length];
-      let lat=null, lon=null;
-      if(c.custom){
-        const b=c.n.base?siteById(c.n.base):null;
-        if(b){ lat=b.lat; lon=b.lon; }
-        else { const p=out.nodes[c.pk]; if(p){ lat=p.lat; lon=p.lon; } }
-      } else {
-        const hs=siteById(ogEffSite(c.n.id)||'');
-        if(hs){ lat=hs.lat; lon=hs.lon; }
-      }
-      out.nodes[key]={id:key, tier:c.tier, shade:shade, parent:c.pk, root:hid, lat:lat, lon:lon,
-        name:c.n.name, custom:!!c.custom};
-      out.order.push(key);
-      if(c.tier>=4) continue;
-      if(!c.custom) ogKids(c.n.id).forEach(function(k){ q.push({n:k, custom:false, tier:c.tier+1, pk:key}); });
-      (orgIx[key]||[]).forEach(function(o){ q.push({n:o, custom:true, tier:c.tier+1, pk:key}); });
-    }
+  BRIEF.mem.forEach(function(id){
+    const c=(typeof orgById==='function')?orgById(id):null;
+    const t=(!c&&typeof orgOf==='function')?orgOf(id):null;
+    if(!c && !t) return;                                  // a deleted custom leaves a hole, never a crash
+    const lvl=lvlOf(id), root=rootOf(id), tier=Math.min(4,lvl);
+    if(!all && (hid.has(root) || lvl>depth)) return;
+    let lat=null, lon=null;
+    if(c){ const b=c.base?siteById(c.base):null; if(b){ lat=b.lat; lon=b.lon; } }
+    else { const hs=siteById(ogEffSite(id)||''); if(hs){ lat=hs.lat; lon=hs.lon; } }
+    const fam=BF_STREAMS[tier];
+    out.nodes[id]={id:id, tier:tier, lvl:lvl, shade:fam[tierN[tier]++ % fam.length],
+      parent:near[id], root:root, lat:lat, lon:lon, name:c?c.name:t.name, custom:!!c};
+    out.order.push(id);
+  });
+  out.order.forEach(function(k){ const n=out.nodes[k];
+    if(n.lat==null && n.parent && out.nodes[n.parent]){ n.lat=out.nodes[n.parent].lat; n.lon=out.nodes[n.parent].lon; }
+    if(n.parent && !out.nodes[n.parent]) n.parent=null;   // filtered-out parent: no dangling arc
   });
   return out;
 }
@@ -2970,6 +3016,11 @@ function _namedStateShapes(topo, geographic){
 //   - Brief tier tokens (--t1..--t4) untouched; no green near data.
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// A-ORG-1's four grouping shells — structure, not commands. They stay OUT of
+// search and OUT of the brief's subordinates picker (their children surface
+// directly); the map-room tree shows them faithfully.
+const _OG_CATS={acoms:1, asccs:1, drus:1, 'acquisition-paes-cpes':1};
+
 // ---- Escaping (PORT of esc ~L14030 / _escA ~L14129 — renamed, deviation 8) -----
 function _srEsc(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
 function _srEscA(v){ return String(v).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
@@ -3007,7 +3058,8 @@ function _searchEntries(){
   // effective site with that org driving the chain picture
   if(typeof A1ORGS!=='undefined'){
     for(const og of A1ORGS){
-      if(og.lvl<3) continue;                               // apex/category rows aren't destinations
+      if(_OG_CATS[og.id]) continue;                        // grouping shells aren't destinations
+      // (v0.13.0: HQDA and NGB — real commands at lvl 1-2 — ARE searchable now)
       const sid=(typeof ogEffSite==='function')?ogEffSite(og.id):null;
       const hs=sid?siteById(sid):null;
       _srEntries.push({
@@ -3095,10 +3147,25 @@ function _sfsPaint(res){
 // SAME rails as every other pick — trail crumb, SELECT-clock auto-fill, brief
 // re-render. The inline body below is only the boot-order fallback (s4 absent).
 function searchSelect(id){
+  // v0.13.0: in the BRIEF room a search pick opens the org's popup (fly to its
+  // base first) — from there one tap adds it. The map room keeps map selection.
+  const inBrief=!!(document.body && document.body.classList && document.body.classList.contains('brief-mode'));
   if(String(id).slice(0,3)==='og:'){                       // an ORGANIZATION pick
     const oid=String(id).slice(3);
     const sid=(typeof ogEffSite==='function')?ogEffSite(oid):null;
+    if(inBrief){
+      const hs=sid?siteById(sid):null;
+      if(hs && hs.lat!=null) try{ flyToLatLon(hs.lat, hs.lon, Math.max(GlobeState.zoom||1, 2.4)); }catch(_){}
+      try{ _bfObjSheet(oid); }catch(_){}
+      return;
+    }
     if(sid && typeof selectSite==='function'){ selectSite(sid, {orgId:oid}); return; }
+  }
+  if(inBrief && siteById(id)){
+    const s0=siteById(id);
+    if(s0.lat!=null) try{ flyToLatLon(s0.lat, s0.lon, Math.max(GlobeState.zoom||1, 2.4)); }catch(_){}
+    try{ _bfObjSheet(id); }catch(_){}
+    return;
   }
   if(typeof selectSite==='function'){ selectSite(id); return; }
   const s=(typeof siteById==='function') ? siteById(id) : null;
@@ -3424,13 +3491,16 @@ try{ window.setMode=setMode; }catch(_){}
 // only (owner law: minimal on the object, everything in the popup); minimize (⌗)
 // collapses the card to its tab. Chips open the object popup.
 function renderBrief(){
+  // v0.13.0: one group block per L1 with an EYE (show/hide that component of
+  // the brief) + the L1-L4 depth control. Rows show only what the owner added.
   const el=document.getElementById('briefStage'); if(!el) return;
   const esc=_odEsc, escA=_odEscA;
+  const memN=(BRIEF.mem||[]).length;
   let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
-    +'<span class="ch-n">'+(BRIEF.hqs.length?(BRIEF.hqs.length+' HQ'+(BRIEF.hqs.length===1?'':'s')):'')+'</span>'
+    +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
     +'<span class="od-ico" data-xpbtn="1" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
     +'</button>';
-  if(!BRIEF.hqs.length){
+  if(!memN){
     const selP=(GlobeState.selOrg&&typeof orgOf==='function')?orgOf(GlobeState.selOrg)
       :((GlobeState.sel&&typeof ogPrimary==='function')?ogPrimary(GlobeState.sel):null);
     h+='<div class="bf-empty"><b>The brief is empty</b>'
@@ -3439,25 +3509,39 @@ function renderBrief(){
       +'</div>';
     el.innerHTML=h; return;
   }
-  const C=_briefChainMap();
-  const CAP={1:4,2:8,3:10,4:12};
-  BRIEF.hqs.forEach(function(hid){
-    const sub={1:[],2:[],3:[],4:[]};
-    C.order.forEach(function(k){ const n=C.nodes[k]; if(n.root===hid) sub[n.tier].push(n); });
-    if(!sub[1].length) return;
-    // user-built orgs never fall off the cap — they lead their tier row
-    [2,3,4].forEach(function(t){ sub[t].sort(function(a,b){ return (b.custom?1:0)-(a.custom?1:0); }); });
-    h+='<div class="ch-col">';
-    [1,2,3,4].forEach(function(t){
-      if(!sub[t].length) return;
+  const C=_briefChainMap({all:true});
+  const dep=GlobeState._bfDepth||4;
+  const hid=new Set(BRIEF.hide||[]);
+  h+='<div class="bf-depth">'+[1,2,3,4].map(function(n){
+    return '<button type="button" class="bf-dep'+(dep>=n?' on':'')+'" data-bfdepth="'+n+'" aria-label="Show levels through L'+n+'">L'+n+'</button>';
+  }).join('')+'</div>';
+  const EYE='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"></path><circle cx="12" cy="12" r="2.6"></circle></svg>';
+  const EYEOFF='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"></path><path d="M4 4l16 16"></path></svg>';
+  const CAP={2:10,3:12,4:14};
+  const roots=C.order.filter(function(k){ return C.nodes[k].lvl===1; });
+  roots.forEach(function(r){
+    const rn=C.nodes[r];
+    const off=hid.has(r);
+    const members=C.order.filter(function(k){ return C.nodes[k].root===r; });
+    h+='<div class="ch-col'+(off?' ch-off':'')+'">';
+    h+='<div class="ch-grp">'
+      +'<button type="button" class="bf-eye'+(off?' off':'')+'" data-bfeye="'+escA(r)+'" aria-label="Show or hide this group">'+(off?EYEOFF:EYE)+'</button>'
+      +'<button type="button" class="ch-chip ch-t1" data-bfobj="'+escA(r)+'" title="'+escA(rn.name)+'">'+esc(_bfAbbr(rn.name))+'</button>'
+      +'<span class="ch-gn">'+members.length+'</span></div>';
+    if(!off) [2,3,4].forEach(function(t){
+      if(t>dep) return;
+      const row=members.map(function(k){ return C.nodes[k]; })
+        .filter(function(n){ return Math.min(4,n.lvl)===t; })
+        .sort(function(a,b){ return (b.custom?1:0)-(a.custom?1:0); });
+      if(!row.length) return;
       const ind=(t-1)*10;
       h+='<div class="ch-row" style="--ch-ind:'+ind+'px">'
-        +sub[t].slice(0,CAP[t]).map(function(n){
+        +row.slice(0,CAP[t]).map(function(n){
           const tcls='ch-t'+t;                             // quote-adjacent for dead-lint's dynamic guard
           return '<button type="button" class="ch-chip '+tcls+(GlobeState.sel===n.id?' on':'')+'" data-bfobj="'+escA(n.id)+'" title="'+escA(n.name)+'">'+esc(_bfAbbr(n.name))+'</button>';
         }).join('')
         +'</div>';
-      if(sub[t].length>CAP[t]) h+='<div class="ch-more" style="--ch-ind:'+ind+'px">+'+(sub[t].length-CAP[t])+' more</div>';
+      if(row.length>CAP[t]) h+='<div class="ch-more" style="--ch-ind:'+ind+'px">+'+(row.length-CAP[t])+' more</div>';
     });
     h+='</div>';
   });
@@ -3807,7 +3891,7 @@ function _bfObjSheet(id){
   const subj=ag || (s ? (((GlobeState.sel===s.id)&&GlobeState.selOrg&&orgOf(GlobeState.selOrg)) || ((typeof ogPrimary==='function')?ogPrimary(s.id):null)) : null);
   const hostS=s || (ag ? siteById(ogEffSite(ag.id)||'') : (o&&o.base?siteById(o.base):null));
   const name=o?o.name:(subj?subj.name:s.base);
-  const sid=subj?subj.id:null;                                          // annotation/brief key (ORG)
+  const sid=o?id:(subj?subj.id:null);                                   // annotation/brief key (ORG or custom)
   const nrec=(hostS && typeof recCount==='function')?recCount(hostS.id):0;
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">'+esc(name)+'</div><span class="od-sp"></span>'
@@ -3832,6 +3916,33 @@ function _bfObjSheet(id){
         +'</div>';
     }
   }
+  // v0.13.0 SUBORDINATES PICKER — the real A-ORG-1 kids of this org (plus its
+  // user-built customs), one tap each. The brief grows ONLY this way (or ★):
+  // no subtree ever auto-adds. Adding a kid pulls its parent in first so the
+  // string stays connected.
+  if(sid){
+    const tk=(!o && typeof ogKids==='function')?(function(){
+      const out=[]; ogKids(sid).forEach(function(k){
+        if(_OG_CATS[k.id]) ogKids(k.id).forEach(function(x){ out.push(x); });   // shells open up
+        else out.push(k);
+      }); return out;
+    })():[];
+    const ck=(typeof orgKidsOf==='function')?orgKidsOf(sid):[];
+    const kidsAll=tk.map(function(k){ return {id:k.id, name:k.name, custom:false}; })
+      .concat(ck.map(function(k){ return {id:k.id, name:k.name, custom:true}; }));
+    if(kidsAll.length){
+      h+='<div class="bf-subhead">Subordinates · '+kidsAll.length+'</div><div class="bf-sub">';
+      kidsAll.forEach(function(k){
+        const isM=bfHas(k.id);
+        const hs2=k.custom?null:siteById(ogEffSite(k.id)||'');
+        h+='<div class="rc-row"><span class="rc-top">'+esc(k.name)+(k.custom?' *':'')+'</span>'
+          +(hs2?('<span class="rc-sub">'+esc(hs2.base)+'</span>'):'')
+          +'<button class="bf-subadd'+(isM?' in':'')+'" type="button" data-bfsub="'+escA(k.id)+'" data-bfhost="'+escA(id)+'" aria-label="'+(isM?'Remove from brief':'Add to brief')+'">'+(isM?'✓':'+')+'</button>'
+          +'</div>';
+      });
+      h+='</div>';
+    }
+  }
   // add-subordinate: the inline two-field form (name · base), datalist-backed
   if(_orgForm && _orgForm.parent===id){
     h+='<div class="rc-form">'
@@ -3849,7 +3960,8 @@ function _bfObjSheet(id){
   h+='<div class="rc-row rc-acts">';
   if(sid && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(sid)+'">Annotate</button>';
   if(hostS) h+='<button class="bf-act in" type="button" data-govmap="'+escA(hostS.id)+'"'+(sid?(' data-govorg="'+escA(sid)+'"'):'')+'>Show on map</button>';
-  if(sid && bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfrm="'+escA(sid)+'">Remove HQ</button>';
+  if(sid && bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfrm="'+escA(sid)+'">Remove from brief</button>';
+  if(sid && !bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfadd="'+escA(sid)+'">Add to brief</button>';
   if(o) h+='<button class="bf-act in" type="button" data-orgrm="'+escA(id)+'">Delete org</button>';
   h+='</div>';
   const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
@@ -3954,7 +4066,20 @@ if(!window._odWired){
     const tx=e.target.closest('[data-tzclose]');
     if(tx){ if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
     const ba=e.target.closest('[data-bfadd]');
-    if(ba){ bfAdd(ba.getAttribute('data-bfadd')); return; }
+    if(ba){ const v=ba.getAttribute('data-bfadd'); bfAdd(v);
+      try{ const d=document.getElementById('dossier');
+        if(d && !d.hidden && document.body.classList.contains('brief-mode')) _bfObjSheet(v); }catch(_){}
+      return; }
+    const bsb=e.target.closest('[data-bfsub]');
+    if(bsb){ const kid=bsb.getAttribute('data-bfsub'), hostId=bsb.getAttribute('data-bfhost');
+      if(bfHas(kid)) bfRemove(kid);
+      else { if(hostId && !bfHas(hostId)) bfAdd(hostId); bfAdd(kid); }   // the string stays connected
+      try{ _bfObjSheet(hostId||kid); }catch(_){}
+      return; }
+    const bey=e.target.closest('[data-bfeye]');
+    if(bey){ bfEye(bey.getAttribute('data-bfeye')); return; }
+    const bdp=e.target.closest('[data-bfdepth]');
+    if(bdp){ bfDepth(bdp.getAttribute('data-bfdepth')); return; }
     const br=e.target.closest('[data-bfrm]');
     if(br){ _bfAnnEdit=null; bfRemove(br.getAttribute('data-bfrm'));
       // map: bfRemove re-rendered the card in place (star flips back); in the
@@ -4267,18 +4392,20 @@ function _rdbOpen(){
         const gb=tk.objectStore('kv').get('brief');
         gb.onsuccess=function(){
           const v=gb.result&&gb.result.v;
-          if(v && Array.isArray(v.hqs)){
-            // v0.11.0 MIGRATION (owner: no duplicates): stored site ids become
-            // their primary ORG ids, once, deduped, and written back.
+          if(v){
+            // v0.13.0 MIGRATION (owner: no duplicates): legacy {hqs} (or older
+            // site ids) become {mem} — org-id-normalized, deduped, written back.
+            const srcIds=Array.isArray(v.mem)?v.mem:(Array.isArray(v.hqs)?v.hqs:[]);
             const mapped=[]; const seenM={};
-            v.hqs.forEach(function(id){
+            srcIds.forEach(function(id){
               const k=(typeof _bfOrgId==='function')?_bfOrgId(id):id;
               if(k && !seenM[k]){ seenM[k]=1; mapped.push(k); }
             });
             const ann={}; const oldAnn=v.ann||{};
             for(const k in oldAnn){ const nk=(typeof _bfOrgId==='function')?(_bfOrgId(k)||k):k; if(!ann[nk]) ann[nk]=oldAnn[k]; }
-            const changed=(mapped.join('|')!==v.hqs.join('|'));
-            BRIEF.hqs=mapped; BRIEF.ann=ann;
+            BRIEF.mem=mapped; BRIEF.ann=ann;
+            BRIEF.hide=Array.isArray(v.hide)?v.hide.slice():[];
+            const changed=(!Array.isArray(v.mem) || mapped.join('|')!==srcIds.join('|'));
             if(changed) try{ _bfSave(); }catch(_){}
           }
           try{ if(document.body.classList.contains('brief-mode')) renderBrief(); }catch(_){}
@@ -4289,19 +4416,22 @@ function _rdbOpen(){
   }catch(_){}
 }
 
-// ---- THE BRIEF SET (v0.5.0) — the user-assembled chain of HQs + annotations ----
-const BRIEF={ hqs:[], ann:{} };                        // ann: site id → ≤80-char callout
+// ---- THE BRIEF SET (v0.13.0) — HAND-BUILT: mem lists exactly the orgs the
+// owner added (HQs and the specific subordinates picked under them); hide
+// lists the L1 group ids currently eyed off; ann keys ≤80-char callouts.
+const BRIEF={ mem:[], ann:{}, hide:[] };
 function _bfSave(){
-  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'brief', v:{hqs:BRIEF.hqs, ann:BRIEF.ann}}); } }catch(_){}
+  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'brief', v:{mem:BRIEF.mem, ann:BRIEF.ann, hide:BRIEF.hide}}); } }catch(_){}
 }
 // v0.11.0: the brief holds ORG ids. Site ids from older callers/storage map to
 // the site's primary org — one structure, never a duplicate pair.
 function _bfOrgId(id){
   if(typeof orgOf==='function' && orgOf(id)) return id;
+  if(typeof orgById==='function' && orgById(id)) return id;      // user-built custom
   if(siteById(id)){ const p=(typeof ogPrimary==='function')?ogPrimary(id):null; if(p) return p.id; }
   return null;
 }
-function bfHas(id){ const k=_bfOrgId(id)||id; return BRIEF.hqs.indexOf(k)>=0; }
+function bfHas(id){ const k=_bfOrgId(id)||id; return BRIEF.mem.indexOf(k)>=0; }
 
 // v0.10.0 AUTOMATION: when the chain GROWS while the brief room is open, the
 // globe gently reframes to hold the whole picture, and the chart's export
@@ -4340,8 +4470,8 @@ function _xpPulse(){
 }
 function bfAdd(id){
   id=_bfOrgId(id);
-  if(!id || BRIEF.hqs.indexOf(id)>=0) return;
-  BRIEF.hqs.push(id); _bfSave();
+  if(!id || BRIEF.mem.indexOf(id)>=0) return;
+  BRIEF.mem.push(id); _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
   try{ if(typeof _coRefresh==='function') _coRefresh(); }catch(_){}
@@ -4351,8 +4481,23 @@ function bfAdd(id){
 }
 function bfRemove(id){
   id=_bfOrgId(id)||id;
-  const i=BRIEF.hqs.indexOf(id); if(i<0) return;
-  BRIEF.hqs.splice(i,1); delete BRIEF.ann[id]; _bfSave();
+  if(BRIEF.mem.indexOf(id)<0) return;
+  // CASCADE: added subordinates leave with their added ancestor — no orphans
+  const gone=new Set([id]); let grew=true, guard=0;
+  while(grew && ++guard<40){ grew=false;
+    BRIEF.mem.forEach(function(m){
+      if(gone.has(m)) return;
+      let p=_bfParentOf(m), hops=0;
+      while(p && ++hops<40){
+        if(BRIEF.mem.indexOf(p)>=0){ if(gone.has(p)){ gone.add(m); grew=true; } break; }
+        p=_bfParentOf(p);
+      }
+    });
+  }
+  BRIEF.mem=BRIEF.mem.filter(function(m){ return !gone.has(m); });
+  gone.forEach(function(g){ delete BRIEF.ann[g]; });
+  BRIEF.hide=(BRIEF.hide||[]).filter(function(r){ return !gone.has(r); });
+  _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
   try{ if(typeof _coRefresh==='function') _coRefresh(); }catch(_){}
@@ -4366,7 +4511,21 @@ function bfNote(id, text){
   _bfSave();
   try{ renderBrief(); }catch(_){}
 }
-try{ window.Brief={ add:bfAdd, remove:bfRemove, note:bfNote, has:bfHas, list:function(){ return BRIEF.hqs.slice(); } }; }catch(_){}
+function bfEye(rootId){
+  const hd=BRIEF.hide||(BRIEF.hide=[]);
+  const i=hd.indexOf(rootId);
+  if(i>=0) hd.splice(i,1); else hd.push(rootId);
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+}
+function bfDepth(n){
+  GlobeState._bfDepth=Math.max(1, Math.min(4, parseInt(n,10)||4));
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+}
+try{ window.Brief={ add:bfAdd, remove:bfRemove, note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth,
+  list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}
 
 
 // v0.10.0 SESSION MEMORY: the app reopens exactly where you left it. The room
@@ -4408,6 +4567,7 @@ function orgAdd(name, parent, base){
   const id='org-'+Date.now().toString(36)+'-'+(ORGS.length+1);
   const o={id:id, name:name, parent:parent, base:(base&&siteById(base))?base:null};
   ORGS.push(o); _orgSave();
+  try{ if(BRIEF.mem && BRIEF.mem.indexOf(parent)>=0) bfAdd(id); }catch(_){}
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
   try{ _bfFrame(); _xpPulse(); }catch(_){}
@@ -4527,7 +4687,7 @@ function buildSnapshot(scope){
   return {
     meta:{ app:'A-ORG-2', version:(typeof APP_VERSION!=='undefined'?APP_VERSION:''),
            generated:new Date().toISOString(),
-           title: (function(){ try{ if(document.body.classList.contains('brief-mode')&&BRIEF.hqs.length){ const h0=(typeof orgOf==='function')?orgOf(BRIEF.hqs[0]):null; return 'Brief — '+(h0?h0.name:'')+(BRIEF.hqs.length>1?(' +'+(BRIEF.hqs.length-1)):''); } }catch(_){} const _po=(GlobeState.selOrg&&typeof orgOf==='function')?orgOf(GlobeState.selOrg):null; return sel ? (sel.base+(_po?(' — '+_po.name):'')) : 'U.S. Army — global laydown'; })(),
+           title: (function(){ try{ if(document.body.classList.contains('brief-mode')&&BRIEF.mem.length){ const Ct=_briefChainMap({all:true}); const r0=Ct.order.filter(function(k){ return Ct.nodes[k].lvl===1; }); const h0=r0.length?Ct.nodes[r0[0]]:null; return 'Brief — '+(h0?h0.name:'')+(r0.length>1?(' +'+(r0.length-1)):''); } }catch(_){} const _po=(GlobeState.selOrg&&typeof orgOf==='function')?orgOf(GlobeState.selOrg):null; return sel ? (sel.base+(_po?(' — '+_po.name):'')) : 'U.S. Army — global laydown'; })(),
            scope: sel&&scope!=='all' ? 'selection-family' : 'all-visible' },
     camera:cam,
     selection: sel ? { id:sel.id, chainUp:chain.map(function(c){return c.id;}), children:kids.map(function(k){return k.id;}) } : null,
@@ -4535,7 +4695,19 @@ function buildSnapshot(scope){
     classes:famCounts,
     sites:rows.map(function(r){ return { id:r.id, base:r.base, st:r.st, unit:r.unit,
       lat:r.lat, lon:r.lon, grp:r.grp, parent:r.parent, cls:clsOf(r.id) }; }),
-    extras:{ brief:(BRIEF.hqs.length?{hqs:BRIEF.hqs.slice(), ann:JSON.parse(JSON.stringify(BRIEF.ann))}:null),
+    extras:{ brief:(BRIEF.mem.length?(function(){
+      const Cb=_briefChainMap({all:true});
+      return { mem:BRIEF.mem.slice(), hide:(BRIEF.hide||[]).slice(),
+        hqs:Cb.order.filter(function(k){ return Cb.nodes[k].lvl===1; }),
+        ann:JSON.parse(JSON.stringify(BRIEF.ann)),
+        rows:Cb.order.map(function(k){ const n=Cb.nodes[k];
+          let siteName='';
+          if(n.custom){ const c=orgById(n.id); const b=(c&&c.base)?siteById(c.base):null; siteName=b?b.base:''; }
+          else { const s2=siteById(ogEffSite(n.id)||''); siteName=s2?s2.base:''; }
+          return {id:n.id, name:n.name, lvl:n.lvl, root:n.root, custom:n.custom,
+            site:siteName, note:BRIEF.ann[n.id]||''};
+        }) };
+    })():null),
       orgs:((typeof ORGS!=='undefined'&&ORGS.length)?JSON.parse(JSON.stringify(ORGS)):null),   // custom subordinates ride too (v0.7.0)
       records:(function(){                     // the datastore rides every export
       const out={}; if(typeof recordOf==='function') rows.forEach(function(r){ const rec=recordOf(r.id); if(rec && recCount(r.id)) out[r.id]=rec; });
@@ -4600,23 +4772,17 @@ function _xpDossierBody(sn){
     }
   }
   const bf=sn.extras&&sn.extras.brief;
-  if(bf && bf.hqs.length){
-    h+='<h2>Brief — '+bf.hqs.length+' HQ'+(bf.hqs.length===1?'':'s')+'</h2>';
-    bf.hqs.forEach(function(hid){
-      const hq=(typeof orgOf==='function')?orgOf(hid):null; if(!hq) return;
-      const siteOf=function(oid){ const hs=siteById(ogEffSite(oid)||''); return hs?hs.base:''; };
+  if(bf && bf.rows && bf.rows.length){
+    // v0.13.0: the export prints EXACTLY what was built — the member rows the
+    // snapshot carries, grouped by L1, never a tree walk of its own.
+    h+='<h2>Brief — '+bf.rows.length+' organization'+(bf.rows.length===1?'':'s')+'</h2>';
+    (bf.hqs||[]).forEach(function(rid){
+      const rows=bf.rows.filter(function(r){ return r.root===rid; });
+      if(!rows.length) return;
       h+='<table><tr><th>Tier</th><th>Organization</th><th>Site</th><th>Note</th></tr>';
-      h+='<tr><td>L1</td><td><b>'+esc(hq.name)+'</b></td><td>'+esc(siteOf(hid))+'</td><td>'+esc(bf.ann[hid]||'')+'</td></tr>';
-      const kidsAll=function(oid){                        // tree kids + user-built customs
-        const t=ogKids(oid).map(function(k){ return {id:k.id, name:k.name}; });
-        if(typeof ORGS!=='undefined') ORGS.forEach(function(c){ if(c.parent===oid) t.push({id:c.id, name:c.name+' *'}); });
-        return t;
-      };
-      kidsAll(hid).forEach(function(k){
-        h+='<tr><td>L2</td><td>'+esc(k.name)+'</td><td>'+esc(siteOf(k.id))+'</td><td>'+esc(bf.ann[k.id]||'')+'</td></tr>';
-        kidsAll(k.id).forEach(function(x){
-          h+='<tr><td>L3</td><td>'+esc(x.name)+'</td><td>'+esc(siteOf(x.id))+'</td><td>'+esc(bf.ann[x.id]||'')+'</td></tr>';
-        });
+      rows.sort(function(a,b){ return a.lvl-b.lvl; }).forEach(function(r){
+        const nm=(r.lvl===1?('<b>'+esc(r.name)+'</b>'):esc(r.name))+(r.custom?' *':'');
+        h+='<tr><td>L'+Math.min(4,r.lvl)+'</td><td>'+nm+'</td><td>'+esc(r.site||'')+'</td><td>'+esc(r.note||'')+'</td></tr>';
       });
       h+='</table>';
     });
