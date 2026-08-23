@@ -443,6 +443,14 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   font:700 9.5px/1 var(--mono); letter-spacing:.06em; padding:6px 10px; border-radius:8px;
   background:rgba(0,0,0,.35); color:var(--faint); box-shadow:0 0 0 1px var(--line)}
 .bf-dep.on{color:var(--accent); background:var(--accent-wash)}
+/* v0.20.0 FOCUS — isolate one branch; the rest dims */
+.bf-focusbar{display:flex; align-items:center; gap:8px; padding:6px 0 2px}
+.bf-foctag{font:800 11px/1.2 var(--body); color:var(--accent); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bf-focusx{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; flex:none;
+  padding:5px 9px; border-radius:8px; background:rgba(0,0,0,.35); box-shadow:0 0 0 1px var(--line);
+  color:var(--dim); font:700 9.5px/1 var(--mono); letter-spacing:.05em}
+.ch-chip.ch-dim{opacity:.3}
+.ch-chip.ch-focus{box-shadow:0 0 0 1.5px var(--accent), 0 0 10px rgba(245,215,110,.3)}
 .ch-grp{display:flex; align-items:center; gap:6px; padding:2px 0}
 .ch-gn{font:700 9.5px/1 var(--mono); color:var(--faint); margin-left:auto}
 .bf-eye{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin:0; background:none;
@@ -841,6 +849,17 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.20.0 • BRIEF BRANCH FOCUS (owner: incorporate A-ORG-1's brief navigation
+//            methodology). A-ORG-1's brief nav is "focus one branch at a time":
+//            tapping a node isolates its lineage UP + descendants DOWN, dims the
+//            rest, and the globe draws only that branch. Brought over — tapping
+//            any chart chip OR globe chain-node now FOCUSES its branch: the
+//            chart dims every off-branch chip (focused chip ringed) and the
+//            globe renders only the focused branch (_briefChainMap prunes to it
+//            when GlobeState._bfFocus is set). A "◎ <name> · Show all ✕" bar
+//            clears it. Focus is render-only + ephemeral (never mutates the set,
+//            never persists, cleared on room flip). Complements the existing
+//            group eyes (per-L1) and the L1-L4 depth dial.
 //   v0.19.0 • THE READOUT IS THE NAVIGATOR (owner: incorporate A-ORG-1's map
 //            navigation methodology — a team of agents reverse-engineered it).
 //            A-ORG-1's core move: the readout card lists the selected org's
@@ -1150,7 +1169,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.19.0';
+const APP_VERSION = 'v0.20.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2676,6 +2695,16 @@ function _briefChainMap(opts){
     if(n.lat==null && n.parent && out.nodes[n.parent]){ n.lat=out.nodes[n.parent].lat; n.lon=out.nodes[n.parent].lon; }
     if(n.parent && !out.nodes[n.parent]) n.parent=null;   // filtered-out parent: no dangling arc
   });
+  // v0.20.0 FOCUS (A-ORG-1 brief nav): the globe shows only the focused branch —
+  // the node's lineage up + all its descendants down; everything else drops.
+  if(!all && GlobeState._bfFocus && out.nodes[GlobeState._bfFocus]){
+    const f=GlobeState._bfFocus, keep=new Set(); let c=f,g=0;
+    while(c!=null && g++<40){ keep.add(c); c=out.nodes[c]?out.nodes[c].parent:null; }
+    const q=[f]; while(q.length){ const cur=q.shift(); out.order.forEach(function(k){ if(out.nodes[k].parent===cur && !keep.has(k)){ keep.add(k); q.push(k); } }); }
+    out.order=out.order.filter(function(k){ return keep.has(k); });
+    const kept={}; out.order.forEach(function(k){ kept[k]=out.nodes[k]; if(kept[k].parent && !keep.has(kept[k].parent)) kept[k].parent=null; });
+    out.nodes=kept;
+  }
   return out;
 }
 // Connectors: grouped by parent shade + child tier; per-level width/alpha
@@ -3616,7 +3645,7 @@ function setMode(m){
     // tapped (chain dot or chart chip); map restores the selection card.
     if(host){ if(brief){ hideDossier(); } else if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); }
   }catch(_){}
-  try{ GlobeState.__bfC=null; }catch(_){}
+  try{ GlobeState.__bfC=null; GlobeState._bfFocus=null; }catch(_){}
   try{ calloutHide(); }catch(_){}
   try{ if(typeof globeMark==='function') globeMark(); }catch(_){}
 }
@@ -3659,6 +3688,17 @@ function renderBrief(){
   const EYE='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"></path><circle cx="12" cy="12" r="2.6"></circle></svg>';
   const EYEOFF='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"></path><path d="M4 4l16 16"></path></svg>';
   const CAP={2:10,3:12,4:14};
+  // v0.20.0 FOCUS: compute the focused branch (lineage up + descendants down)
+  const foc=(GlobeState._bfFocus && C.nodes[GlobeState._bfFocus])?GlobeState._bfFocus:null;
+  if(GlobeState._bfFocus && !foc) GlobeState._bfFocus=null;   // focused org left the set — release
+  let branch=null;
+  if(foc){ branch=new Set(); let c=foc,g=0;
+    while(c!=null && g++<40){ branch.add(c); c=C.nodes[c]?C.nodes[c].parent:null; }
+    const q=[foc]; while(q.length){ const cur=q.shift(); C.order.forEach(function(k){ if(C.nodes[k].parent===cur && !branch.has(k)){ branch.add(k); q.push(k); } }); }
+    h+='<div class="bf-focusbar"><span class="bf-foctag">\u25ce '+esc(_bfAbbr(C.nodes[foc].name))+'</span>'
+      +'<button type="button" class="bf-focusx" data-bffocusclear="1" aria-label="Clear focus — show the whole brief">Show all \u2715</button></div>';
+  }
+  const _dc=function(id){ return (branch&&!branch.has(id)?' ch-dim':'')+(foc===id?' ch-focus':''); };
   const roots=C.order.filter(function(k){ return C.nodes[k].lvl===1; });
   roots.forEach(function(r){
     const rn=C.nodes[r];
@@ -3667,7 +3707,7 @@ function renderBrief(){
     h+='<div class="ch-col'+(off?' ch-off':'')+'">';
     h+='<div class="ch-grp">'
       +'<button type="button" class="bf-eye'+(off?' off':'')+'" data-bfeye="'+escA(r)+'" aria-label="Show or hide this group">'+(off?EYEOFF:EYE)+'</button>'
-      +'<button type="button" class="ch-chip ch-t1" data-bfobj="'+escA(r)+'" title="'+escA(rn.name)+'">'+esc(_bfAbbr(rn.name))+'</button>'
+      +'<button type="button" class="ch-chip ch-t1'+_dc(r)+'" data-bfobj="'+escA(r)+'" title="'+escA(rn.name)+'">'+esc(_bfAbbr(rn.name))+'</button>'
       +'<span class="ch-gn">'+members.length+'</span></div>';
     if(!off) [2,3,4].forEach(function(t){
       if(t>dep) return;
@@ -3679,7 +3719,7 @@ function renderBrief(){
       h+='<div class="ch-row" style="--ch-ind:'+ind+'px">'
         +row.slice(0,CAP[t]).map(function(n){
           const tcls='ch-t'+t;                             // quote-adjacent for dead-lint's dynamic guard
-          return '<button type="button" class="ch-chip '+tcls+(GlobeState.sel===n.id?' on':'')+'" data-bfobj="'+escA(n.id)+'" title="'+escA(n.name)+'">'+esc(_bfAbbr(n.name))+'</button>';
+          return '<button type="button" class="ch-chip '+tcls+(GlobeState.sel===n.id?' on':'')+_dc(n.id)+'" data-bfobj="'+escA(n.id)+'" title="'+escA(n.name)+'">'+esc(_bfAbbr(n.name))+'</button>';
         }).join('')
         +'</div>';
       if(row.length>CAP[t]) h+='<div class="ch-more" style="--ch-ind:'+ind+'px">+'+(row.length-CAP[t])+' more</div>';
@@ -3730,7 +3770,9 @@ function tapAtScreen(x, y){
     // v0.7.0: the brief globe is the destination — a chain dot opens its popup;
     // empty sphere does nothing (hold the globe button 3s to return to map).
     const bs=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
-    if(bs && bs.id!=null){ _bfAnnEdit=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){} }
+    if(bs && bs.id!=null){ _bfAnnEdit=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){}
+      GlobeState._bfFocus=bs.id;                     // v0.20.0: a globe chain-node tap focuses its branch too
+      try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} }
     return;
   }
   const hits=GlobeState._cluHits;
@@ -4316,10 +4358,15 @@ if(!window._odWired){
     const bc=e.target.closest('[data-bfanncancel]');
     if(bc){ const id=_bfAnnEdit; _bfAnnEdit=null; if(id) _bfObjSheet(id); return; }
     // ---- v0.7.0 object popup + chart + custom orgs ----
+    const bfc=e.target.closest('[data-bffocusclear]');
+    if(bfc){ GlobeState._bfFocus=null; try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
     const bo=e.target.closest('[data-bfobj]');
     if(bo){ _bfAnnEdit=null; _orgForm=null;
+      const id=bo.getAttribute('data-bfobj');
       const r=bo.getBoundingClientRect();
-      calloutShow(bo.getAttribute('data-bfobj'), {x:r.left+r.width/2, y:r.bottom+4});
+      calloutShow(id, {x:r.left+r.width/2, y:r.bottom+4});
+      GlobeState._bfFocus=id;                       // v0.20.0: tapping a node FOCUSES its branch (chart + globe)
+      try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
     const cx0=e.target.closest('[data-cox]');
     if(cx0){ selectSite(null); return; }
