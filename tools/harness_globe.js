@@ -208,7 +208,9 @@ if(!fails){
       fails++; console.log('✗ SEL ARCS: _cmdSites is missing chain members');
     } else {
       const lc={}, lctx=makeCtx(lc);
+      GS._showSubs=true; GS._showHQ=true; GS._relStep=-1;   // v0.21.0: connections are opt-in — turn both on to exercise the draw path
       G.drawGlobeLinks(lctx,m);
+      GS._showSubs=false; GS._showHQ=false;
       const segs=lc.lineTo||0;
       if(!(segs>0&&(lc.stroke||0)>0)){ fails++; console.log('✗ SEL ARCS: drawGlobeLinks emitted '+segs+' segments, '+(lc.stroke||0)+' strokes — arcs never reached the canvas'); }
       else console.log('✓ SEL ARCS: '+sel.id+' → '+up.length+' gold hop(s) up ('+UP.join('→')+') + '+down.length+' blue child arc(s); drawGlobeLinks drew '+segs+' path segments, '+lc.stroke+' strokes');

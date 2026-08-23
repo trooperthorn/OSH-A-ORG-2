@@ -379,6 +379,14 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
   display:flex; align-items:center; justify-content:center; color:var(--text);
 }
 .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
+/* v0.21.0 — popped-out ring controls are ILLUMINATED YELLOW (owner: easy to see
+   and identify). Bright accent glyph, gold ring, lifted glass, soft glow. */
+body.nav-open .nv-sat{
+  color:var(--accent);
+  background:linear-gradient(180deg, rgba(60,46,14,.96), rgba(32,24,8,.96));
+  box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), 0 0 16px rgba(245,215,110,.35), var(--drop);
+}
+body.nav-open .nv-sat:active{ background:var(--accent-wash); box-shadow:0 0 0 2px var(--accent), 0 0 20px rgba(245,215,110,.5) }
 /* v0.16.0 — THE CONTROL ROW (owner: the ring's pop-outs go left-to-right under
    the search bar, not a circle, to maximize space). Full-width bar just below
    the search pill; the pill lifts while the row is open so the row sits under it. */
@@ -700,9 +708,6 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-x::after{content:''; position:absolute; left:50%; top:50%; width:44px; height:44px; transform:translate(-50%,-50%)}
 .co-sub{margin-top:2px; font:600 10.5px/1.35 var(--body); color:var(--dim);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.co-rel{margin-top:6px; font:600 10.5px/1.4 var(--body); color:var(--dim);
-  display:flex; flex-wrap:wrap; align-items:center; gap:3px}
-.co-relsep{margin:0 5px; color:var(--faint)}
 /* v0.19.0 THE READOUT NAVIGATOR — crumbs climb up, the list drills down */
 .co-crumbs{display:flex; flex-wrap:wrap; align-items:center; gap:2px; margin-top:7px}
 .co-crumb{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:3px 6px;
@@ -729,6 +734,27 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-dcount{flex:none; font:700 10px/1 var(--mono); color:var(--signal); letter-spacing:.02em}
 .co-up{color:var(--signal); font-weight:800; margin-right:1px}   /* solid orange = reports-to */
 .co-dn{color:var(--accent); font-weight:800; margin-right:1px}   /* dashed yellow = subordinates */
+/* v0.21.0 CONNECTION TOGGLES + STEPPER — nothing draws on the globe until asked */
+.co-conx{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.co-tgl{appearance:none;-webkit-appearance:none; cursor:pointer; margin:0; padding:6px 10px;
+  border:0; border-radius:9px; background:rgba(0,0,0,.28); color:var(--dim);
+  box-shadow:0 0 0 1px var(--line); font:700 11px/1 var(--body); letter-spacing:.01em;
+  display:inline-flex; align-items:center; gap:5px}
+.co-tgl:active{filter:brightness(1.3)}
+.co-tgl.on{color:var(--accent); background:linear-gradient(180deg, rgba(60,46,14,.96), rgba(32,24,8,.96));
+  box-shadow:0 0 0 1.5px var(--accent), 0 0 14px rgba(245,215,110,.32)}
+.co-tgl.on .co-up,.co-tgl.on .co-dn{color:var(--accent)}
+.co-step{display:flex; align-items:center; gap:6px; margin-top:7px}
+.co-stepb{appearance:none;-webkit-appearance:none; cursor:pointer; margin:0; flex:none;
+  width:30px; height:30px; border:0; border-radius:8px; background:rgba(0,0,0,.28);
+  color:var(--accent); box-shadow:0 0 0 1px var(--line); font:800 15px/1 var(--body)}
+.co-stepb:active{filter:brightness(1.35)}
+.co-stepn{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  text-align:center; font:700 11px/1.2 var(--mono); letter-spacing:.02em; color:var(--text)}
+.co-stepall{appearance:none;-webkit-appearance:none; cursor:pointer; margin:0; flex:none;
+  padding:6px 10px; border:0; border-radius:8px; background:rgba(0,0,0,.28); color:var(--dim);
+  box-shadow:0 0 0 1px var(--line); font:700 10.5px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase}
+.co-stepall.on{color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
 .co-acts{display:flex; gap:9px; padding-top:9px}
 .co-acts:empty{display:none}
 .co-pop{flex:none; width:36px; height:36px; border:0; cursor:pointer; border-radius:50%;
@@ -849,6 +875,22 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.21.0 • NAVIGATION OVERHAUL (owner: 6 fixes from screen recording). (1) MAP
+//            AND BRIEF ARE SEPARATE ROOMS — "Show on map" is gone; the ★ add-to-
+//            brief button now appears ONLY in brief mode, never from a map dot.
+//            (2) BASE TAP → UNITS PICKER — tapping an installation no longer opens
+//            a random tenant; it shows the base and a "Units here N · tap to open"
+//            list (ogAtSite) so the user chooses which org. (3) ON-DEMAND
+//            CONNECTIONS — searching/selecting an org draws NOTHING automatically;
+//            the callout offers "↑ HQ line" and "↓ N subordinates" toggles plus a
+//            ‹ i/N · name › stepper to walk subordinate arcs one at a time (all
+//            reset per selection). (4) ZOOM ROBUSTNESS — touchcancel + touchstart
+//            defensively clear the pinch latch that could strand a gesture; double-
+//            tap when zoomed-in now zooms OUT. (5) THE ✕ CLEARS THE WHOLE MAP —
+//            clearAll cancels camera/glide/pinch, drops all connection state, and
+//            glides home. (6) ILLUMINATED RING — popped-out nav satellites glow
+//            accent-yellow (gold ring, lifted glass, soft halo) so they read at a
+//            glance. Exercised by harness_globe + smoke_runtime.
 //   v0.20.0 • BRIEF BRANCH FOCUS (owner: incorporate A-ORG-1's brief navigation
 //            methodology). A-ORG-1's brief nav is "focus one branch at a time":
 //            tapping a node isolates its lineage UP + descendants DOWN, dims the
@@ -1169,7 +1211,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.20.0';
+const APP_VERSION = 'v0.21.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -1794,7 +1836,7 @@ function setupGlobeInteraction(cv){
       const _u=GlobeState._undo, _lastTs=(_u&&_u.length)?(_u[_u.length-1].ts||0):0;
       if(typeof _undoPush==='function' && !(performance.now()-_lastTs<450)) _undoPush();
     }catch(_){}
-    const z0=GlobeState.zoom, zT=(z0>=27.9)?2.0:Math.min(28, z0*2);
+    const z0=GlobeState.zoom, zT=(z0>=6)?1.4:Math.min(28, z0*2);   // v0.21.0: deep double-tap zooms OUT — always an escape
     const t0=performance.now(), dur=260;
     let zPrev=z0;
     (function step(now){
@@ -1858,6 +1900,11 @@ function setupGlobeInteraction(cv){
   cv.addEventListener('touchend', e=>{
     if(e.touches.length<2 && GlobeState._pinching){ GlobeState._pinching=false; pinchPrevD=0; }
   }, {passive:true});
+  // v0.21.0 — a system gesture / notification fires touchcancel WITHOUT touchend,
+  // which used to leave _pinching latched forever (drag + zoom felt "stuck"). Any
+  // cancel, or dropping below two fingers, always clears the pinch latch now.
+  cv.addEventListener('touchcancel', ()=>{ GlobeState._pinching=false; pinchPrevD=0; }, {passive:true});
+  cv.addEventListener('touchstart', e=>{ if(e.touches.length<2) { GlobeState._pinching=false; pinchPrevD=0; } }, {passive:true});
 }
 
 // v1.23.0-style momentum glide, hoisted out of A-ORG-1's startGlobeLoop frame() (deviation 2).
@@ -2269,7 +2316,7 @@ function _mTok(){
 function _syncSelArcs(selId){
   try{
     GlobeState._selUp=null; GlobeState._selDown=null;
-    GlobeState._cmdSites=null; GlobeState._selKidOrg=null;
+    GlobeState._cmdSites=null; GlobeState._selKidOrg=null; GlobeState._relList=null;
     if(selId==null){
       GlobeState._hqArc=null; GlobeState._cmdLinkArcs=null;
       if(typeof globeMark==='function') globeMark();
@@ -2304,7 +2351,7 @@ function _syncSelArcs(selId){
       // DOWN (v0.18.0): DIRECT subordinate orgs — the "L2" you drill INTO. Each
       // renders at its site; _selKidOrg maps site → the exact child org so a
       // dot-tap descends one level (see tapAtScreen), never the whole subtree.
-      const seenKid=new Set(); const kidOrg={};
+      const seenKid=new Set(); const kidOrg={}; const relList=[];
       for(const c of ogKids(og.id)){
         const sid=ogEffSite(c.id); if(!sid || seenKid.has(sid)) continue;
         seenKid.add(sid);
@@ -2313,8 +2360,9 @@ function _syncSelArcs(selId){
         if(cs.id!==s.id && kidOrg[cs.id]==null) kidOrg[cs.id]=c.id;   // never map the focus onto itself
         if(cs.lat===s.lat && cs.lon===s.lon) continue;    // co-located: dot highlights, no arc
         down.push({ from:{lon:s.lon, lat:s.lat, n:s.id}, to:{lon:cs.lon, lat:cs.lat, n:cs.id}, rel:'subordinate' });
+        relList.push({ name:c.name, orgId:c.id, siteId:cs.id });   // index-aligned to the down arc, for the 1-by-1 stepper
       }
-      GlobeState._selKidOrg=kidOrg;
+      GlobeState._selKidOrg=kidOrg; GlobeState._relList=relList;
     }
     GlobeState._hqArc = up.length?up:null;
     GlobeState._cmdLinkArcs = down.length?down:null;
@@ -2385,10 +2433,17 @@ function drawGlobeLinks(ctx, m){
   // were illegible / meaningless). SUBORDINATES = dashed, dim, thin yellow spurs
   // fanning OUT to each direct command. REPORTS-TO = one solid, bright orange
   // line UP to the parent, with an arrowhead. The callout spells both out in words.
-  if(GlobeState._cmdLinkArcs && GlobeState._cmdLinkArcs.length){
-    drawSubtleArcs(ctx, m, GlobeState._cmdLinkArcs, T.accent, 1.3, 0.5, false, [2.5,5]);
+  // v0.21.0 — connections are OFF until the user asks (owner: don't auto-populate).
+  // The callout toggles _showSubs / _showHQ; nothing draws on plain selection.
+  if(GlobeState._showSubs && GlobeState._cmdLinkArcs && GlobeState._cmdLinkArcs.length){
+    const st=GlobeState._relStep;
+    if(st!=null && st>=0 && st<GlobeState._cmdLinkArcs.length){
+      drawSubtleArcs(ctx, m, [GlobeState._cmdLinkArcs[st]], T.accent, 2.4, 0.95, true);   // 1-by-1: isolate one, bright
+    } else {
+      drawSubtleArcs(ctx, m, GlobeState._cmdLinkArcs, T.accent, 1.3, 0.5, false, [2.5,5]);  // all, dim
+    }
   }
-  if(GlobeState._hqArc && GlobeState._hqArc.length){
+  if(GlobeState._showHQ && GlobeState._hqArc && GlobeState._hqArc.length){
     drawSubtleArcs(ctx, m, GlobeState._hqArc, T.signal, 2.4, 0.95, true);
   }
 }
@@ -3613,8 +3668,13 @@ function selectSite(id, o){
   GlobeState.sel=s.id;
   // v0.11.0: the org tree drives the chain — a specific org pick (search/org
   // row) wins; otherwise the site's primary org speaks for it
-  GlobeState.selOrg=(o && o.orgId && typeof orgOf==='function' && orgOf(o.orgId)) ? o.orgId
-    : ((typeof ogPrimary==='function' && ogPrimary(s.id)) ? ogPrimary(s.id).id : null);
+  GlobeState.selOrg=(o && o.orgId && typeof orgOf==='function' && orgOf(o.orgId)) ? o.orgId : null;
+  // v0.21.0: a base tap shows the BASE + its units to choose — never a random
+  // tenant. Connections start hidden; the stepper resets, every new selection.
+  GlobeState._showSubs=false; GlobeState._showHQ=false; GlobeState._relStep=-1;
+  // build the arc/relation stores NOW so the callout's connection toggles + stepper
+  // read the current selection's counts (the draw loop's own sync is a frame late).
+  try{ if(typeof _syncSelArcs==='function') _syncSelArcs(s.id); }catch(_){}
   if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
   const _inBrief=(function(){ try{ return document.body.classList.contains('brief-mode'); }catch(_){ return false; } })();
   if(!(o&&o.keepCam) && !_inBrief && typeof flyToLatLon==='function' && s.lat!=null && s.lon!=null){
@@ -3750,6 +3810,12 @@ function clearAll(){
   try{ selectSite(null); }catch(_){}
   try{ hideDossier(); }catch(_){}
   try{ _trailClear(); }catch(_){}
+  // v0.21.0: the ✕ clears the WHOLE map — connections off, camera back to the
+  // clean world view (owner: "clear the whole map").
+  try{ GlobeState._showSubs=false; GlobeState._showHQ=false; GlobeState._relStep=-1; GlobeState._relHi=null; }catch(_){}
+  try{ if(typeof cameraCancel==='function') cameraCancel(); }catch(_){}
+  try{ GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState._pinching=false; }catch(_){}
+  try{ if(typeof flyToLatLon==='function') flyToLatLon(24, -30, 1.0); }catch(_){}   // home: Atlantic-centered world
   try{ const i=document.getElementById('searchInput'); if(i) i.value=''; }catch(_){}
   try{ const r=document.getElementById('searchResults'); if(r){ r.innerHTML=''; r.classList.remove('sr-open'); } }catch(_){}
   try{ ['legendPanel','exportSheet','appMenu'].forEach(function(id){
@@ -3988,8 +4054,7 @@ function _coRender(){
   const esc=_odEsc, escA=_odEscA;
   const agHost=ag?siteById(ogEffSite(ag.id)||''):null;
   const selOg=(s && GlobeState.selOrg && typeof orgOf==='function')?orgOf(GlobeState.selOrg):null;
-  const sPrim=(s && typeof ogPrimary==='function')?ogPrimary(s.id):null;
-  const sOg=(s && GlobeState.sel===s.id && selOg) ? selOg : sPrim;       // the org speaking for this dot
+  const sOg=(s && GlobeState.sel===s.id && selOg) ? selOg : null;       // v0.21.0: a base tap has NO org — the base speaks (units picker)
   const name=o?o.name:(ag?ag.name:((sOg&&sOg.name)||s.base));
   const sub=o?('Custom org'+(o.base&&siteById(o.base)?(' · '+siteById(o.base).base):''))
             :(ag?((agHost?agHost.base:'')+((agHost&&agHost.st)?(' · '+agHost.st):''))
@@ -4000,15 +4065,57 @@ function _coRender(){
     +'<button class="co-x" type="button" data-cox="1" aria-label="Clear selection">✕</button></div>'
     +'<div class="co-sub">'+esc(sub)+(nrec?(' · '+nrec+' rec'):'')+'</div>';
   const briefSubj = ag ? ag.id : (sOg ? sOg.id : null);   // what ★ adds — always an ORG
-  // CONNECTION SUMMARY (map): tell the user, in words, what the arcs mean.
+  // v0.21.0 — BASE-UNITS PICKER: a base tap shows the installation and the units
+  // stationed there; the user chooses which org to open (no more random tenant).
+  const mapBase = !brief && s && !briefSubj;
+  if(mapBase && typeof ogAtSite==='function'){
+    let units=[]; try{ units=ogAtSite(s.id)||[]; }catch(_){ units=[]; }
+    if(window._coDrillFor!==s.id){ window._coDrillFor=s.id; window._coDrillQ=''; }
+    if(units.length){
+      const q=(typeof _srFold==='function')?_srFold(window._coDrillQ||''):String(window._coDrillQ||'').toLowerCase();
+      h+='<div class="co-drillhead">Units here <b>'+units.length+'</b> · tap to open</div>';
+      if(units.length>8) h+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+units.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+      h+='<div class="co-drill">';
+      units.forEach(function(u){
+        const sub=(typeof ogKids==='function')?ogKids(u.id).length:0;
+        const fold=(typeof _srFold==='function')?_srFold(u.name):u.name.toLowerCase();
+        h+='<button class="co-drow" type="button" data-counit="'+escA(u.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
+          +'<span class="co-dname">'+esc(u.name)+'</span>'
+          +(sub?('<span class="co-dcount" title="'+sub+' subordinate'+(sub===1?'':'s')+'">'+sub+' ▸</span>'):'')
+          +'</button>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div class="co-drillhead">No units recorded at this installation</div>';
+    }
+  }
+  // v0.21.0 — CONNECTION TOGGLES (org on map): nothing auto-draws. The user opts
+  // in to the higher-HQ line or the subordinate arcs, and can step subordinates
+  // one by one. This replaces the old always-on connection summary.
   if(!brief && briefSubj && typeof orgOf==='function'){
     let parentName=null;
     try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parentName=anc.name; break; } } }catch(_){}
-    const kids=(typeof ogKids==='function')?ogKids(briefSubj).length:0;
-    const bits=[];
-    if(parentName) bits.push('<span class="co-up">↑</span> Reports to '+esc(_bfAbbr(parentName)));
-    if(kids) bits.push('<span class="co-dn">↓</span> '+kids+' subordinate'+(kids===1?'':'s'));
-    if(bits.length) h+='<div class="co-rel">'+bits.join('<span class="co-relsep">·</span>')+'</div>';
+    // subordinate toggle counts the CONNECTIONS that will draw (mapped subs), so
+    // its number matches the stepper's "all N"; the drill list below still walks
+    // the full tree (same-site kids included) for navigation.
+    const subN=(GlobeState._cmdLinkArcs&&GlobeState._cmdLinkArcs.length)?GlobeState._cmdLinkArcs.length:0;
+    if(parentName||subN){
+      h+='<div class="co-conx">';
+      if(parentName) h+='<button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq"><span class="co-up">↑</span> HQ line</button>';
+      if(subN) h+='<button class="co-tgl'+(GlobeState._showSubs?' on':'')+'" type="button" data-cotgl="subs"><span class="co-dn">↓</span> '+subN+' subordinate'+(subN===1?'':'s')+'</button>';
+      h+='</div>';
+    }
+    // 1-by-1 stepper over the subordinate arcs (only while subs are shown)
+    if(subN && GlobeState._showSubs){
+      const rl=GlobeState._relList||[]; const st=GlobeState._relStep;
+      const label=(st!=null&&st>=0&&st<rl.length)?((st+1)+'/'+rl.length+' · '+_bfAbbr(rl[st].name)):('showing all '+rl.length);
+      h+='<div class="co-step">'
+        +'<button class="co-stepb" type="button" data-costep="prev" aria-label="Previous subordinate">‹</button>'
+        +'<span class="co-stepn">'+esc(label)+'</span>'
+        +'<button class="co-stepb" type="button" data-costep="next" aria-label="Next subordinate">›</button>'
+        +'<button class="co-stepall'+((st==null||st<0)?' on':'')+'" type="button" data-costep="all">all</button>'
+        +'</div>';
+    }
   }
   // v0.19.0 — THE READOUT IS THE NAVIGATOR (A-ORG-1 methodology): crumbs climb UP,
   // a subordinate list drills DOWN. Tapping a name re-selects that org on the map,
@@ -4041,15 +4148,14 @@ function _coRender(){
     }
   }
   h+='<div class="co-acts">';
-  if(briefSubj){
+  if(brief && briefSubj){
     h+=bfHas(briefSubj)
       ?'<button class="co-pop on" type="button" data-bfrm="'+escA(briefSubj)+'" aria-label="Remove from brief"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>'
       :'<button class="co-pop" type="button" data-bfadd="'+escA(briefSubj)+'" aria-label="Add to brief"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>';
   }
-  h+='<button class="co-pop" type="button" data-orgadd="'+escA(o?_coId:(briefSubj||_coId))+'" aria-label="Add subordinate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="6" r="2.6"></circle><path d="M12 9v3M12 12l-5 4M12 12l5 4"></path><circle cx="7" cy="18" r="2.2"></circle><circle cx="17" cy="18" r="2.2"></circle></svg></button>';
+  if(briefSubj||o) h+='<button class="co-pop" type="button" data-orgadd="'+escA(o?_coId:(briefSubj||_coId))+'" aria-label="Add subordinate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="6" r="2.6"></circle><path d="M12 9v3M12 12l-5 4M12 12l5 4"></path><circle cx="7" cy="18" r="2.2"></circle><circle cx="17" cy="18" r="2.2"></circle></svg></button>';
   const detailSite = s ? s.id : (agHost ? agHost.id : null);
   if(detailSite) h+='<button class="co-pop" type="button" data-codetail="'+escA(detailSite)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>';
-  if(brief && (s||ag)) h+='<button class="co-pop" type="button" data-govmap="'+escA(s?_coId:agHost?agHost.id:_coId)+'"'+(ag?(' data-govorg="'+escA(ag.id)+'"'):'')+' aria-label="Show on map"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg></button>';
   if(o) h+='<button class="co-pop" type="button" data-orgrm="'+escA(o.id)+'" aria-label="Delete org"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>';
   h+='</div><i class="co-tail" aria-hidden="true"></i>';
   c.innerHTML=h;
@@ -4211,7 +4317,6 @@ function _bfObjSheet(id){
   // action rail: annotate (sites w/o callout yet) · map jump · remove
   h+='<div class="rc-row rc-acts">';
   if(sid && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(sid)+'">Annotate</button>';
-  if(hostS) h+='<button class="bf-act in" type="button" data-govmap="'+escA(hostS.id)+'"'+(sid?(' data-govorg="'+escA(sid)+'"'):'')+'>Show on map</button>';
   if(sid && bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfrm="'+escA(sid)+'">Remove from brief</button>';
   if(sid && !bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfadd="'+escA(sid)+'">Add to brief</button>';
   if(o) h+='<button class="bf-act in" type="button" data-orgrm="'+escA(id)+'">Delete org</button>';
@@ -4374,6 +4479,32 @@ if(!window._odWired){
     if(cdr){ const oid=cdr.getAttribute('data-codrill');
       const sid=(typeof ogEffSite==='function')?ogEffSite(oid):null;
       if(sid && typeof selectSite==='function') selectSite(sid, {orgId:oid});   // re-select = re-render the navigator for that org
+      return; }
+    // v0.21.0 — base-units picker: open the chosen org AT the tapped installation
+    const cu=e.target.closest('[data-counit]');
+    if(cu){ const oid=cu.getAttribute('data-counit');
+      const sid=GlobeState.sel || ((typeof ogEffSite==='function')?ogEffSite(oid):null);
+      if(sid && typeof selectSite==='function') selectSite(sid, {orgId:oid});
+      return; }
+    // v0.21.0 — connection toggles: nothing draws until the user opts in
+    const ct=e.target.closest('[data-cotgl]');
+    if(ct){ const which=ct.getAttribute('data-cotgl');
+      if(which==='subs'){ GlobeState._showSubs=!GlobeState._showSubs; if(!GlobeState._showSubs) GlobeState._relStep=-1; }
+      else if(which==='hq'){ GlobeState._showHQ=!GlobeState._showHQ; }
+      try{ _coRender(); _coPlace(); }catch(_){} try{ globeMark(); }catch(_){}
+      return; }
+    // v0.21.0 — step through subordinate arcs one at a time
+    const cs=e.target.closest('[data-costep]');
+    if(cs){ const dir=cs.getAttribute('data-costep');
+      const rl=GlobeState._relList||[]; const n=rl.length;
+      GlobeState._showSubs=true;
+      if(dir==='all'){ GlobeState._relStep=-1; }
+      else if(n){
+        let st=GlobeState._relStep; if(st==null||st<0) st=(dir==='prev'?n-1:0);
+        else st=(dir==='next')?((st+1)%n):((st-1+n)%n);
+        GlobeState._relStep=st;
+      }
+      try{ _coRender(); _coPlace(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
     const cd=e.target.closest('[data-codetail]');
     if(cd){ const id=cd.getAttribute('data-codetail');

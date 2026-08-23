@@ -230,3 +230,46 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   selectSite(site,{orgId:child}) — descends into that exact org (its own chain).
   Climb back via the details-sheet reports-to crumbs or the ring's back/undo.
 - harness_globe expUp mirrors the one-hop rule (OGCATS skip) — keep them in sync.
+
+## v0.19.0 — the readout is the navigator (A-ORG-1 methodology)
+- The map callout (#calloutCard) is a NAVIGATOR: crumbs (data-codrill on
+  ancestors) climb UP, a subordinate list (data-codrill on kids) drills DOWN.
+  Tapping any name re-selectSites that org → the card re-renders for it. You
+  walk the tree by name, not by hunting dots. _coPlace band-clamps a tall card
+  (topSafe 112 / botSafe vh-168); .co-drill scrolls; .co-clamped drops the caret.
+
+## v0.20.0 — brief branch focus (A-ORG-1 methodology)
+- Tapping a chart chip OR globe chain-node FOCUSES its branch: GlobeState._bfFocus
+  isolates that lineage (UP ancestors + DOWN descendants), the chart dims every
+  off-branch chip (focused chip ringed), and _briefChainMap prunes the globe to
+  that branch only. setMode clears _bfFocus. Brief and map stay separate rooms.
+
+## v0.21.0 — navigation overhaul (owner, 23 Aug: 6 fixes from a screen recording)
+- ROOMS ARE SEPARATE (fix 1): "Show on map" (data-govmap) is REMOVED from both
+  the callout and _bfObjSheet. The ★ add-to-brief button (data-bfadd/data-bfrm)
+  renders ONLY in brief mode — gated `if(brief && briefSubj)`. A map dot never
+  writes to the brief. data-orgadd is gated `if(briefSubj||o)` (no bare-base add).
+- BASE TAP → UNITS PICKER (fix 2): selectSite no longer falls back to a base's
+  primary org — `selOrg = (o.orgId && orgOf) ? o.orgId : null`. A bare base tap
+  shows the installation + a "Units here N · tap to open" list (data-counit, from
+  ogAtSite) so the USER chooses which org. data-counit → selectSite(sel,{orgId}).
+- CONNECTIONS ARE OPT-IN (fix 3): nothing auto-draws. selectSite resets
+  _showSubs=_showHQ=false, _relStep=-1, and calls _syncSelArcs(s.id) SYNCHRONOUSLY
+  (the draw loop's own sync is a frame late — the callout must read fresh counts).
+  drawGlobeLinks gates subs behind _showSubs, the HQ line behind _showHQ. The
+  callout offers "↑ HQ line" / "↓ N subordinates" toggles (data-cotgl) — the sub
+  count is _cmdLinkArcs.length (= what draws), so it matches the stepper. A
+  ‹ i/N · name › stepper (data-costep prev/next/all) walks _relList one arc at a
+  time (bright single when _relStep>=0, else all dim). _relList is built in
+  _syncSelArcs index-aligned to _cmdLinkArcs.
+- ZOOM ROBUSTNESS (fix 4): the pinch latch (_pinching) is cleared on touchcancel
+  AND defensively on touchstart (a system gesture/notification used to strand it,
+  blocking drag forever). Double-tap when already zoomed-in (z>=6) now zooms OUT.
+- ✕ CLEARS THE WHOLE MAP (fix 5): clearAll cancels the camera/glide/pinch, drops
+  sel/selOrg + all connection state (_showSubs/_showHQ/_relStep), and glides home
+  (flyToLatLon 24,-30,1.0). The callout's ✕ (data-cox) → selectSite(null).
+- ILLUMINATED RING (fix 6): popped-out nav satellites glow accent-yellow —
+  `body.nav-open .nv-sat` gets the accent glyph, a 1.5px gold ring, lifted glass
+  gradient, and a soft halo, so they read at a glance.
+- harness_globe SEL ARCS turns _showSubs/_showHQ on before drawGlobeLinks (arcs
+  are opt-in now); smoke_runtime asserts data-govmap is ABSENT from the sheet.
