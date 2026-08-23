@@ -816,6 +816,17 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.18.0 • MAP DRILL-DOWN (owner, 22 Aug: don't display everything at once —
+//            show the L2 orgs, click down into deeper ones). A map selection no
+//            longer draws the whole lineage: UP is now ONE line to the real
+//            parent (nearest non-category ancestor); DOWN is the direct
+//            subordinates — the level you drill INTO. Tapping a subordinate dot
+//            now DESCENDS into that exact org and reveals ITS subordinates (one
+//            level per tap), so you walk the tree instead of seeing it all at
+//            once. The callout tracks the descent ("↑ Reports to <parent> · ↓ N
+//            subordinates"); the details sheet still lists subordinate tiles to
+//            drill and reports-to crumbs to climb back. harness_globe expUp
+//            follows the one-hop rule.
 //   v0.17.0 • FLANKING CONTROLS + LEGIBLE CONNECTIONS (owner, 22 Aug).
 //            (1) The nav controls now flank the globe button in the bottom
 //            band — three to the bottom-LEFT, three to the bottom-RIGHT (the
@@ -1102,7 +1113,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.17.0';
+const APP_VERSION = 'v0.18.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2202,7 +2213,7 @@ function _mTok(){
 function _syncSelArcs(selId){
   try{
     GlobeState._selUp=null; GlobeState._selDown=null;
-    GlobeState._cmdSites=null;
+    GlobeState._cmdSites=null; GlobeState._selKidOrg=null;
     if(selId==null){
       GlobeState._hqArc=null; GlobeState._cmdLinkArcs=null;
       if(typeof globeMark==='function') globeMark();
@@ -2221,27 +2232,33 @@ function _syncSelArcs(selId){
     const up=[]; const upSet=new Set();
     const down=[]; const downSet=new Set();
     if(og){
-      // UP: located ancestor hops, selection site → … → HQDA (bright gold)
-      let from=s;
+      // UP (v0.18.0): ONE line to the nearest NON-category located ancestor — the
+      // real parent. The full lineage lives in the details sheet; the map shows a
+      // single level up so a selection never becomes a lineage tangle.
       for(const p of ogChainUp(og.id)){
+        if(typeof _OG_CATS!=='undefined' && _OG_CATS[p.id]) continue;   // grouping shell — not a real parent
         const sid=ogEffSite(p.id); if(!sid) continue;
         const ps=siteById(sid); if(!ps || ps.lat==null) continue;
-        if(sid!==from.id && !(ps.lat===from.lat && ps.lon===from.lon)){
-          up.push({ from:{lon:from.lon, lat:from.lat, n:from.id}, to:{lon:ps.lon, lat:ps.lat, n:ps.id}, rel:'parent' });
-          upSet.add(ps.id);
-          from=ps;
-        } else { upSet.add(ps.id); }
+        upSet.add(ps.id);
+        if(sid!==s.id && !(ps.lat===s.lat && ps.lon===s.lon)){
+          up.push({ from:{lon:s.lon, lat:s.lat, n:s.id}, to:{lon:ps.lon, lat:ps.lat, n:ps.id}, rel:'parent' });
+        }
+        break;                                            // one hop only
       }
-      // DOWN: DIRECT subordinate orgs only (dim blue web), each at its site
-      const seenKid=new Set();
+      // DOWN (v0.18.0): DIRECT subordinate orgs — the "L2" you drill INTO. Each
+      // renders at its site; _selKidOrg maps site → the exact child org so a
+      // dot-tap descends one level (see tapAtScreen), never the whole subtree.
+      const seenKid=new Set(); const kidOrg={};
       for(const c of ogKids(og.id)){
         const sid=ogEffSite(c.id); if(!sid || seenKid.has(sid)) continue;
         seenKid.add(sid);
         const cs=siteById(sid); if(!cs || cs.lat==null) continue;
         downSet.add(cs.id);
+        if(cs.id!==s.id && kidOrg[cs.id]==null) kidOrg[cs.id]=c.id;   // never map the focus onto itself
         if(cs.lat===s.lat && cs.lon===s.lon) continue;    // co-located: dot highlights, no arc
         down.push({ from:{lon:s.lon, lat:s.lat, n:s.id}, to:{lon:cs.lon, lat:cs.lat, n:cs.id}, rel:'subordinate' });
       }
+      GlobeState._selKidOrg=kidOrg;
     }
     GlobeState._hqArc = up.length?up:null;
     GlobeState._cmdLinkArcs = down.length?down:null;
@@ -3683,7 +3700,12 @@ function tapAtScreen(x, y){
   if(hits){ for(const h of hits){ const dx=x-h.x, dy=y-h.y;
     if(dx*dx+dy*dy<=h.r*h.r){ try{ _undoPush(); flyToLatLon(h.lat, h.lon, 2.4); }catch(_){} return; } } }
   const s=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
-  if(s && s.id!=null) selectSite(s.id);
+  if(s && s.id!=null){
+    // DRILL DOWN (v0.18.0): tapping a direct-subordinate dot focuses THAT org and
+    // its own children — you descend the tree one level per tap, never all at once.
+    const kid=GlobeState._selKidOrg && GlobeState._selKidOrg[s.id];
+    selectSite(s.id, kid ? {orgId:kid} : undefined);
+  }
   // no-hit: selection survives (A-ORG-1 ~L17929 only hid the tip) — clearing is
   // a deliberate act (✕ on the card, or the nav ring's Clear).
 }

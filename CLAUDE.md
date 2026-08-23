@@ -221,3 +221,12 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   (T.signal) with an arrowhead. drawSubtleArcs gained a `dash` param (8th).
   The callout carries a .co-rel summary ("↑ Reports to X · ↓ N subordinates",
   glyphs colored --signal/--accent) — never touch the no-blue/no-green law.
+
+## v0.18.0 — map drill-down (owner, 22 Aug)
+- A map selection shows ONE level, not the subtree. _syncSelArcs: UP = one line
+  to the nearest NON-category located ancestor (skip _OG_CATS), then break; DOWN
+  = direct children (the "L2"). GlobeState._selKidOrg maps child site → child org.
+- DRILL: tapAtScreen, when the tapped site is in _selKidOrg, calls
+  selectSite(site,{orgId:child}) — descends into that exact org (its own chain).
+  Climb back via the details-sheet reports-to crumbs or the ring's back/undo.
+- harness_globe expUp mirrors the one-hop rule (OGCATS skip) — keep them in sync.

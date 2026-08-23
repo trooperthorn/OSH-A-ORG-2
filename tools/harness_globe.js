@@ -168,12 +168,15 @@ if(!fails){
     const loc=s=>s&&s.lat!=null&&s.lon!=null;
     function oEff(oid){ let c=oById.get(oid),h=0; while(c&&h<=8){ if(c.site) return c.site; c=oById.get(c.parent); h++; } return null; }
     function primary(siteId){ const a=ORGS_JSON.filter(o=>o.site===siteId); if(!a.length) return null; let b=a[0]; for(const o of a){ if(o.lvl<b.lvl) b=o; } return b; }
-    function expUp(s){ const po=primary(s.id); if(!po) return [];
-      const out=[]; let from=s; let c=oById.get(po.id); const seen=new Set([po.id]);
+    const OGCATS={acoms:1,asccs:1,drus:1,'acquisition-paes-cpes':1};   // grouping shells (match _OG_CATS)
+    function expUp(s){ const po=primary(s.id); if(!po) return [];   // v0.18.0: ONE hop to nearest non-category located ancestor
+      let c=oById.get(po.id); const seen=new Set([po.id]);
       while(c&&c.parent&&!seen.has(c.parent)){ seen.add(c.parent); c=oById.get(c.parent); if(!c) break;
+        if(OGCATS[c.id]) continue;
         const ps=byId.get(oEff(c.id)||''); if(!ps||!loc(ps)) continue;
-        if(ps.id!==from.id && !(ps.lat===from.lat&&ps.lon===from.lon)){ out.push(ps.id); from=ps; } }
-      return out; }
+        if(ps.id!==s.id && !(ps.lat===s.lat&&ps.lon===s.lon)) return [ps.id];
+        return []; }
+      return []; }
     function expDown(s){ const po=primary(s.id); if(!po) return [];
       const seenK=new Set(); const out=[];
       for(const c of ORGS_JSON.filter(o=>o.parent===po.id)){
