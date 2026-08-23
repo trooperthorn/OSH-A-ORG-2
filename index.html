@@ -676,7 +676,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 /* ═══ THE ANCHORED CALLOUT (v0.9.0): identity at the pin, depth in the sheet ═══ */
 #calloutCard{
-  position:absolute; z-index:38; width:236px;
+  position:absolute; z-index:38; width:250px;
   padding:10px 12px 11px; border-radius:14px;
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
@@ -695,6 +695,30 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-rel{margin-top:6px; font:600 10.5px/1.4 var(--body); color:var(--dim);
   display:flex; flex-wrap:wrap; align-items:center; gap:3px}
 .co-relsep{margin:0 5px; color:var(--faint)}
+/* v0.19.0 THE READOUT NAVIGATOR — crumbs climb up, the list drills down */
+.co-crumbs{display:flex; flex-wrap:wrap; align-items:center; gap:2px; margin-top:7px}
+.co-crumb{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:3px 6px;
+  background:rgba(0,0,0,.28); color:var(--accent); border-radius:7px;
+  font:700 10px/1 var(--mono); letter-spacing:.02em; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.co-crumb-here{background:none; color:var(--faint); cursor:default; padding-left:2px}
+.co-crsep{color:var(--faint); font:700 10px/1 var(--body)}
+.co-drillhead{margin-top:9px; font:700 9.5px/1.3 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--faint)}
+.co-drillhead b{color:var(--accent); margin:0 1px}
+.co-drillq{width:100%; box-sizing:border-box; margin-top:6px; padding:7px 10px; border:0; outline:none;
+  border-radius:9px; background:rgba(0,0,0,.32); box-shadow:0 0 0 1px var(--line);
+  color:var(--text); font:600 12px/1 var(--body)}
+.co-drill{margin-top:5px; max-height:188px; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  display:flex; flex-direction:column; gap:2px}
+.co-drow{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; width:100%; text-align:left;
+  display:flex; align-items:baseline; gap:7px; min-height:38px; padding:6px 8px; border-radius:9px;
+  background:rgba(0,0,0,.2)}
+.co-drow:active{background:var(--accent-wash)}
+.co-drow + .co-drow{margin-top:0}
+.co-dname{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 12px/1.25 var(--body); color:var(--text)}
+.co-dsub{flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:500 10px/1.25 var(--body); color:var(--dim)}
+.co-dcount{flex:none; font:700 10px/1 var(--mono); color:var(--signal); letter-spacing:.02em}
 .co-up{color:var(--signal); font-weight:800; margin-right:1px}   /* solid orange = reports-to */
 .co-dn{color:var(--accent); font-weight:800; margin-right:1px}   /* dashed yellow = subordinates */
 .co-acts{display:flex; gap:9px; padding-top:9px}
@@ -709,6 +733,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   background:var(--glass-lo); transform:rotate(45deg);
   box-shadow:1px 1px 0 0 var(--line)}
 #calloutCard.co-below .co-tail{bottom:auto; top:-6px; box-shadow:-1px -1px 0 0 var(--line)}
+#calloutCard.co-clamped .co-tail{display:none}
 
 /* ═══ GOOGLE-FEEL FUSION — open results and the pill become ONE surface ═══ */
 #searchPill.sr-open{border-radius:0 0 24px 24px}
@@ -816,6 +841,18 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.19.0 • THE READOUT IS THE NAVIGATOR (owner: incorporate A-ORG-1's map
+//            navigation methodology — a team of agents reverse-engineered it).
+//            A-ORG-1's core move: the readout card lists the selected org's
+//            subordinates as tappable rows, and tapping one IS the drill —
+//            you navigate the tree by NAME, never by hunting overlapping dots.
+//            Brought over: the anchored callout now carries (1) a breadcrumb
+//            path of the real ancestors — tap to climb UP a level — and (2) a
+//            SUBORDINATE DRILL LIST (name · station · own sub-count) — tap to
+//            descend into that exact org, which re-renders the card as the new
+//            focus. Long lists filter in place (ARNG's 60+ states). The
+//            one-level map arcs (v0.18.0) stay; the list is now the reliable
+//            drill surface (co-located/overlapping dots no longer block it).
 //   v0.18.0 • MAP DRILL-DOWN (owner, 22 Aug: don't display everything at once —
 //            show the L2 orgs, click down into deeper ones). A map selection no
 //            longer draws the whole lineage: UP is now ONE line to the real
@@ -1113,7 +1150,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.18.0';
+const APP_VERSION = 'v0.19.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -3931,6 +3968,36 @@ function _coRender(){
     if(kids) bits.push('<span class="co-dn">↓</span> '+kids+' subordinate'+(kids===1?'':'s'));
     if(bits.length) h+='<div class="co-rel">'+bits.join('<span class="co-relsep">·</span>')+'</div>';
   }
+  // v0.19.0 — THE READOUT IS THE NAVIGATOR (A-ORG-1 methodology): crumbs climb UP,
+  // a subordinate list drills DOWN. Tapping a name re-selects that org on the map,
+  // which re-renders this card for it — you walk the tree by name, not by hunting dots.
+  if(!brief && briefSubj && typeof ogKids==='function'){
+    const anc=[]; try{ for(const a of ogChainUp(briefSubj)){ if(typeof _OG_CATS!=='undefined'&&_OG_CATS[a.id]) continue; anc.push(a); if(anc.length>=3) break; } }catch(_){}
+    if(anc.length){
+      h+='<div class="co-crumbs">'+anc.reverse().map(function(a){
+        return '<button class="co-crumb" type="button" data-codrill="'+escA(a.id)+'" title="'+escA(a.name)+'">'+esc(_bfAbbr(a.name))+'</button>';
+      }).join('<span class="co-crsep">\u203a</span>')
+        +'<span class="co-crsep">\u203a</span><span class="co-crumb co-crumb-here" aria-current="true">'+esc(_bfAbbr(name))+'</span></div>';
+    }
+    const kids=ogKids(briefSubj);
+    if(kids.length){
+      if(window._coDrillFor!==briefSubj){ window._coDrillFor=briefSubj; window._coDrillQ=''; }
+      const q=(typeof _srFold==='function')?_srFold(window._coDrillQ||''):String(window._coDrillQ||'').toLowerCase();
+      h+='<div class="co-drillhead">Subordinates <b>'+kids.length+'</b> \u00b7 tap to drill</div>';
+      if(kids.length>8) h+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+kids.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+      h+='<div class="co-drill">';
+      kids.forEach(function(k){
+        const hs=siteById(ogEffSite(k.id)||''); const sub=ogKids(k.id).length;
+        const fold=(typeof _srFold==='function')?_srFold(k.name+' '+(hs?hs.base:'')):(k.name+' '+(hs?hs.base:'')).toLowerCase();
+        h+='<button class="co-drow" type="button" data-codrill="'+escA(k.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
+          +'<span class="co-dname">'+esc(k.name)+'</span>'
+          +(hs?('<span class="co-dsub">'+esc(hs.base)+'</span>'):'')
+          +(sub?('<span class="co-dcount" title="'+sub+' subordinate'+(sub===1?'':'s')+'">'+sub+' \u25b8</span>'):'')
+          +'</button>';
+      });
+      h+='</div>';
+    }
+  }
   h+='<div class="co-acts">';
   if(briefSubj){
     h+=bfHas(briefSubj)
@@ -3974,21 +4041,40 @@ function _coPlace(){
     if(!a || a.back){ c.style.opacity='0'; c.style.pointerEvents='none'; return; }
     c.style.opacity=''; c.style.pointerEvents='auto';
     const vw=window.innerWidth||390, vh=window.innerHeight||844;
-    const w=c.offsetWidth||236, hgt=c.offsetHeight||110;
-    const x=Math.max(8, Math.min(a.x-w/2, vw-w-8));
-    // above the dot by default; below when the top chrome would eat it; never
-    // over the dot itself, never under the globe button band when avoidable
-    let above=(a.y-hgt-18)>=112;
-    let y=above ? a.y-hgt-18 : a.y+18;
-    if(!above && (y+hgt)>(vh-128)){
-      const y2=Math.max(112, a.y-hgt-18);
-      if(!(a.y>=y2 && a.y<=y2+hgt)) { y=y2; above=true; }   // only flip up if the dot stays clear
+    const topSafe=112, botSafe=vh-168;                    // clear of the clocks / search bar + globe
+    // v0.19.0: a tall navigator (drill list) is capped to the band; the list
+    // scrolls inside so the card never bleeds under the search bar or globe.
+    const drill=c.querySelector('.co-drill');
+    if(drill) drill.style.maxHeight='';                   // natural first, then cap to fit
+    let w=c.offsetWidth||236, hgt=c.offsetHeight||110;
+    if(drill && hgt>(botSafe-topSafe)){
+      const dh=Math.max(84, drill.offsetHeight-(hgt-(botSafe-topSafe)));
+      drill.style.maxHeight=dh+'px'; hgt=c.offsetHeight;
     }
-    c.classList.toggle('co-below', !above);
+    const x=Math.max(8, Math.min(a.x-w/2, vw-w-8));
+    let above=(a.y-hgt-18)>=topSafe;
+    let y=above ? a.y-hgt-18 : a.y+18;
+    let clamped=false;
+    if(!above && (y+hgt)>botSafe){
+      y=Math.max(topSafe, botSafe-hgt); clamped=true;      // dock into the band; the dot still pulses on the globe
+    }
+    c.classList.toggle('co-below', !above && !clamped);
+    c.classList.toggle('co-clamped', clamped);
     c.style.left=Math.round(x)+'px'; c.style.top=Math.round(y)+'px';
     const t=c.querySelector('.co-tail');
     if(t) t.style.left=Math.max(12, Math.min(a.x-x-6, w-24))+'px';
   }catch(_){}
+}
+if(!window.__coDrillWired){ window.__coDrillWired=true;
+  document.addEventListener('input', function(e){
+    if(!e.target || e.target.id!=='coDrillQ') return;
+    window._coDrillQ=e.target.value||'';
+    const q=(typeof _srFold==='function')?_srFold(window._coDrillQ):window._coDrillQ.toLowerCase();
+    document.querySelectorAll('#calloutCard .co-drow').forEach(function(r){
+      r.hidden=!!(q && String(r.getAttribute('data-cofold')||'').indexOf(q)<0);
+    });
+    try{ _coPlace(); }catch(_){}
+  });
 }
 window._coTrack=function(){ try{ if(_coId!=null && !_coAt) _coPlace(); }catch(_){} };
 try{ window.Callout={ show:calloutShow, hide:calloutHide, id:function(){ return _coId; } }; }catch(_){}
@@ -4237,6 +4323,11 @@ if(!window._odWired){
       return; }
     const cx0=e.target.closest('[data-cox]');
     if(cx0){ selectSite(null); return; }
+    const cdr=e.target.closest('[data-codrill]');
+    if(cdr){ const oid=cdr.getAttribute('data-codrill');
+      const sid=(typeof ogEffSite==='function')?ogEffSite(oid):null;
+      if(sid && typeof selectSite==='function') selectSite(sid, {orgId:oid});   // re-select = re-render the navigator for that org
+      return; }
     const cd=e.target.closest('[data-codetail]');
     if(cd){ const id=cd.getAttribute('data-codetail');
       const oid=cd.getAttribute('data-codeorg');
