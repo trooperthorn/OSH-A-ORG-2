@@ -396,8 +396,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     // view toggles exist in the legend and flip flags
     global.renderLegend();
     const lg=IDS['legendPanel'];
-    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==4 || lg.innerHTML.indexOf('data-vw="usace"')<0){
-      fails++; console.log('✗ LEGEND view toggles missing (want names/usace/dots/lines)'); }
+    // v0.22.0: view toggles trimmed to Labels + USACE (Dots/Lines retired)
+    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==2 || lg.innerHTML.indexOf('data-vw="usace"')<0
+       || lg.innerHTML.indexOf('data-vw="dots"')>=0 || lg.innerHTML.indexOf('data-vw="lines"')>=0){
+      fails++; console.log('✗ LEGEND view toggles wrong (want names+usace only, no dots/lines)'); }
     // snapshot carries the BUILT rows; the export prints exactly those
     const sn3=global.buildSnapshot();
     const xb=sn3.extras.brief;

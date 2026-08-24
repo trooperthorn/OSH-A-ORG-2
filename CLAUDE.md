@@ -273,3 +273,30 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   gradient, and a soft halo, so they read at a glance.
 - harness_globe SEL ARCS turns _showSubs/_showHQ on before drawGlobeLinks (arcs
   are opt-in now); smoke_runtime asserts data-govmap is ABSENT from the sheet.
+
+## v0.22.0 — simpler map + calmer surfaces (owner, 24 Aug: 3-part overhaul, parts 1-2)
+- MAP CONNECTIONS reversed to show-all-on-select: selectSite sets _showSubs=!!selOrg
+  (an org draws every subordinate arc at once; a bare base tap still shows the units
+  picker). _relStep=-1 = show-all; the callout stepper (‹ n/N · name › · All) is
+  ALWAYS present when subN>0 (dropped the _showSubs guard) and isolates one arc
+  bright. The redundant subs on/off toggle is gone; HQ line is the one optional tap.
+- FLOOD KILLED two ways: (1) the tiny-label pass has a hard CAP (_lblCap = 13 phone /
+  22 desktop at rest, +a few when sel!=null), applied over the priority-sorted queue
+  so the meaningful few survive; (2) session restore clamps zoom to <=1.5 when there
+  is NO saved selection — a reopen returns to the cluster world, not a deep-zoom wall.
+- CLUTTER: retired the global Dots + Lines view toggles (Lines' _linesOff early-return
+  silently killed selection arcs; Dots hid + un-tappable'd the selection). renderLegend
+  View row is now just Labels + USACE labels. drawGlobeLinks no longer reads _linesOff.
+- STUCK POPUPS: calloutShow→hideDossier and _bfObjSheet/showDossier→calloutHide make the
+  two floating surfaces mutually exclusive; tapAtScreen's empty-sphere no-hit now clears
+  an open popup (tap-away) in both rooms; calloutHide/hideDossier reset the drill/sub
+  filter state; #calloutCard z-index 38→41 (above #dossier 40).
+- DISCLOSURE PRIMITIVE: _disc(id,title,body,{count,def}) builds one accordion (.disc /
+  .disc-h / .disc-b, chevron, open state in GlobeState._discOpen, one delegated
+  [data-disc] handler that toggles the class + re-clamps the callout). Applied to the
+  Layers "Classes" list and the callout "Open a subordinate" browser — collapsed by
+  default. Reuse this everywhere new options appear; default posture = collapsed.
+- LABELS: callout action rail is labeled pills now (Brief/In brief · Add unit · Details ·
+  Delete) via .co-poplbl; sheet "Annotate"→"Add note", note placeholder "Callout"→"Note"
+  (ends the name collision with the anchored callout).
+- Still tier-bucketed brief chart + free-text add — that is the v0.23.0 job (part 3).

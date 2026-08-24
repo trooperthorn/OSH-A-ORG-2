@@ -598,9 +598,26 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 .lg-sw{flex:none; width:11px; height:11px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,.25)}
 .lg-sw-vw{box-shadow:none; background:none; display:flex; align-items:center; justify-content:center;
   font:800 10px/1 var(--mono); color:var(--accent)}
-.lg-head-2{margin-top:6px; padding-top:8px; box-shadow:0 -1px 0 var(--line)}
 .lg-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .lg-ct{flex:none; font:700 10.5px/1 var(--mono); color:var(--faint)}
+
+/* v0.22.0 — SHARED DISCLOSURE PRIMITIVE (.disc): ONE accordion used across the
+   legend, callout and dossier so options expand only when needed, not by default
+   (owner refs: FAQ accordion / Android expandable list). Header toggles the body;
+   open state lives in GlobeState._discOpen so it survives a re-render. */
+.disc{border-radius:10px}
+.disc + .disc{margin-top:2px}
+.disc-h{display:flex; align-items:center; gap:8px; width:100%; border:none; background:rgba(0,0,0,.18);
+  cursor:pointer; padding:9px 11px; border-radius:9px; text-align:left;
+  font:800 10px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--faint)}
+.disc-h:active{background:var(--accent-wash)}
+.disc.open .disc-h{color:var(--accent)}
+.disc-h .disc-ct{margin-left:auto; padding-left:8px; font:700 10.5px/1 var(--mono); color:var(--faint)}
+.disc.open .disc-h .disc-ct{color:var(--accent)}
+.disc-h .disc-cv{flex:none; width:13px; height:13px; transition:transform .18s ease; color:var(--dim)}
+.disc.open .disc-h .disc-cv{transform:rotate(180deg); color:var(--accent)}
+.disc-b{display:none; padding:4px 2px 2px}
+.disc.open .disc-b{display:block}
 
 #exportSheet{position:absolute; z-index:40; right:var(--safe-r);
   bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
@@ -692,7 +709,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 /* ═══ THE ANCHORED CALLOUT (v0.9.0): identity at the pin, depth in the sheet ═══ */
 #calloutCard{
-  position:absolute; z-index:38; width:250px;
+  position:absolute; z-index:41; width:250px;
   padding:10px 12px 11px; border-radius:14px;
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
@@ -755,14 +772,18 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   padding:6px 10px; border:0; border-radius:8px; background:rgba(0,0,0,.28); color:var(--dim);
   box-shadow:0 0 0 1px var(--line); font:700 10.5px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase}
 .co-stepall.on{color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
-.co-acts{display:flex; gap:9px; padding-top:9px}
+/* v0.22.0 — action rail: LABELED pills, not bare icons (owner: "unclear what the
+   selections mean"). Icon + word, wraps on a narrow card. */
+.co-acts{display:flex; flex-wrap:wrap; gap:7px; padding-top:10px}
 .co-acts:empty{display:none}
-.co-pop{flex:none; width:36px; height:36px; border:0; cursor:pointer; border-radius:50%;
-  display:inline-flex; align-items:center; justify-content:center; color:var(--dim);
-  background:var(--panel-2);
+.co-pop{flex:0 0 auto; height:34px; padding:0 12px; border:0; cursor:pointer; border-radius:17px;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; color:var(--dim);
+  background:var(--panel-2); font:700 11px/1 var(--body);
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
+.co-pop svg{flex:none}
 .co-pop.on{color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
 .co-pop:active{filter:brightness(1.3)}
+.co-poplbl{font:700 11px/1 var(--body); white-space:nowrap}
 .co-tail{position:absolute; left:50%; bottom:-6px; width:12px; height:12px;
   background:var(--glass-lo); transform:rotate(45deg);
   box-shadow:1px 1px 0 0 var(--line)}
@@ -875,6 +896,28 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.22.0 • SIMPLER MAP + CALMER SURFACES (owner: 3-part navigation overhaul,
+//            parts 1-2). MAP: selecting an org now draws ALL its subordinate
+//            connections at once (reversing v0.21's opt-in) and the stepper is
+//            always present to click through them 1 by 1 (‹ n/N · name › · All).
+//            The redundant subs on/off toggle is gone; HQ line stays one tap.
+//            FLOOD: the "opens flooded with overlapping names" is fixed two ways —
+//            a hard, priority-sorted CAP on how many labels draw (13 phone / 22
+//            desktop at rest; a few more when something's selected), and a reopen
+//            with no saved selection returns to the calm cluster world instead of
+//            replaying a deep zoom. CLUTTER: the harmful global Dots + Lines view
+//            toggles are retired (Lines silently killed selection arcs; Dots hid
+//            and un-tappable'd the selection) — "Labels" + "USACE labels" remain.
+//            STUCK POPUPS: the callout and the bottom sheet are now mutually
+//            exclusive (each dismisses the other), an empty-globe TAP now clears
+//            an open popup (tap-away), filter state resets on hide, and the
+//            callout sits above the sheet in z-order. DISCLOSURE: a shared
+//            accordion primitive (.disc) collapses options until needed —
+//            Classes in the Layers panel and the subordinate browser in the
+//            callout now expand on tap, not by default. LABELS: the callout's
+//            icon rail gained words (Brief · Add unit · Details · Delete);
+//            "Annotate" → "Add note" (and the note is no longer confusingly
+//            called a "callout"). Exercised by harness_globe + smoke_runtime.
 //   v0.21.0 • NAVIGATION OVERHAUL (owner: 6 fixes from screen recording). (1) MAP
 //            AND BRIEF ARE SEPARATE ROOMS — "Show on map" is gone; the ★ add-to-
 //            brief button now appears ONLY in brief mode, never from a map dot.
@@ -1211,7 +1254,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.21.0';
+const APP_VERSION = 'v0.22.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2225,25 +2268,52 @@ function clsOf(id){
 try{ window.clsOf=clsOf; }catch(_){}
 
 // ---- Legend / layer list — swatch · name · count; tap toggles the family ------
+// v0.22.0 — the shared accordion builder. id = stable key (open state persists in
+// GlobeState._discOpen); title/count trusted; body is pre-escaped HTML. opts.def
+// sets the first-render open state. Used by the legend, callout and dossier alike.
+function _disc(id, title, bodyHtml, opts){
+  opts=opts||{};
+  const st=GlobeState._discOpen||(GlobeState._discOpen={});
+  const open=(id in st)?st[id]:!!opts.def;
+  const ct=(opts.count!=null)?('<span class="disc-ct">'+opts.count+'</span>'):'';
+  const cv='<svg class="disc-cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>';
+  return '<div class="disc'+(open?' open':'')+'"><button type="button" class="disc-h" data-disc="'+id+'"><span>'+title+'</span>'+ct+cv+'</button>'
+    +'<div class="disc-b">'+bodyHtml+'</div></div>';
+}
+if(!window.__discWired){ window.__discWired=true;
+  document.addEventListener('click', function(e){
+    if(!e.target||!e.target.closest) return;
+    const hh=e.target.closest('[data-disc]'); if(!hh) return;
+    const id=hh.getAttribute('data-disc');
+    const box=hh.closest('.disc'); const open=!(box&&box.classList.contains('open'));
+    const st=GlobeState._discOpen||(GlobeState._discOpen={}); st[id]=open;
+    if(box) box.classList.toggle('open', open);
+    try{ if(typeof _coPlace==='function') _coPlace(); }catch(_){}   // an open/close resizes the callout — re-clamp it
+  });
+}
 function renderLegend(){
   const el=document.getElementById('legendPanel'); if(!el) return;
   const off=GlobeState._famOff||(GlobeState._famOff=new Set());
   const counts={}; for(const st of _sitesArr()){ const k=clsOf(st.id); counts[k]=(counts[k]||0)+1; }
   let h='<div class="lg-head">Layers</div>';
-  // VIEW toggles (v0.7.0 owner directive): names · dots · lines, both rooms.
-  [['names','Names','_namesOff'],['usace','USACE names','_usaceOff'],
-   ['dots','Dots','_dotsOff'],['lines','Lines','_linesOff']].forEach(function(v){
+  // v0.22.0 — VIEW toggles trimmed to the two that matter (owner: "too many
+  // options for turning off lines, dots"). Dots and Lines are gone: the map's
+  // connections now follow the selection, and hiding dots only broke selection.
+  [['names','Labels','_namesOff'],['usace','USACE labels','_usaceOff']].forEach(function(v){
     h+='<button type="button" class="lg-row'+(GlobeState[v[2]]?' off':'')+'" data-vw="'+v[0]+'">'
-      +'<span class="lg-sw lg-sw-vw">'+(v[0]==='names'?'A':(v[0]==='usace'?'U':(v[0]==='dots'?'●':'◜')))+'</span>'
+      +'<span class="lg-sw lg-sw-vw">'+(v[0]==='names'?'A':'U')+'</span>'
       +'<span class="lg-nm">'+v[1]+'</span><span class="lg-ct">'+(GlobeState[v[2]]?'off':'on')+'</span></button>';
   });
-  h+='<div class="lg-head lg-head-2">Classes</div>';
+  // v0.22.0 — Classes collapse behind an accordion (owner: "too many options ...
+  // not by default"). The two view toggles stay; the class list expands on tap.
+  let famH=''; let famN=0;
   for(const k of Object.keys(CLS_META)){
-    if(!counts[k]) continue;
-    h+='<button type="button" class="lg-row'+(off.has(k)?' off':'')+'" data-fam="'+k+'">'
+    if(!counts[k]) continue; famN++;
+    famH+='<button type="button" class="lg-row'+(off.has(k)?' off':'')+'" data-fam="'+k+'">'
       +'<span class="lg-sw" style="background:rgb('+CLS_META[k].c+')"></span>'
       +'<span class="lg-nm">'+CLS_META[k].n+'</span><span class="lg-ct">'+counts[k]+'</span></button>';
   }
+  h+=_disc('lg-classes','Classes', famH, {count:famN, def:false});
   el.innerHTML=h;
 }
 try{ window.renderLegend=renderLegend; }catch(_){}
@@ -2254,7 +2324,7 @@ if(!window.__lgWired){ window.__lgWired=true;
     if(r){
       const vw=r.getAttribute('data-vw');
       if(vw){                                            // view toggles: names · dots · lines
-        const flag={names:'_namesOff', usace:'_usaceOff', dots:'_dotsOff', lines:'_linesOff'}[vw];
+        const flag={names:'_namesOff', usace:'_usaceOff'}[vw];
         if(flag) GlobeState[flag]=!GlobeState[flag];
       } else {
         const k=r.getAttribute('data-fam');
@@ -2427,7 +2497,6 @@ function drawGlobeLinks(ctx, m){
   // v0.7.0: in brief the chain connectors ARE the link layer (A-ORG-1 law:
   // non-brief arcs are skipped entirely in brief); Lines toggle gates both rooms.
   try{ if(document.body.classList.contains('brief-mode')){ drawBriefArcs(ctx, m); return; } }catch(_){}
-  if(GlobeState._linesOff) return;
   const T=_mTok();
   // v0.17.0 — the two families now read as DIFFERENT things (owner: the lines
   // were illegible / meaningless). SUBORDINATES = dashed, dim, thin yellow spurs
@@ -2612,7 +2681,12 @@ function drawGlobeMarkers(ctx, m){
       if(clsOf(i.id)==='guard'||String(i.grp||'').split('|')[0]==='guardInset') return 4;
       return 3; };
     const _lblQ=Array.from(GlobeState._screen).sort(function(a,b){ return _lblPr(a)-_lblPr(b); });
+    // v0.22.0 — HARD CAP on labels (owner: "flooded with names overlapping"). The
+    // queue is priority-sorted (chain → hosts-command → HQ → base → guard), so the
+    // cap keeps the meaningful few and drops the crowd. A selection earns a few more.
+    const _lblCap=GlobeState.sel?(m.w<700?18:30):(m.w<700?13:22); let _lblN=0;
     for(const s of _lblQ){
+      if(_lblN>=_lblCap) break;
       const inst=s.inst;
       if(clsOf(inst.id)==='guard' && GlobeState.zoom<6.5) continue;   // guard names arrive only deep in
       if(GlobeState._usaceOff && clsOf(inst.id)==='usace') continue;   // USACE names toggled off
@@ -2635,6 +2709,7 @@ function drawGlobeMarkers(ctx, m){
       ctx.lineWidth=2.2; ctx.strokeStyle='rgba('+T.ground+',.78)'; ctx.strokeText(name, _pl.x, _pl.y);
       ctx.shadowBlur=0; ctx.shadowOffsetY=0;
       ctx.fillStyle='rgba('+(clsOf(inst.id)==='depot'?T.signal:T.text)+',.92)'; ctx.fillText(name, _pl.x, _pl.y);
+      _lblN++;
     }
     ctx.restore();
   }
@@ -3669,9 +3744,12 @@ function selectSite(id, o){
   // v0.11.0: the org tree drives the chain — a specific org pick (search/org
   // row) wins; otherwise the site's primary org speaks for it
   GlobeState.selOrg=(o && o.orgId && typeof orgOf==='function' && orgOf(o.orgId)) ? o.orgId : null;
-  // v0.21.0: a base tap shows the BASE + its units to choose — never a random
-  // tenant. Connections start hidden; the stepper resets, every new selection.
-  GlobeState._showSubs=false; GlobeState._showHQ=false; GlobeState._relStep=-1;
+  // v0.22.0 (owner: "select an org and click through subordinates — initially
+  // show ALL connections, then click through 1 by 1"): selecting an ORG draws
+  // every subordinate arc at once (_relStep=-1 = show-all); the callout stepper
+  // then isolates them one by one. A bare BASE tap (no driving org) shows the
+  // units picker instead, so subs stay off until a tenant is chosen.
+  GlobeState._showSubs=!!GlobeState.selOrg; GlobeState._showHQ=false; GlobeState._relStep=-1;
   // build the arc/relation stores NOW so the callout's connection toggles + stepper
   // read the current selection's counts (the draw loop's own sync is a frame late).
   try{ if(typeof _syncSelArcs==='function') _syncSelArcs(s.id); }catch(_){}
@@ -3833,12 +3911,19 @@ try{ window.selectSite=selectSite; }catch(_){}   // mission: expose the brain gl
 function tapAtScreen(x, y){
   if(GlobeState._navSwallow){ GlobeState._navSwallow=false; return; }   // that tap only closed the nav ring
   if(document.body && document.body.classList.contains('brief-mode')){
-    // v0.7.0: the brief globe is the destination — a chain dot opens its popup;
-    // empty sphere does nothing (hold the globe button 3s to return to map).
+    // v0.7.0: the brief globe is the destination — a chain dot opens its popup.
     const bs=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
     if(bs && bs.id!=null){ _bfAnnEdit=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){}
       GlobeState._bfFocus=bs.id;                     // v0.20.0: a globe chain-node tap focuses its branch too
-      try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} }
+      try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
+      return; }
+    // v0.22.0 — TAP-AWAY (owner: "pop ups get stuck"): an empty-sphere tap clears
+    // any open popup and the branch focus, so a stray card is one tap from gone.
+    const _shOpen=(function(){ const h=document.getElementById('dossier'); return h && !h.hidden; })();
+    if(_coId!=null || _shOpen || GlobeState._bfFocus){
+      try{ calloutHide(); }catch(_){} try{ hideDossier(); }catch(_){}
+      GlobeState._bfFocus=null; try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
+    }
     return;
   }
   const hits=GlobeState._cluHits;
@@ -3851,8 +3936,11 @@ function tapAtScreen(x, y){
     const kid=GlobeState._selKidOrg && GlobeState._selKidOrg[s.id];
     selectSite(s.id, kid ? {orgId:kid} : undefined);
   }
-  // no-hit: selection survives (A-ORG-1 ~L17929 only hid the tip) — clearing is
-  // a deliberate act (✕ on the card, or the nav ring's Clear).
+  // v0.22.0 — TAP-AWAY (owner: "pop ups get stuck"): an empty-sphere tap with a
+  // popup open clears it (and the selection it belongs to); with nothing open the
+  // selection survives (A-ORG-1 law — clearing the map is otherwise a deliberate act).
+  const _shOpen=(function(){ const h=document.getElementById('dossier'); return h && !h.hidden; })();
+  if(_coId!=null || _shOpen){ try{ selectSite(null); }catch(_){} }
 }
 
 // ---- The card (PORT of renderBaseDossier's grammar — render only, no state) ----
@@ -3861,6 +3949,7 @@ function showDossier(id){
   if(document.body && document.body.classList && document.body.classList.contains('brief-mode')){
     _bfObjSheet(id); return;                       // brief mode: the sheet is the object popup
   }
+  try{ calloutHide(); }catch(_){}                  // v0.22.0: sheet and callout never coexist
   const s=(typeof siteById==='function') ? siteById(id) : null;
   if(!s){ hideDossier(); return; }
   // a NEW org resets the pop-out state — the card always arrives compact
@@ -3884,6 +3973,7 @@ function hideDossier(){
   // v0.8.0 audit: a closed card forgets everything — the NEXT card always
   // arrives compact and peeked, even for the same org after a clear.
   _odLastId=null; _odFan=false; _odShowRec=false;
+  try{ window._bfSubFor=null; window._bfSubQ=''; }catch(_){}   // v0.22.0: no stale subordinate filter on reopen
   host.classList.remove('dz-half','dz-full','fan-open'); host.classList.add('dz-peek');
   try{ host.setAttribute('aria-label','Dossier'); }catch(_){}
   _odStageClearSync(false);
@@ -4036,12 +4126,17 @@ function _odRender(s){
 let _coId=null;            // the anchored org (site or custom) — null = hidden
 let _coAt=null;            // fixed screen anchor (chart chips); null = track the dot
 function calloutShow(id, at){
+  // v0.22.0 — one floating surface at a time (owner: "pop ups get stuck"). The
+  // anchored callout and the bottom sheet are mutually exclusive; showing one
+  // dismisses the other so they can never strand each other on screen.
+  try{ hideDossier(); }catch(_){}
   _coId=id; _coAt=at||null;
   _coRender();
   _coPlace();
 }
 function calloutHide(){
   _coId=null; _coAt=null;
+  try{ window._coDrillFor=null; window._coDrillQ=''; }catch(_){}   // v0.22.0: no stale filter on reopen
   const c=document.getElementById('calloutCard'); if(c) c.hidden=true;
 }
 function _coRefresh(){ if(_coId!=null){ _coRender(); _coPlace(); } }
@@ -4089,32 +4184,29 @@ function _coRender(){
       h+='<div class="co-drillhead">No units recorded at this installation</div>';
     }
   }
-  // v0.21.0 — CONNECTION TOGGLES (org on map): nothing auto-draws. The user opts
-  // in to the higher-HQ line or the subordinate arcs, and can step subordinates
-  // one by one. This replaces the old always-on connection summary.
+  // v0.22.0 — CONNECTIONS (org on map): all subordinate arcs draw on select
+  // (owner: "initially show all connections"), and the stepper — always present
+  // when there are subs — clicks through them 1 by 1 (owner: "then click through
+  // 1 by 1"). The upward HQ line stays one optional tap. No more subs on/off.
   if(!brief && briefSubj && typeof orgOf==='function'){
     let parentName=null;
     try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parentName=anc.name; break; } } }catch(_){}
-    // subordinate toggle counts the CONNECTIONS that will draw (mapped subs), so
-    // its number matches the stepper's "all N"; the drill list below still walks
-    // the full tree (same-site kids included) for navigation.
-    const subN=(GlobeState._cmdLinkArcs&&GlobeState._cmdLinkArcs.length)?GlobeState._cmdLinkArcs.length:0;
-    if(parentName||subN){
-      h+='<div class="co-conx">';
-      if(parentName) h+='<button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq"><span class="co-up">↑</span> HQ line</button>';
-      if(subN) h+='<button class="co-tgl'+(GlobeState._showSubs?' on':'')+'" type="button" data-cotgl="subs"><span class="co-dn">↓</span> '+subN+' subordinate'+(subN===1?'':'s')+'</button>';
-      h+='</div>';
-    }
-    // 1-by-1 stepper over the subordinate arcs (only while subs are shown)
-    if(subN && GlobeState._showSubs){
-      const rl=GlobeState._relList||[]; const st=GlobeState._relStep;
-      const label=(st!=null&&st>=0&&st<rl.length)?((st+1)+'/'+rl.length+' · '+_bfAbbr(rl[st].name)):('showing all '+rl.length);
+    const rl=GlobeState._relList||[]; const subN=(GlobeState._cmdLinkArcs&&GlobeState._cmdLinkArcs.length)?GlobeState._cmdLinkArcs.length:0;
+    if(subN){
+      const st=GlobeState._relStep; const stepping=(st!=null&&st>=0&&st<rl.length);
+      const label=stepping?((st+1)+' / '+subN+' · '+_bfAbbr(rl[st]?rl[st].name:''))
+                          :('All '+subN+' shown');
+      h+='<div class="co-drillhead"><span class="co-dn">↓</span> Subordinate connections</div>';
       h+='<div class="co-step">'
         +'<button class="co-stepb" type="button" data-costep="prev" aria-label="Previous subordinate">‹</button>'
         +'<span class="co-stepn">'+esc(label)+'</span>'
         +'<button class="co-stepb" type="button" data-costep="next" aria-label="Next subordinate">›</button>'
-        +'<button class="co-stepall'+((st==null||st<0)?' on':'')+'" type="button" data-costep="all">all</button>'
+        +'<button class="co-stepall'+(stepping?'':' on')+'" type="button" data-costep="all">All</button>'
         +'</div>';
+    }
+    if(parentName){
+      h+='<div class="co-conx"><button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq">'
+        +'<span class="co-up">↑</span> '+(GlobeState._showHQ?'Hide':'Show')+' HQ line · '+esc(_bfAbbr(parentName))+'</button></div>';
     }
   }
   // v0.19.0 — THE READOUT IS THE NAVIGATOR (A-ORG-1 methodology): crumbs climb UP,
@@ -4130,33 +4222,36 @@ function _coRender(){
     }
     const kids=ogKids(briefSubj);
     if(kids.length){
+      // v0.22.0 \u2014 the subordinate browser collapses into an accordion (owner:
+      // "expand when needed, not by default"). Open it to filter and drill down.
       if(window._coDrillFor!==briefSubj){ window._coDrillFor=briefSubj; window._coDrillQ=''; }
       const q=(typeof _srFold==='function')?_srFold(window._coDrillQ||''):String(window._coDrillQ||'').toLowerCase();
-      h+='<div class="co-drillhead">Subordinates <b>'+kids.length+'</b> \u00b7 tap to drill</div>';
-      if(kids.length>8) h+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+kids.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
-      h+='<div class="co-drill">';
+      let drillH='';
+      if(kids.length>8) drillH+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+kids.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+      drillH+='<div class="co-drill">';
       kids.forEach(function(k){
         const hs=siteById(ogEffSite(k.id)||''); const sub=ogKids(k.id).length;
         const fold=(typeof _srFold==='function')?_srFold(k.name+' '+(hs?hs.base:'')):(k.name+' '+(hs?hs.base:'')).toLowerCase();
-        h+='<button class="co-drow" type="button" data-codrill="'+escA(k.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
+        drillH+='<button class="co-drow" type="button" data-codrill="'+escA(k.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
           +'<span class="co-dname">'+esc(k.name)+'</span>'
           +(hs?('<span class="co-dsub">'+esc(hs.base)+'</span>'):'')
           +(sub?('<span class="co-dcount" title="'+sub+' subordinate'+(sub===1?'':'s')+'">'+sub+' \u25b8</span>'):'')
           +'</button>';
       });
-      h+='</div>';
+      drillH+='</div>';
+      h+=_disc('co-nav','Open a subordinate', drillH, {count:kids.length, def:false});
     }
   }
   h+='<div class="co-acts">';
   if(brief && briefSubj){
     h+=bfHas(briefSubj)
-      ?'<button class="co-pop on" type="button" data-bfrm="'+escA(briefSubj)+'" aria-label="Remove from brief"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>'
-      :'<button class="co-pop" type="button" data-bfadd="'+escA(briefSubj)+'" aria-label="Add to brief"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>';
+      ?'<button class="co-pop on" type="button" data-bfrm="'+escA(briefSubj)+'" aria-label="Remove from brief"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg><span class="co-poplbl">In brief</span></button>'
+      :'<button class="co-pop" type="button" data-bfadd="'+escA(briefSubj)+'" aria-label="Add to brief"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg><span class="co-poplbl">Brief</span></button>';
   }
-  if(briefSubj||o) h+='<button class="co-pop" type="button" data-orgadd="'+escA(o?_coId:(briefSubj||_coId))+'" aria-label="Add subordinate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="6" r="2.6"></circle><path d="M12 9v3M12 12l-5 4M12 12l5 4"></path><circle cx="7" cy="18" r="2.2"></circle><circle cx="17" cy="18" r="2.2"></circle></svg></button>';
+  if(briefSubj||o) h+='<button class="co-pop" type="button" data-orgadd="'+escA(o?_coId:(briefSubj||_coId))+'" aria-label="Add a unit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="6" r="2.6"></circle><path d="M12 9v3M12 12l-5 4M12 12l5 4"></path><circle cx="7" cy="18" r="2.2"></circle><circle cx="17" cy="18" r="2.2"></circle></svg><span class="co-poplbl">Add unit</span></button>';
   const detailSite = s ? s.id : (agHost ? agHost.id : null);
-  if(detailSite) h+='<button class="co-pop" type="button" data-codetail="'+escA(detailSite)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>';
-  if(o) h+='<button class="co-pop" type="button" data-orgrm="'+escA(o.id)+'" aria-label="Delete org"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>';
+  if(detailSite) h+='<button class="co-pop" type="button" data-codetail="'+escA(detailSite)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg><span class="co-poplbl">Details</span></button>';
+  if(o) h+='<button class="co-pop" type="button" data-orgrm="'+escA(o.id)+'" aria-label="Delete org"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg><span class="co-poplbl">Delete</span></button>';
   h+='</div><i class="co-tail" aria-hidden="true"></i>';
   c.innerHTML=h;
   c.hidden=false;
@@ -4186,7 +4281,7 @@ function _coPlace(){
   if(!c || _coId==null || c.hidden) return;
   try{
     const a=_coAnchor();
-    if(!a || a.back){ c.style.opacity='0'; c.style.pointerEvents='none'; return; }
+    if(!a || a.back){ c.style.opacity='0'; c.style.pointerEvents='none'; return; }  // far hemisphere / matrix not ready: hide, returns on rotate (a dead id self-hides in _coRender)
     c.style.opacity=''; c.style.pointerEvents='auto';
     const vw=window.innerWidth||390, vh=window.innerHeight||844;
     const topSafe=112, botSafe=vh-168;                    // clear of the clocks / search bar + globe
@@ -4234,6 +4329,7 @@ let _bfAnnEdit=null;                                 // id with the annotation f
 let _orgForm=null;                                   // {parent} when add-subordinate is open
 function _bfObjSheet(id){
   const host=document.getElementById('dossier'); if(!host) return;
+  try{ calloutHide(); }catch(_){}                  // v0.22.0: sheet and callout never coexist
   _odInjectCSS();
   const esc=_odEsc, escA=_odEscA;
   const o=(typeof orgById==='function')?orgById(id):null;              // user custom
@@ -4258,14 +4354,14 @@ function _bfObjSheet(id){
   if(sid){
     if(_bfAnnEdit===sid){
       h+='<div class="rc-form">'
-        +'<input class="rc-in" id="rcF1" type="text" maxlength="80" placeholder="Callout (80 max)" value="'+escA(BRIEF.ann[sid]||'')+'">'
+        +'<input class="rc-in" id="rcF1" type="text" maxlength="80" placeholder="Note (80 max)" value="'+escA(BRIEF.ann[sid]||'')+'">'
         +'<div class="rc-btns"><span class="od-sp"></span>'
         +'<button class="rc-cancel" type="button" data-bfanncancel="1">Cancel</button>'
         +'<button class="rc-save" type="button" data-bfannsave="'+escA(sid)+'">Save</button>'
         +'</div></div>';
     } else if(BRIEF.ann[sid]){
       h+='<div class="rc-row"><i class="bf-ann">'+esc(BRIEF.ann[sid])+'</i>'
-        +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(sid)+'" aria-label="Edit callout"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
+        +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(sid)+'" aria-label="Edit note"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
         +'</div>';
     }
   }
@@ -4316,7 +4412,7 @@ function _bfObjSheet(id){
   }
   // action rail: annotate (sites w/o callout yet) · map jump · remove
   h+='<div class="rc-row rc-acts">';
-  if(sid && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(sid)+'">Annotate</button>';
+  if(sid && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(sid)+'">Add note</button>';
   if(sid && bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfrm="'+escA(sid)+'">Remove from brief</button>';
   if(sid && !bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfadd="'+escA(sid)+'">Add to brief</button>';
   if(o) h+='<button class="bf-act in" type="button" data-orgrm="'+escA(id)+'">Delete org</button>';
@@ -4486,14 +4582,12 @@ if(!window._odWired){
       const sid=GlobeState.sel || ((typeof ogEffSite==='function')?ogEffSite(oid):null);
       if(sid && typeof selectSite==='function') selectSite(sid, {orgId:oid});
       return; }
-    // v0.21.0 — connection toggles: nothing draws until the user opts in
+    // v0.22.0 — HQ line is the one optional connection toggle (subs draw by default)
     const ct=e.target.closest('[data-cotgl]');
-    if(ct){ const which=ct.getAttribute('data-cotgl');
-      if(which==='subs'){ GlobeState._showSubs=!GlobeState._showSubs; if(!GlobeState._showSubs) GlobeState._relStep=-1; }
-      else if(which==='hq'){ GlobeState._showHQ=!GlobeState._showHQ; }
+    if(ct){ if(ct.getAttribute('data-cotgl')==='hq') GlobeState._showHQ=!GlobeState._showHQ;
       try{ _coRender(); _coPlace(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
-    // v0.21.0 — step through subordinate arcs one at a time
+    // v0.22.0 — step through subordinate arcs one at a time (All = show every arc)
     const cs=e.target.closest('[data-costep]');
     if(cs){ const dir=cs.getAttribute('data-costep');
       const rl=GlobeState._relList||[]; const n=rl.length;
@@ -4749,11 +4843,16 @@ function _rdbOpen(){
           // restore only an untouched boot — never fight a hand already on the globe
           if(!v || GlobeState._touched || GlobeState.sel!=null) return;
           try{
+            // v0.22.0 (owner: "open the app and it's flooded with names"): a reopen
+            // with NO saved selection returns to the calm cluster world — restoring a
+            // deep zoom is what dropped the owner back into a wall of labels. A saved
+            // selection keeps its camera (the zoom is justified by the pick).
+            const _hasSel=v.sel && siteById(v.sel);
             if(typeof v.yaw==='number'){ GlobeState.yaw=v.yaw; GlobeState.pitch=v.pitch||0;
-              GlobeState.zoom=Math.max(1, Math.min(28, v.zoom||1.5));
+              GlobeState.zoom=_hasSel?Math.max(1, Math.min(28, v.zoom||1.5)):Math.min(v.zoom||1.5, 1.5);
               if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ();
               globeMark(); }
-            if(v.sel && siteById(v.sel)) selectSite(v.sel, {keepCam:true, noUndo:true});
+            if(_hasSel) selectSite(v.sel, {keepCam:true, noUndo:true});
             if(v.brief) setMode('brief');
             _ssLast=JSON.stringify(v);
           }catch(_){}
@@ -4985,6 +5084,9 @@ function orgRemove(id){
   ORGS.forEach(function(o){ if(o.parent===id) o.parent=dead.parent; });
   _orgSave();
   try{ renderBrief(); }catch(_){}
+  // v0.22.0 — a delete can leave a callout describing a now-reparented child or a
+  // gone subject; refresh it (self-hides if the subject no longer resolves).
+  try{ _coRefresh(); }catch(_){}
   try{ globeMark(); }catch(_){}
 }
 try{ window.Orgs={ add:orgAdd, remove:orgRemove, of:orgKidsOf, byId:orgById, list:function(){ return ORGS.slice(); } }; }catch(_){}
