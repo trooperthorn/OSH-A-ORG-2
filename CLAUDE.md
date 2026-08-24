@@ -461,3 +461,15 @@ TOP-DOWN org chart, rebuilt sleek for Lumen. If you touch it, keep these:
   picker (base) or crumbs+drill (org). The .co-acts rail is brief/custom-only now.
 - The compact-card contract lives in smoke_runtime: base name + all three icons, and
   the card must never lead with a tenant org on a bare base tap.
+
+## v0.27.1 — the stepper navigates + honest chain names (owner recording)
+- GlobeState._selSiteName (built in _syncSelArcs, cleared with the stores): siteId →
+  the name of the org THE CHAIN put there — selected org at the focus, parent org at
+  the up-hop, child org at each subordinate site. The chain-label pass reads this map
+  FIRST; a site's own `unit` string (Aberdeen's is literally "ATEC") must never label
+  a selection. Sites can host many commands — the chain decides which one is speaking.
+- data-costep now FLIES: each step calls _flyPair(parentLatLon, subordinateLatLon) —
+  great-circle midpoint, zoom keyed to separation (1.05 at >120° … 5.2 under 3°) — so
+  the parent (and its callout) stays reachable while the arc's far end is on screen.
+  'All' flies home to the parent. Keep the callout anchored to the PARENT; the fly
+  guarantees it stays near-screen, and _coPlace clamps the rest.

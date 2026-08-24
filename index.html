@@ -1028,6 +1028,20 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.27.1 • THE STEPPER NAVIGATES + HONEST CHAIN NAMES (owner recording:
+//            Aberdeen → DEVCOM → "ATEC starts showing as the HQ … the globe
+//            should navigate to the different subordinate commands"). Two fixes.
+//            (1) NAMES: _syncSelArcs now builds _selSiteName — each chain site is
+//            labeled with the org THE CHAIN put there (the selected org at the
+//            focus, the parent at the up-hop, the child at each subordinate
+//            site). A site's default unit string (Aberdeen's "ATEC") never again
+//            speaks for a DEVCOM selection. (2) NAVIGATION: each stepper click
+//            flies the camera to frame the parent AND that subordinate together
+//            (_flyPair: great-circle midpoint, separation-keyed zoom), so
+//            clicking through physically walks the globe command by command; All
+//            flies home to the parent. Verified on the owner's exact path:
+//            APG → DEVCOM → Connect → 1/6 AC · 2/6 ARL · 3/6 AvMC, camera
+//            provably moving each step, card reading DEVCOM throughout.
 //   v0.27.0 • THE COMPACT CARD + BIG DESKTOP RING (owner, 4 asks). (1) DESKTOP
 //            NAV: the six ring satellites grow to 64px with 26px icons and pull
 //            IN beside the globe button (≥1100px) instead of hiding in the far
@@ -1499,7 +1513,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.27.0';
+const APP_VERSION = 'v0.27.1';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2665,6 +2679,7 @@ function _syncSelArcs(selId){
   try{
     GlobeState._selUp=null; GlobeState._selDown=null;
     GlobeState._cmdSites=null; GlobeState._selKidOrg=null; GlobeState._relList=null;
+    GlobeState._selSiteName=null;
     if(selId==null){
       GlobeState._hqArc=null; GlobeState._cmdLinkArcs=null;
       if(typeof globeMark==='function') globeMark();
@@ -2682,6 +2697,11 @@ function _syncSelArcs(selId){
     const og=(GlobeState.selOrg && typeof orgOf==='function') ? orgOf(GlobeState.selOrg) : null;
     const up=[]; const upSet=new Set();
     const down=[]; const downSet=new Set();
+    // v0.27.1 (owner recording: "ATEC starts showing as the HQ"): each chain site
+    // is labeled with the org THE CHAIN put there — the selected org at the focus,
+    // the parent org at the up-hop, the child org at each subordinate site. The
+    // site's own unit string (e.g. Aberdeen's "ATEC") never speaks for a selection.
+    const nameBy={}; nameBy[selId]=og?og.name:s.base;
     if(og){
       // UP (v0.18.0): ONE line to the nearest NON-category located ancestor — the
       // real parent. The full lineage lives in the details sheet; the map shows a
@@ -2691,6 +2711,7 @@ function _syncSelArcs(selId){
         const sid=ogEffSite(p.id); if(!sid) continue;
         const ps=siteById(sid); if(!ps || ps.lat==null) continue;
         upSet.add(ps.id);
+        if(nameBy[ps.id]==null && ps.id!==selId) nameBy[ps.id]=p.name;
         if(sid!==s.id && !(ps.lat===s.lat && ps.lon===s.lon)){
           up.push({ from:{lon:s.lon, lat:s.lat, n:s.id}, to:{lon:ps.lon, lat:ps.lat, n:ps.id}, rel:'parent' });
         }
@@ -2706,6 +2727,7 @@ function _syncSelArcs(selId){
         const cs=siteById(sid); if(!cs || cs.lat==null) continue;
         downSet.add(cs.id);
         if(cs.id!==s.id && kidOrg[cs.id]==null) kidOrg[cs.id]=c.id;   // never map the focus onto itself
+        if(nameBy[cs.id]==null && cs.id!==selId) nameBy[cs.id]=c.name;
         if(cs.lat===s.lat && cs.lon===s.lon) continue;    // co-located: dot highlights, no arc
         down.push({ from:{lon:s.lon, lat:s.lat, n:s.id}, to:{lon:cs.lon, lat:cs.lat, n:cs.id}, rel:'subordinate' });
         relList.push({ name:c.name, orgId:c.id, siteId:cs.id });   // index-aligned to the down arc, for the 1-by-1 stepper
@@ -2717,6 +2739,7 @@ function _syncSelArcs(selId){
     GlobeState._selUp=upSet; GlobeState._selDown=downSet;
     const all=new Set(upSet); downSet.forEach(function(id){ all.add(id); }); all.add(selId);
     GlobeState._cmdSites=all;
+    GlobeState._selSiteName=nameBy;
     if(typeof globeMark==='function') globeMark();
   }catch(_){}
 }
@@ -2931,9 +2954,10 @@ function drawGlobeMarkers(ctx, m){
     // chain-member labels draw at ANY zoom AND through the Names/USACE toggles —
     // a selected command string keeps its names (v0.12.0 owner directive).
     if(onChain){
-      // v0.27.0: with no driving org (a bare base tap) the label is the BASE —
-      // the unit voice returns once an org is actually selected.
-      const _nm=(GlobeState.selOrg?(inst.unit||inst.base):inst.base)||inst.id;
+      // v0.27.1: the chain map names each site by the org the chain put there
+      // (selected org / parent / child); a site's default unit string never
+      // mislabels a selection ("ATEC" over a DEVCOM pick, the owner's recording).
+      const _nm=(GlobeState._selSiteName&&GlobeState._selSiteName[inst.id])||inst.base||inst.id;
       const _fs=(m.w<560?12:11);
       ctx.save();
       ctx.textBaseline='middle';
@@ -4333,6 +4357,22 @@ function _trailClear(){ GlobeState._trail=[]; _trailRender(); }
 // selection (arcs + callout via selectSite(null)), sheet, trail crumbs, search,
 // and any open panels. View toggles and stored data (brief, records, custom orgs)
 // are settings and work product, not map content; they stay.
+// v0.27.1 — frame TWO points: fly to their great-circle midpoint at a zoom that
+// holds both on screen (the stepper's parent + subordinate view).
+function _flyPair(aLat,aLon,bLat,bLon){
+  try{
+    const d=Math.PI/180;
+    const va=[Math.cos(aLat*d)*Math.cos(aLon*d), Math.cos(aLat*d)*Math.sin(aLon*d), Math.sin(aLat*d)];
+    const vb=[Math.cos(bLat*d)*Math.cos(bLon*d), Math.cos(bLat*d)*Math.sin(bLon*d), Math.sin(bLat*d)];
+    const m=[va[0]+vb[0], va[1]+vb[1], va[2]+vb[2]];
+    const L=Math.hypot(m[0],m[1],m[2])||1;
+    const cLat=Math.asin(Math.max(-1,Math.min(1,m[2]/L)))/d, cLon=Math.atan2(m[1],m[0])/d;
+    let dot=va[0]*vb[0]+va[1]*vb[1]+va[2]*vb[2]; dot=Math.max(-1,Math.min(1,dot));
+    const sep=Math.acos(dot)/d;                              // degrees apart
+    const zoom = sep>120?1.05 : sep>80?1.3 : sep>45?1.8 : sep>20?2.4 : sep>8?3.2 : sep>3?4.2 : 5.2;
+    flyToLatLon(cLat, cLon, zoom);
+  }catch(_){}
+}
 function clearAll(){
   try{ selectSite(null); }catch(_){}
   try{ hideDossier(); }catch(_){}
@@ -5339,16 +5379,28 @@ if(!window._odWired){
     if(ct){ if(ct.getAttribute('data-cotgl')==='hq') GlobeState._showHQ=!GlobeState._showHQ;
       try{ _coRender(); _coPlace(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
-    // v0.22.0 — step through subordinate arcs one at a time (All = show every arc)
+    // v0.27.1 — the stepper NAVIGATES (owner recording: "the globe should navigate
+    // to the different subordinate commands when clicking through"). Each step
+    // flies the camera to frame the parent AND that subordinate together — the
+    // callout (on the parent) stays reachable while the arc's far end is on
+    // screen. All returns home to the parent.
     const cs=e.target.closest('[data-costep]');
     if(cs){ const dir=cs.getAttribute('data-costep');
       const rl=GlobeState._relList||[]; const n=rl.length;
       GlobeState._showSubs=true;
-      if(dir==='all'){ GlobeState._relStep=-1; }
+      if(dir==='all'){ GlobeState._relStep=-1;
+        try{ const s0=GlobeState.sel?siteById(GlobeState.sel):null;
+          if(s0&&s0.lat!=null) flyToLatLon(s0.lat, s0.lon, Math.max(GlobeState.zoom||1, 2.2)); }catch(_){}
+      }
       else if(n){
         let st=GlobeState._relStep; if(st==null||st<0) st=(dir==='prev'?n-1:0);
         else st=(dir==='next')?((st+1)%n):((st-1+n)%n);
         GlobeState._relStep=st;
+        try{
+          const tgt=rl[st]; const ts=tgt?siteById(tgt.siteId):null;
+          const s0=GlobeState.sel?siteById(GlobeState.sel):null;
+          if(ts&&ts.lat!=null&&s0&&s0.lat!=null) _flyPair(s0.lat,s0.lon,ts.lat,ts.lon);
+        }catch(_){}
       }
       try{ _coRender(); _coPlace(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
