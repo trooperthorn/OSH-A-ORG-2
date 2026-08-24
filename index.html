@@ -972,6 +972,18 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.25.1 • TAPPING THE MAP SELECTS AGAIN (owner recording: "still don't have
+//            the ability to select a location on the map with finger / cursor").
+//            My bug, from v0.22.0. tapAtScreen's map branch selected the site it
+//            hit and then FELL THROUGH into the tap-away block added that
+//            version; that block saw the callout selectSite had just opened and
+//            called selectSite(null) — every tap selected and cleared in the same
+//            gesture, so the map could not be selected at all. One missing
+//            `return` after a hit. Tap-away on empty sphere still works.
+//            WHY IT SHIPPED: the harness only ever proved siteHitTest FINDS a
+//            dot, never that a TAP SELECTS one. harness_globe now drives the real
+//            tapAtScreen at a dot and asserts the selection survives the whole
+//            handler (verified to fail without the return, pass with it).
 //   v0.25.0 • THE HIERARCHY CHART (owner: "completely do away with this chart …
 //            review how it was done in A-ORG-1. That's what I need"). The indented
 //            list is GONE. In its place is A-ORG-1's real TOP-DOWN org chart,
@@ -1395,7 +1407,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.25.0';
+const APP_VERSION = 'v0.25.1';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -4270,6 +4282,10 @@ function tapAtScreen(x, y){
     // its own children — you descend the tree one level per tap, never all at once.
     const kid=GlobeState._selKidOrg && GlobeState._selKidOrg[s.id];
     selectSite(s.id, kid ? {orgId:kid} : undefined);
+    return;                     // v0.25.1: a HIT is done here. Without this return the
+                                // tap-away below saw the callout selectSite just opened
+                                // and cleared the selection in the same tap — the map
+                                // could not be selected at all (owner's recording).
   }
   // v0.22.0 — TAP-AWAY (owner: "pop ups get stuck"): an empty-sphere tap with a
   // popup open clears it (and the selection it belongs to); with nothing open the

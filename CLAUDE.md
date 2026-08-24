@@ -406,3 +406,18 @@ TOP-DOWN org chart, rebuilt sleek for Lumen. If you touch it, keep these:
 - FOLD: `GlobeState._bfFold[k]` folds a branch; the caret shows `+<descendant count>`
   when folded, `▾` when open. Depth dial (L1-L4) still gates render depth on top.
 - smoke_runtime asserts the chart is bf-tree/bf-box/bf-kids and that `ch-node` is gone.
+
+## v0.25.1 — tapping the map selects again (regression fix + the guard that was missing)
+- BUG (mine, from v0.22.0): `tapAtScreen`'s map branch called `selectSite(s.id)` on a
+  hit and then FELL THROUGH into the v0.22.0 tap-away block, which saw the callout
+  `selectSite` had just opened (`_coId != null`) and called `selectSite(null)`. Every
+  tap selected and cleared in one gesture — the map could not be selected at all.
+  FIX: `return` immediately after a hit. Tap-away on empty sphere is unaffected.
+- WHY IT SHIPPED, and the lesson: the harness proved `siteHitTest` FINDS a dot, which
+  is not the same claim as "a tap SELECTS one". Hit-testing was green the whole time.
+  harness_globe now has a TAP CONTRACT probe that drives the real `tapAtScreen` at a
+  dot's screen position and asserts `GlobeState.sel` survives the whole handler —
+  confirmed to fail with the `return` removed and pass with it. `document.body` in
+  that harness gained a real `classList` stub so tapAtScreen can run there.
+- When touching tapAtScreen: each branch that consumes a gesture must RETURN. The
+  tail of the map branch is the "nothing was hit" path only.

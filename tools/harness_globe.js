@@ -66,7 +66,13 @@ global.document={
   getElementById:()=>null, querySelector:()=>null, querySelectorAll:()=>[],
   addEventListener:()=>{}, removeEventListener:()=>{},
   createElement:()=>({ style:{}, setAttribute(){}, appendChild(){}, getContext:()=>makeCtx({}) }),
-  body:{ appendChild(){}, style:{} }, head:{ appendChild(){} },
+  // body.classList is real enough for the TAP probe (tapAtScreen asks whether the
+  // brief room is open before it decides what a tap means)
+  body:{ appendChild(){}, style:{},
+         classList:{ _s:new Set(), contains(c){return this._s.has(c);},
+                     add(c){this._s.add(c);}, remove(c){this._s.delete(c);},
+                     toggle(c,f){ const on=(f===undefined)?!this._s.has(c):!!f; on?this._s.add(c):this._s.delete(c); return on; } } },
+  head:{ appendChild(){} },
   hidden:false, visibilityState:'visible'
 };
 global.getComputedStyle=()=>({ getPropertyValue:()=>'', display:'block', visibility:'visible' });
@@ -244,6 +250,21 @@ if(!fails){
       const hit=G.siteHitTest(m.cx,m.cy);
       if(!hit||!(hit.id===sel.id||(hit.lat===sel.lat&&hit.lon===sel.lon))){ fails++; console.log('✗ DRAW PATH: center hit-test returned '+(hit&&hit.id)+', expected '+sel.id); }
       else console.log('✓ DRAW PATH: drawMarkersHook over '+LOCATED.length+' sites → '+scr+' front dots in _screen, '+mc.arc+' ctx.arc calls, save/restore balanced, hit-test at center → '+hit.id);
+      // ── TAP CONTRACT (v0.25.1 regression guard). A hit-test that finds a dot is
+      // NOT the same as a tap that selects it: v0.22.0's tap-away ran on after a
+      // successful hit and cleared the selection in the same gesture, so the map
+      // could not be selected at all. Drive the REAL tapAtScreen and prove the
+      // selection survives the whole handler.
+      try{
+        if(typeof G.tapAtScreen!=='function'){ fails++; console.log('✗ TAP: tapAtScreen is not exposed'); }
+        else{
+          GS.sel=null; GS.selOrg=null; GS._navSwallow=false;
+          G.tapAtScreen(m.cx, m.cy);
+          if(GS.sel!==hit.id){ fails++; console.log('✗ TAP: tapping the dot at centre left sel='+GS.sel+', expected '+hit.id+' — a tap must SELECT, not clear'); }
+          else console.log('✓ TAP: tapAtScreen at a dot selects it (sel='+GS.sel+') and the selection survives the handler');
+          GS.sel=sel.id; GS.selOrg=null; G._syncSelArcs(sel.id);
+        }
+      }catch(e){ fails++; console.log('✗ TAP probe crashed: '+e.message); }
     }
     // ── CLUSTER GATE (v0.6.0): below zoom 1.6 ordinary sites divert to badges ──
     {
