@@ -382,7 +382,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     // object popup: annotation + SUBORDINATES PICKER (one-tap real tree kids)
     global._bfObjSheet('fort-bragg');
     const host2=IDS['dossier'];
-    if(host2.innerHTML.indexOf('Main effort')<0 || host2.innerHTML.indexOf('data-orgadd')<0){ fails++; console.log('✗ OBJECT popup incomplete'); }
+    // v0.23.0: add-by-search is the primary path (data-bfsearch); the custom-org
+    // form moved behind an accordion (data-orgsave). The old data-orgadd is gone.
+    if(host2.innerHTML.indexOf('Main effort')<0 || host2.innerHTML.indexOf('data-bfsearch')<0
+       || host2.innerHTML.indexOf('data-orgsave')<0 || host2.innerHTML.indexOf('data-orgadd')>=0){ fails++; console.log('✗ OBJECT popup incomplete (want search + custom-org form, no data-orgadd)'); }
     // v0.21.0: brief and map are separate rooms — the "Show on map" (data-govmap) door is gone
     if(host2.innerHTML.indexOf('data-govmap')>=0){ fails++; console.log('✗ "Show on map" should be removed from the brief object sheet'); }
     if(host2.innerHTML.indexOf('Remove from brief')<0){ fails++; console.log('✗ member popup lacks Remove from brief'); }

@@ -300,3 +300,25 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
   Delete) via .co-poplbl; sheet "Annotate"→"Add note", note placeholder "Callout"→"Note"
   (ends the name collision with the anchored callout).
 - Still tier-bucketed brief chart + free-text add — that is the v0.23.0 job (part 3).
+
+## v0.23.0 — the brief is a real tree (owner, 24 Aug: overhaul part 3)
+- renderBrief REWRITTEN from tier buckets to a recursive nested tree: for each L1
+  root it walks C.order filtering C.nodes[k].parent===pid, rendering each node under
+  its specific parent, indented by echelon (--ch-lvl) with a connector tick (.ch-rail).
+  Per-parent child cap KIDCAP=16 with "+N more under <parent>"; depth dial (_bfDepth),
+  per-group eye (data-bfeye), and branch focus (_bfFocus) all preserved. The data model
+  was already correct — _briefChainMap sets nodes[id].parent (nearest ADDED ancestor);
+  the globe (drawBriefArcs) already drew it. Only the chart had to change. No data change.
+- Chart CSS: .ch-row/.ch-more(--ch-ind) → .ch-node/.ch-rail/.ch-kn(--ch-lvl); .ch-node.ch-more
+  is the per-parent spill; .ch-chip / .ch-t1..t4 tier colors unchanged (load-bearing).
+- ADD BY SEARCH (owner: "a search of organizations instead of add subordinates manually"):
+  sfsResults cap 2→6 (top-2 buried real org matches); _sfsPaint count "sites"→"results" and
+  an ORG/SITE badge per row (.sr-tag / .sr-tag-org / .sr-tag-site — full literals for dead-lint).
+  Object sheet leads with "Add another organization — search" (data-bfsearch → focus #searchInput);
+  the subordinates picker (data-bfsub, real kids, one tap) stays; the free-text creator is
+  relabeled "Add a custom org (advanced)" inside a collapsed _disc, kept only for orgs not in
+  the app (orgAdd/Orgs.add intact for that + existing briefs). Removed the data-orgadd buttons
+  (callout, dossier fan) and the data-orgadd/data-orgcancel handlers; data-orgsave (custom form) kept.
+- Every brief node maps to a real org → ogEffSite → lat/lon (custom orgs still resolve via base or
+  the ancestor they ride). smoke_runtime OBJECT-popup probe updated (data-bfsearch + data-orgsave,
+  no data-orgadd); Orgs.add path unchanged so the custom-org + snapshot tests still hold.
