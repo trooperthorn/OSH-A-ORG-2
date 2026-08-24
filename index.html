@@ -1028,6 +1028,17 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.28.0 • CONNECT ZOOMS OUT (owner: "apply a zoom out to show the connections
+//            across the map"). Turning connections on now FRAMES THE WHOLE WEB:
+//            _flyFitChain gathers the selected site + every subordinate arc
+//            endpoint (+ the HQ end when shown), flies to their mean-vector
+//            center, and picks the zoom from the widest spread (world 1.0 …
+//            regional 4.4). Wired into all three doors: the Connect icon, the
+//            base→Connect hop (selectSite's conx landing), and the stepper's
+//            All (which now returns to the whole picture, not just the parent).
+//            Stepping still dives to frame parent+subordinate; All pulls back.
+//            Verified: DEVCOM (CONUS labs + Camp Zama) fits at 1.0; USARPAC's
+//            Pacific web at 1.15; step-in 2.4 → All back out to 1.15.
 //   v0.27.1 • THE STEPPER NAVIGATES + HONEST CHAIN NAMES (owner recording:
 //            Aberdeen → DEVCOM → "ATEC starts showing as the HQ … the globe
 //            should navigate to the different subordinate commands"). Two fixes.
@@ -1513,7 +1524,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.27.1';
+const APP_VERSION = 'v0.28.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -4173,7 +4184,9 @@ function selectSite(id, o){
   try{ if(typeof _syncSelArcs==='function') _syncSelArcs(s.id); }catch(_){}
   if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
   const _inBrief=(function(){ try{ return document.body.classList.contains('brief-mode'); }catch(_){ return false; } })();
-  if(!(o&&o.keepCam) && !_inBrief && typeof flyToLatLon==='function' && s.lat!=null && s.lon!=null){
+  if(window._coSec==='conx' && !_inBrief){
+    try{ _flyFitChain(); }catch(_){}                         // v0.28.0: landing IN connections view — frame the whole web
+  } else if(!(o&&o.keepCam) && !_inBrief && typeof flyToLatLon==='function' && s.lat!=null && s.lon!=null){
     // the base-dossier fly (~L15089): never zoom OUT to meet a selection
     // (keepCam: saved-view recall owns the camera — the fly must not eat it)
     try{ flyToLatLon(s.lat, s.lon, Math.max(GlobeState.zoom||1, 2.6)); }catch(_){}
@@ -4359,6 +4372,31 @@ function _trailClear(){ GlobeState._trail=[]; _trailRender(); }
 // are settings and work product, not map content; they stay.
 // v0.27.1 — frame TWO points: fly to their great-circle midpoint at a zoom that
 // holds both on screen (the stepper's parent + subordinate view).
+// v0.28.0 — FIT THE WHOLE PICTURE: frame the selected site plus every live
+// connection endpoint (subordinate arcs, and the HQ line when shown). Center =
+// mean vector; zoom keyed to the widest spread so nothing falls off the disc.
+function _flyFitChain(){
+  try{
+    const s0=GlobeState.sel?siteById(GlobeState.sel):null;
+    if(!s0 || s0.lat==null) return;
+    const pts=[{lat:s0.lat, lon:s0.lon}];
+    (GlobeState._cmdLinkArcs||[]).forEach(function(a){ if(a&&a.to) pts.push({lat:a.to.lat, lon:a.to.lon}); });
+    if(GlobeState._showHQ) (GlobeState._hqArc||[]).forEach(function(a){ if(a&&a.to) pts.push({lat:a.to.lat, lon:a.to.lon}); });
+    if(pts.length<2){ flyToLatLon(s0.lat, s0.lon, Math.max(GlobeState.zoom||1, 2.2)); return; }
+    const d=Math.PI/180; let x=0,y=0,z=0;
+    const vs=pts.map(function(pt){ const v=[Math.cos(pt.lat*d)*Math.cos(pt.lon*d), Math.cos(pt.lat*d)*Math.sin(pt.lon*d), Math.sin(pt.lat*d)];
+      x+=v[0]; y+=v[1]; z+=v[2]; return v; });
+    const L=Math.hypot(x,y,z)||1;
+    const cLat=Math.asin(Math.max(-1,Math.min(1,z/L)))/d, cLon=Math.atan2(y,x)/d;
+    const cv=[x/L,y/L,z/L];
+    let maxSep=0;
+    vs.forEach(function(v){ let dot=cv[0]*v[0]+cv[1]*v[1]+cv[2]*v[2]; dot=Math.max(-1,Math.min(1,dot));
+      maxSep=Math.max(maxSep, Math.acos(dot)/d); });
+    const span=maxSep*2*1.15;                                // full width + breathing room
+    const zoom = span>150?1.0 : span>110?1.15 : span>75?1.5 : span>45?2.0 : span>22?2.6 : span>10?3.4 : 4.4;
+    flyToLatLon(cLat, cLon, zoom);
+  }catch(_){}
+}
 function _flyPair(aLat,aLon,bLat,bLon){
   try{
     const d=Math.PI/180;
@@ -5370,7 +5408,8 @@ if(!window._odWired){
           if(p0){ GlobeState._coSecNext='conx'; selectSite(s0.id,{orgId:p0.id,keepCam:true}); return; }
         }
         if(window._coSec==='conx'){ window._coSec=null; GlobeState._showSubs=false; GlobeState._showHQ=false; GlobeState._relStep=-1; }
-        else { window._coSec='conx'; GlobeState._showSubs=true; GlobeState._relStep=-1; }
+        else { window._coSec='conx'; GlobeState._showSubs=true; GlobeState._relStep=-1;
+          try{ _flyFitChain(); }catch(_){} }                 // v0.28.0: zoom OUT so the whole web is visible
       }
       try{ _coRender(); _coPlace(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
@@ -5389,8 +5428,7 @@ if(!window._odWired){
       const rl=GlobeState._relList||[]; const n=rl.length;
       GlobeState._showSubs=true;
       if(dir==='all'){ GlobeState._relStep=-1;
-        try{ const s0=GlobeState.sel?siteById(GlobeState.sel):null;
-          if(s0&&s0.lat!=null) flyToLatLon(s0.lat, s0.lon, Math.max(GlobeState.zoom||1, 2.2)); }catch(_){}
+        try{ _flyFitChain(); }catch(_){}                     // v0.28.0: All = the whole web again
       }
       else if(n){
         let st=GlobeState._relStep; if(st==null||st<0) st=(dir==='prev'?n-1:0);

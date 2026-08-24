@@ -473,3 +473,12 @@ TOP-DOWN org chart, rebuilt sleek for Lumen. If you touch it, keep these:
   the parent (and its callout) stays reachable while the arc's far end is on screen.
   'All' flies home to the parent. Keep the callout anchored to the PARENT; the fly
   guarantees it stays near-screen, and _coPlace clamps the rest.
+
+## v0.28.0 — Connect zooms out to the whole web
+- `_flyFitChain()` (beside _flyPair): selected site + every _cmdLinkArcs endpoint
+  (+ _hqArc end when _showHQ) → mean-vector center, zoom keyed to 2×max-spread×1.15
+  (>150°→1.0 … <10°→4.4). One point only → the old dive (2.2).
+- Three doors call it: the Connect icon's on-branch, selectSite's conx landing
+  (window._coSec==='conx' replaces the normal fly — check BEFORE the keepCam fly),
+  and data-costep 'all'. Stepping keeps _flyPair (parent+subordinate dive); All is
+  the pull-back. Camera grammar: Connect/All = wide, step = dive.
