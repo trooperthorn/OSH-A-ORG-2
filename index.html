@@ -407,6 +407,18 @@ body.nav-open .nv-sat:active{ background:var(--accent-wash); box-shadow:0 0 0 2p
 }
 .nv-side{display:flex; align-items:center; gap:8px}       /* three buttons per side, flanking the globe */
 body.nav-open #navRow{opacity:1; transform:none; pointer-events:auto}
+/* v0.27.0 — DESKTOP RING (owner: "buttons much bigger … spread far apart and
+   easily missed"): the six satellites pull IN beside the globe button and grow.
+   One glance, one mouse travel — no more hunting the screen corners. */
+@media(min-width:1100px){
+  #navRow{left:50%; right:auto; transform:translate(-50%,10px); width:auto; justify-content:center; height:84px}
+  body.nav-open #navRow{transform:translate(-50%,0)}
+  .nv-side{gap:14px}
+  .nv-side:first-of-type{margin-right:120px}
+  .nv-side:last-of-type{margin-left:120px}
+  .nv-sat{width:64px; height:64px}
+  .nv-sat svg{width:26px; height:26px}
+}
 body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,215,110,.35), inset 0 1px 0 var(--spec)}
 
 /* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
@@ -819,7 +831,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 /* ═══ THE ANCHORED CALLOUT (v0.9.0): identity at the pin, depth in the sheet ═══ */
 #calloutCard{
-  position:absolute; z-index:41; width:250px;
+  position:absolute; z-index:41; width:236px;
   padding:10px 12px 11px; border-radius:14px;
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
@@ -894,6 +906,16 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-pop.on{color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
 .co-pop:active{filter:brightness(1.3)}
 .co-poplbl{font:700 11px/1 var(--body); white-space:nowrap}
+/* v0.27.0 — the compact card's icon row: Units (count) · Connections · Details */
+.co-icrow{display:flex; gap:6px; padding-top:9px}
+.co-ic{flex:1; appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
+  display:flex; flex-direction:column; align-items:center; gap:2px; min-height:56px;
+  padding:7px 4px 6px; border-radius:10px; background:rgba(0,0,0,.22); color:var(--dim);
+  box-shadow:inset 0 0 0 1px var(--line); font:700 8.5px/1 var(--mono); letter-spacing:.05em; text-transform:uppercase}
+.co-ic svg{color:var(--accent)}
+.co-ic b{font:800 11px/1 var(--body); color:var(--text); min-height:11px}
+.co-ic.on{color:var(--accent); box-shadow:inset 0 0 0 1.5px var(--accent); background:var(--accent-wash)}
+.co-ic:active{filter:brightness(1.25)}
 .co-tail{position:absolute; left:50%; bottom:-6px; width:12px; height:12px;
   background:var(--glass-lo); transform:rotate(45deg);
   box-shadow:1px 1px 0 0 var(--line)}
@@ -1006,6 +1028,24 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.27.0 • THE COMPACT CARD + BIG DESKTOP RING (owner, 4 asks). (1) DESKTOP
+//            NAV: the six ring satellites grow to 64px with 26px icons and pull
+//            IN beside the globe button (≥1100px) instead of hiding in the far
+//            screen corners — one glance, one mouse travel. (2) THE ✕ now clears
+//            EVERYTHING on screen: selection, arcs, callout/sheet, brief focus,
+//            armed add-under, search — hardened clearAll. (3) THE MAP OPENS WITH
+//            BASES ONLY — command-HQ dots join depot/USACE/guard behind the
+//            Layers toggles; a base tap ALWAYS leads with the base (the chain
+//            label at the dot says the base name too, not a tenant's). (4) THE
+//            POP-UP IS SMALL: base name + state and THREE icons — Units (with
+//            the tenant count), Connect, Details. Units expands the tenant
+//            picker in place; Connect turns the arcs on (picking the base's
+//            primary org first when the base is bare) with the 1-by-1 stepper
+//            and the HQ-line tap; Details opens the records sheet. Connections
+//            are OFF until Connect asks (the compact law) — selecting draws
+//            nothing but the card. smoke_runtime asserts the compact contract.
+//   NOTE: window._coSec ('units'|'conx'|null) is the card's open section;
+//         GlobeState._coSecNext pre-arms it across the base→Connect re-select.
 //   v0.26.0 • ＋ AND ✎ ON EVERY OBJECT, AND MULTI-ADD (owner: "allow a + pop up to
 //            add subordinates and a pencil icon to edit … also need the ability to
 //            add multiple subordinates at a time"). Each chart box now carries two
@@ -1459,7 +1499,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.26.0';
+const APP_VERSION = 'v0.27.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2524,7 +2564,7 @@ if(!window.__discWired){ window.__discWired=true;
 // default. You can still toggle on the others"). Depots, USACE districts and the
 // Guard/reserve camps start hidden; the Layers panel turns each back on. Forts and
 // HQ posts — the bases people look for — are what greets you.
-const _FAM_DEFAULT_OFF=['depot','usace','guard'];
+const _FAM_DEFAULT_OFF=['depot','usace','guard','hq'];   // v0.27.0 owner: "only the bases upon getting into the app — no command HQ" 
 function _famOffSet(){
   if(!GlobeState._famOff){ GlobeState._famOff=new Set(_FAM_DEFAULT_OFF); }
   return GlobeState._famOff;
@@ -2891,7 +2931,9 @@ function drawGlobeMarkers(ctx, m){
     // chain-member labels draw at ANY zoom AND through the Names/USACE toggles —
     // a selected command string keeps its names (v0.12.0 owner directive).
     if(onChain){
-      const _nm=inst.unit||inst.base||inst.id;
+      // v0.27.0: with no driving org (a bare base tap) the label is the BASE —
+      // the unit voice returns once an org is actually selected.
+      const _nm=(GlobeState.selOrg?(inst.unit||inst.base):inst.base)||inst.id;
       const _fs=(m.w<560?12:11);
       ctx.save();
       ctx.textBaseline='middle';
@@ -4096,12 +4138,12 @@ function selectSite(id, o){
   // v0.11.0: the org tree drives the chain — a specific org pick (search/org
   // row) wins; otherwise the site's primary org speaks for it
   GlobeState.selOrg=(o && o.orgId && typeof orgOf==='function' && orgOf(o.orgId)) ? o.orgId : null;
-  // v0.22.0 (owner: "select an org and click through subordinates — initially
-  // show ALL connections, then click through 1 by 1"): selecting an ORG draws
-  // every subordinate arc at once (_relStep=-1 = show-all); the callout stepper
-  // then isolates them one by one. A bare BASE tap (no driving org) shows the
-  // units picker instead, so subs stay off until a tenant is chosen.
-  GlobeState._showSubs=!!GlobeState.selOrg; GlobeState._showHQ=false; GlobeState._relStep=-1;
+  // v0.27.0 (owner: the compact card): NOTHING draws until the Connections icon
+  // asks — a selection is just the card. The base→Connections hop pre-arms the
+  // section via _coSecNext so that one flow lands with arcs already on.
+  window._coSec=GlobeState._coSecNext||null;
+  GlobeState._showSubs=(GlobeState._coSecNext==='conx'); GlobeState._showHQ=false; GlobeState._relStep=-1;
+  GlobeState._coSecNext=null;
   // build the arc/relation stores NOW so the callout's connection toggles + stepper
   // read the current selection's counts (the draw loop's own sync is a frame late).
   try{ if(typeof _syncSelArcs==='function') _syncSelArcs(s.id); }catch(_){}
@@ -4298,6 +4340,8 @@ function clearAll(){
   // v0.21.0: the ✕ clears the WHOLE map — connections off, camera back to the
   // clean world view (owner: "clear the whole map").
   try{ GlobeState._showSubs=false; GlobeState._showHQ=false; GlobeState._relStep=-1; GlobeState._relHi=null; }catch(_){}
+  try{ window._coSec=null; GlobeState._coSecNext=null; }catch(_){}
+  try{ GlobeState._bfFocus=null; GlobeState._bfAddUnder=null; if(typeof _bfArmHint==='function') _bfArmHint(); }catch(_){}
   try{ if(typeof cameraCancel==='function') cameraCancel(); }catch(_){}
   try{ GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState._pinching=false; }catch(_){}
   try{ if(typeof flyToLatLon==='function') flyToLatLon(24, -30, 1.0); }catch(_){}   // home: Atlantic-centered world
@@ -4558,95 +4602,109 @@ function _coRender(){
   const name=o?o.name:(ag?ag.name:((sOg&&sOg.name)||s.base));
   const sub=o?('Custom org'+(o.base&&siteById(o.base)?(' · '+siteById(o.base).base):''))
             :(ag?((agHost?agHost.base:'')+((agHost&&agHost.st)?(' · '+agHost.st):''))
-                 :(s.base+(s.st?(' · '+s.st):'')));
+                 :(s.st||''));                     // v0.27.0: the base card's title IS the base — the sub adds only the state
   const nrec=(s&&typeof recCount==='function')?recCount(_coId):0;
   const brief=document.body.classList.contains('brief-mode');
   let h='<div class="co-head"><div class="co-name">'+esc(name)+'</div>'
     +'<button class="co-x" type="button" data-cox="1" aria-label="Clear selection">✕</button></div>'
-    +'<div class="co-sub">'+esc(sub)+(nrec?(' · '+nrec+' rec'):'')+'</div>';
-  const briefSubj = ag ? ag.id : (sOg ? sOg.id : null);   // what ★ adds — always an ORG
-  // v0.21.0 — BASE-UNITS PICKER: a base tap shows the installation and the units
-  // stationed there; the user chooses which org to open (no more random tenant).
-  const mapBase = !brief && s && !briefSubj;
-  if(mapBase && typeof ogAtSite==='function'){
-    let units=[]; try{ units=ogAtSite(s.id)||[]; }catch(_){ units=[]; }
-    if(window._coDrillFor!==s.id){ window._coDrillFor=s.id; window._coDrillQ=''; }
-    if(units.length){
-      const q=(typeof _srFold==='function')?_srFold(window._coDrillQ||''):String(window._coDrillQ||'').toLowerCase();
-      h+='<div class="co-drillhead">Units here <b>'+units.length+'</b> · tap to open</div>';
-      if(units.length>8) h+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+units.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
-      h+='<div class="co-drill">';
-      units.forEach(function(u){
-        const sub=(typeof ogKids==='function')?ogKids(u.id).length:0;
-        const fold=(typeof _srFold==='function')?_srFold(u.name):u.name.toLowerCase();
-        h+='<button class="co-drow" type="button" data-counit="'+escA(u.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
-          +'<span class="co-dname">'+esc(u.name)+'</span>'
-          +(sub?('<span class="co-dcount" title="'+sub+' subordinate'+(sub===1?'':'s')+'">'+sub+' ▸</span>'):'')
-          +'</button>';
-      });
-      h+='</div>';
-    } else {
-      h+='<div class="co-drillhead">No units recorded at this installation</div>';
+    +'<div class="co-sub">'+esc(sub)+'</div>';
+  const briefSubj = ag ? ag.id : (sOg ? sOg.id : null);   // the ORG the card speaks for (null = the base itself)
+  // ═══ v0.27.0 THE COMPACT CARD (owner: "only the base name and location with
+  // these icons should be shown initially — everything else expands"). Map mode
+  // renders the name, the location, and THREE icons: Units (with the tenant
+  // count), Connections (arcs + the 1-by-1 stepper), Details. Each icon opens
+  // its section IN the card; nothing else renders until asked.
+  if(!brief && (s || ag)){
+    const isBase=!!(s && !briefSubj);
+    const hostSite=s || agHost;
+    let unitsN=0, kids=[];
+    if(isBase){ try{ unitsN=(ogAtSite(s.id)||[]).length; }catch(_){} }
+    else if(briefSubj){ try{ kids=ogKids(briefSubj)||[]; unitsN=kids.length; }catch(_){} }
+    const subN=(GlobeState._cmdLinkArcs&&GlobeState._cmdLinkArcs.length)?GlobeState._cmdLinkArcs.length:0;
+    const canConx=isBase ? unitsN>0 : (subN>0 || true);   // an org always has at least its HQ line
+    const sec=window._coSec||null;
+    // ── the icon row
+    h+='<div class="co-icrow">';
+    if(unitsN) h+='<button type="button" class="co-ic'+(sec==='units'?' on':'')+'" data-coic="units" aria-label="'+(isBase?'Units on this base':'Subordinate units')+'">'
+      +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"></rect></svg>'
+      +'<b>'+unitsN+'</b><span>'+(isBase?'Units':'Subs')+'</span></button>';
+    if(canConx) h+='<button type="button" class="co-ic'+(sec==='conx'?' on':'')+'" data-coic="conx" aria-label="Show connections">'
+      +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2.2"></circle><circle cx="12" cy="6" r="2.2"></circle><circle cx="19" cy="19" r="2.2"></circle><path d="M6.5 17L10.5 8M13.5 8l4 9"></path></svg>'
+      +'<b>&nbsp;</b><span>Connect</span></button>';
+    if(hostSite) h+='<button type="button" class="co-ic" data-codetail="'+escA(hostSite.id)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records">'
+      +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>'
+      +'<b>&nbsp;</b><span>Details</span></button>';
+    h+='</div>';
+    // ── UNITS — the picker (base) / the drill navigator with crumbs (org)
+    if(sec==='units' && unitsN){
+      if(isBase){
+        if(window._coDrillFor!==s.id){ window._coDrillFor=s.id; window._coDrillQ=''; }
+        const q=_srFold(window._coDrillQ||'');
+        let units=[]; try{ units=ogAtSite(s.id)||[]; }catch(_){}
+        h+='<div class="co-drillhead">Units here <b>'+units.length+'</b> \u00b7 tap to open</div>';
+        if(units.length>8) h+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+units.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+        h+='<div class="co-drill">';
+        units.forEach(function(u){
+          const kn=(typeof ogKids==='function')?ogKids(u.id).length:0;
+          const fold=_srFold(u.name);
+          h+='<button class="co-drow" type="button" data-counit="'+escA(u.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
+            +'<span class="co-dname">'+esc(u.name)+'</span>'
+            +(kn?('<span class="co-dcount">'+kn+' \u25b8</span>'):'')
+            +'</button>';
+        });
+        h+='</div>';
+      } else {
+        const anc=[]; try{ for(const a of ogChainUp(briefSubj)){ if(typeof _OG_CATS!=='undefined'&&_OG_CATS[a.id]) continue; anc.push(a); if(anc.length>=3) break; } }catch(_){}
+        if(anc.length){
+          h+='<div class="co-crumbs">'+anc.reverse().map(function(a){
+            return '<button class="co-crumb" type="button" data-codrill="'+escA(a.id)+'" title="'+escA(a.name)+'">'+esc(_bfAbbr(a.name))+'</button>';
+          }).join('<span class="co-crsep">\u203a</span>')
+            +'<span class="co-crsep">\u203a</span><span class="co-crumb co-crumb-here" aria-current="true">'+esc(_bfAbbr(name))+'</span></div>';
+        }
+        if(window._coDrillFor!==briefSubj){ window._coDrillFor=briefSubj; window._coDrillQ=''; }
+        const q=_srFold(window._coDrillQ||'');
+        h+='<div class="co-drillhead">Subordinates <b>'+kids.length+'</b> \u00b7 tap to drill</div>';
+        if(kids.length>8) h+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+kids.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+        h+='<div class="co-drill">';
+        kids.forEach(function(k2){
+          const hs=siteById(ogEffSite(k2.id)||''); const kn=ogKids(k2.id).length;
+          const fold=_srFold(k2.name+' '+(hs?hs.base:''));
+          h+='<button class="co-drow" type="button" data-codrill="'+escA(k2.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
+            +'<span class="co-dname">'+esc(k2.name)+'</span>'
+            +(hs?('<span class="co-dsub">'+esc(hs.base)+'</span>'):'')
+            +(kn?('<span class="co-dcount">'+kn+' \u25b8</span>'):'')
+            +'</button>';
+        });
+        h+='</div>';
+      }
+    }
+    // ── CONNECTIONS — the arcs are live while this section is open; the stepper
+    // clicks through them 1 by 1; the HQ line is one more tap.
+    if(sec==='conx' && briefSubj){
+      let parentName=null;
+      try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parentName=anc.name; break; } } }catch(_){}
+      const rl=GlobeState._relList||[];
+      if(subN){
+        const st=GlobeState._relStep; const stepping=(st!=null&&st>=0&&st<rl.length);
+        const label=stepping?((st+1)+' / '+subN+' \u00b7 '+_bfAbbr(rl[st]?rl[st].name:''))
+                            :('All '+subN+' shown');
+        h+='<div class="co-drillhead"><span class="co-dn">\u2193</span> Subordinate connections</div>';
+        h+='<div class="co-step">'
+          +'<button class="co-stepb" type="button" data-costep="prev" aria-label="Previous subordinate">\u2039</button>'
+          +'<span class="co-stepn">'+esc(label)+'</span>'
+          +'<button class="co-stepb" type="button" data-costep="next" aria-label="Next subordinate">\u203a</button>'
+          +'<button class="co-stepall'+(stepping?'':' on')+'" type="button" data-costep="all">All</button>'
+          +'</div>';
+      } else {
+        h+='<div class="co-drillhead">No mapped subordinate connections</div>';
+      }
+      if(parentName){
+        h+='<div class="co-conx"><button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq">'
+          +'<span class="co-up">\u2191</span> '+(GlobeState._showHQ?'Hide':'Show')+' HQ line \u00b7 '+esc(_bfAbbr(parentName))+'</button></div>';
+      }
     }
   }
-  // v0.22.0 — CONNECTIONS (org on map): all subordinate arcs draw on select
-  // (owner: "initially show all connections"), and the stepper — always present
-  // when there are subs — clicks through them 1 by 1 (owner: "then click through
-  // 1 by 1"). The upward HQ line stays one optional tap. No more subs on/off.
-  if(!brief && briefSubj && typeof orgOf==='function'){
-    let parentName=null;
-    try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parentName=anc.name; break; } } }catch(_){}
-    const rl=GlobeState._relList||[]; const subN=(GlobeState._cmdLinkArcs&&GlobeState._cmdLinkArcs.length)?GlobeState._cmdLinkArcs.length:0;
-    if(subN){
-      const st=GlobeState._relStep; const stepping=(st!=null&&st>=0&&st<rl.length);
-      const label=stepping?((st+1)+' / '+subN+' · '+_bfAbbr(rl[st]?rl[st].name:''))
-                          :('All '+subN+' shown');
-      h+='<div class="co-drillhead"><span class="co-dn">↓</span> Subordinate connections</div>';
-      h+='<div class="co-step">'
-        +'<button class="co-stepb" type="button" data-costep="prev" aria-label="Previous subordinate">‹</button>'
-        +'<span class="co-stepn">'+esc(label)+'</span>'
-        +'<button class="co-stepb" type="button" data-costep="next" aria-label="Next subordinate">›</button>'
-        +'<button class="co-stepall'+(stepping?'':' on')+'" type="button" data-costep="all">All</button>'
-        +'</div>';
-    }
-    if(parentName){
-      h+='<div class="co-conx"><button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq">'
-        +'<span class="co-up">↑</span> '+(GlobeState._showHQ?'Hide':'Show')+' HQ line · '+esc(_bfAbbr(parentName))+'</button></div>';
-    }
-  }
-  // v0.19.0 — THE READOUT IS THE NAVIGATOR (A-ORG-1 methodology): crumbs climb UP,
-  // a subordinate list drills DOWN. Tapping a name re-selects that org on the map,
-  // which re-renders this card for it — you walk the tree by name, not by hunting dots.
-  if(!brief && briefSubj && typeof ogKids==='function'){
-    const anc=[]; try{ for(const a of ogChainUp(briefSubj)){ if(typeof _OG_CATS!=='undefined'&&_OG_CATS[a.id]) continue; anc.push(a); if(anc.length>=3) break; } }catch(_){}
-    if(anc.length){
-      h+='<div class="co-crumbs">'+anc.reverse().map(function(a){
-        return '<button class="co-crumb" type="button" data-codrill="'+escA(a.id)+'" title="'+escA(a.name)+'">'+esc(_bfAbbr(a.name))+'</button>';
-      }).join('<span class="co-crsep">\u203a</span>')
-        +'<span class="co-crsep">\u203a</span><span class="co-crumb co-crumb-here" aria-current="true">'+esc(_bfAbbr(name))+'</span></div>';
-    }
-    const kids=ogKids(briefSubj);
-    if(kids.length){
-      // v0.22.0 \u2014 the subordinate browser collapses into an accordion (owner:
-      // "expand when needed, not by default"). Open it to filter and drill down.
-      if(window._coDrillFor!==briefSubj){ window._coDrillFor=briefSubj; window._coDrillQ=''; }
-      const q=(typeof _srFold==='function')?_srFold(window._coDrillQ||''):String(window._coDrillQ||'').toLowerCase();
-      let drillH='';
-      if(kids.length>8) drillH+='<input class="co-drillq" id="coDrillQ" type="text" placeholder="Filter '+kids.length+'" value="'+escA(window._coDrillQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
-      drillH+='<div class="co-drill">';
-      kids.forEach(function(k){
-        const hs=siteById(ogEffSite(k.id)||''); const sub=ogKids(k.id).length;
-        const fold=(typeof _srFold==='function')?_srFold(k.name+' '+(hs?hs.base:'')):(k.name+' '+(hs?hs.base:'')).toLowerCase();
-        drillH+='<button class="co-drow" type="button" data-codrill="'+escA(k.id)+'" data-cofold="'+escA(fold)+'"'+((q&&fold.indexOf(q)<0)?' hidden':'')+'>'
-          +'<span class="co-dname">'+esc(k.name)+'</span>'
-          +(hs?('<span class="co-dsub">'+esc(hs.base)+'</span>'):'')
-          +(sub?('<span class="co-dcount" title="'+sub+' subordinate'+(sub===1?'':'s')+'">'+sub+' \u25b8</span>'):'')
-          +'</button>';
-      });
-      drillH+='</div>';
-      h+=_disc('co-nav','Open a subordinate', drillH, {count:kids.length, def:false});
-    }
-  }
+  if(brief || o){
   h+='<div class="co-acts">';
   if(brief && briefSubj){
     h+=bfHas(briefSubj)
@@ -4654,9 +4712,11 @@ function _coRender(){
       :'<button class="co-pop" type="button" data-bfadd="'+escA(briefSubj)+'" aria-label="Add to brief"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg><span class="co-poplbl">Brief</span></button>';
   }
   const detailSite = s ? s.id : (agHost ? agHost.id : null);
-  if(detailSite) h+='<button class="co-pop" type="button" data-codetail="'+escA(detailSite)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg><span class="co-poplbl">Details</span></button>';
+  if(brief && detailSite) h+='<button class="co-pop" type="button" data-codetail="'+escA(detailSite)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg><span class="co-poplbl">Details</span></button>';
   if(o) h+='<button class="co-pop" type="button" data-orgrm="'+escA(o.id)+'" aria-label="Delete org"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg><span class="co-poplbl">Delete</span></button>';
-  h+='</div><i class="co-tail" aria-hidden="true"></i>';
+  h+='</div>';
+  }
+  h+='<i class="co-tail" aria-hidden="true"></i>';
   c.innerHTML=h;
   c.hidden=false;
 }
@@ -5257,6 +5317,22 @@ if(!window._odWired){
     if(cu){ const oid=cu.getAttribute('data-counit');
       const sid=GlobeState.sel || ((typeof ogEffSite==='function')?ogEffSite(oid):null);
       if(sid && typeof selectSite==='function') selectSite(sid, {orgId:oid});
+      return; }
+    // v0.27.0 — the compact card's icons: Units opens the list, Connections turns
+    // the arcs on (picking the base's primary org first when the base is bare).
+    const cic=e.target.closest('[data-coic]');
+    if(cic){ const w=cic.getAttribute('data-coic');
+      if(w==='units'){ window._coSec=(window._coSec==='units')?null:'units'; }
+      else if(w==='conx'){
+        if(!GlobeState.selOrg && GlobeState.sel){
+          const s0=siteById(GlobeState.sel);
+          const p0=(s0&&typeof ogPrimary==='function')?ogPrimary(s0.id):null;
+          if(p0){ GlobeState._coSecNext='conx'; selectSite(s0.id,{orgId:p0.id,keepCam:true}); return; }
+        }
+        if(window._coSec==='conx'){ window._coSec=null; GlobeState._showSubs=false; GlobeState._showHQ=false; GlobeState._relStep=-1; }
+        else { window._coSec='conx'; GlobeState._showSubs=true; GlobeState._relStep=-1; }
+      }
+      try{ _coRender(); _coPlace(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
     // v0.22.0 — HQ line is the one optional connection toggle (subs draw by default)
     const ct=e.target.closest('[data-cotgl]');

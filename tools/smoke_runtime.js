@@ -266,8 +266,15 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(global.GlobeState && GlobeState.dirty!==true){ fails++; console.log('✗ selectSite did not set GlobeState.dirty'); }
     // v0.9.0 anchored callout: identity arrives AT the dot; the sheet stays down
     const co=IDS['calloutCard'];
-    if(!co || co.hidden!==false || co.innerHTML.indexOf('USAWHC')<0 || co.innerHTML.indexOf('data-codetail')<0){
-      fails++; console.log('✗ selectSite: callout not populated (hidden='+(co&&co.hidden)+', '+(co?co.innerHTML.length:0)+' chars)');
+    // v0.27.0 COMPACT CARD contract: a bare base tap shows THE BASE (name +
+    // location) with the three icons — Units (tenant count), Connections,
+    // Details — and NEVER leads with a tenant organization.
+    if(!co || co.hidden!==false || co.innerHTML.indexOf('Fort Bragg')<0
+       || co.innerHTML.indexOf('data-coic="units"')<0 || co.innerHTML.indexOf('data-coic="conx"')<0
+       || co.innerHTML.indexOf('data-codetail')<0){
+      fails++; console.log('✗ selectSite: compact base card wrong (hidden='+(co&&co.hidden)+', '+(co?co.innerHTML.length:0)+' chars — want base name + units/conx/details icons)');
+    } else if(co.innerHTML.indexOf('<div class="co-name">USAWHC')>=0){
+      fails++; console.log('✗ selectSite: a bare base tap led with a tenant org, not the base');
     } else if(host && host.hidden!==true){
       fails++; console.log('✗ selectSite auto-opened the sheet (callout era: sheet only on ▤)');
     } else console.log('  ✓ selectSite(fort-bragg): anchored callout ('+co.innerHTML.length+' chars), sheet held back, dirty re-armed');

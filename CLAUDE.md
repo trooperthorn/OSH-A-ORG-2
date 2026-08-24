@@ -441,3 +441,23 @@ TOP-DOWN org chart, rebuilt sleek for Lumen. If you touch it, keep these:
   `_bfFrame` ONCE. Never loop `bfAdd` for a batch — that reframes the globe per node.
 - The picker opens at `dz-full` with a sticky `.rc-acts` so the commit button is never
   stranded behind the globe FAB. `_bfToast(msg)` confirms the count.
+
+## v0.27.0 — the compact card + the big desktop ring (owner, 24 Aug: 4 asks)
+- DESKTOP NAV (≥1100px): #navRow centers under the globe (left:50%, translateX(-50%));
+  .nv-side clusters gap 14px with 120px margins clearing the FAB; .nv-sat 64px, svg 26px.
+  The media query must override BOTH transform states (closed translate(-50%,10px),
+  open translate(-50%,0)) or the open ring jumps sideways.
+- clearAll also clears: window._coSec/_coSecNext, GlobeState._bfFocus, _bfAddUnder
+  (+_bfArmHint teardown). The ✕ = every screen selection, both rooms.
+- _FAM_DEFAULT_OFF now includes 'hq' — the map opens with BASE dots only. The chain
+  label at a selected dot uses inst.base when selOrg is null (unit voice returns with
+  an org) so a bare base tap never flashes a tenant name anywhere.
+- THE COMPACT CARD (map-mode _coRender): name + state, then THREE icons (.co-icrow/.co-ic):
+  Units (tenant/subordinate count), Connect, Details. window._coSec ('units'|'conx'|null)
+  is the open section — reset by selectSite; GlobeState._coSecNext pre-arms it across a
+  re-select (the base→Connect hop picks ogPrimary and lands with arcs on). Connections
+  are OFF until Connect asks: selectSite sets _showSubs=(coSecNext==='conx'). The conx
+  section holds the ‹ n/N › stepper + HQ-line tap; the units section holds the tenant
+  picker (base) or crumbs+drill (org). The .co-acts rail is brief/custom-only now.
+- The compact-card contract lives in smoke_runtime: base name + all three icons, and
+  the card must never lead with a tenant org on a bare base tap.
