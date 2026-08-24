@@ -381,10 +381,15 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     // chart: group headers with eyes, depth control, the custom chip
     global.renderBrief();
     const bs2=IDS['briefStage'];
-    if((bs2.innerHTML.match(/data-bfeye=/g)||[]).length!==2){ fails++; console.log('✗ CHART group eyes: want 2 L1 groups'); }
+    // v0.25.0: the chart is A-ORG-1's TOP-DOWN org chart — nested ul/li with CSS
+    // connector risers and MINIMAL boxes; options (eye, add-subordinate, colour,
+    // move) live in each node's sheet, not as chips on the diagram.
+    if(bs2.innerHTML.indexOf('bf-tree')<0 || bs2.innerHTML.indexOf('bf-box')<0
+       || bs2.innerHTML.indexOf('bf-kids')<0){ fails++; console.log('✗ CHART is not the top-down org chart (want bf-tree/bf-li/bf-box/bf-kids)'); }
+    if(bs2.innerHTML.indexOf('ch-node')>=0){ fails++; console.log('✗ the retired indented-list chart still renders'); }
     if(bs2.innerHTML.indexOf('data-bfdepth')<0){ fails++; console.log('✗ CHART depth control missing'); }
     if(bs2.innerHTML.indexOf('data-bfobj="'+org.id+'"')<0){ fails++; console.log('✗ custom org missing from chart'); }
-    if(bs2.innerHTML.indexOf('bf-box')>=0){ fails++; console.log('✗ old bf-box tree still renders'); }
+
     // object popup: annotation + SUBORDINATES PICKER (one-tap real tree kids)
     global._bfObjSheet('fort-bragg');
     const host2=IDS['dossier'];

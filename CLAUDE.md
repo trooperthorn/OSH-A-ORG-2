@@ -376,3 +376,33 @@ Removed: the map card's brief star, its one-button pop-out fan (records moved in
 header row), the empty-brief "add the map's selection" button (now points at search), and
 the dead data-govmap "Show on map" handler. smoke_runtime asserts the empty brief offers
 data-bfsearch and carries NO data-bfadd.
+
+## v0.25.0 — the hierarchy chart (owner, 24 Aug: "do away with this chart … how it was done in A-ORG-1")
+The indented list (v0.23-24 `.ch-node`) is DELETED. The chart is now A-ORG-1's real
+TOP-DOWN org chart, rebuilt sleek for Lumen. If you touch it, keep these:
+- STRUCTURE: nested `<ul class="bf-tree">` / `<li class="bf-li">` / `<div class="bf-box">`
+  / `<ul class="bf-kids">`. Connector risers are CSS ::before/::after on .bf-li and
+  .bf-kids (A-ORG-1's technique verbatim — no SVG to keep in sync). :first-child /
+  :last-child / :only-child rules draw the corners. `--line-tree` is the rail colour
+  (defined per room; the brief room overrides it in body.brief-mode).
+- SIZING (this is what the owner meant by "optimized"): `_bfFit()` runs after every
+  render — measures .bf-tree scrollWidth against the pane and sets CSS `zoom` (NOT
+  transform: zoom reflows, so the wrap scrolls honestly). Floor 0.62 so it never
+  shrinks past readable — pan instead. Manual ± pins `GlobeState._bfZoom`; the Fit
+  button clears it. A litter wider than 6 wraps into banded rows of ceil(sqrt(n*1.7))
+  inside one `.bf-kgroup` frame — A-ORG-1 §2.1, the fix for endless ribbons.
+- #briefStage is now the full-width WORK SURFACE (left/right safe gutters, 56vh;
+  ≥1100px it becomes a 880px column), not the old 300px corner tile. A hierarchy
+  needs width. `⌗ CHART` still collapses it to a pill via body.chart-min.
+- MINIMAL BOXES: name + a quiet station line, nothing else. NO per-box button rows.
+  Every option lives in the node's sheet (`_bfSelections`) one tap away: colour,
+  striped fill, move-under, reorder, note, hide-component (roots), remove.
+- ADD UNDER A SPECIFIC ORG (the owner's core requirement): the sheet's
+  "⊕ Add a subordinate under X" sets `GlobeState._bfAddUnder`, `_bfArmHint()` shows a
+  fixed bar naming the target, and the next search pick lands there. `_bfTakeParent()`
+  is the ONE consumer — it returns the armed key and disarms; bfAdd/bfAddState both
+  call it, so every add path honours the target exactly once. searchSelect in the
+  brief room now PLACES the org (bfAdd) instead of only opening its sheet.
+- FOLD: `GlobeState._bfFold[k]` folds a branch; the caret shows `+<descendant count>`
+  when folded, `▾` when open. Depth dial (L1-L4) still gates render depth on top.
+- smoke_runtime asserts the chart is bf-tree/bf-box/bf-kids and that `ch-node` is gone.

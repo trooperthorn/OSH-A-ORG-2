@@ -167,6 +167,7 @@
   --land:17,14,9;
   --coast:240,220,140;
   --world-glow:0;
+  --line-tree:rgba(245,215,110,.34);
 }
 
 /* ─── 2 · RESET + THE STAGE (the globe IS the page) ────────────────────────── */
@@ -416,14 +417,19 @@ body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,21
    full-screen chain globe. Minimize (–) collapses it to a "⌗ CHART" tab. */
 #briefStage{display:none}
 body.brief-mode #briefStage{
+  /* v0.25.0 — the chart is the WORK SURFACE in brief, not a corner tile: a
+     hierarchy needs width. Full pane minus the safe gutters; the globe still
+     shows through above and below, and ⌗ CHART collapses it to a pill. */
   display:block; position:absolute; z-index:16;
-  left:var(--safe-l); top:calc(env(safe-area-inset-top,0px) + 58px);
-  width:min(300px, 76vw); max-height:44vh;
+  left:var(--safe-l); right:var(--safe-r);
+  top:calc(env(safe-area-inset-top,0px) + 58px);
+  width:auto; max-height:56vh; max-height:56dvh;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   padding:10px 12px 12px; border-radius:var(--r-card);
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
 }
+@media(min-width:1100px){ body.brief-mode #briefStage{ right:auto; width:min(880px,72vw); max-height:76vh } }
 body.brief-mode.chart-min #briefStage{
   width:auto; max-height:none; overflow:visible; padding:0; background:none; box-shadow:none;
 }
@@ -435,29 +441,84 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   margin:0 0 4px; padding:2px 0; cursor:pointer; -webkit-tap-highlight-color:transparent;
   font:800 10.5px/1 var(--body); letter-spacing:.22em; color:var(--faint); text-align:left}
 .ch-head .ch-n{margin-left:auto; letter-spacing:.06em; color:var(--dim)}
-.ch-col{padding:7px 0 2px; box-shadow:0 -1px 0 var(--line)}
-.ch-col:first-of-type{box-shadow:none}
-/* v0.23.0 — REAL NESTED TREE: each node sits on its own row under its specific
-   parent, indented by echelon with a connector tick (owner: "each L3 tied to a
-   specific L2 ... like the org chart"). --ch-lvl (0 = a root's direct child). */
-.ch-node{position:relative; display:flex; align-items:center; padding:2.5px 0 2.5px calc(var(--ch-lvl,0)*15px)}
-.ch-rail{position:absolute; top:50%; height:1.5px; width:9px; background:var(--line); pointer-events:none;
-  left:calc(var(--ch-lvl,0)*15px - 10px)}
-.ch-rail::before{content:''; position:absolute; left:0; bottom:-9px; width:1.5px; height:19px; background:var(--line)}
-.ch-kn{margin-left:6px; font:700 9px/1 var(--mono); color:var(--faint); opacity:.85}
-.ch-chip{
-  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  padding:5px 9px; border-radius:8px; max-width:100%;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  font:800 10.5px/1.2 var(--body); background:var(--panel-2);
-}
-.ch-t1{box-shadow:0 0 0 1.4px var(--t1); color:var(--t1)}
-.ch-t2{box-shadow:0 0 0 1.2px var(--t2); color:var(--t2)}
-.ch-t3{box-shadow:0 0 0 1.2px var(--t3); color:var(--t3)}
-.ch-t4{box-shadow:0 0 0 1.2px var(--t4); color:var(--t4)}
-.ch-chip.on{background:var(--accent-wash)}
-.ch-more{font:700 9.5px/1 var(--mono); letter-spacing:.08em; color:var(--faint);
-  padding:3px 0 3px calc(var(--ch-lvl,0)*15px + 4px)}
+/* ═══ v0.25.0 THE HIERARCHY CHART (A-ORG-1's technique, sleek Lumen build) ═══
+   A real TOP-DOWN org chart: nested ul/li, boxes centred under their parent, and
+   connector risers drawn with ::before/::after so there is no SVG to keep in sync.
+   Boxes are MINIMAL — a name; options live in the sheet a tap away. */
+.bf-wrap{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  max-height:52vh; padding:4px 2px 8px}
+.bf-tree,.bf-kids{display:flex; justify-content:center; align-items:flex-start;
+  list-style:none; margin:0; padding:0; position:relative}
+.bf-tree{min-width:max-content; margin:0 auto}
+.bf-kids{padding-top:15px}
+.bf-kids::before{content:''; position:absolute; top:0; left:50%; width:0; height:15px;
+  border-left:1.4px solid var(--line-tree)}
+.bf-li{display:flex; flex-direction:column; align-items:center; position:relative; padding:15px 4px 0}
+.bf-li::before,.bf-li::after{content:''; position:absolute; top:0; right:50%; width:50%; height:15px;
+  border-top:1.4px solid var(--line-tree)}
+.bf-li::after{right:auto; left:50%; border-left:1.4px solid var(--line-tree)}
+.bf-li:first-child::before{border:0 none}
+.bf-li:last-child::after{border-left:0 none; border-top:0 none}
+.bf-li:last-child::before{border-right:1.4px solid var(--line-tree); border-radius:0 8px 0 0}
+.bf-li:first-child::after{border-radius:8px 0 0 0}
+.bf-li:only-child::before{display:none}
+.bf-li:only-child::after{border-top:0; border-radius:0}
+.bf-tree>.bf-li{padding-top:0}
+.bf-tree>.bf-li::before,.bf-tree>.bf-li::after{display:none}
+/* a wide litter wraps into banded rows — never one endless ribbon */
+.bf-kgroup{position:relative; display:flex; flex-direction:column; align-items:center;
+  padding:0 4px 3px; border-radius:12px; box-shadow:inset 0 0 0 1px var(--line-tree)}
+.bf-kids.bf-krow2{padding-top:7px}
+.bf-kids.bf-krow2::before{display:none}
+/* THE BOX — minimal: the name, a quiet station line, nothing else */
+.bf-box{position:relative; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  min-width:66px; max-width:132px; padding:6px 10px; border-radius:10px;
+  display:flex; flex-direction:column; align-items:center; gap:1px;
+  background:var(--panel-2); box-shadow:0 0 0 1.3px var(--bfc,var(--t1)), var(--drop);
+  transition:box-shadow .16s ease, opacity .16s ease}
+.bf-box:active{filter:brightness(1.12)}
+.bf-nm{font:800 10.5px/1.25 var(--body); color:var(--bfc,var(--t1));
+  max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bf-st{font:600 8.5px/1.2 var(--mono); letter-spacing:.03em; color:var(--faint);
+  max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bf-t1{--bfc:var(--t1)} .bf-t2{--bfc:var(--t2)} .bf-t3{--bfc:var(--t3)} .bf-t4{--bfc:var(--t4)}
+.bf-box.bf-dim{opacity:.28}
+.bf-box.bf-foc{box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(var(--accent-rgb),.35)}
+.bf-box.bf-tinted{background:color-mix(in srgb, var(--bfc) 16%, var(--panel-2))}
+/* the fold caret sits under its box and carries the hidden count */
+.bf-caret{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:3px 0 0;
+  padding:1px 7px; border-radius:7px; background:var(--panel-2); color:var(--dim);
+  box-shadow:0 0 0 1px var(--line); font:800 8.5px/1.5 var(--mono); letter-spacing:.04em}
+.bf-caret.on{color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+/* the control bar — depth dial + zoom, one quiet row */
+/* the armed "adding under X" bar — says where the next pick will land */
+.bf-armbar{position:fixed; left:50%; transform:translateX(-50%); z-index:44;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 170px);
+  display:flex; align-items:center; gap:9px; padding:8px 10px 8px 13px; border-radius:12px;
+  background:linear-gradient(180deg, rgba(60,46,14,.97), rgba(32,24,8,.97));
+  box-shadow:0 0 0 1.4px var(--accent), 0 0 18px rgba(245,215,110,.3);
+  color:var(--accent); font:600 11.5px/1.25 var(--body); max-width:min(92vw,340px)}
+.bf-armbar b{font-weight:800}
+.bf-armbar button{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
+  width:24px; height:24px; border-radius:50%; flex:none;
+  background:rgba(0,0,0,.35); color:var(--accent); font:800 12px/1 var(--body)}
+.bf-addsub{width:100%; margin-top:8px}
+/* the chart foot — one quiet add action, not a slab */
+#briefStage .bf-foot{display:flex; padding-top:8px}
+#briefStage .bf-foot .bf-act{margin:0 auto; min-height:34px; padding:0 14px;
+  border-radius:17px; font:700 11px/1 var(--body)}
+.bf-bar{display:flex; align-items:center; gap:6px; padding:5px 0 6px; flex-wrap:wrap}
+.bf-seg{display:inline-flex; border-radius:9px; overflow:hidden; box-shadow:0 0 0 1px var(--line)}
+.bf-dep,.bf-zb,.bf-zpct{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
+  background:rgba(0,0,0,.28); color:var(--faint); font:700 9.5px/1 var(--mono); letter-spacing:.05em;
+  padding:7px 9px}
+.bf-dep.on{color:var(--accent); background:var(--accent-wash)}
+.bf-zpct{min-width:44px; color:var(--dim)}
+.bf-zb{font-size:12px; color:var(--accent)}
+.bf-dep:active,.bf-zb:active,.bf-zpct:active{filter:brightness(1.25)}
+.bf-clearfoc{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin-left:auto;
+  padding:6px 10px; border-radius:9px; background:rgba(0,0,0,.28); box-shadow:0 0 0 1px var(--line);
+  color:var(--accent); font:700 9.5px/1 var(--mono); letter-spacing:.04em}
 /* v0.13.0 THE HAND-BUILT BRIEF: echelon depth control · per-HQ group eyes */
 .bf-depth{display:flex; gap:4px; padding:5px 0 7px}
 .bf-dep{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin:0;
@@ -465,19 +526,6 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   background:rgba(0,0,0,.35); color:var(--faint); box-shadow:0 0 0 1px var(--line)}
 .bf-dep.on{color:var(--accent); background:var(--accent-wash)}
 /* v0.20.0 FOCUS — isolate one branch; the rest dims */
-.bf-focusbar{display:flex; align-items:center; gap:8px; padding:6px 0 2px}
-.bf-foctag{font:800 11px/1.2 var(--body); color:var(--accent); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.bf-focusx{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; flex:none;
-  padding:5px 9px; border-radius:8px; background:rgba(0,0,0,.35); box-shadow:0 0 0 1px var(--line);
-  color:var(--dim); font:700 9.5px/1 var(--mono); letter-spacing:.05em}
-.ch-chip.ch-dim{opacity:.3}
-.ch-chip.ch-focus{box-shadow:0 0 0 1.5px var(--accent), 0 0 10px rgba(245,215,110,.3)}
-.ch-grp{display:flex; align-items:center; gap:6px; padding:2px 0}
-.ch-gn{font:700 9.5px/1 var(--mono); color:var(--faint); margin-left:auto}
-.bf-eye{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin:0; background:none;
-  color:var(--dim); width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:50%}
-.bf-eye.off{color:var(--faint); opacity:.5}
-.ch-col.ch-off .ch-chip{opacity:.45}
 /* v0.24.0 THE SELECTIONS — palette, stripe toggle, move/reorder controls */
 .bf-pal{display:grid; grid-template-columns:repeat(8,1fr); gap:5px; padding:2px 0 6px}
 .bf-sw{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:0;
@@ -503,6 +551,7 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 @keyframes xpPulse{0%,100%{box-shadow:0 0 0 1px var(--line)} 35%{box-shadow:0 0 0 2px var(--accent), 0 0 14px rgba(var(--accent-rgb),.55)}}
 .xp-pulse{animation:xpPulse 1.4s ease 2; color:var(--accent)}
 body.brief-mode{
+  --line-tree:rgba(60,48,16,.34);
   /* THE INVERTED ROOM — brief flips the scheme (owner law: map = main, brief =
      inverted). Values only; the canvas keeps map paint because it reads tokens
      from the document element, while DOM chrome inherits these body-scoped ones.
@@ -923,6 +972,25 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.25.0 • THE HIERARCHY CHART (owner: "completely do away with this chart …
+//            review how it was done in A-ORG-1. That's what I need"). The indented
+//            list is GONE. In its place is A-ORG-1's real TOP-DOWN org chart,
+//            rebuilt sleek: nested <ul>/<li> with CSS connector risers drawn by
+//            ::before/::after (no SVG to keep in sync), every box centred under
+//            its parent. SIZING: a litter wider than 6 wraps into banded rows
+//            (√(n·1.7) per row) inside one family frame, so a 50-sibling chain
+//            fits the pane instead of becoming a 3000px ribbon — A-ORG-1's §2.1
+//            rule. Branches FOLD, and a folded caret carries its hidden
+//            descendant count. A one-row control bar holds the L1-L4 depth dial
+//            and a zoom segment (− · Fit · +). MINIMAL BY DEFAULT: a box is just
+//            the name (plus a quiet station line) — every option lives in the
+//            sheet one tap away, where the v0.24.0 selections already sit. ADD
+//            UNDER A SPECIFIC ORG: each sheet carries "⊕ Add a subordinate under
+//            <that org>", which arms that parent, shows a bar saying where the
+//            next pick lands, and drops the searched organization or state
+//            exactly there — L2, L3 or L4 under the organization you chose. The
+//            per-component eye moved off the diagram into the sheet with it.
+//            Exercised by smoke_runtime (chart shape + no indented list).
 //   v0.24.0 • TWO ROOMS, ONE APP (owner: "really need a total app approach").
 //            THE BRIEF IS A DIAGRAM YOU BUILD — A-ORG-1's briefing ability, in
 //            A-ORG-2's format. Structure is STORED, never derived: every node
@@ -1327,7 +1395,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.24.0';
+const APP_VERSION = 'v0.25.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -3655,6 +3723,9 @@ function searchSelect(id){
     if(inBrief){
       const hs=sid?siteById(sid):null;
       if(hs && hs.lat!=null) try{ flyToLatLon(hs.lat, hs.lon, Math.max(GlobeState.zoom||1, 2.4)); }catch(_){}
+      // v0.25.0 — a brief-room pick PLACES the organization: under the armed parent
+      // when "Add a subordinate under X" armed one, else nested naturally. One tap.
+      try{ if(!bfHas(oid)) bfAdd(oid); }catch(_){}
       try{ _bfObjSheet(oid); }catch(_){}
       return;
     }
@@ -4016,17 +4087,19 @@ try{ window.setMode=setMode; }catch(_){}
 // only (owner law: minimal on the object, everything in the popup); minimize (⌗)
 // collapses the card to its tab. Chips open the object popup.
 function renderBrief(){
-  // v0.13.0: one group block per L1 with an EYE (show/hide that component of
-  // the brief) + the L1-L4 depth control. Rows show only what the owner added.
+  // v0.25.0 — THE HIERARCHY CHART (A-ORG-1's technique, rebuilt sleek). A real
+  // TOP-DOWN org chart: nested <ul>/<li> with CSS connector risers, boxes centred
+  // under their parent. Every box is MINIMAL — the name, and a fold caret when it
+  // has children. Tapping a box opens its sheet, where the options live (add a
+  // subordinate under THIS org, colour, stripe, move, note, remove).
   const el=document.getElementById('briefStage'); if(!el) return;
   const esc=_odEsc, escA=_odEscA;
-  const memN=(BRIEF.mem||[]).length;
+  const memN=(BRIEF.nodes||[]).length;
   let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
     +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
     +'<span class="od-ico" data-xpbtn="1" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
     +'</button>';
   if(!memN){
-    // v0.24.0: the brief is built HERE, by searching — never handed over from the map.
     h+='<div class="bf-empty"><b>The brief is empty</b>'
       +'<span>Search an organization or a US state below to place it on the diagram.</span>'
       +'<button type="button" class="bf-addsel" data-bfsearch="1">Search to add</button>'
@@ -4036,65 +4109,97 @@ function renderBrief(){
   const C=_briefChainMap({all:true});
   const dep=GlobeState._bfDepth||4;
   const hid=new Set(BRIEF.hide||[]);
-  h+='<div class="bf-depth">'+[1,2,3,4].map(function(n){
-    return '<button type="button" class="bf-dep'+(dep>=n?' on':'')+'" data-bfdepth="'+n+'" aria-label="Show levels through L'+n+'">L'+n+'</button>';
-  }).join('')+'</div>';
-  const EYE='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"></path><circle cx="12" cy="12" r="2.6"></circle></svg>';
-  const EYEOFF='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"></path><path d="M4 4l16 16"></path></svg>';
-  // v0.20.0 FOCUS: compute the focused branch (lineage up + descendants down)
+  const fold=GlobeState._bfFold||(GlobeState._bfFold={});
+  // v0.20.0 FOCUS — one branch at a time; the rest dims
   const foc=(GlobeState._bfFocus && C.nodes[GlobeState._bfFocus])?GlobeState._bfFocus:null;
-  if(GlobeState._bfFocus && !foc) GlobeState._bfFocus=null;   // focused org left the set — release
-  let branch=null;
-  if(foc){ branch=new Set(); let c=foc,g=0;
-    while(c!=null && g++<40){ branch.add(c); c=C.nodes[c]?C.nodes[c].parent:null; }
+  if(GlobeState._bfFocus && !foc) GlobeState._bfFocus=null;
+  let branch=null, lineage={};
+  if(foc){
+    branch=new Set(); let c=foc,g=0;
+    while(c!=null && g++<60){ branch.add(c); const pn=C.nodes[c]; c=pn?pn.parent:null; if(c) lineage[c]=1; }
     const q=[foc]; while(q.length){ const cur=q.shift(); C.order.forEach(function(k){ if(C.nodes[k].parent===cur && !branch.has(k)){ branch.add(k); q.push(k); } }); }
-    h+='<div class="bf-focusbar"><span class="bf-foctag">\u25ce '+esc(_bfAbbr(C.nodes[foc].name))+'</span>'
-      +'<button type="button" class="bf-focusx" data-bffocusclear="1" aria-label="Clear focus — show the whole brief">Show all \u2715</button></div>';
   }
-  const _dc=function(id){ return (branch&&!branch.has(id)?' ch-dim':'')+(foc===id?' ch-focus':''); };
-  const roots=C.order.filter(function(k){ return C.nodes[k].lvl===1; });
-  roots.forEach(function(r){
-    const rn=C.nodes[r];
-    const off=hid.has(r);
-    const members=C.order.filter(function(k){ return C.nodes[k].root===r; });
-    h+='<div class="ch-col'+(off?' ch-off':'')+'">';
-    h+='<div class="ch-grp">'
-      +'<button type="button" class="bf-eye'+(off?' off':'')+'" data-bfeye="'+escA(r)+'" aria-label="Show or hide this group">'+(off?EYEOFF:EYE)+'</button>'
-      +'<button type="button" class="ch-chip ch-t1'+_dc(r)+'" data-bfobj="'+escA(r)+'" title="'+escA(rn.name)+'">'+esc(_bfAbbr(rn.name))+'</button>'
-      +'<span class="ch-gn">'+members.length+'</span></div>';
-    // v0.23.0 — REAL NESTED TREE (owner: "not just L1/L2/L3 buckets — each L3
-    // could be tied to a specific L2"). Walk parent→child from this root so every
-    // node renders UNDER its own parent, indented by echelon, like an org chart.
-    // node.parent is the specific added-ancestor _briefChainMap already computed.
-    if(!off){
-      const KIDCAP=16;
-      const walk=function(pid, lvl){
-        if(lvl>dep) return '';
-        let kids=C.order.filter(function(k){ return C.nodes[k].parent===pid; });
-        if(!kids.length) return '';
-        kids.sort(function(a,b){ return (C.nodes[b].custom?1:0)-(C.nodes[a].custom?1:0); });
-        let out=''; const shown=kids.slice(0, KIDCAP); const chLvl=lvl-1;
-        shown.forEach(function(kid){
-          const n=C.nodes[kid]; const tcls='ch-t'+Math.min(4,n.lvl);   // quote-adjacent for dead-lint's dynamic guard
-          const kn=C.order.filter(function(k){ return C.nodes[k].parent===kid; }).length;
-          // v0.24.0: a node the owner recolored carries that colour on its chip too,
-          // so the chart and the globe highlight always agree.
-          const cst=n.color?(' style="color:'+n.color+';box-shadow:0 0 0 1.3px '+n.color+'"'):'';
-          out+='<div class="ch-node" style="--ch-lvl:'+chLvl+'">'
-            +'<span class="ch-rail" aria-hidden="true"></span>'
-            +'<button type="button" class="ch-chip '+tcls+(GlobeState.sel===kid?' on':'')+_dc(kid)+'" data-bfobj="'+escA(kid)+'" title="'+escA(n.name)+'"'+cst+'>'+esc(_bfAbbr(n.name))
-            +(kn?'<span class="ch-kn">'+kn+'</span>':'')+'</button>'
-            +'</div>';
-          out+=walk(kid, lvl+1);        // the child's own subtree renders right under it
-        });
-        if(kids.length>KIDCAP) out+='<div class="ch-node ch-more" style="--ch-lvl:'+chLvl+'">+'+(kids.length-KIDCAP)+' more under '+esc(_bfAbbr(C.nodes[pid]?C.nodes[pid].name:''))+'</div>';
-        return out;
-      };
-      h+=walk(r, 2);
+  // ── the CONTROL BAR: fit/zoom + the depth dial. Minimal, one row.
+  const zpc=GlobeState._bfZoom?(Math.round(GlobeState._bfZoom*100)+'%'):'Fit';
+  h+='<div class="bf-bar">'
+    +'<span class="bf-seg">'+[1,2,3,4].map(function(n){
+        return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+'">L'+n+'</button>';
+      }).join('')+'</span>'
+    +'<span class="bf-seg bf-zseg">'
+      +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">\u2212</button>'
+      +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
+      +'<button type="button" class="bf-zb" data-bfzoom="+" aria-label="Bigger">+</button>'
+    +'</span>';
+  if(foc) h+='<button type="button" class="bf-clearfoc" data-bffocusclear="1">Show all \u2715</button>';
+  h+='</div>';
+  // ── ONE BOX. Minimal by design: the name, a station line only when it adds
+  // something, and a fold caret carrying the hidden-descendant count.
+  const kidsOf=function(k){ return C.order.filter(function(x){ return C.nodes[x].parent===k; }); };
+  const descN=function(k){ let n=0; const q=kidsOf(k); while(q.length){ n++; kidsOf(q.shift()).forEach(function(c){ q.push(c); }); } return n; };
+  const nodeHtml=function(k, lvl){
+    const n=C.nodes[k];
+    const kids=(lvl>=dep)?[]:kidsOf(k);
+    const folded=!!fold[k] && kids.length;
+    const dim=(branch && !branch.has(k))?' bf-dim':'';
+    const isFoc=(foc===k)?' bf-foc':'';
+    const tier=Math.min(4,n.lvl);
+    const tcls='bf-t'+tier;                                  // quote-adjacent for dead-lint
+    const col=n.color||'';
+    const sty=col?(' style="--bfc:'+col+'"'):'';
+    const stn=(n.kind==='state')?'state':((n.lat!=null&&n.kind==='org')?_bfBaseOf(n.ref):'');
+    let r='<li class="bf-li">';
+    r+='<div class="bf-box '+tcls+dim+isFoc+(col?' bf-tinted':'')+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
+      +'<span class="bf-nm">'+esc(_bfAbbr(n.name))+'</span>'
+      +(stn?('<span class="bf-st">'+esc(stn)+'</span>'):'')
+      +'</div>';
+    if(kids.length) r+='<button type="button" class="bf-caret'+(folded?' on':'')+'" data-bffold="'+escA(k)+'" aria-expanded="'+(folded?'false':'true')+'" aria-label="'+(folded?'Expand':'Collapse')+' branch">'
+      +(folded?('+'+descN(k)):'\u25be')+'</button>';
+    if(kids.length && !folded){
+      // SIZING (A-ORG-1 §2.1): a wide litter wraps into rows instead of one endless
+      // ribbon, so a 50-sibling chain still fits the pane at a readable size.
+      let rows=[kids];
+      if(kids.length>6){ const per=Math.ceil(Math.sqrt(kids.length*1.7)); rows=[];
+        for(let i2=0;i2<kids.length;i2+=per) rows.push(kids.slice(i2,i2+per)); }
+      if(rows.length>1) r+='<div class="bf-kgroup">';
+      rows.forEach(function(row,ri){
+        r+='<ul class="bf-kids'+(ri?' bf-krow2':'')+'">'+row.map(function(c){ return nodeHtml(c, lvl+1); }).join('')+'</ul>';
+      });
+      if(rows.length>1) r+='</div>';
     }
-    h+='</div>';
-  });
+    return r+'</li>';
+  };
+  const roots=C.order.filter(function(k){ return C.nodes[k].lvl===1; });
+  const zst=GlobeState._bfZoom?(' style="zoom:'+GlobeState._bfZoom+'"'):'';
+  h+='<div class="bf-wrap"><ul class="bf-tree"'+zst+'>'
+    +roots.map(function(r){
+      // the per-root eye rides ABOVE its tree so a whole component can drop out
+      return (hid.has(r)?'':'')+nodeHtml(r,1);
+    }).join('')+'</ul></div>';
+  h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">\u2295 Add organization</button></div>';
   el.innerHTML=h;
+  try{ _bfFit(); }catch(_){}
+}
+// v0.25.0 SIZING — "Fit" measures the built tree and shrinks it until it fits the
+// pane (never enlarges past 1). A manual ± pins the zoom and Fit releases it.
+function _bfFit(){
+  const wrap=document.querySelector('#briefStage .bf-wrap');
+  const tree=wrap?wrap.querySelector('.bf-tree'):null;
+  if(!wrap || !tree) return;
+  if(GlobeState._bfZoom){ _bfCenter(wrap,tree); return; }   // manual zoom wins
+  tree.style.zoom='';
+  const avail=wrap.clientWidth||1, natural=tree.scrollWidth||1;
+  const fit=Math.max(0.62, Math.min(1, (avail-4)/natural));   // never shrink past readable — pan instead
+  if(fit<0.999) tree.style.zoom=fit;
+  GlobeState.__bfFitPct=fit;
+  const pct=document.querySelector('#briefStage .bf-zpct');
+  if(pct) pct.textContent=(fit<0.999)?('Fit '+Math.round(fit*100)+'%'):'Fit';
+  _bfCenter(wrap,tree);
+}
+function _bfCenter(wrap,tree){
+  try{ wrap.scrollLeft=Math.max(0,(tree.scrollWidth*(parseFloat(tree.style.zoom)||1)-wrap.clientWidth)/2); }catch(_){}
+}
+function _bfBaseOf(orgId){
+  try{ const s=siteById(ogEffSite(orgId)||''); return s?s.base:''; }catch(_){ return ''; }
 }
 try{ window.renderBrief=renderBrief; }catch(_){}
 
@@ -4567,6 +4672,24 @@ const BF_PALETTE=['#ffffff','#c9d4dd','#8d99ae','#fff3b0','#ffdc46','#d4a017',
                   '#ffb27a','#ff9632','#ff7518','#ff5f50','#d62828','#8f1d1d',
                   '#ff9ecd','#ff5fbe','#c9184a','#e0aaff','#b266ff','#7b2cbf',
                   '#9bd4ff','#4678ff','#2743c7','#00e5ff','#40e0d0','#b08968'];
+// v0.25.0 — ADD UNDER A SPECIFIC ORG. Tapping "Add subordinate" on a box arms that
+// org; the next search pick lands under it. A visible bar says so, and cancels.
+function _bfArmHint(){
+  let el=document.getElementById('bfArmBar');
+  const k=GlobeState._bfAddUnder, nd=k?bfNode(k):null;
+  if(!nd){ if(el) el.remove(); return; }
+  if(!el){ el=document.createElement('div'); el.id='bfArmBar'; document.body.appendChild(el); }
+  el.className='bf-armbar';
+  el.innerHTML='<span>Adding under <b>'+_odEsc(_bfAbbr(nd.n))+'</b> \u2014 search below</span>'
+    +'<button type="button" data-bfdisarm="1" aria-label="Cancel">\u2715</button>';
+}
+// every add path funnels through here so the armed parent is honoured exactly once
+function _bfTakeParent(fallback){
+  const k=GlobeState._bfAddUnder;
+  GlobeState._bfAddUnder=null;
+  try{ _bfArmHint(); }catch(_){}
+  return (k && bfNode(k)) ? k : fallback;
+}
 function _bfSelections(k){
   const nd=bfNode(k); if(!nd) return '';
   const escA=_odEscA, esc=_odEsc;
@@ -4593,6 +4716,16 @@ function _bfSelections(k){
     +'<div class="bf-ord"><button type="button" class="bf-act" data-bfmv="'+escA(k)+'" data-bfd="-1"'+(si<=0?' disabled':'')+'>\u25c0 Move left</button>'
     +'<button type="button" class="bf-act" data-bfmv="'+escA(k)+'" data-bfd="1"'+(si>=sibs.length-1?' disabled':'')+'>Move right \u25b6</button></div>';
   h+=_disc('bf-pos', 'Position in the diagram', pos, {def:false});
+  // a ROOT can drop its whole component out of the picture (the old chart eye,
+  // now an option in the sheet rather than a chip on the diagram)
+  if(!nd.p){
+    const off=(BRIEF.hide||[]).indexOf(k)>=0;
+    h+='<button type="button" class="bf-act'+(off?'':' in')+'" data-bfeye="'+escA(k)+'">'
+      +(off?'\u25c9 Show this component':'\u25cc Hide this component')+'</button>';
+  }
+  // the whole point of a hierarchy: put an L2/L3/L4 under THIS specific organization
+  h+='<button type="button" class="bf-act in bf-addsub" data-bfsearch="1" data-bfunder="'+escA(k)+'">'
+    +'\u2295 Add a subordinate under '+esc(_bfAbbr(nd.n))+'</button>';
   return h;
 }
 // a STATE or a free-text box has no installation record — it gets its own compact
@@ -4848,7 +4981,7 @@ if(!window._odWired){
       try{ _bfObjSheet(hostId||kid); }catch(_){}
       return; }
     const bey=e.target.closest('[data-bfeye]');
-    if(bey){ bfEye(bey.getAttribute('data-bfeye')); return; }
+    if(bey){ const k=bey.getAttribute('data-bfeye'); bfEye(k); try{ _bfObjSheet(k); }catch(_){} return; }
     const bdp=e.target.closest('[data-bfdepth]');
     if(bdp){ bfDepth(bdp.getAttribute('data-bfdepth')); return; }
     const br=e.target.closest('[data-bfrm]');
@@ -4931,8 +5064,28 @@ if(!window._odWired){
       } return; }
     // v0.23.0 — "Add another organization" focuses the org search (owner: build the
     // brief by SEARCHING real orgs, not free-text). Close the sheet so search is clear.
+    const bdis=e.target.closest('[data-bfdisarm]');
+    if(bdis){ GlobeState._bfAddUnder=null; try{ _bfArmHint(); }catch(_){} return; }
+    // v0.25.0 — fold a branch (the caret carries the hidden count)
+    const bfd=e.target.closest('[data-bffold]');
+    if(bfd){ const k=bfd.getAttribute('data-bffold');
+      const f=GlobeState._bfFold||(GlobeState._bfFold={});
+      if(f[k]) delete f[k]; else f[k]=1;
+      try{ renderBrief(); }catch(_){} return; }
+    // v0.25.0 — chart zoom: fit / smaller / bigger
+    const bz=e.target.closest('[data-bfzoom]');
+    if(bz){ const d=bz.getAttribute('data-bfzoom');
+      let z=GlobeState._bfZoom||1;
+      if(d==='0') GlobeState._bfZoom=null;
+      else { z=(d==='+')?z*1.15:z/1.15; GlobeState._bfZoom=Math.max(0.45, Math.min(2.2, z)); }
+      try{ renderBrief(); }catch(_){} return; }
     const bsr=e.target.closest('[data-bfsearch]');
-    if(bsr){ try{ hideDossier(); }catch(_){} try{ calloutHide(); }catch(_){}
+    if(bsr){
+      // v0.25.0 — an "Add subordinate" from a BOX arms that org as the parent, so the
+      // next search pick lands UNDER it. A bare "Add organization" clears the target.
+      GlobeState._bfAddUnder=bsr.getAttribute('data-bfunder')||null;
+      try{ hideDossier(); }catch(_){} try{ calloutHide(); }catch(_){}
+      try{ _bfArmHint(); }catch(_){}
       const si=document.getElementById('searchInput'); if(si){ try{ si.focus(); si.select&&si.select(); }catch(_){} } return; }
     const os=e.target.closest('[data-orgsave]');
     if(os){ const pid=os.getAttribute('data-orgsave');
@@ -5353,12 +5506,14 @@ function bfAdd(id, parent){
     let up=_bfParentOf(id), hops=0;
     while(up && ++hops<40){ if(bfNode(up)){ p=up; break; } up=_bfParentOf(up); }
   }
+  p=_bfTakeParent(p);            // an armed "add under X" wins over the natural nesting
   _bfPush({k:id, n:o.name, p:p||null, t:'org', r:id, c:'', sh:0, tx:''});
 }
 // add a US STATE — it paints as a highlighted polygon on the globe
 function bfAddState(name, parent){
   const st=(typeof US_STATES!=='undefined')?US_STATES.find(function(s){ return s.n===name; }):null;
   if(!st) return;
+  parent=_bfTakeParent(parent||null);
   _bfPush({k:_bfStateKey(st.n), n:st.n, p:parent||null, t:'state', r:st.n, c:'', sh:0, tx:''});
 }
 // add a FREE-TEXT box — a proposed or notional element with no app record
