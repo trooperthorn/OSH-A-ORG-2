@@ -322,3 +322,57 @@ charter is a CONTRACT — the OUT column returns only with written owner sign-of
 - Every brief node maps to a real org → ogEffSite → lat/lon (custom orgs still resolve via base or
   the ancestor they ride). smoke_runtime OBJECT-popup probe updated (data-bfsearch + data-orgsave,
   no data-orgadd); Orgs.add path unchanged so the custom-org + snapshot tests still hold.
+
+## v0.24.0 — two rooms, one app (owner, 24 Aug: "really need a total app approach")
+THE ARCHITECTURE. Two rooms that never write to each other. MAP = what exists, where.
+BRIEF = the diagram you are building. Nothing jumps between them.
+
+### The brief is a diagram you BUILD (A-ORG-1's briefing ability, A-ORG-2's format)
+- Structure is STORED, never derived. `BRIEF.nodes=[{k,n,p,t,r,c,sh,tx}]` — each node
+  carries its OWN parent `p`, so anything can be a peer / parent / subordinate of
+  anything else regardless of the real Army chain. THIS is what the derived model
+  (v0.23.0 and earlier) could not do, and why the owner "couldn't do what's needed".
+- Three kinds `t`: 'org' (r=org id, real location) · 'state' (r=state name) · 'custom'
+  (free-text box). Key namespace: an org node IS its org id (so bfHas(orgId) holds);
+  a state is 'st:<Name>'; a custom is 'cx:<rand>'.
+- `BRIEF.mem` / `BRIEF.ann` are MAINTAINED MIRRORS (rebuilt by `_bfSync` on every
+  mutation) so snapshot/export/harnesses keep reading one shape. Don't write them.
+- Mutators: bfAdd(id,parent) · bfAddState(name,parent) · bfAddCustom(name,parent) ·
+  bfRemove (cascades the stored subtree) · bfMove(k,newParent) (refuses cycles) ·
+  bfReorder(k,dir) · bfColor(k,hex) · bfStripe(k) · bfNote. All on window.Brief.
+- MIGRATION v1→v2 in the kv 'brief' restore: a flat {mem,ann} list becomes nodes with
+  the structure it USED to derive frozen in as each node's own parent — an existing
+  brief reopens identical, and is now movable. v2 payloads are validated on read.
+- `_briefChainMap` reads the stored tree (no more nearest-added-ancestor walk); it
+  still computes lvl/root/tier/shade and keeps the v0.20.0 focus filter.
+- `custom` in the chain map still means "not a stock A1ORGS record" (free-text box OR
+  an owner-created org) — the chart's sort and the smoke test depend on that.
+
+### US states as brief subjects (ported from A-ORG-1)
+- `US_STATES` (centroids) + the already-loaded `GLOBE_STATE_SHAPES` (keyed by state
+  name, filled by loadStateBorders) — the geometry was always there, just unused.
+- `drawBriefStates(ctx,m,labels)` — TWO PHASES: fills/stripes run from drawBriefArcs
+  (UNDER the arcs and dots), labels run at the end of drawMarkersHook (on top, sharing
+  the label collision list). Wash 0.26 + 1.7px outline; `sh` adds the diagonal
+  ATTENTION LINES clipped to the polygon (7px pitch), exactly A-ORG-1's v13.7.1.
+- States are searchable (STATE badge); a brief-room pick places one on the diagram.
+
+### The selections (per node, collapsed accordions — expand when needed)
+`_bfSelections(k)`: 24-swatch BF_PALETTE colour (state → highlight tint, otherwise the
+chip tint) · ▨ striped fill (states) · ⇄ "Reports to" move-under select (cycles refused,
+own subtree excluded) · ◀▶ reorder among sisters · note. `_bfPlainSheet` gives states and
+custom boxes their own compact sheet; org members get the same block inside _bfObjSheet.
+
+### The map opens quiet, and isolates
+- `_FAM_DEFAULT_OFF=['depot','usace','guard']` via `_famOffSet()` — base + HQ dots and
+  names only at rest; Layers turns the rest back on. EVERY reader must use _famOffSet().
+- ISOLATE: in drawGlobeMarkers, `if(GlobeState.selOrg && !onChain) continue;` and the
+  same gate on the label pass — selecting an organization leaves only that org and its
+  connections on the globe. A bare BASE tap (no selOrg) keeps the full picture + units picker.
+- harness_globe asserts BOTH: the isolated picture, then selOrg=null for the full pass.
+
+### The rooms are severed
+Removed: the map card's brief star, its one-button pop-out fan (records moved into the
+header row), the empty-brief "add the map's selection" button (now points at search), and
+the dead data-govmap "Show on map" handler. smoke_runtime asserts the empty brief offers
+data-bfsearch and carries NO data-bfadd.

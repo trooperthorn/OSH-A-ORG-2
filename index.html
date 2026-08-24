@@ -318,6 +318,7 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 #searchResults .sr-tag{flex:none; font:800 8.5px/1 var(--mono); letter-spacing:.05em; padding:3px 5px; border-radius:5px}
 #searchResults .sr-tag-org{color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
 #searchResults .sr-tag-site{color:var(--dim); box-shadow:inset 0 0 0 1px var(--line)}
+#searchResults .sr-tag-state{color:var(--t3); box-shadow:inset 0 0 0 1px var(--t3)}
 #searchResults .sr-sub{flex:none; color:var(--dim); font:500 11px/1.3 var(--body)}
 #searchResults .sr-none{padding:12px 14px; color:var(--dim); font:500 13px/1.5 var(--body)}
 #searchResults .sr-count{padding:6px 14px 8px; color:var(--faint); font:600 10.5px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase}
@@ -477,6 +478,19 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   color:var(--dim); width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:50%}
 .bf-eye.off{color:var(--faint); opacity:.5}
 .ch-col.ch-off .ch-chip{opacity:.45}
+/* v0.24.0 THE SELECTIONS — palette, stripe toggle, move/reorder controls */
+.bf-pal{display:grid; grid-template-columns:repeat(8,1fr); gap:5px; padding:2px 0 6px}
+.bf-sw{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:0;
+  height:26px; border-radius:7px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.45)}
+.bf-sw.on{box-shadow:0 0 0 2px var(--accent), inset 0 0 0 1px rgba(0,0,0,.45)}
+.bf-sublab{font:700 9.5px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase;
+  color:var(--faint); padding:8px 0 4px}
+.bf-move{width:100%; box-sizing:border-box; appearance:none;-webkit-appearance:none;
+  padding:10px 11px; border:0; border-radius:9px; background:rgba(0,0,0,.42);
+  box-shadow:0 0 0 1px var(--line); color:var(--text); font:600 12.5px/1.2 var(--body)}
+.bf-ord{display:flex; gap:6px; padding-top:2px}
+.bf-ord .bf-act{flex:1}
+.bf-act[disabled]{opacity:.35; pointer-events:none}
 .bf-subhead{font:700 9.5px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--faint); padding:9px 0 3px}
 .bf-subfilter{margin:2px 0 6px}
 .bf-sub{max-height:264px; overflow-y:auto; margin:0 0 4px}
@@ -909,6 +923,31 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.24.0 • TWO ROOMS, ONE APP (owner: "really need a total app approach").
+//            THE BRIEF IS A DIAGRAM YOU BUILD — A-ORG-1's briefing ability, in
+//            A-ORG-2's format. Structure is STORED, never derived: every node
+//            carries its own parent, so anything can be a peer, a parent or a
+//            subordinate of anything else regardless of the real Army chain.
+//            Three kinds of node: a real ORG (carries its location), a US STATE
+//            (paints its real polygon — translucent wash, bright outline, and
+//            ▨ STRIPED FILL diagonal attention lines on demand), and a free-text
+//            CUSTOM box for a proposed element. THE SELECTIONS, per node: a
+//            24-swatch highlight/level colour, striped fill, ⇄ move under
+//            (re-parent anywhere; cycles refused), ◀▶ reorder among sisters,
+//            and a note. US states are searchable subjects (STATE badge) and a
+//            brief-room pick places one on the diagram. Existing briefs migrate
+//            v1→v2: the structure they used to derive is frozen in as each
+//            node's own parent, so they reopen identical — and are now movable.
+//            THE MAP OPENS QUIET — only base + HQ dots and names by default;
+//            depots, USACE districts and Guard camps are one tap away in Layers.
+//            Selecting an ORGANISATION now ISOLATES it: only that org and its
+//            connections stay on the globe, everything else leaves, so the
+//            picture can be read. THE ROOMS ARE SEVERED — the map card's brief
+//            star and its one-button pop-out fan are gone (records moved into the
+//            header), the empty brief points at search instead of borrowing the
+//            map's selection, and the dead "Show on map" door is deleted. Nothing
+//            jumps between rooms any more. Exercised by harness_globe (new
+//            ISOLATE assertion) + smoke_runtime.
 //   v0.23.0 • THE BRIEF IS A REAL TREE (owner: navigation overhaul, part 3).
 //            THE CHART: renderBrief no longer dumps members into flat L1/L2/L3/L4
 //            buckets — it walks parent→child and renders every node UNDER ITS OWN
@@ -1288,7 +1327,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.23.0';
+const APP_VERSION = 'v0.24.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -1561,6 +1600,30 @@ const GLOBE_FALLBACK_RINGS = [[[-168, 65.5], [-166, 68.5], [-161, 70.3], [-156, 
 let GLOBE_RINGS = GLOBE_FALLBACK_RINGS;   // [[ [lon,lat],... ], ... ]
 try{ Object.defineProperty(window,'GLOBE_RINGS',{get:function(){ return GLOBE_RINGS; }}); }catch(_){}   // debug/harness contract: readable from window
 let GLOBE_STATE_RINGS = [];               // US state borders (lat/lon), loaded at runtime
+// v0.24.0 — US STATES as brief subjects (ported from A-ORG-1). GLOBE_STATE_SHAPES
+// (already loaded by loadStateBorders) supplies the polygons; these centroids
+// place the label and frame the camera.
+const US_STATES=[
+  {n:'Alabama',lat:32.8,lon:-86.8},{n:'Alaska',lat:64.0,lon:-152.5},{n:'Arizona',lat:34.3,lon:-111.7},
+  {n:'Arkansas',lat:34.8,lon:-92.4},{n:'California',lat:37.2,lon:-119.3},{n:'Colorado',lat:39.0,lon:-105.5},
+  {n:'Connecticut',lat:41.6,lon:-72.7},{n:'Delaware',lat:39.0,lon:-75.5},{n:'Florida',lat:28.6,lon:-82.4},
+  {n:'Georgia',lat:32.7,lon:-83.4},{n:'Hawaii',lat:20.3,lon:-156.4},{n:'Idaho',lat:44.4,lon:-114.6},
+  {n:'Illinois',lat:40.0,lon:-89.2},{n:'Indiana',lat:39.9,lon:-86.3},{n:'Iowa',lat:42.0,lon:-93.5},
+  {n:'Kansas',lat:38.5,lon:-98.4},{n:'Kentucky',lat:37.5,lon:-85.3},{n:'Louisiana',lat:31.0,lon:-92.0},
+  {n:'Maine',lat:45.4,lon:-69.2},{n:'Maryland',lat:39.0,lon:-76.8},{n:'Massachusetts',lat:42.3,lon:-71.8},
+  {n:'Michigan',lat:44.3,lon:-85.4},{n:'Minnesota',lat:46.3,lon:-94.3},{n:'Mississippi',lat:32.7,lon:-89.7},
+  {n:'Missouri',lat:38.4,lon:-92.5},{n:'Montana',lat:47.0,lon:-109.6},{n:'Nebraska',lat:41.5,lon:-99.8},
+  {n:'Nevada',lat:39.5,lon:-116.6},{n:'New Hampshire',lat:43.7,lon:-71.6},{n:'New Jersey',lat:40.1,lon:-74.7},
+  {n:'New Mexico',lat:34.4,lon:-106.1},{n:'New York',lat:42.9,lon:-75.5},{n:'North Carolina',lat:35.5,lon:-79.4},
+  {n:'North Dakota',lat:47.5,lon:-100.5},{n:'Ohio',lat:40.3,lon:-82.8},{n:'Oklahoma',lat:35.6,lon:-97.5},
+  {n:'Oregon',lat:43.9,lon:-120.6},{n:'Pennsylvania',lat:40.9,lon:-77.8},{n:'Rhode Island',lat:41.7,lon:-71.5},
+  {n:'South Carolina',lat:33.9,lon:-80.9},{n:'South Dakota',lat:44.4,lon:-100.3},{n:'Tennessee',lat:35.8,lon:-86.4},
+  {n:'Texas',lat:31.4,lon:-99.3},{n:'Utah',lat:39.3,lon:-111.7},{n:'Vermont',lat:44.0,lon:-72.7},
+  {n:'Virginia',lat:37.5,lon:-78.8},{n:'Washington',lat:47.4,lon:-120.4},{n:'West Virginia',lat:38.6,lon:-80.6},
+  {n:'Wisconsin',lat:44.6,lon:-89.7},{n:'Wyoming',lat:43.0,lon:-107.5},{n:'District of Columbia',lat:38.9,lon:-77.02},
+  {n:'Puerto Rico',lat:18.22,lon:-66.42}
+];
+try{ window.US_STATES=US_STATES; }catch(_){}
 let GLOBE_STATE_SHAPES=null;               // {stateName:[rings]} — filled by loadStateBorders
 let _globeLoadedHi=false;
 let _statesLoaded=false;
@@ -2325,9 +2388,18 @@ if(!window.__discWired){ window.__discWired=true;
     try{ if(typeof _coPlace==='function') _coPlace(); }catch(_){}   // an open/close resizes the callout — re-clamp it
   });
 }
+// v0.24.0 — THE MAP OPENS QUIET (owner: "only display base dots and names by
+// default. You can still toggle on the others"). Depots, USACE districts and the
+// Guard/reserve camps start hidden; the Layers panel turns each back on. Forts and
+// HQ posts — the bases people look for — are what greets you.
+const _FAM_DEFAULT_OFF=['depot','usace','guard'];
+function _famOffSet(){
+  if(!GlobeState._famOff){ GlobeState._famOff=new Set(_FAM_DEFAULT_OFF); }
+  return GlobeState._famOff;
+}
 function renderLegend(){
   const el=document.getElementById('legendPanel'); if(!el) return;
-  const off=GlobeState._famOff||(GlobeState._famOff=new Set());
+  const off=_famOffSet();
   const counts={}; for(const st of _sitesArr()){ const k=clsOf(st.id); counts[k]=(counts[k]||0)+1; }
   let h='<div class="lg-head">Layers</div>';
   // v0.22.0 — VIEW toggles trimmed to the two that matter (owner: "too many
@@ -2362,7 +2434,7 @@ if(!window.__lgWired){ window.__lgWired=true;
         if(flag) GlobeState[flag]=!GlobeState[flag];
       } else {
         const k=r.getAttribute('data-fam');
-        const off=GlobeState._famOff||(GlobeState._famOff=new Set());
+        const off=_famOffSet();
         if(off.has(k)) off.delete(k); else off.add(k);
       }
       renderLegend();
@@ -2634,8 +2706,12 @@ function drawGlobeMarkers(ctx, m){
     const onChain=isSel||isUp||isDown;
     const cls=clsOf(inst.id);
     const isGuard=(cls==='guard');
+    // v0.24.0 ISOLATE (owner: "when an organization is selected, only populate the
+    // selected organization and their connections — hide all other ones"). With an
+    // ORG driving the map, everything off its chain leaves the picture entirely.
+    if(GlobeState.selOrg && !onChain) continue;
     // class filter (legend): chain members stay — the picture outranks the layers
-    if(!onChain && GlobeState._famOff && GlobeState._famOff.has(cls)) continue;
+    if(!onChain && _famOffSet().has(cls)) continue;
     // CLUSTERS (A-ORG-1 §3.4, gate 1.6 · 44px grid): at world zoom, ordinary
     // sites divert into count badges; the badge pass draws after this loop.
     if(GlobeState.zoom<1.6 && !onChain){
@@ -2722,6 +2798,7 @@ function drawGlobeMarkers(ctx, m){
     for(const s of _lblQ){
       if(_lblN>=_lblCap) break;
       const inst=s.inst;
+      if(GlobeState.selOrg && !(cmdSites && cmdSites.has(inst.id))) continue;   // v0.24.0: isolated picture, isolated names
       if(clsOf(inst.id)==='guard' && GlobeState.zoom<6.5) continue;   // guard names arrive only deep in
       if(GlobeState._usaceOff && clsOf(inst.id)==='usace') continue;   // USACE names toggled off
       if(s.depth<0.25) continue;
@@ -2824,46 +2901,50 @@ function _bfParentOf(id){
   const c=(typeof orgById==='function')?orgById(id):null; if(c) return c.parent;
   const t=(typeof orgOf==='function')?orgOf(id):null; return t?t.parent:null;
 }
+// v0.24.0 — reads the STORED tree. Structure is whatever the owner built: each
+// node's own p is the edge, so a node can sit anywhere regardless of the real
+// Army chain. Levels/roots/colors are computed from that stored shape.
 function _briefChainMap(opts){
   const out={nodes:{}, order:[]};
-  if(typeof BRIEF==='undefined' || !BRIEF.mem || !BRIEF.mem.length) return out;
+  if(typeof BRIEF==='undefined' || !BRIEF.nodes || !BRIEF.nodes.length) return out;
   const all=!!(opts&&opts.all);
-  const memIx={}; BRIEF.mem.forEach(function(m,i){ memIx[m]=i; });
   const hid=new Set(BRIEF.hide||[]);
   const depth=all?4:(GlobeState._bfDepth||4);
-  // nearest ADDED ancestor per member (custom chains climb into the tree)
-  const near={};
-  BRIEF.mem.forEach(function(id){
-    let p=_bfParentOf(id), hops=0, hit=null;
-    while(p && ++hops<40){ if(memIx[p]!=null){ hit=p; break; } p=_bfParentOf(p); }
-    near[id]=hit;
-  });
-  const lvlOf=function(id){ let l=1,c=near[id],g=0; while(c!=null&&++g<40){ l++; c=near[c]; } return l; };
-  const rootOf=function(id){ let c=id,g=0; while(near[c]!=null&&++g<40){ c=near[c]; } return c; };
+  const byK={}; BRIEF.nodes.forEach(function(n){ byK[n.k]=n; });
+  const lvlOf=function(k){ let l=1,c=byK[k]?byK[k].p:null,g=0; while(c!=null&&byK[c]&&++g<60){ l++; c=byK[c].p; } return l; };
+  const rootOf=function(k){ let c=k,g=0; while(byK[c]&&byK[c].p!=null&&byK[byK[c].p]&&++g<60){ c=byK[c].p; } return c; };
   const tierN={1:0,2:0,3:0,4:0};
-  BRIEF.mem.forEach(function(id){
-    const c=(typeof orgById==='function')?orgById(id):null;
-    const t=(!c&&typeof orgOf==='function')?orgOf(id):null;
-    if(!c && !t) return;                                  // a deleted custom leaves a hole, never a crash
-    const lvl=lvlOf(id), root=rootOf(id), tier=Math.min(4,lvl);
+  BRIEF.nodes.forEach(function(nd){
+    const lvl=lvlOf(nd.k), root=rootOf(nd.k), tier=Math.min(4,lvl);
     if(!all && (hid.has(root) || lvl>depth)) return;
     let lat=null, lon=null;
-    if(c){ const b=c.base?siteById(c.base):null; if(b){ lat=b.lat; lon=b.lon; } }
-    else { const hs=siteById(ogEffSite(id)||''); if(hs){ lat=hs.lat; lon=hs.lon; } }
+    if(nd.t==='state'){
+      const st=(typeof US_STATES!=='undefined')?US_STATES.find(function(s){ return s.n===nd.r; }):null;
+      if(st){ lat=st.lat; lon=st.lon; }
+    } else if(nd.t==='org'){
+      const c=(typeof orgById==='function')?orgById(nd.r):null;
+      if(c){ const b=c.base?siteById(c.base):null; if(b){ lat=b.lat; lon=b.lon; } }
+      else { const hs=siteById(ogEffSite(nd.r)||''); if(hs){ lat=hs.lat; lon=hs.lon; } }
+    }
     const fam=BF_STREAMS[tier];
-    out.nodes[id]={id:id, tier:tier, lvl:lvl, shade:fam[tierN[tier]++ % fam.length],
-      parent:near[id], root:root, lat:lat, lon:lon, name:c?c.name:t.name, custom:!!c};
-    out.order.push(id);
+    out.nodes[nd.k]={id:nd.k, tier:tier, lvl:lvl, shade:fam[tierN[tier]++ % fam.length],
+      parent:(nd.p&&byK[nd.p])?nd.p:null, root:root, lat:lat, lon:lon, name:nd.n,
+      kind:nd.t, ref:nd.r, color:nd.c||'', stripe:!!nd.sh, note:nd.tx||'',
+      // "custom" stays what it always meant — NOT a stock A1ORGS record: a
+      // free-text box, or an org the owner created. Chart order still favours them.
+      custom:(nd.t==='custom') || (nd.t==='org' && typeof orgById==='function' && !!orgById(nd.r))};
+    out.order.push(nd.k);
   });
   out.order.forEach(function(k){ const n=out.nodes[k];
+    // a node with no place of its own (custom box) rides its parent's coordinates
     if(n.lat==null && n.parent && out.nodes[n.parent]){ n.lat=out.nodes[n.parent].lat; n.lon=out.nodes[n.parent].lon; }
     if(n.parent && !out.nodes[n.parent]) n.parent=null;   // filtered-out parent: no dangling arc
   });
-  // v0.20.0 FOCUS (A-ORG-1 brief nav): the globe shows only the focused branch —
-  // the node's lineage up + all its descendants down; everything else drops.
+  // v0.20.0 FOCUS: the globe/chart show only the focused branch — lineage up +
+  // every descendant down; everything else drops.
   if(!all && GlobeState._bfFocus && out.nodes[GlobeState._bfFocus]){
     const f=GlobeState._bfFocus, keep=new Set(); let c=f,g=0;
-    while(c!=null && g++<40){ keep.add(c); c=out.nodes[c]?out.nodes[c].parent:null; }
+    while(c!=null && g++<60){ keep.add(c); c=out.nodes[c]?out.nodes[c].parent:null; }
     const q=[f]; while(q.length){ const cur=q.shift(); out.order.forEach(function(k){ if(out.nodes[k].parent===cur && !keep.has(k)){ keep.add(k); q.push(k); } }); }
     out.order=out.order.filter(function(k){ return keep.has(k); });
     const kept={}; out.order.forEach(function(k){ kept[k]=out.nodes[k]; if(kept[k].parent && !keep.has(kept[k].parent)) kept[k].parent=null; });
@@ -2871,10 +2952,78 @@ function _briefChainMap(opts){
   }
   return out;
 }
+// v0.24.0 — STATE HIGHLIGHTS (ported from A-ORG-1's briefing ability). A brief
+// node of kind 'state' paints its real polygon: a translucent wash + a bright
+// outline, and — when the owner turns on STRIPED FILL — diagonal attention lines
+// clipped to the shape. Two phases: fills go UNDER the arcs and dots, labels on
+// top through the shared collision list so nothing overlaps.
+function drawBriefStates(ctx, m, labels){
+  if(!document.body.classList.contains('brief-mode')) return;
+  if(typeof GLOBE_STATE_SHAPES==='undefined' || !GLOBE_STATE_SHAPES) return;
+  const C=GlobeState.__bfC; if(!C || !C.order || !C.order.length) return;
+  if(labels && GlobeState._namesOff) return;          // Names toggle silences state labels too
+  const T=_mTok();
+  for(const k of C.order){
+    const n=C.nodes[k];
+    if(!n || n.kind!=='state') continue;
+    // color: the node's own pick, else its tier stream shade
+    let trip=n.color?_hexTrip(n.color):null;
+    if(!trip) trip=String(n.shade||'245,215,110').split(',');
+    const R=+trip[0]||245, G=+trip[1]||215, B=+trip[2]||110;
+    if(!labels){
+      const shapes=GLOBE_STATE_SHAPES[n.ref];
+      if(!shapes) continue;                            // geometry not in yet — label still shows
+      ctx.save();
+      for(const ring of shapes){
+        if(!ring || ring.length<3) continue;
+        let behind=false, bx0=1e9, by0=1e9, bx1=-1e9, by1=-1e9;
+        ctx.beginPath();
+        for(let i=0;i<ring.length;i++){
+          const pt=_projectLonLat(ring[i][0], ring[i][1], m);
+          if(pt[2] < -0.02){ behind=true; break; }     // ring crosses the limb — skip it
+          if(pt[0]<bx0)bx0=pt[0]; if(pt[0]>bx1)bx1=pt[0];
+          if(pt[1]<by0)by0=pt[1]; if(pt[1]>by1)by1=pt[1];
+          if(i===0) ctx.moveTo(pt[0],pt[1]); else ctx.lineTo(pt[0],pt[1]);
+        }
+        if(behind) continue;
+        ctx.closePath();
+        ctx.fillStyle='rgba('+R+','+G+','+B+',0.26)'; ctx.fill();
+        ctx.lineWidth=1.7; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.95)'; ctx.stroke();
+        if(n.stripe){
+          ctx.save(); ctx.clip();
+          ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.8)';
+          const hh=by1-by0;
+          ctx.beginPath();
+          for(let hx=bx0-hh; hx<bx1; hx+=7){ ctx.moveTo(hx,by1+1); ctx.lineTo(hx+hh+2,by0-1); }
+          ctx.stroke(); ctx.restore();
+        }
+      }
+      ctx.restore();
+    } else {
+      if(n.lat==null) continue;
+      const pt=_projectLonLat(n.lon, n.lat, m); if(pt[2]<0) continue;
+      const fs=(m.w<560?12:11);
+      ctx.save();
+      ctx.font='800 '+fs+'px '+bodyFont; ctx.textBaseline='middle';
+      const tw=ctx.measureText(n.name).width;
+      const pl=_placeGlobeLabel(ctx, pt[0], pt[1], tw, m, GlobeState.__gLbl, {h:14});
+      if(pl){
+        ctx.lineWidth=3.4; ctx.strokeStyle='rgba('+T.ground+',.9)'; ctx.strokeText(n.name, pl.x, pl.y);
+        ctx.fillStyle='rgba('+R+','+G+','+B+',1)'; ctx.fillText(n.name, pl.x, pl.y);
+      }
+      ctx.restore();
+    }
+  }
+}
+function _hexTrip(hex){
+  const m2=/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/.exec(String(hex||''));
+  return m2?[parseInt(m2[1],16),parseInt(m2[2],16),parseInt(m2[3],16)]:null;
+}
 // Connectors: grouped by parent shade + child tier; per-level width/alpha
 // (A-ORG-1 L16878), deepest first so bright trunks paint on top.
 function drawBriefArcs(ctx, m){
   GlobeState.__bfC=_briefChainMap();                 // links draw first each frame — nodes reuse this
+  try{ drawBriefStates(ctx, m, false); }catch(_){}   // v0.24.0: state washes sit UNDER the arcs and dots
   if(GlobeState._linesOff) return;
   const C=GlobeState.__bfC, groups={};
   for(const key of C.order){
@@ -2941,6 +3090,7 @@ function drawMarkersHook(ctx, m){
   drawGlobeLinks(ctx, m);
   drawGlobeMarkers(ctx, m);
   drawClusters(ctx, m);
+  try{ drawBriefStates(ctx, m, true); }catch(_){}    // v0.24.0: state names last — they share the label collision list
 }
 
 // ---- Tap hit-test for m3 (PORT of handleGlobeTap's best-dot loop) --------------
@@ -3386,6 +3536,17 @@ function _searchEntries(){
       });
     }
   }
+  // v0.24.0 — US STATES are searchable subjects: adding one to the brief paints
+  // its real polygon on the globe (highlight, and stripes on demand).
+  if(typeof US_STATES!=='undefined'){
+    for(const st of US_STATES){
+      _srEntries.push({
+        id:_bfStateKey(st.n), base:st.n, sub:'US state',
+        baseF:_srFold(st.n), unitF:'', stF:_srFold(st.n),
+        allF:_srFold(st.n+' us state')
+      });
+    }
+  }
   _srSrc=arr;
   return _srEntries;
 }
@@ -3458,7 +3619,9 @@ function _sfsPaint(res){
     : res.total+' results — top '+shown+' shown';
   dd.innerHTML=res.list.map(function(e,i){
     const isOrg=String(e.id).slice(0,3)==='og:';
-    const tag=isOrg?'<span class="sr-tag sr-tag-org">ORG</span>':'<span class="sr-tag sr-tag-site">SITE</span>';   // full literals for dead-lint
+    const isSt=!!bfStateName(e.id);
+    const tag=isSt?'<span class="sr-tag sr-tag-state">STATE</span>'
+      :(isOrg?'<span class="sr-tag sr-tag-org">ORG</span>':'<span class="sr-tag sr-tag-site">SITE</span>');   // full literals for dead-lint
     return '<button type="button" class="sr-row'+(i===_sfsHi?' hi':'')+'" role="option"'
       +' aria-selected="'+(i===_sfsHi?'true':'false')+'" data-sfs="'+_srEscA(e.id)+'">'
       +tag
@@ -3471,6 +3634,18 @@ function _sfsPaint(res){
 // SAME rails as every other pick — trail crumb, SELECT-clock auto-fill, brief
 // re-render. The inline body below is only the boot-order fallback (s4 absent).
 function searchSelect(id){
+  // v0.24.0 — a US STATE pick. In the brief room it becomes a highlighted node;
+  // on the map it is only a place to look at (the rooms never cross-write).
+  const _stn=bfStateName(id);
+  if(_stn){
+    const st=US_STATES.find(function(s){ return s.n===_stn; });
+    if(st) try{ flyToLatLon(st.lat, st.lon, Math.max(GlobeState.zoom||1, 2.2)); }catch(_){}
+    if(document.body.classList.contains('brief-mode')){
+      if(!bfNode(id)) bfAddState(_stn, GlobeState._bfFocus||null);
+      try{ _bfObjSheet(id); }catch(_){}
+    }
+    return;
+  }
   // v0.13.0: in the BRIEF room a search pick opens the org's popup (fly to its
   // base first) — from there one tap adds it. The map room keeps map selection.
   const inBrief=!!(document.body && document.body.classList && document.body.classList.contains('brief-mode'));
@@ -3851,11 +4026,10 @@ function renderBrief(){
     +'<span class="od-ico" data-xpbtn="1" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
     +'</button>';
   if(!memN){
-    const selP=(GlobeState.selOrg&&typeof orgOf==='function')?orgOf(GlobeState.selOrg)
-      :((GlobeState.sel&&typeof ogPrimary==='function')?ogPrimary(GlobeState.sel):null);
+    // v0.24.0: the brief is built HERE, by searching — never handed over from the map.
     h+='<div class="bf-empty"><b>The brief is empty</b>'
-      +(selP?('<button type="button" class="bf-addsel" data-bfadd="'+escA(selP.id)+'">Add '+esc(_bfAbbr(selP.name))+'</button>')
-            :'<span>Pick an organization on the map, then add it here.</span>')
+      +'<span>Search an organization or a US state below to place it on the diagram.</span>'
+      +'<button type="button" class="bf-addsel" data-bfsearch="1">Search to add</button>'
       +'</div>';
     el.innerHTML=h; return;
   }
@@ -3903,9 +4077,12 @@ function renderBrief(){
         shown.forEach(function(kid){
           const n=C.nodes[kid]; const tcls='ch-t'+Math.min(4,n.lvl);   // quote-adjacent for dead-lint's dynamic guard
           const kn=C.order.filter(function(k){ return C.nodes[k].parent===kid; }).length;
+          // v0.24.0: a node the owner recolored carries that colour on its chip too,
+          // so the chart and the globe highlight always agree.
+          const cst=n.color?(' style="color:'+n.color+';box-shadow:0 0 0 1.3px '+n.color+'"'):'';
           out+='<div class="ch-node" style="--ch-lvl:'+chLvl+'">'
             +'<span class="ch-rail" aria-hidden="true"></span>'
-            +'<button type="button" class="ch-chip '+tcls+(GlobeState.sel===kid?' on':'')+_dc(kid)+'" data-bfobj="'+escA(kid)+'" title="'+escA(n.name)+'">'+esc(_bfAbbr(n.name))
+            +'<button type="button" class="ch-chip '+tcls+(GlobeState.sel===kid?' on':'')+_dc(kid)+'" data-bfobj="'+escA(kid)+'" title="'+escA(n.name)+'"'+cst+'>'+esc(_bfAbbr(n.name))
             +(kn?'<span class="ch-kn">'+kn+'</span>':'')+'</button>'
             +'</div>';
           out+=walk(kid, lvl+1);        // the child's own subtree renders right under it
@@ -4080,19 +4257,14 @@ function _odRender(s){
   // the pop-out rail RIDES ABOVE the name row (it springs upward from ⊕ like
   // the nav ring) — audit law: the bottom band belongs to the globe button on
   // narrow phones, so nothing tappable may render beneath the head row.
-  const fanOrg=(selOg&&selOg.id)||((typeof ogPrimary==='function'&&ogPrimary(s.id))?ogPrimary(s.id).id:null);
-  h+='<div class="od-fan'+(_odFan?' open':'')+'">'
-    +(fanOrg&&bfHas(fanOrg)
-      ?'<button class="od-pop on" type="button" data-bfrm="'+_odEscA(fanOrg)+'" aria-label="Remove from brief"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>'
-      :'<button class="od-pop" type="button" data-bfadd="'+_odEscA(fanOrg||s.id)+'" aria-label="Add to brief"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>')
-    +'<button class="od-pop'+(_odShowRec?' on':'')+'" type="button" data-odrec="1" aria-label="Details and records"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>'
-    +'</div>';
+  // v0.24.0 — the map card carries NO brief door (owner: the jumping between rooms
+  // is clunky). The map explains what is there; the brief is built in the brief.
 
   h+='<div class="od-head od-head-slim">'
     +'<div class="od-name">'+_odEsc((selOg&&selOg.name)||s.base)+'</div>'
     +(s.st?'<span class="bd-state">'+_odEsc(s.st)+'</span>':'')
     +'<span class="od-sp"></span>'
-    +'<button class="od-ico od-plus'+(_odFan?' on':'')+'" type="button" data-odfan="1" aria-label="Actions" aria-expanded="'+(_odFan?'true':'false')+'"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>'
+    +'<button class="od-ico'+(_odShowRec?' on':'')+'" type="button" data-odrec="1" aria-label="Details and records"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>'
     +'<button class="od-ico" id="exportBtn" type="button" aria-label="Export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>'
     +'<button class="od-ico od-ico-x" type="button" data-odclose="1" aria-label="Clear selection">✕</button>'
     +'</div>';
@@ -4359,6 +4531,15 @@ function _coPlace(){
     if(t) t.style.left=Math.max(12, Math.min(a.x-x-6, w-24))+'px';
   }catch(_){}
 }
+// v0.24.0 — \u21c4 MOVE UNDER: re-parent a diagram node from its sheet
+if(!window.__bfMoveWired){ window.__bfMoveWired=true;
+  document.addEventListener('change', function(e){
+    if(!e.target || !e.target.getAttribute) return;
+    const k=e.target.getAttribute('data-bfmove'); if(!k) return;
+    if(!bfMove(k, e.target.value||null)){ try{ _bfObjSheet(k); }catch(_){} return; }
+    try{ _bfObjSheet(k); }catch(_){}
+  });
+}
 if(!window.__coDrillWired){ window.__coDrillWired=true;
   document.addEventListener('input', function(e){
     if(!e.target || e.target.id!=='coDrillQ') return;
@@ -4378,8 +4559,79 @@ try{ window.Callout={ show:calloutShow, hide:calloutHide, id:function(){ return 
 // dots, chart chips, and custom orgs, in either room. ---------------------------
 let _bfAnnEdit=null;                                 // id with the annotation form open
 let _orgForm=null;                                   // {parent} when add-subordinate is open
+// v0.24.0 — THE SELECTIONS (A-ORG-1's briefing ability). Everything the owner can
+// do to a node they placed in the diagram: recolor it, stripe its state for
+// attention, re-parent it anywhere, reorder it among its sisters, drop it. Each
+// group is a collapsed accordion — expanded when needed, never in the way.
+const BF_PALETTE=['#ffffff','#c9d4dd','#8d99ae','#fff3b0','#ffdc46','#d4a017',
+                  '#ffb27a','#ff9632','#ff7518','#ff5f50','#d62828','#8f1d1d',
+                  '#ff9ecd','#ff5fbe','#c9184a','#e0aaff','#b266ff','#7b2cbf',
+                  '#9bd4ff','#4678ff','#2743c7','#00e5ff','#40e0d0','#b08968'];
+function _bfSelections(k){
+  const nd=bfNode(k); if(!nd) return '';
+  const escA=_odEscA, esc=_odEsc;
+  const isState=(nd.t==='state');
+  const cur=String(nd.c||'').toLowerCase();
+  // ── appearance: highlight/level color + striped fill for a state
+  let apr='<div class="bf-pal">'+BF_PALETTE.map(function(c){
+    return '<button type="button" class="bf-sw'+((cur===c)?' on':'')+'" data-bfclr="'+escA(k)+'" data-bfc="'+c+'" style="background:'+c+'" aria-label="'+c+'"></button>';
+  }).join('')+'</div>';
+  if(cur) apr+='<button type="button" class="bf-act" data-bfclr="'+escA(k)+'" data-bfc="">Reset to level color</button>';
+  if(isState) apr+='<button type="button" class="bf-act'+(nd.sh?' in':'')+'" data-bfstripe="'+escA(k)+'">'
+    +(nd.sh?'\u25a8 Striped fill ON':'\u25a8 Striped fill \u2014 stripe the state for attention')+'</button>';
+  let h=_disc('bf-appear'+(isState?'-st':''), isState?'Highlight color':'Color', apr, {def:false});
+  // ── position: re-parent anywhere (cycles refused), reorder among sisters
+  const desc={}; (function walk(x){ bfKids(x).forEach(function(c2){ desc[c2.k]=1; walk(c2.k); }); })(k);
+  const opts=BRIEF.nodes.filter(function(x){ return x.k!==k && !desc[x.k]; });
+  let pos='<div class="bf-sublab">Reports to</div>'
+    +'<select class="bf-move" data-bfmove="'+escA(k)+'">'
+    +'<option value=""'+(nd.p?'':' selected')+'>\u2014 Top level \u2014</option>'
+    +opts.map(function(x){ return '<option value="'+escA(x.k)+'"'+((nd.p===x.k)?' selected':'')+'>'+esc(x.n)+'</option>'; }).join('')
+    +'</select>';
+  const sibs=bfKids(nd.p); const si=sibs.indexOf(nd);
+  if(sibs.length>1) pos+='<div class="bf-sublab">Order \u00b7 '+(si+1)+' of '+sibs.length+'</div>'
+    +'<div class="bf-ord"><button type="button" class="bf-act" data-bfmv="'+escA(k)+'" data-bfd="-1"'+(si<=0?' disabled':'')+'>\u25c0 Move left</button>'
+    +'<button type="button" class="bf-act" data-bfmv="'+escA(k)+'" data-bfd="1"'+(si>=sibs.length-1?' disabled':'')+'>Move right \u25b6</button></div>';
+  h+=_disc('bf-pos', 'Position in the diagram', pos, {def:false});
+  return h;
+}
+// a STATE or a free-text box has no installation record — it gets its own compact
+// sheet: the name, its note, the selections, and remove.
+function _bfPlainSheet(k){
+  const host=document.getElementById('dossier'); if(!host) return false;
+  const nd=bfNode(k); if(!nd || nd.t==='org') return false;
+  try{ calloutHide(); }catch(_){}
+  _odInjectCSS();
+  const esc=_odEsc, escA=_odEscA;
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">'+esc(nd.n)+'</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
+    +'<div class="od-sub">'+(nd.t==='state'?'US state \u00b7 highlighted on the globe':'Custom element')+'</div>';
+  if(_bfAnnEdit===k){
+    h+='<div class="rc-form">'
+      +'<input class="rc-in" id="rcF1" type="text" maxlength="80" placeholder="Note (80 max)" value="'+escA(nd.tx||'')+'">'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-bfanncancel="1">Cancel</button>'
+      +'<button class="rc-save" type="button" data-bfannsave="'+escA(k)+'">Save</button></div></div>';
+  } else if(nd.tx){
+    h+='<div class="rc-row"><i class="bf-ann">'+esc(nd.tx)+'</i>'
+      +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(k)+'" aria-label="Edit note"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button></div>';
+  }
+  h+=_bfSelections(k);
+  h+='<div class="rc-row rc-acts">';
+  if(!nd.tx && _bfAnnEdit!==k) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(k)+'">Add note</button>';
+  h+='<button class="bf-act in" type="button" data-bfrm="'+escA(k)+'">Remove from brief</button></div>';
+  const kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
+  host.innerHTML=h;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add('dz-'+(kept==='full'?'full':'half'));
+  host.hidden=false; host.scrollTop=0;
+  return true;
+}
 function _bfObjSheet(id){
   const host=document.getElementById('dossier'); if(!host) return;
+  // v0.24.0: a state / free-text node has its own compact sheet
+  try{ if(_bfPlainSheet(id)) return; }catch(_){}
   try{ calloutHide(); }catch(_){}                  // v0.22.0: sheet and callout never coexist
   _odInjectCSS();
   const esc=_odEsc, escA=_odEscA;
@@ -4463,7 +4715,9 @@ function _bfObjSheet(id){
     +'<button class="rc-save" type="button" data-orgsave="'+escA(o?id:(sid||id))+'">Add custom org</button>'
     +'</div></div>';
   h+=_disc('bf-custom','Add a custom org (advanced)', customH, {def:false});
-  // action rail: annotate (sites w/o callout yet) · map jump · remove
+  // v0.24.0: an org already IN the diagram gets the same selections
+  if(sid && bfHas(sid)){ try{ h+=_bfSelections(_bfOrgId(sid)||sid); }catch(_){} }
+  // action rail: note · add/remove
   h+='<div class="rc-row rc-acts">';
   if(sid && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(sid)+'">Add note</button>';
   if(sid && bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfrm="'+escA(sid)+'">Remove from brief</button>';
@@ -4691,12 +4945,19 @@ if(!window._odWired){
       }
       const made=orgAdd(nm, pid, baseId);
       if(made) _bfObjSheet(pid); return; }
+    // v0.24.0 THE SELECTIONS — recolor, stripe, reorder a node of the diagram
+    const bcl=e.target.closest('[data-bfclr]');
+    if(bcl){ bfColor(bcl.getAttribute('data-bfclr'), bcl.getAttribute('data-bfc')||'');
+      try{ _bfObjSheet(bcl.getAttribute('data-bfclr')); }catch(_){} return; }
+    const bst=e.target.closest('[data-bfstripe]');
+    if(bst){ const k=bst.getAttribute('data-bfstripe'); bfStripe(k);
+      try{ _bfObjSheet(k); }catch(_){} return; }
+    const bmv=e.target.closest('[data-bfmv]');
+    if(bmv){ const k=bmv.getAttribute('data-bfmv');
+      bfReorder(k, parseInt(bmv.getAttribute('data-bfd'),10)||1);
+      try{ _bfObjSheet(k); }catch(_){} return; }
     const od0=e.target.closest('[data-orgrm]');
     if(od0){ orgRemove(od0.getAttribute('data-orgrm')); try{ calloutHide(); }catch(_){} hideDossier(); return; }
-    const gm=e.target.closest('[data-govmap]');
-    if(gm){ const id=gm.getAttribute('data-govmap'); const oid=gm.getAttribute('data-govorg');
-      try{ setMode('map'); }catch(_){}
-      selectSite(id, oid?{orgId:oid}:undefined); return; }
     const t=e.target.closest('[data-odsel]');
     if(t){ selectSite(t.getAttribute('data-odsel')); return; }
     const gsw=e.target.closest('[data-ogsel]');           // re-aim the chain at another org HERE
@@ -4948,20 +5209,43 @@ function _rdbOpen(){
         gb.onsuccess=function(){
           const v=gb.result&&gb.result.v;
           if(v){
-            // v0.13.0 MIGRATION (owner: no duplicates): legacy {hqs} (or older
-            // site ids) become {mem} — org-id-normalized, deduped, written back.
-            const srcIds=Array.isArray(v.mem)?v.mem:(Array.isArray(v.hqs)?v.hqs:[]);
-            const mapped=[]; const seenM={};
-            srcIds.forEach(function(id){
-              const k=(typeof _bfOrgId==='function')?_bfOrgId(id):id;
-              if(k && !seenM[k]){ seenM[k]=1; mapped.push(k); }
-            });
-            const ann={}; const oldAnn=v.ann||{};
-            for(const k in oldAnn){ const nk=(typeof _bfOrgId==='function')?(_bfOrgId(k)||k):k; if(!ann[nk]) ann[nk]=oldAnn[k]; }
-            BRIEF.mem=mapped; BRIEF.ann=ann;
             BRIEF.hide=Array.isArray(v.hide)?v.hide.slice():[];
-            const changed=(!Array.isArray(v.mem) || mapped.join('|')!==srcIds.join('|'));
-            if(changed) try{ _bfSave(); }catch(_){}
+            if(Array.isArray(v.nodes)){
+              // v2 — the stored diagram, exactly as the owner arranged it
+              const seen={};
+              BRIEF.nodes=v.nodes.filter(function(n){
+                if(!n || typeof n.k!=='string' || seen[n.k]) return false;
+                if(n.t==='org' && !((typeof orgOf==='function'&&orgOf(n.r))||(typeof orgById==='function'&&orgById(n.r)))) return false;
+                seen[n.k]=1; return true;
+              }).map(function(n){
+                return {k:n.k, n:String(n.n||n.k).slice(0,80), p:(typeof n.p==='string'?n.p:null),
+                  t:(n.t==='state'||n.t==='custom')?n.t:'org', r:(n.r==null?null:n.r),
+                  c:(/^#[0-9a-fA-F]{6}$/.test(String(n.c||''))?String(n.c).toLowerCase():''),
+                  sh:n.sh?1:0, tx:String(n.tx||'').slice(0,80)};
+              });
+              BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
+              _bfSync();
+            } else {
+              // v1 → v2 MIGRATION: a flat {mem, ann} list becomes real nodes. The
+              // structure it USED to derive is frozen in as each node's own parent,
+              // so an existing brief reopens looking identical — and is now movable.
+              const srcIds=Array.isArray(v.mem)?v.mem:(Array.isArray(v.hqs)?v.hqs:[]);
+              const mapped=[]; const seenM={};
+              srcIds.forEach(function(id){
+                const k=(typeof _bfOrgId==='function')?_bfOrgId(id):id;
+                if(k && !seenM[k]){ seenM[k]=1; mapped.push(k); }
+              });
+              const oldAnn=v.ann||{}; const annN={};
+              for(const k in oldAnn){ const nk=(typeof _bfOrgId==='function')?(_bfOrgId(k)||k):k; if(!annN[nk]) annN[nk]=oldAnn[k]; }
+              const inSet={}; mapped.forEach(function(k){ inSet[k]=1; });
+              BRIEF.nodes=mapped.map(function(k){
+                let par=null, up=(typeof _bfParentOf==='function')?_bfParentOf(k):null, hops=0;
+                while(up && ++hops<40){ if(inSet[up]){ par=up; break; } up=_bfParentOf(up); }
+                const o=(typeof orgOf==='function'&&orgOf(k))||(typeof orgById==='function'?orgById(k):null);
+                return {k:k, n:o?o.name:k, p:par, t:'org', r:k, c:'', sh:0, tx:String(annN[k]||'').slice(0,80)};
+              });
+              _bfSave();
+            }
           }
           try{ if(document.body.classList.contains('brief-mode')) renderBrief(); }catch(_){}
           try{ globeMark(); }catch(_){}
@@ -4974,19 +5258,41 @@ function _rdbOpen(){
 // ---- THE BRIEF SET (v0.13.0) — HAND-BUILT: mem lists exactly the orgs the
 // owner added (HQs and the specific subordinates picked under them); hide
 // lists the L1 group ids currently eyed off; ann keys ≤80-char callouts.
-const BRIEF={ mem:[], ann:{}, hide:[] };
-function _bfSave(){
-  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'brief', v:{mem:BRIEF.mem, ann:BRIEF.ann, hide:BRIEF.hide}}); } }catch(_){}
+// v0.24.0 — THE BRIEF IS A DIAGRAM YOU BUILD (A-ORG-1's briefing ability, in
+// A-ORG-2's format). Structure is STORED, never derived: every node carries its
+// OWN parent, so anything can be a peer, a parent or a subordinate of anything
+// else regardless of the real Army tree. A node is one of three kinds:
+//   t:'org'    r=org id      — a real organization (carries its real location)
+//   t:'state'  r=state name  — a US state: highlighted polygon, optional stripes
+//   t:'custom' r=null        — a free-text box for a proposed/notional element
+// node = { k:key, n:name, p:parentKey|null, t:kind, r:ref, c:color, sh:stripe, tx:note }
+// BRIEF.mem / BRIEF.ann stay as maintained MIRRORS so exports and the harnesses
+// keep reading one shape; _bfSync rebuilds them after every mutation.
+const BRIEF={ nodes:[], mem:[], ann:{}, hide:[] };
+function _bfSync(){
+  BRIEF.mem=BRIEF.nodes.map(function(n){ return n.k; });
+  const a={}; BRIEF.nodes.forEach(function(n){ if(n.tx) a[n.k]=n.tx; });
+  BRIEF.ann=a;
 }
-// v0.11.0: the brief holds ORG ids. Site ids from older callers/storage map to
-// the site's primary org — one structure, never a duplicate pair.
+function _bfSave(){
+  _bfSync();
+  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
+    tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide}}); } }catch(_){}
+}
+function bfNode(k){ for(const n of BRIEF.nodes) if(n.k===k) return n; return null; }
+function bfKids(k){ return BRIEF.nodes.filter(function(n){ return (n.p||null)===(k||null); }); }
+// v0.11.0 law kept: a SITE id resolves to the site's primary org, so a caller may
+// still hand us a base and get one organization — never a duplicate pair.
 function _bfOrgId(id){
   if(typeof orgOf==='function' && orgOf(id)) return id;
   if(typeof orgById==='function' && orgById(id)) return id;      // user-built custom
   if(siteById(id)){ const p=(typeof ogPrimary==='function')?ogPrimary(id):null; if(p) return p.id; }
   return null;
 }
-function bfHas(id){ const k=_bfOrgId(id)||id; return BRIEF.mem.indexOf(k)>=0; }
+function bfHas(id){ const k=_bfOrgId(id)||id; return !!bfNode(k); }
+// the key namespace: an org node IS its org id, so bfHas(orgId) stays true.
+function _bfStateKey(name){ return 'st:'+String(name); }
+function bfStateName(k){ const m=/^st:(.+)$/.exec(String(k||'')); return m?m[1]:null; }
 
 // v0.10.0 AUTOMATION: when the chain GROWS while the brief room is open, the
 // globe gently reframes to hold the whole picture, and the chart's export
@@ -5023,46 +5329,103 @@ function _xpPulse(){
     setTimeout(function(){ try{ b.classList.remove('xp-pulse'); }catch(_){} }, 2900);
   }catch(_){}
 }
-function bfAdd(id){
-  id=_bfOrgId(id);
-  if(!id || BRIEF.mem.indexOf(id)>=0) return;
-  BRIEF.mem.push(id); _bfSave();
+// ── MUTATORS. Every add takes an optional parent key, so the caller decides the
+// relationship (subordinate to X / peer of X / top-level) instead of the app
+// guessing it from the real Army tree.
+function _bfPush(node){
+  if(bfNode(node.k)) return null;
+  if(node.p && !bfNode(node.p)) node.p=null;      // never strand a node under a ghost
+  BRIEF.nodes.push(node); _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
-  try{ if(typeof _coRefresh==='function') _coRefresh(); }catch(_){}
   try{ _bfFrame(); _xpPulse(); }catch(_){}
-  try{ const d=document.getElementById('dossier');
-    if(GlobeState.sel && d && !d.hidden && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
+  return node;
+}
+// add a REAL organization. parent omitted → its nearest already-added real
+// ancestor (so a natural build still nests itself), else top level.
+function bfAdd(id, parent){
+  id=_bfOrgId(id);
+  if(!id || bfNode(id)) return;
+  const o=(typeof orgOf==='function'&&orgOf(id))||(typeof orgById==='function'?orgById(id):null);
+  if(!o) return;
+  let p=(parent===undefined)?null:parent;
+  if(parent===undefined){
+    let up=_bfParentOf(id), hops=0;
+    while(up && ++hops<40){ if(bfNode(up)){ p=up; break; } up=_bfParentOf(up); }
+  }
+  _bfPush({k:id, n:o.name, p:p||null, t:'org', r:id, c:'', sh:0, tx:''});
+}
+// add a US STATE — it paints as a highlighted polygon on the globe
+function bfAddState(name, parent){
+  const st=(typeof US_STATES!=='undefined')?US_STATES.find(function(s){ return s.n===name; }):null;
+  if(!st) return;
+  _bfPush({k:_bfStateKey(st.n), n:st.n, p:parent||null, t:'state', r:st.n, c:'', sh:0, tx:''});
+}
+// add a FREE-TEXT box — a proposed or notional element with no app record
+function bfAddCustom(name, parent){
+  name=String(name||'').slice(0,60).trim(); if(!name) return;
+  _bfPush({k:'cx:'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),
+    n:name, p:parent||null, t:'custom', r:null, c:'', sh:0, tx:''});
 }
 function bfRemove(id){
-  id=_bfOrgId(id)||id;
-  if(BRIEF.mem.indexOf(id)<0) return;
-  // CASCADE: added subordinates leave with their added ancestor — no orphans
-  const gone=new Set([id]); let grew=true, guard=0;
-  while(grew && ++guard<40){ grew=false;
-    BRIEF.mem.forEach(function(m){
-      if(gone.has(m)) return;
-      let p=_bfParentOf(m), hops=0;
-      while(p && ++hops<40){
-        if(BRIEF.mem.indexOf(p)>=0){ if(gone.has(p)){ gone.add(m); grew=true; } break; }
-        p=_bfParentOf(p);
-      }
-    });
+  const k=(_bfOrgId(id)||id);
+  if(!bfNode(k)) return;
+  // CASCADE over the STORED tree: a node's descendants leave with it, no orphans
+  const gone=new Set([k]); let grew=true, guard=0;
+  while(grew && ++guard<60){ grew=false;
+    BRIEF.nodes.forEach(function(n){ if(!gone.has(n.k) && n.p && gone.has(n.p)){ gone.add(n.k); grew=true; } });
   }
-  BRIEF.mem=BRIEF.mem.filter(function(m){ return !gone.has(m); });
-  gone.forEach(function(g){ delete BRIEF.ann[g]; });
+  BRIEF.nodes=BRIEF.nodes.filter(function(n){ return !gone.has(n.k); });
   BRIEF.hide=(BRIEF.hide||[]).filter(function(r){ return !gone.has(r); });
+  if(GlobeState._bfFocus && gone.has(GlobeState._bfFocus)) GlobeState._bfFocus=null;
   _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
-  try{ if(typeof _coRefresh==='function') _coRefresh(); }catch(_){}
-  try{ const d=document.getElementById('dossier');
-    if(GlobeState.sel && d && !d.hidden && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel); }catch(_){}
+}
+// ⇄ MOVE UNDER — re-parent a node (its subtree follows). Cycles are refused.
+function bfMove(k, newParent){
+  const n=bfNode(k); if(!n) return false;
+  newParent=newParent||null;
+  if(newParent===k) return false;
+  let c=newParent, guard=0;                       // would newParent sit inside k's own subtree?
+  while(c && ++guard<60){ if(c===k) return false; const pn=bfNode(c); c=pn?pn.p:null; }
+  if(newParent && !bfNode(newParent)) return false;
+  n.p=newParent; _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  return true;
+}
+// ◀▶ REORDER among same-parent sisters (chart order = array order)
+function bfReorder(k, dir){
+  const n=bfNode(k); if(!n) return false;
+  const sibs=bfKids(n.p); const i=sibs.indexOf(n);
+  const j=i+(dir<0?-1:1);
+  if(i<0 || j<0 || j>=sibs.length) return false;
+  const a=BRIEF.nodes.indexOf(sibs[i]), b=BRIEF.nodes.indexOf(sibs[j]);
+  BRIEF.nodes[a]=sibs[j]; BRIEF.nodes[b]=sibs[i];
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  return true;
+}
+// per-node COLOR — a state tints its highlight, any other node tints its chip
+function bfColor(k, hex){
+  const n=bfNode(k); if(!n) return;
+  n.c=(/^#[0-9a-fA-F]{6}$/.test(String(hex||'')))?String(hex).toLowerCase():'';
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+}
+// ▨ STRIPED FILL — diagonal attention lines across a highlighted state
+function bfStripe(k){
+  const n=bfNode(k); if(!n) return;
+  n.sh=n.sh?0:1; _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
 }
 function bfNote(id, text){
-  id=_bfOrgId(id)||id;
-  text=String(text||'').slice(0,80).trim();
-  if(text) BRIEF.ann[id]=text; else delete BRIEF.ann[id];
+  const n=bfNode(_bfOrgId(id)||id); if(!n) return;
+  n.tx=String(text||'').slice(0,80).trim();
   _bfSave();
   try{ renderBrief(); }catch(_){}
 }
@@ -5079,8 +5442,10 @@ function bfDepth(n){
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
 }
-try{ window.Brief={ add:bfAdd, remove:bfRemove, note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth,
-  list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}
+try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, remove:bfRemove,
+  move:bfMove, reorder:bfReorder, color:bfColor, stripe:bfStripe,
+  note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth,
+  node:bfNode, kids:bfKids, list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}
 
 
 // v0.10.0 SESSION MEMORY: the app reopens exactly where you left it. The room
@@ -5226,7 +5591,7 @@ try{ window.Records={ add:recAdd, update:recUpdate, remove:recRemove, of:recordO
 function buildSnapshot(scope){
   scope=scope||'auto';
   const sel=GlobeState.sel?siteById(GlobeState.sel):null;
-  const off=GlobeState._famOff||new Set();
+  const off=_famOffSet();
   // v0.11.0: the selection family = the selected ORG's chain, at their sites
   const og=(GlobeState.selOrg&&typeof orgOf==='function')?orgOf(GlobeState.selOrg):null;
   const chain=og?ogChainUp(og.id).map(function(p){ return siteById(ogEffSite(p.id)||''); }).filter(Boolean):[];

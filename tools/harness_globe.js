@@ -220,6 +220,18 @@ if(!fails){
     // v0.6.0: reticle = interior+core (2 arcs) + HQ concentric ring; the selected
     // site draws a DIAMOND (rects, no arcs). Assert a floor, not an exact count.
     GS.zoom=2.0;                                           // above the cluster gate
+    // v0.24.0 ISOLATE: with an ORG driving the map only its chain draws. Prove that
+    // first, then drop selOrg so the FULL laydown pass still exercises every dot.
+    {
+      const iso={}, ictx=makeCtx(iso);
+      GS._famOff=null;                                     // defaults apply (base+hq only)
+      G.drawMarkersHook(ictx,m);
+      const isoN=(GS._screen||[]).length, chainN=(GS._cmdSites?GS._cmdSites.size:0);
+      if(!(isoN>0 && isoN<=chainN)) { fails++; console.log('✗ ISOLATE: selOrg drew '+isoN+' dots, expected ≤ chain '+chainN+' and >0'); }
+      else console.log('✓ ISOLATE: an org selection paints only its chain — '+isoN+' dots of '+LOCATED.length+' sites');
+    }
+    GS.selOrg=null;                                        // full picture from here
+    GS._famOff=new Set();                                  // every class visible for the coverage pass
     const front=LOCATED.filter(s=>G._projectLonLat(s.lon,s.lat,m)[2]>=0).length;
     const mc={}, mctx=makeCtx(mc);
     G.drawMarkersHook(mctx,m);

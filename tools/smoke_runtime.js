@@ -233,9 +233,12 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     const wantN=(function(){ try{ return JSON.parse(fs.readFileSync(__dirname+'/../data/sites.json','utf8')).sites.length; }catch(_){ return null; } })();
     const wantOrgs=(function(){ try{ const cats={acoms:1,asccs:1,drus:1,'acquisition-paes-cpes':1};
       return JSON.parse(fs.readFileSync(__dirname+'/../data/orgs.json','utf8')).orgs.filter(o=>!cats[o.id]).length; }catch(_){ return 0; } })();
-    if(wantN!=null && n!==wantN+wantOrgs){ fails++; console.log('✗ SEARCH index '+n+' entries, want '+wantN+' sites + '+wantOrgs+' orgs — a payload is stale or truncated'); }
+    // v0.24.0: US states are searchable brief subjects too
+    const wantSt=(global.US_STATES&&global.US_STATES.length)||0;
+    if(!wantSt){ fails++; console.log('✗ US_STATES missing from the search index'); }
+    if(wantN!=null && n!==wantN+wantOrgs+wantSt){ fails++; console.log('✗ SEARCH index '+n+' entries, want '+wantN+' sites + '+wantOrgs+' orgs + '+wantSt+' states — a payload is stale or truncated'); }
     else if(!(n>200)){ fails++; console.log('✗ SEARCH index too small: '+n+' entries (contract: >200 sites)'); }
-    else console.log('  ✓ search index built: '+n+' sites');
+    else console.log('  ✓ search index built: '+n+' entries ('+wantN+' sites + '+wantOrgs+' orgs + '+wantSt+' states)');
     const res=(typeof global.sfsResults==='function')? global.sfsResults('bragg') : null;
     if(!res || !res.list.length || res.list[0].id!=='fort-bragg'){
       fails++; console.log('✗ SEARCH ranking: "bragg" top hit = '+(res&&res.list[0]?res.list[0].id:'(none)'));
@@ -307,7 +310,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       const briefOn=(typeof document!=='undefined')&&document.body&&document.body.classList&&document.body.classList.contains('brief-mode');
       if(!briefOn){ fails++; console.log('✗ setMode(brief) did not flip body.brief-mode'); }
       // v0.5.0: an empty brief SET shows the add-selected prompt, never an auto-chain
-      if(!bs || bs.innerHTML.indexOf('data-bfadd')<0){ fails++; console.log('✗ BRIEF empty state missing the add-selected action'); }
+      // v0.24.0: the rooms are severed — the empty brief points at SEARCH, it is
+      // never handed the map's selection (data-bfadd would be a cross-room bridge).
+      if(!bs || bs.innerHTML.indexOf('data-bfsearch')<0){ fails++; console.log('✗ BRIEF empty state should offer search-to-add'); }
+      if(bs && bs.innerHTML.indexOf('data-bfadd')>=0){ fails++; console.log('✗ BRIEF empty state must not carry the map selection across rooms'); }
       else console.log('  ✓ brief mode: body flag + empty-state add action');
       global.setMode('map');
     } else { fails++; console.log('✗ setMode not exposed'); }
