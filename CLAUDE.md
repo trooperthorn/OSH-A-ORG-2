@@ -421,3 +421,23 @@ TOP-DOWN org chart, rebuilt sleek for Lumen. If you touch it, keep these:
   that harness gained a real `classList` stub so tapAtScreen can run there.
 - When touching tapAtScreen: each branch that consumes a gesture must RETURN. The
   tail of the map branch is the "nothing was hit" path only.
+
+## v0.26.0 — ＋ and ✎ on every object, and multi-add
+- Each `.bf-box` carries two small ops (`.bf-ops`/`.bf-op`): `data-bfaddkids` (＋ →
+  the picker) and `data-bfedit` (✎ → `_bfObjSheet`, i.e. the v0.24.0 selections).
+- **ORDERING TRAP — read before adding any op:** the ops render INSIDE `.bf-box`,
+  which itself carries `data-bfobj`. Their delegate branches MUST sit ABOVE the
+  `data-bfobj` branch in the click handler, or `closest('[data-bfobj]')` matches the
+  parent box first and swallows the tap. That bug cost a round; the harness can't see
+  it because the markup is correct — only a live click exposes it.
+- `_bfAddSheet(parentKey)` — the MULTI picker. Candidates: the parent org's real
+  `ogKids` first (with `_OG_CATS` shells opened to their grandchildren), then anything
+  matching the search (orgs + US states) at ≥2 chars. Nodes already on the diagram are
+  filtered out. Selection lives in `window._bfPick` (a Set); ticking a row repaints
+  ONLY that row plus the footer via `_bfPickFoot()` — never re-render the list
+  mid-selection or you lose the scroll position and the keyboard. `window._bfPickQ`
+  holds the query; the input handler re-renders and restores focus + caret.
+- `bfAddMany(ids,parent)` pushes every pick then `_bfSave`/`renderBrief`/`globeMark`/
+  `_bfFrame` ONCE. Never loop `bfAdd` for a batch — that reframes the globe per node.
+- The picker opens at `dz-full` with a sticky `.rc-acts` so the commit button is never
+  stranded behind the globe FAB. `_bfToast(msg)` confirms the count.
