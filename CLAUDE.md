@@ -784,3 +784,30 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Legacy-only oddities flagged for the OWNER (not auto-deleted): 80th TC
   (USAR vs TASS trees), SSL/SSI duplicate pair, AAL/STE pair, the mangled
   16th CAB node under DIVARTY, TF Spartan historical markers.
+
+## v1.0.2 — current organizations + the longer title (owner ruling on the flagged oddities)
+- The owner ruled: "make all updates to reflect current organizations." Every
+  legacy-only oddity v1.0.1 flagged is now RESOLVED, each against a verified
+  2025-26 source (verdicts + citations in scratchpad research/repair3.config.json):
+  USAWC → Combined Arms Command / T2COM (DRU status ended 2 Oct 2025; the DRU
+  subtree merged in, SSL/SSI/AHEC child pairs deduped, CSL carried over);
+  780th MI Bde (Cyber) → one node under INSCOM (OPCON ARCYBER is a relationship,
+  not a parent); AAL stays under FCC/T2COM (it PARTNERS with acquisition's PIT,
+  is not part of it) while STE is acquisition-only (PEO STRI → CPE ST3 6 Feb
+  2026, PM SIM 12 Mar 2026); USACE Transatlantic Division deleted (TOA to SWD
+  5 Aug 2025; Middle East + Transatlantic Expeditionary districts under SWD);
+  80th Training Command → USARC only; the parallel Europe garrison shells
+  merged; TF Spartan historical rotation markers deleted, current = 36th ID
+  (TOA 6 Jun 2026); mangled multi-unit rows folded into clean nodes; PAO
+  office stubs removed (sub-office granularity is out of model). 1,452→1,418.
+- LESSON — BOTH-LEGACY DUPES: the legacy-id merge rule cannot pick a keeper
+  when both twins predate the backup; the keeper is chosen by verified current
+  truth + richer subtree, and each such pair needs a sourced verdict, not a
+  guess. Rotation/history belongs in notes or names on ONE node, never as
+  sibling marker nodes (they read as real units and trip the twin lint).
+- THE TITLE at v1.0.2: T=4600 ms, REVS=3 (eased, lands exactly on the boot
+  face; spin ≈1.5× v0.34.0), paper beat still 45-72% of the flight. The
+  version toast (5600 ms) and first-run coach (5400 ms) are timed AFTER the
+  veil — anything that pops during the title is a bug (the coach would also
+  be killed unseen by the skip-tap listener). If T changes again, move both.
+
