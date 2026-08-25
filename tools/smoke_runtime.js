@@ -431,6 +431,25 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(body3.indexOf('Main effort')<0 || body3.indexOf('Brief — 4 organizations')<0 || body3.indexOf('L2')<0){
       fails++; console.log('✗ EXPORT body missing built-brief section'); }
     if(!fails) console.log('  ✓ hand-built brief: members-only map + levels + eye/depth + picker + snapshot rows + export');
+    // v1.0.3 GROUPS — a named filler node: create under a member, nest a real
+    // org beneath it, rename it, and its removal cascades the subtree away.
+    global.Brief.addGroup('Enablers', 'usawhc');
+    const grp=(global.Brief.node&&global.Brief.list().map(k=>global.Brief.node(k)).find(n=>n&&n.t==='custom'&&n.n==='Enablers'))||null;
+    if(!grp || grp.p!=='usawhc'){ fails++; console.log('✗ GROUP did not land under its parent'); }
+    else {
+      if(!global.Brief.move('amc', grp.k) || global.Brief.node('amc').p!==grp.k){
+        fails++; console.log('✗ GROUP cannot take a real org as a child'); }
+      global.Brief.rename(grp.k, 'Sustainment Enablers');
+      if(global.Brief.node(grp.k).n!=='Sustainment Enablers'){ fails++; console.log('✗ GROUP rename did not stick'); }
+      global.Brief.rename('amc', 'Hacked');   // real orgs must refuse rename
+      if(global.Brief.node('amc').n==='Hacked'){ fails++; console.log('✗ RENAME must be group-only'); }
+      const chart=global.renderBrief && (function(){ global.renderBrief(); return IDS['briefStage']?IDS['briefStage'].innerHTML:''; })();
+      if(chart && (chart.indexOf('bf-grp')<0 || chart.indexOf('GROUP')<0)){
+        fails++; console.log('✗ GROUP box missing its dashed class / engraved tag in the chart'); }
+      global.Brief.remove(grp.k);
+      if(global.Brief.has('amc')){ fails++; console.log('✗ GROUP removal must cascade its subtree'); }
+      if(!fails) console.log('  ✓ groups: create-under + nest real org + rename (group-only) + chart tag + cascade remove');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');

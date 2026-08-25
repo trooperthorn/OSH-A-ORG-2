@@ -543,6 +543,15 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 .bf-box.bf-dim{opacity:.28}
 .bf-box.bf-foc{box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(var(--accent-rgb),.35)}
 .bf-box.bf-tinted{background:color-mix(in srgb, var(--bfc) 16%, var(--panel-2))}
+/* v1.0.3 GROUPS — an owner-named filler element that shapes the hierarchy.
+   Dashed ring + engraved tag: reads as structure, never as a real unit. */
+.bf-box.bf-grp{background:rgba(0,0,0,.14); box-shadow:var(--drop);
+  outline:1.4px dashed var(--bfc,var(--t1)); outline-offset:-1.4px}
+.bf-box.bf-grp.bf-tinted{background:color-mix(in srgb, var(--bfc) 10%, rgba(0,0,0,.14))}
+.bf-grptag{font:700 7px/1 var(--mono); letter-spacing:.16em; color:var(--faint)}
+.bf-grprow{display:flex; gap:6px; align-items:center; margin:6px 0 2px}
+.bf-grprow .rc-in{flex:1; margin:0}
+.bf-grprow .bf-act{flex:none; margin:0}
 /* the fold caret sits under its box and carries the hidden count */
 /* v0.26.0 — the per-object ops: ＋ add subordinates · ✎ edit. Small and quiet so
    the box stays minimal, but always reachable without opening anything first. */
@@ -1127,6 +1136,21 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.0.3 • GROUPS IN THE BRIEF (owner: "allow to make groups in brief mode
+//            as a filler organization to help with hierarchy"). A GROUP is an
+//            owner-named filler node — "Enablers", "TF Alpha" — that exists
+//            only on the diagram and shapes it: anything nests under a group
+//            and a group nests under anything (move/reorder/color/note ride
+//            the same rails as every node). CREATE: "⊞ New group" in the
+//            chart foot and the empty state (inline name form in place), or
+//            straight from any box's ＋ picker ("Or create a group under X").
+//            RENAME lives in the group's sheet (groups only — real orgs and
+//            states keep their true names). The box wears a dashed ring and
+//            an engraved GROUP tag so filler never reads as a real unit.
+//            Storage is the v0.24.0 custom node unchanged — old briefs load
+//            as-is, old free-text boxes simply become groups. Smoke grew the
+//            probe: create-under + nest real org + group-only rename + chart
+//            tag + cascade remove.
 //   v1.0.2 • CURRENT ORGANIZATIONS + THE LONGER TITLE (owner: "make all
 //            updates to reflect current organizations… increase globe
 //            spinning speed and have the intro last 4-5 seconds"). Every
@@ -1849,7 +1873,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.0.2';
+const APP_VERSION = 'v1.0.3';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -4800,8 +4824,16 @@ function renderBrief(){
   if(!memN){
     h+='<div class="bf-empty"><b>The brief is empty</b>'
       +'<span>Search an organization or a US state below to place it on the diagram.</span>'
-      +'<button type="button" class="bf-addsel" data-bfsearch="1">Search to add</button>'
-      +'</div>';
+      +'<button type="button" class="bf-addsel" data-bfsearch="1">Search to add</button>';
+    // v1.0.3 — a build can START from a group scaffold, not only from a real org
+    if(window._bfGrpForm){
+      h+='<div class="bf-grprow"><input class="rc-in" id="bfGrpNm" type="text" maxlength="40" placeholder="Group name — e.g. Enablers" autocomplete="off">'
+        +'<button class="bf-act in" type="button" data-bfgrpcreate="">Create</button>'
+        +'<button class="bf-act" type="button" data-bfgrpcancel="1" aria-label="Cancel">✕</button></div>';
+    } else {
+      h+='<button type="button" class="bf-addsel" data-bfgrpnew="1">⊞ Start with a group</button>';
+    }
+    h+='</div>';
     el.innerHTML=h; return;
   }
   const C=_briefChainMap({all:true});
@@ -4846,9 +4878,12 @@ function renderBrief(){
     const col=n.color||'';
     const sty=col?(' style="--bfc:'+col+'"'):'';
     const stn=(n.kind==='state')?'state':((n.lat!=null&&n.kind==='org')?_bfBaseOf(n.ref):'');
+    // v1.0.3 — a GROUP (custom filler node) wears a dashed ring + engraved tag
+    const grp=(n.kind==='custom')?' bf-grp':'';
     let r='<li class="bf-li">';
-    r+='<div class="bf-box '+tcls+dim+isFoc+(col?' bf-tinted':'')+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
+    r+='<div class="bf-box '+tcls+grp+dim+isFoc+(col?' bf-tinted':'')+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
       +'<span class="bf-nm">'+esc(_bfAbbr(n.name))+'</span>'
+      +(grp?'<span class="bf-grptag">GROUP</span>':'')
       +(stn?('<span class="bf-st">'+esc(stn)+'</span>'):'')
       // v0.26.0 — the two ops the owner asked for, right on the object: ＋ opens the
       // multi-select picker to add subordinates UNDER this org, ✎ opens its sheet.
@@ -4882,7 +4917,17 @@ function renderBrief(){
       // the per-root eye rides ABOVE its tree so a whole component can drop out
       return (hid.has(r)?'':'')+nodeHtml(r,1);
     }).join('')+'</ul></div>';
-  h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">\u2295 Add organization</button></div>';
+  // v1.0.3 \u2014 the foot offers BOTH build moves: a real org (search) or a GROUP
+  // (an owner-named filler node that shapes the hierarchy). The group button
+  // becomes its inline name form in place; \u2715 or tap-away puts it back.
+  if(window._bfGrpForm){
+    h+='<div class="bf-foot bf-grprow"><input class="rc-in" id="bfGrpNm" type="text" maxlength="40" placeholder="Group name \u2014 e.g. Enablers, TF Alpha" autocomplete="off">'
+      +'<button class="bf-act in" type="button" data-bfgrpcreate="">Create</button>'
+      +'<button class="bf-act" type="button" data-bfgrpcancel="1" aria-label="Cancel">\u2715</button></div>';
+  } else {
+    h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">\u2295 Add organization</button>'
+      +'<button type="button" class="bf-act" data-bfgrpnew="1">\u229e New group</button></div>';
+  }
   el.innerHTML=h;
   try{ _bfFit(); }catch(_){}
 }
@@ -5057,7 +5102,7 @@ function clearAll(){
   // so ✕ looked dead). The built diagram is KEPT: ✕ clears the view, it never
   // deletes work; the toast says so out loud.
   try{ if(typeof calloutHide==='function') calloutHide(); }catch(_){}
-  try{ _bfAnnEdit=null; _orgForm=null; window._bfPick=null; GlobeState._bfAddArm=false; GlobeState._bfFold={};
+  try{ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null; window._bfPick=null; GlobeState._bfAddArm=false; GlobeState._bfFold={};
     if(typeof _bfArmHint==='function') _bfArmHint();   // again — the earlier call ran while _bfAddArm was still true (top-level arm kept its bar)
   }catch(_){}
   try{ document.body.classList.remove('chart-min'); }catch(_){}
@@ -5080,7 +5125,7 @@ function tapAtScreen(x, y){
   if(document.body && document.body.classList.contains('brief-mode')){
     // v0.7.0: the brief globe is the destination — a chain dot opens its popup.
     const bs=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
-    if(bs && bs.id!=null){ _bfAnnEdit=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){}
+    if(bs && bs.id!=null){ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){}
       GlobeState._bfFocus=bs.id;                     // v0.20.0: a globe chain-node tap focuses its branch too
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
@@ -5659,6 +5704,7 @@ try{ window.Callout={ show:calloutShow, hide:calloutHide, id:function(){ return 
 // object shows almost nothing; the popup shows everything). One sheet for chain
 // dots, chart chips, and custom orgs, in either room. ---------------------------
 let _bfAnnEdit=null;                                 // id with the annotation form open
+let _bfRnEdit=null;                                  // v1.0.3: group key with the rename form open
 let _orgForm=null;                                   // {parent} when add-subordinate is open
 // v0.24.0 — THE SELECTIONS (A-ORG-1's briefing ability). Everything the owner can
 // do to a node they placed in the diagram: recolor it, stripe its state for
@@ -5732,6 +5778,9 @@ function _bfAddSheet(pk){
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
     +'<div class="od-sub">Tick as many as you need \u2014 they all land under this organization.</div>';
   h+='<input class="rc-in bf-pickq" id="bfPickQ" type="text" placeholder="Search all organizations and states\u2026" value="'+escA(window._bfPickQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+  // v1.0.3 \u2014 or create a GROUP right here: a named filler node under this parent
+  h+='<div class="bf-grprow"><input class="rc-in" id="bfGrpNmP" type="text" maxlength="40" placeholder="Or create a group under '+escA(_bfAbbr(par.n))+'\u2026" autocomplete="off">'
+    +'<button class="bf-act in" type="button" data-bfgrpcreate="'+escA(pk)+'">Create</button></div>';
   if(own && q.length<2) h+='<div class="bf-subhead">Its subordinates \u00b7 '+own+'</div>';
   else if(q.length>=2) h+='<div class="bf-subhead">Matches \u00b7 '+shown.length+'</div>';
   h+='<div class="bf-picklist">';
@@ -5834,7 +5883,15 @@ function _bfPlainSheet(k){
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">'+esc(nd.n)+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
-    +'<div class="od-sub">'+(nd.t==='state'?'US state \u00b7 highlighted on the globe':'Custom element')+'</div>';
+    +'<div class="od-sub">'+(nd.t==='state'?'US state \u00b7 highlighted on the globe':'Group \u00b7 a filler element on this diagram')+'</div>';
+  // v1.0.3 \u2014 a group is the owner's own object, so it renames in place
+  if(nd.t==='custom' && _bfRnEdit===k){
+    h+='<div class="rc-form">'
+      +'<input class="rc-in" id="rcFRn" type="text" maxlength="60" placeholder="Group name" value="'+escA(nd.n)+'">'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-bfrncancel="1">Cancel</button>'
+      +'<button class="rc-save" type="button" data-bfrnsave="'+escA(k)+'">Save</button></div></div>';
+  }
   if(_bfAnnEdit===k){
     h+='<div class="rc-form">'
       +'<input class="rc-in" id="rcF1" type="text" maxlength="80" placeholder="Note (80 max)" value="'+escA(nd.tx||'')+'">'
@@ -5848,6 +5905,7 @@ function _bfPlainSheet(k){
   h+=_bfSelections(k);
   h+='<div class="rc-row rc-acts">';
   if(!nd.tx && _bfAnnEdit!==k) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(k)+'">Add note</button>';
+  if(nd.t==='custom' && _bfRnEdit!==k) h+='<button class="bf-act in" type="button" data-bfrnedit="'+escA(k)+'">Rename</button>';
   h+='<button class="bf-act in" type="button" data-bfrm="'+escA(k)+'">Remove from brief</button></div>';
   const kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
   host.innerHTML=h;
@@ -6105,6 +6163,30 @@ if(!window._odWired){
       bfNote(id, f?f.value:''); _bfAnnEdit=null; _bfObjSheet(id); return; }
     const bc=e.target.closest('[data-bfanncancel]');
     if(bc){ const id=_bfAnnEdit; _bfAnnEdit=null; if(id) _bfObjSheet(id); return; }
+    // ---- v1.0.3 GROUPS — create (foot / empty state / ＋ picker) and rename ----
+    const bgn=e.target.closest('[data-bfgrpnew]');
+    if(bgn){ window._bfGrpForm=1; try{ renderBrief(); }catch(_){}
+      try{ const f=document.getElementById('bfGrpNm'); f&&f.focus(); }catch(_){} return; }
+    const bgx=e.target.closest('[data-bfgrpcancel]');
+    if(bgx){ window._bfGrpForm=null; try{ renderBrief(); }catch(_){} return; }
+    const bgc=e.target.closest('[data-bfgrpcreate]');
+    if(bgc){ const pk2=bgc.getAttribute('data-bfgrpcreate')||null;
+      const inp=bgc.parentElement?bgc.parentElement.querySelector('input'):null;
+      const nm=String((inp&&inp.value)||'').trim();
+      if(!nm){ try{ inp&&inp.focus(); }catch(_){} return; }   // a group needs a name — no silent blanks
+      window._bfGrpForm=null;
+      bfAddCustom(nm, pk2);                                   // _bfPush renders + reframes
+      if(pk2){ try{ _bfAddSheet(pk2); }catch(_){} }           // the picker stays — keep filling the group's parent
+      try{ _bfToast('Group “'+nm.slice(0,28)+'” added'+(pk2?(' under '+_bfAbbr((bfNode(pk2)||{}).n||'')):'')); }catch(_){}
+      return; }
+    const brn=e.target.closest('[data-bfrnedit]');
+    if(brn){ const id=brn.getAttribute('data-bfrnedit'); _bfRnEdit=id; _bfAnnEdit=null; _bfObjSheet(id);
+      try{ const f=document.getElementById('rcFRn'); if(f){ f.focus(); f.select(); } }catch(_){} return; }
+    const brs=e.target.closest('[data-bfrnsave]');
+    if(brs){ const id=brs.getAttribute('data-bfrnsave'); const f=document.getElementById('rcFRn');
+      bfRename(id, f?f.value:''); _bfRnEdit=null; _bfObjSheet(id); return; }
+    const brc=e.target.closest('[data-bfrncancel]');
+    if(brc){ const id=_bfRnEdit; _bfRnEdit=null; if(id) _bfObjSheet(id); return; }
     // ---- v0.7.0 object popup + chart + custom orgs ----
     const bfc=e.target.closest('[data-bffocusclear]');
     if(bfc){ GlobeState._bfFocus=null; try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
@@ -6138,7 +6220,7 @@ if(!window._odWired){
       try{ if(n) _bfToast(n+' organization'+(n===1?'':'s')+' added under '+_bfAbbr((bfNode(pk)||{}).n||'')); }catch(_){}
       return; }
     const bo=e.target.closest('[data-bfobj]');
-    if(bo){ _bfAnnEdit=null; _orgForm=null;
+    if(bo){ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null;
       const id=bo.getAttribute('data-bfobj');
       const r=bo.getBoundingClientRect();
       calloutShow(id, {x:r.left+r.width/2, y:r.bottom+4});
@@ -6217,7 +6299,7 @@ if(!window._odWired){
       try{ _sheetFlag(); }catch(_){}   // v0.31.0 (re-verify): Details opens at half — the FAB must step aside HERE too
       return; }
     const ox=e.target.closest('[data-objx]');
-    if(ox){ _bfAnnEdit=null; _orgForm=null;
+    if(ox){ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null;
       // in map mode the popup sits over a live selection — closing restores its card
       if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel);
       else hideDossier();
@@ -6317,9 +6399,9 @@ if(!window._odWired){
       const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navRow,#navDock,#legendPanel,#exportSheet,#appMenu,#titleBar,#clockTL,#clockTR,#bfArmBar,#errToast,#sbxNote');
       if(!ctrl){
         const dz2=document.getElementById('dossier');
-        const dirty=(_coId!=null)||(dz2&&!dz2.hidden)||GlobeState._bfFocus||GlobeState._bfAddUnder||GlobeState._bfAddArm||_bfAnnEdit||_orgForm;
+        const dirty=(_coId!=null)||(dz2&&!dz2.hidden)||GlobeState._bfFocus||GlobeState._bfAddUnder||GlobeState._bfAddArm||_bfAnnEdit||_bfRnEdit||window._bfGrpForm||_orgForm;
         if(dirty){
-          _bfAnnEdit=null; _orgForm=null;
+          _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null;
           GlobeState._bfFocus=null; GlobeState._bfAddUnder=null; GlobeState._bfAddArm=false;
           try{ _bfArmHint(); }catch(_){}
           try{ calloutHide(); }catch(_){}
@@ -6707,11 +6789,22 @@ function bfAddState(name, parent){
   parent=_bfTakeParent(parent||null);
   _bfPush({k:_bfStateKey(st.n), n:st.n, p:parent||null, t:'state', r:st.n, c:'', sh:0, tx:''});
 }
-// add a FREE-TEXT box — a proposed or notional element with no app record
+// add a GROUP — an owner-named filler element with no app record (v1.0.3 face
+// of the old free-text custom box; same storage, so old briefs load unchanged).
+// It shapes the hierarchy: anything can nest under it, and it under anything.
 function bfAddCustom(name, parent){
   name=String(name||'').slice(0,60).trim(); if(!name) return;
+  parent=_bfTakeParent(parent||null);          // an armed "add under X" is honoured here too
   _bfPush({k:'cx:'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),
     n:name, p:parent||null, t:'custom', r:null, c:'', sh:0, tx:''});
+}
+// rename a GROUP in place (real orgs and states keep their true names)
+function bfRename(k, name){
+  const n=bfNode(k); if(!n || n.t!=='custom') return;
+  name=String(name||'').slice(0,60).trim(); if(!name) return;
+  n.n=name; _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
 }
 function bfRemove(id){
   const k=(_bfOrgId(id)||id);
@@ -6788,7 +6881,8 @@ function bfDepth(n){
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
 }
-try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, remove:bfRemove,
+try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, addGroup:bfAddCustom,
+  remove:bfRemove, rename:bfRename,
   move:bfMove, reorder:bfReorder, color:bfColor, stripe:bfStripe,
   note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth,
   node:bfNode, kids:bfKids, list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}

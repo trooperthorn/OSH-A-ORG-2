@@ -811,3 +811,24 @@ closeouts. The stepping label POLICY is now load-bearing:
   veil — anything that pops during the title is a bug (the coach would also
   be killed unseen by the skip-tap listener). If T changes again, move both.
 
+## v1.0.3 — groups in the brief (owner: filler organizations for hierarchy)
+- A GROUP is the v0.24.0 custom node (t:'custom') wearing its real face: an
+  owner-named filler element with no app record. Do NOT add a new node type
+  for this — storage, kv load, chain map, exports all already carry customs,
+  so old briefs load unchanged and old free-text boxes simply became groups.
+- Entry points (the only two build surfaces, per the one-surface law): the
+  chart foot / empty state ("⊞ New group" → inline name form in place, state
+  window._bfGrpForm) and the ＋ picker's group row (creates under that parent,
+  picker stays open to keep filling). Both funnel into bfAddCustom, which now
+  honours an armed "add under X" via _bfTakeParent like every other add.
+- bfRename is GROUP-ONLY (n.t==='custom' guard): real orgs and states keep
+  their true names — a renamed "1st ID" would be a lie on the diagram.
+- The box: .bf-grp = dashed outline (outline, not border — the tier box-shadow
+  ring and layout stay untouched) + engraved GROUP tag (.bf-grptag). Tier
+  colors still apply — a group is structure, and the dash is what says
+  "not a real unit", never a color change (tier colors are semantics).
+- Form state discipline: _bfRnEdit and window._bfGrpForm reset everywhere
+  _bfAnnEdit does (sheet switches, ✕ clear, brief tap-away dirty list). A new
+  brief-room form that skips those reset sites WILL get stuck — that class of
+  bug shipped twice before (v0.32.2/v0.32.3).
+
