@@ -500,3 +500,24 @@ radius, #7 per-site IANA timezones (data work), #10 co-located dot disambiguatio
   subN (arcs) vs unitsN (kids) differences are SAID ("+N here on this base").
 - Dossier ✕ = close the sheet only. Ring Clear = the full reset. Keep it that way.
 - setMode has a labeled door now (navSat-brief); the 3s hold remains as the fast path.
+
+## v0.30.0 — the audit, closed out (all 27 findings resolved)
+- DOUBLE-TAP (#6): the pointerup tap DEFERS 260ms (GlobeState._tapT); a second tap
+  inside 300ms/24px cancels it and runs _dblZoom — a double-tap can never select.
+  Any future tap-path change must preserve the defer+cancel pair. Hit radius 16px.
+- TIMEZONES (#7): _tzForSite(site) = _TZ_SITE (split-state posts: fort-bliss→Denver,
+  fort-campbell→Chicago, holston-aap→New_York) → _TZ_ST (state/territory/country →
+  IANA; AZ→America/Phoenix, no DST) → nearRegion fallback for unknown st. Labels in
+  _TZ_LBL. autoFillSelect reads it; the manual zone sheet is untouched. If SITES gains
+  a new country code, add it to _TZ_ST or the clock silently falls back to nearRegion.
+- THE PILE (#10): the base card lists co-located sites (Δlat<0.22, Δlon<0.28, cap 4)
+  as .co-pilechip switch chips via data-odsel. Labels use the RAW base name with a
+  trailing "(Fort X)" qualifier stripped — _bfAbbr collapses the Meade pile into
+  identical chips; don't reintroduce it here.
+- GRIP (#17): pointer-based drag on .sh-grip, ~180px per detent, snap on release;
+  dz.__swallowStep guards the click that follows a drag from double-stepping.
+- CLUSTERS (#19): badge cells whose circles intersect merge (iterative, guard 24);
+  members ride each hit (h.mem) so a cluster tap fits them via _flyFitPts(pts, 2.0).
+- Copy: BASE TIME —:— chip (#20) · "close matches" headline counts _s>=38 only (#21)
+  · "Highlight color & stripes" (#23) · empty record tabs self-describe (#26) ·
+  .co-name wraps two lines (#11).

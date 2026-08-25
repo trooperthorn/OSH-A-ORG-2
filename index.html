@@ -841,8 +841,8 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 }
 #calloutCard[hidden]{display:none}
 .co-head{display:flex; align-items:center; gap:8px}
-.co-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  font:800 13px/1.25 var(--body); color:var(--text)}
+.co-name{flex:1; min-width:0; font:800 15px/1.25 var(--body); color:var(--text);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
 .co-x{flex:none; appearance:none; -webkit-appearance:none; border:0; background:none; cursor:pointer;
   width:26px; height:26px; margin:-4px -6px 0 0; border-radius:50%; color:var(--danger);
   font:700 12px/1 var(--body); position:relative}
@@ -909,6 +909,14 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-pop:active{filter:brightness(1.3)}
 .co-poplbl{font:700 11px/1 var(--body); white-space:nowrap}
 /* v0.27.0 — the compact card's icon row: Units (count) · Connections · Details */
+/* v0.30.0 — the co-located pile switcher */
+.co-pile{display:flex; flex-wrap:wrap; align-items:center; gap:5px; padding-top:7px}
+.co-pilelbl{font:700 8.5px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--faint)}
+.co-pilechip{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
+  padding:5px 9px; border-radius:9px; background:rgba(0,0,0,.25); color:var(--accent);
+  box-shadow:inset 0 0 0 1px var(--line); font:700 10px/1 var(--body);
+  max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.co-pilechip:active{filter:brightness(1.3)}
 .co-icrow{display:flex; gap:6px; padding-top:9px}
 .co-ic{flex:1; appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
   display:flex; flex-direction:column; align-items:center; gap:2px; min-height:56px;
@@ -1052,6 +1060,25 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.30.0 • THE AUDIT, CLOSED OUT (owner: "execute both" → the two majors, plus
+//            every remaining finding). DOUBLE-TAP ZOOMS (#6): the single-tap
+//            defers 260ms so a double-tap is pure zoom — it can never select a
+//            dot under the gesture; hit radius 18→16px. REAL TIMEZONES (#7):
+//            the selected clock reads a per-site IANA table (every state,
+//            territory and country in the data; Fort Bliss/Fort Campbell/
+//            Holston split-state exceptions; Arizona no-DST) — Fort Riley says
+//            US CENTRAL now; nearRegion survives only as the unknown-st
+//            fallback. THE PILE (#10): a base card lists its co-located
+//            neighbors as switch chips (Fort Meade → USCYBERCOM · NSA/CSS ·
+//            MD Guard · Baltimore District). GRIP DRAGS (#17): the sheet grip
+//            pointer-tracks and snaps to the detent the finger asked for; tap
+//            still steps. CLUSTERS (#19): overlapping badges MERGE into one
+//            honest count, and a cluster tap fits ITS members instead of a
+//            blind fixed hop. Card titles wrap to two lines (#11). BASE TIME
+//            —:— replaces the mystery SELECT chip (#20). The search headline
+//            counts close matches only (#21). "Highlight color & stripes"
+//            (#23). Empty record tabs explain themselves (#26). This closes
+//            all 27 findings from the v0.29.0 audit.
 //   v0.29.0 • THE AUDIT RELEASE (owner: "deploy a team of agents… view this from
 //            the standpoint of app users"). A 6-journey UX audit (27 ranked
 //            findings) drove one coherent redesign instead of another patch.
@@ -1574,7 +1601,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.29.0';
+const APP_VERSION = 'v0.30.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2196,15 +2223,26 @@ function setupGlobeInteraction(cv){
       // two stationary releases within 300ms and 24px = double-tap zoom, else a tap.
       const nowT=performance.now();
       if(nowT-(GlobeState._dtT||0)<300 && Math.hypot(e.clientX-(GlobeState._dtX||0), e.clientY-(GlobeState._dtY||0))<24){
-        GlobeState._dtT=0; try{ _dblZoom(e); }catch(_){}
+        // v0.30.0 (audit #6): a DOUBLE-tap is a zoom, full stop — cancel the
+        // pending single-tap so the first tap never selects a dot under the
+        // zoom gesture. The 260ms defer below is what makes this possible.
+        GlobeState._dtT=0;
+        if(GlobeState._tapT){ clearTimeout(GlobeState._tapT); GlobeState._tapT=null; }
+        try{ _dblZoom(e); }catch(_){}
       } else {
         GlobeState._dtT=nowT; GlobeState._dtX=e.clientX; GlobeState._dtY=e.clientY;
         // M3 hook boundary: canvas-relative coords, exactly what A-ORG-1's
         // handleGlobeTap derived before hit-testing GlobeState._screen. (Deviation 4.)
+        // v0.30.0: the tap DEFERS 260ms — if a second tap lands, it was a zoom.
         try{
           if(typeof tapAtScreen==='function'){
             const r=cv.getBoundingClientRect();
-            tapAtScreen(e.clientX-r.left, e.clientY-r.top);
+            const tx=e.clientX-r.left, ty=e.clientY-r.top;
+            if(GlobeState._tapT) clearTimeout(GlobeState._tapT);
+            GlobeState._tapT=setTimeout(function(){
+              GlobeState._tapT=null;
+              try{ tapAtScreen(tx, ty); }catch(_){}
+            }, 260);
           }
         }catch(_){}
       }
@@ -3095,12 +3133,32 @@ function drawClusters(ctx, m){
   const gm=new Map();
   for(const c of GlobeState._clu){
     const k=((c.x/44)|0)+':'+((c.y/44)|0);
-    let g=gm.get(k); if(!g){ g={x:0,y:0,la:0,lo:0,n:0}; gm.set(k,g); }
+    let g=gm.get(k); if(!g){ g={x:0,y:0,la:0,lo:0,n:0,mem:[]}; gm.set(k,g); }
     g.x+=c.x; g.y+=c.y; g.la+=c.lat; g.lo+=c.lon; g.n++; g.c=c.c;
+    g.mem.push({lat:c.lat, lon:c.lon});
+  }
+  // v0.30.0 (audit #19): grid cells whose badges would overlap MERGE — one badge,
+  // one honest count, instead of "2" printed over "21".
+  let cells=[]; gm.forEach(function(g){ cells.push(g); });
+  let merged=true, guard=0;
+  while(merged && ++guard<24){
+    merged=false;
+    outer: for(let a2=0;a2<cells.length;a2++){
+      for(let b2=a2+1;b2<cells.length;b2++){
+        const A=cells[a2], B=cells[b2];
+        const ra=(A.n>1)?Math.min(15,7+Math.log2(A.n)*2.6)+4:3, rb=(B.n>1)?Math.min(15,7+Math.log2(B.n)*2.6)+4:3;
+        const dx=A.x/A.n-B.x/B.n, dy=A.y/A.n-B.y/B.n;
+        if(dx*dx+dy*dy < (ra+rb)*(ra+rb)){
+          A.x+=B.x; A.y+=B.y; A.la+=B.la; A.lo+=B.lo; A.n+=B.n;
+          A.mem=(A.mem||[]).concat(B.mem||[]);
+          cells.splice(b2,1); merged=true; break outer;
+        }
+      }
+    }
   }
   GlobeState._cluHits=[];
   ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
-  gm.forEach(function(g){
+  cells.forEach(function(g){
     const cx=g.x/g.n, cy=g.y/g.n;
     if(g.n===1){
       ctx.beginPath(); ctx.arc(cx,cy,2.2,0,Math.PI*2);
@@ -3120,7 +3178,7 @@ function drawClusters(ctx, m){
     ctx.fillStyle='rgba('+T.text+',.95)';
     ctx.font='700 9px '+T.body;
     ctx.fillText(String(g.n), cx, cy+0.5);
-    GlobeState._cluHits.push({x:cx, y:cy, r:r+8, lat:g.la/g.n, lon:g.lo/g.n});
+    GlobeState._cluHits.push({x:cx, y:cy, r:r+8, lat:g.la/g.n, lon:g.lo/g.n, mem:g.mem||null});
   });
   ctx.restore(); GlobeState._clu=null;
 }
@@ -3357,7 +3415,7 @@ function drawMarkersHook(ctx, m){
 // Canvas-relative coords in (what tapAtScreen receives); nearest front-hemisphere
 // site within 18px, else null. Tests LAST FRAME's _screen — exactly A-ORG-1.
 function siteHitTest(x, y){
-  let best=null, bestD=18*18;
+  let best=null, bestD=16*16;   // v0.30.0 audit #6: a tap clearly between dots selects nothing
   for(const s of (GlobeState._screen||[])){
     const d=(s.sx-x)*(s.sx-x)+(s.sy-y)*(s.sy-y);
     if(d<bestD){ bestD=d; best=s; }
@@ -3843,7 +3901,8 @@ function sfsResults(q){
   });
   // v0.23.0 — show up to 6 (was 2). Org search is now a primary way to build the
   // brief (owner: "a search of organizations"); a top-2 cap buried real matches.
-  return {list:hits.slice(0,6).map(function(h){ return h.e; }), total:hits.length, q:q};
+  return {list:hits.slice(0,6).map(function(h){ return h.e; }), total:hits.length,
+    strong:hits.filter(function(h){ return h._s>=38; }).length, q:q};   // name/word-start tier only
 }
 
 // ---- Render (PORT of sfsRender — rows via innerHTML <button data-sfs>) ---------
@@ -3874,9 +3933,10 @@ function _sfsPaint(res){
   // v0.23.0 — honest count (was always "sites" even for org hits) + an ORG/SITE
   // badge so a search-to-add pick is unambiguous.
   const shown=res.list.length;
-  const count = res.total===1 ? '1 result'
-    : res.total<=shown ? res.total+' results'
-    : res.total+' results — top '+shown+' shown';
+  const strong=(res.strong!=null)?res.strong:res.total;   // v0.30.0 audit #21: honest headline
+  const count = strong===1 ? '1 match'
+    : strong<=shown ? strong+' matches'
+    : strong+' close matches — top '+shown+' shown';
   dd.innerHTML=res.list.map(function(e,i){
     const isOrg=String(e.id).slice(0,3)==='og:';
     const isSt=!!bfStateName(e.id);
@@ -4470,6 +4530,25 @@ function _flyFitChain(){
     flyToLatLon(cLat, cLon, zoom);
   }catch(_){}
 }
+// fit ANY point set: mean-vector center, zoom from spread (floor = the zoom that
+// dissolves clusters so the members resolve into dots)
+function _flyFitPts(pts, minZoom){
+  try{
+    if(!pts || !pts.length) return;
+    const d=Math.PI/180; let x=0,y=0,z=0;
+    const vs=pts.map(function(pt){ const v=[Math.cos(pt.lat*d)*Math.cos(pt.lon*d), Math.cos(pt.lat*d)*Math.sin(pt.lon*d), Math.sin(pt.lat*d)];
+      x+=v[0]; y+=v[1]; z+=v[2]; return v; });
+    const L=Math.hypot(x,y,z)||1;
+    const cLat=Math.asin(Math.max(-1,Math.min(1,z/L)))/d, cLon=Math.atan2(y,x)/d;
+    const cv2=[x/L,y/L,z/L];
+    let maxSep=0;
+    vs.forEach(function(v){ let dot=cv2[0]*v[0]+cv2[1]*v[1]+cv2[2]*v[2]; dot=Math.max(-1,Math.min(1,dot));
+      maxSep=Math.max(maxSep, Math.acos(dot)/d); });
+    const span=maxSep*2*1.2;
+    const zoom=Math.max(minZoom||1.7, span>60?1.7 : span>30?2.2 : span>14?2.9 : span>6?3.8 : 4.8);
+    flyToLatLon(cLat, cLon, zoom);
+  }catch(_){}
+}
 function _flyPair(aLat,aLon,bLat,bLon){
   try{
     const d=Math.PI/180;
@@ -4530,7 +4609,13 @@ function tapAtScreen(x, y){
   }
   const hits=GlobeState._cluHits;
   if(hits){ for(const h of hits){ const dx=x-h.x, dy=y-h.y;
-    if(dx*dx+dy*dy<=h.r*h.r){ try{ _undoPush(); flyToLatLon(h.lat, h.lon, 2.4); }catch(_){} return; } } }
+    if(dx*dx+dy*dy<=h.r*h.r){
+      // v0.30.0 (audit #19): a cluster tap frames ITS members, not a blind hop
+      try{ _undoPush();
+        if(h.mem && h.mem.length>1) _flyFitPts(h.mem, 2.0);
+        else flyToLatLon(h.lat, h.lon, 2.4);
+      }catch(_){}
+      return; } } }
   const s=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
   if(s && s.id!=null){
     // DRILL DOWN (v0.18.0): tapping a direct-subordinate dot focuses THAT org and
@@ -4786,6 +4871,24 @@ function _coRender(){
   if(!brief && (s || ag)){
     const isBase=!!(s && !briefSubj);
     const hostSite=s || agHost;
+    // v0.30.0 (audit #10 — the Fort Meade pile): when several installations sit
+    // on the same point, the card SAYS so and offers the switch — no more
+    // "the app opened something I didn't choose" with no way out.
+    if(isBase){
+      let pile=[];
+      try{ pile=_sitesArr().filter(function(o2){
+        return o2.id!==s.id && Math.abs(o2.lat-s.lat)<0.22 && Math.abs(o2.lon-s.lon)<0.28;
+      }).slice(0,4); }catch(_){}
+      if(pile.length){
+        h+='<div class="co-pile"><span class="co-pilelbl">Also here</span>'
+          +pile.map(function(o2){
+            // the RAW base name — the abbreviator collapses "USCYBERCOM (Fort
+            // Meade)" and "NSA/CSS (Fort Meade)" into two identical chips
+            var lbl=String(o2.base).replace(/\s*\(([^)]*)\)\s*$/, '');   // drop a trailing "(Fort X)" qualifier
+            return '<button type="button" class="co-pilechip" data-odsel="'+escA(o2.id)+'" title="'+escA(o2.base)+'">'+esc(lbl)+'</button>'; }).join('')
+          +'</div>';
+      }
+    }
     let unitsN=0, kids=[];
     if(isBase){ try{ unitsN=(ogAtSite(s.id)||[]).length; }catch(_){} }
     else if(briefSubj){ try{ kids=ogKids(briefSubj)||[]; unitsN=kids.length; }catch(_){} }
@@ -5001,6 +5104,36 @@ if(!window.__bfMoveWired){ window.__bfMoveWired=true;
     try{ _bfObjSheet(k); }catch(_){}
   });
 }
+// v0.30.0 (audit #17): the sheet grip looks draggable — now it IS. Pointer-track
+// the grip; on release snap to the detent the finger asked for. Tap still steps.
+if(!window.__dzDragWired){ window.__dzDragWired=true;
+  let drag=null;
+  document.addEventListener('pointerdown', function(e){
+    const gp=e.target && e.target.closest && e.target.closest('.sh-grip');
+    if(!gp) return;
+    const dz=gp.closest('#dossier'); if(!dz) return;
+    drag={y0:e.clientY, dz:dz, moved:false};
+  }, true);
+  document.addEventListener('pointermove', function(e){
+    if(!drag) return;
+    if(Math.abs(e.clientY-drag.y0)>12) drag.moved=true;
+  }, true);
+  document.addEventListener('pointerup', function(e){
+    if(!drag) return;
+    const d=drag; drag=null;
+    if(!d.moved) return;                              // a tap — the click handler steps
+    const dy=e.clientY-d.y0;
+    const order=['dz-peek','dz-half','dz-full'];
+    let i=order.findIndex(function(c){ return d.dz.classList.contains(c); }); if(i<0) i=0;
+    const steps=Math.max(-2, Math.min(2, Math.round(-dy/180)));   // ~180px per detent
+    const next=order[Math.max(0, Math.min(2, i+steps))];
+    if(next && !d.dz.classList.contains(next)){
+      d.dz.classList.remove('dz-peek','dz-half','dz-full'); d.dz.classList.add(next);
+      try{ _sheetFlag(); }catch(_){}
+    }
+    d.dz.__swallowStep=performance.now();             // the click that follows a drag must not ALSO step
+  }, true);
+}
 if(!window.__coDrillWired){ window.__coDrillWired=true;
   document.addEventListener('input', function(e){
     if(!e.target || e.target.id!=='coDrillQ') return;
@@ -5157,7 +5290,7 @@ function _bfSelections(k){
   if(cur) apr+='<button type="button" class="bf-act" data-bfclr="'+escA(k)+'" data-bfc="">Reset to level color</button>';
   if(isState) apr+='<button type="button" class="bf-act'+(nd.sh?' in':'')+'" data-bfstripe="'+escA(k)+'">'
     +(nd.sh?'\u25a8 Striped fill ON':'\u25a8 Striped fill \u2014 stripe the state for attention')+'</button>';
-  let h=_disc('bf-appear'+(isState?'-st':''), isState?'Highlight color':'Color', apr, {def:false});
+  let h=_disc('bf-appear'+(isState?'-st':''), isState?'Highlight color & stripes':'Color', apr, {def:false});
   // ── position: re-parent anywhere (cycles refused), reorder among sisters
   const desc={}; (function walk(x){ bfKids(x).forEach(function(c2){ desc[c2.k]=1; walk(c2.k); }); })(k);
   const opts=BRIEF.nodes.filter(function(x){ return x.k!==k && !desc[x.k]; });
@@ -5349,6 +5482,11 @@ function _rcRender(id, kind){
       +'<button class="od-ico rc-dots" type="button" data-rcedit="'+i+'" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
       +'</div>';
   });
+  if(!items.length && !_rcForm){
+    // v0.30.0 (audit #26): an empty tab explains itself — these are YOUR records
+    const s0=siteById(id);
+    h+='<div class="rc-note">Your '+String(K.n||kind).toLowerCase()+' records'+(s0?(' for '+_odEsc(s0.base)):'')+' \u2014 nothing added yet.</div>';
+  }
   if(_rcForm && _rcForm.kind===kind && _rcForm.idx==null) h+=_rcFormHTML(kind, null, null);
   else h+='<button class="rc-add" type="button" data-rcadd="'+kind+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Add</button>';
   return h;
@@ -5648,6 +5786,7 @@ if(!window._odWired){
     // card body while peeked opens to half (the globe stays owner below half).
     const gp=e.target.closest('[data-dzstep]');
     const dz=e.target.closest('#dossier');
+    if(dz && dz.__swallowStep && (performance.now()-dz.__swallowStep)<400){ dz.__swallowStep=0; if(gp) return; }
     if(dz && (gp || !e.target.closest('button'))){
       const order=['dz-peek','dz-half','dz-full'];
       let i=order.findIndex(function(c){ return dz.classList.contains(c); });
@@ -6599,13 +6738,59 @@ function nearRegion(lat, lon){
   return best;
 }
 
+// v0.30.0 (audit #7 — Fort Riley read "US MOUNTAIN"): the selected clock stops
+// guessing by distance-to-anchor and reads a REAL zone table. Every site's `st`
+// is a US state/territory or a country code; three split-state posts get their
+// own line. nearRegion survives only as the last-ditch fallback.
+const _TZ_ST={
+  CT:'America/New_York',DE:'America/New_York',FL:'America/New_York',GA:'America/New_York',
+  IN:'America/New_York',KY:'America/New_York',ME:'America/New_York',MD:'America/New_York',
+  MA:'America/New_York',MI:'America/New_York',NH:'America/New_York',NJ:'America/New_York',
+  NY:'America/New_York',NC:'America/New_York',OH:'America/New_York',PA:'America/New_York',
+  RI:'America/New_York',SC:'America/New_York',VA:'America/New_York',VT:'America/New_York',
+  WV:'America/New_York',DC:'America/New_York',
+  AL:'America/Chicago',AR:'America/Chicago',IL:'America/Chicago',IA:'America/Chicago',
+  KS:'America/Chicago',LA:'America/Chicago',MN:'America/Chicago',MS:'America/Chicago',
+  MO:'America/Chicago',NE:'America/Chicago',ND:'America/Chicago',OK:'America/Chicago',
+  SD:'America/Chicago',TN:'America/Chicago',TX:'America/Chicago',WI:'America/Chicago',
+  CO:'America/Denver',ID:'America/Denver',MT:'America/Denver',NM:'America/Denver',
+  UT:'America/Denver',WY:'America/Denver',
+  AZ:'America/Phoenix',
+  CA:'America/Los_Angeles',NV:'America/Los_Angeles',OR:'America/Los_Angeles',WA:'America/Los_Angeles',
+  AK:'America/Anchorage',HI:'Pacific/Honolulu',
+  PR:'America/Puerto_Rico',VI:'America/St_Thomas',GU:'Pacific/Guam',
+  Germany:'Europe/Berlin',Italy:'Europe/Rome',Belgium:'Europe/Brussels',
+  Poland:'Europe/Warsaw',PL:'Europe/Warsaw',BG:'Europe/Sofia',XK:'Europe/Belgrade',
+  RO:'Europe/Bucharest',Korea:'Asia/Seoul',KR:'Asia/Seoul',Japan:'Asia/Tokyo',
+  JP:'Asia/Tokyo',Kuwait:'Asia/Kuwait',KW:'Asia/Kuwait',QA:'Asia/Qatar',
+  DJ:'Africa/Djibouti',Djibouti:'Africa/Djibouti'
+};
+const _TZ_SITE={                                       // split-state posts, by site id
+  'fort-bliss':'America/Denver',                       // El Paso rides Mountain
+  'fort-campbell':'America/Chicago',                   // KY line post, Central side
+  'holston-aap':'America/New_York'                     // east-TN, Eastern side
+};
+const _TZ_LBL={'America/New_York':'US EASTERN','America/Chicago':'US CENTRAL',
+  'America/Denver':'US MOUNTAIN','America/Phoenix':'ARIZONA','America/Los_Angeles':'US PACIFIC',
+  'America/Anchorage':'ALASKA','Pacific/Honolulu':'HAWAII','America/Puerto_Rico':'PUERTO RICO',
+  'America/St_Thomas':'USVI','Pacific/Guam':'GUAM','Europe/Berlin':'GERMANY','Europe/Rome':'ITALY',
+  'Europe/Brussels':'BELGIUM','Europe/Warsaw':'POLAND','Europe/Sofia':'BULGARIA',
+  'Europe/Belgrade':'KOSOVO','Europe/Bucharest':'ROMANIA','Asia/Seoul':'KOREA','Asia/Tokyo':'JAPAN',
+  'Asia/Kuwait':'KUWAIT','Asia/Qatar':'QATAR','Africa/Djibouti':'DJIBOUTI'};
+function _tzForSite(site){
+  if(!site) return null;
+  const tz=_TZ_SITE[site.id] || _TZ_ST[site.st];
+  if(tz) return {tz:tz, label:_TZ_LBL[tz]||String(site.st||'').toUpperCase()};
+  const r=nearRegion(site.lat, site.lon);              // unknown st: old behavior, honestly approximate
+  return r?{tz:r.tz, label:r.name.toUpperCase()}:null;
+}
 // called from every selection: manual pick wins (early return); clearing the
 // selection clears an auto zone (PORTED precedence law)
 function autoFillSelect(site){
   if(window._selZone && !window._selZone.auto) return;
   if(!site || site.lat==null){ if(window._selZone && window._selZone.auto) window._setSelZone(null, {ephemeral:true}); return; }
-  const r=nearRegion(site.lat, site.lon);
-  if(r) window._setSelZone({tz:r.tz, label:r.name.toUpperCase().slice(0,12), auto:true}, {ephemeral:true});
+  const z=_tzForSite(site);
+  if(z) window._setSelZone({tz:z.tz, label:z.label.slice(0,12), auto:true}, {ephemeral:true});
 }
 
 // manual pick (zone sheet row): toggle-off on repeat — but tapping the row an
@@ -6646,7 +6831,7 @@ function tickClocks(){
             +'</span><span class="bt-z">'+_ckEsc(z.label)+'</span>';
         }
       } else if(bs.__k!=='idle'){ bs.__k='idle';
-        bs.innerHTML='<span class="bt-t bt-idle">◷</span><span class="bt-z">SELECT</span>';
+        bs.innerHTML='<span class="bt-t bt-idle">\u2014:\u2014</span><span class="bt-z">BASE TIME</span>';   // v0.30.0 audit #20: an awaiting clock, not a mystery button
       }
     }
   }catch(_){}
