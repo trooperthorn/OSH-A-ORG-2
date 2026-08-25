@@ -696,3 +696,18 @@ closeouts. The stepping label POLICY is now load-bearing:
   ⋯ menu row + wordmark long-press sheet = full detail (version + date).
 - The stamp is populated from APP_VERSION in the boot block (single source —
   never hand-write a version into markup). Keep it OUT of interactive paths.
+
+## v0.34.0 — the boot title (owner: spinning globe, big print, main → invert → main)
+- #introVeil over the REAL globe: one eased full revolution (~2.3s) under the
+  big engraved mark + build version; paper beat at 45–72%; veil fades, chrome
+  breathes in, camera lands EXACTLY on the boot face (whole revolution + yaw
+  restore in fin()). Tap skips. prefers-reduced-motion and __SANDBOX skip
+  entirely. Stub DOMs (harness) no-op via the veil/classList/rAF guards; the
+  900-frame hard cap makes a hostile rAF stub finite.
+- THE INVERT IS A PALETTE, NOT A FILTER: GlobeState._introInvert makes
+  drawGlobe swap ocean/coast/land inks to the paper set (cream #F1EBD8 ground,
+  bronze 96,72,22 ink, parchment land). A CSS invert+hue-rotate was tried and
+  REJECTED — it turns Lumen's gold grey-green (hue-rotate is a linear
+  approximation; gold does not survive the round trip). Never reintroduce it.
+- The version toast waits until 3.6s (after the veil) — nothing may crash the
+  title sequence.

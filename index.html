@@ -269,6 +269,23 @@ body{
   font:600 8.5px/1 var(--mono); letter-spacing:.14em; color:var(--faint);
   opacity:.9; pointer-events:none; -webkit-user-select:none; user-select:none}
 
+/* v0.34.0 — BOOT TITLE. The veil is transparent glass over the REAL spinning
+   globe; only the big mark + version sit on it. body.intro parks the chrome;
+   body.intro-invert flips the canvas to the paper look for one beat
+   (invert+hue-rotate keeps the gold a gold — never blue; Lumen law). */
+#introVeil{position:absolute; inset:0; z-index:200; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:12px; opacity:1; transition:opacity .45s ease}
+#introVeil .in-mark{font:900 clamp(30px,9vw,54px)/1 var(--disp); letter-spacing:.34em; text-indent:.34em;
+  white-space:nowrap; text-align:center; transform:translateY(-16vh);
+  background:linear-gradient(180deg,#FFFDF2 0%,#FFF6D8 30%,#F5D76E 58%,#B9973E 92%,#D4B54A 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.65)) drop-shadow(0 0 18px rgba(var(--accent-rgb),.35));
+  -webkit-user-select:none; user-select:none}
+#introVeil .in-ver{font:600 10px/1 var(--mono); letter-spacing:.18em; color:var(--faint);
+  transform:translateY(-16vh)}
+body.intro #titleBar, body.intro #searchPill, body.intro .clock,
+body.intro #navDock, body.intro #navRow, body.intro #legendPanel{opacity:0 !important; pointer-events:none !important}
+
 /* CHROME YIELDS (v0.8.0 automation): while a gesture is moving the globe, every
    floating surface steps back so the world owns the screen; it breathes back in
    the moment the hand lifts. Pure CSS response to one body flag. */
@@ -1011,6 +1028,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <span id="verTag" aria-label="Build version"></span>
 </header>
 
+<!-- v0.34.0 BOOT TITLE (owner: "brief intro... spinning globe, A-ORG-2 in big
+     print, main color → invert → back, then the map"). ~2.3s, tap skips,
+     prefers-reduced-motion skips entirely. The globe behind is the REAL one. -->
+<div id="introVeil" hidden aria-hidden="true">
+  <div class="in-mark">A&thinsp;-&thinsp;O&thinsp;R&thinsp;G&thinsp;-&thinsp;2</div>
+  <span class="in-ver"></span>
+</div>
+
 <!-- SEARCH — standalone, one job (map is the default room; modes flip on the globe button) -->
 <div id="searchPill" class="glass" role="search">
   <span class="sp-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></span>
@@ -1084,6 +1109,16 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.34.0 • THE BOOT TITLE (owner: "brief intro when the app is open — a
+//            spinning globe with A-ORG-2 in big print, a couple seconds,
+//            main color, then invert, then back, then the map"). A ~2.3s
+//            title over the REAL globe: one eased full revolution under the
+//            big engraved mark + build version; at 45–72% of the flight the
+//            canvas flips to the PAPER look for one beat (invert+hue-rotate —
+//            the gold stays gold, never blue) and flips back; the veil fades
+//            and the chrome breathes in on the untouched map view (a whole
+//            revolution lands exactly where boot faced). Tap skips instantly;
+//            prefers-reduced-motion skips entirely; harness stub DOMs no-op.
 //   v0.33.2 • THE BUILD STAMP (owner: "how can we track current build or
 //            version through the app?"). The running version now lives under
 //            the wordmark — #verTag, faint mono, always on screen in both
@@ -1739,7 +1774,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.33.2';
+const APP_VERSION = 'v0.34.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -1756,7 +1791,7 @@ try{
         if(typeof _bfToast==='function') _bfToast('A-ORG-2 '+APP_VERSION);
       }
     }catch(_){}
-  }, 1600);
+  }, 3600);   // v0.34.0: after the boot title — the toast may not crash the intro
 }catch(_){}
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2112,9 +2147,17 @@ function drawGlobe(cv, ctx){
   // stays a dark instrument under every theme — a deliberate constant, so the light
   // Command Paper chrome reads as a console around a scope, not a washed-out map.
   const W=(typeof _mTok==='function')?_mTok():null;
-  const wAcc=(W&&W.accent)||'92,238,210';
-  const wCoast=(W&&W.coast)||wAcc, wLand=(W&&W.land)||'64,178,152';
+  let wAcc=(W&&W.accent)||'92,238,210';
+  let wCoast=(W&&W.coast)||wAcc, wLand=(W&&W.land)||'64,178,152';
+  let oHi=(W&&W.oceanHi)||'#0f1d1a', oLo=(W&&W.oceanLo)||'#091110';
   const wGlow=!!(W&&W.glow);
+  // v0.34.0 — the boot title's one-beat PAPER flip is a REAL palette swap
+  // (a CSS invert filter turned the gold grey-green — Lumen's gold must stay
+  // gold). Cream ground, bronze ink, parchment land; markers keep their own inks.
+  if(GlobeState._introInvert){
+    wAcc='150,110,40'; wCoast='96,72,22'; wLand='226,215,185';
+    oHi='#F1EBD8'; oLo='#E3DABF';
+  }
   if(wGlow){
     // instrument mode (token --world-glow:1) — the A-ORG-1 limb halo survives as an option
     const ag=ctx.createRadialGradient(m.cx,m.cy,m.R*0.88, m.cx,m.cy,m.R*1.20);
@@ -2125,7 +2168,7 @@ function drawGlobe(cv, ctx){
     ctx.beginPath(); ctx.arc(m.cx,m.cy,m.R*1.20,0,Math.PI*2); ctx.fillStyle=ag; ctx.fill();
   }
   const grad=ctx.createRadialGradient(m.cx-m.R*0.3,m.cy-m.R*0.3,m.R*0.2, m.cx,m.cy,m.R);
-  grad.addColorStop(0,(W&&W.oceanHi)||'#0f1d1a'); grad.addColorStop(1,(W&&W.oceanLo)||'#091110');   // ocean: theme tokens
+  grad.addColorStop(0,oHi); grad.addColorStop(1,oLo);   // ocean: theme tokens (or the intro's paper beat)
   ctx.beginPath(); ctx.arc(m.cx,m.cy,m.R,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill();
   ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.6':'.4')+')'; ctx.stroke();
   // Clip all overlay drawing to the sphere disc (prevents any chord/limb artifacts).
@@ -7644,6 +7687,45 @@ function bootShell(){
   }catch(_){}
 }
 bootShell();
+
+// ── v0.34.0 BOOT TITLE — one revolution of the real globe under the big mark:
+// main color → one PAPER-INVERT beat (45–72% of the flight) → main → the map.
+// Tap skips. prefers-reduced-motion skips entirely (motion law). Ends exactly
+// where it started (whole revolution), so the map view lands untouched.
+(function(){
+  try{
+    var veil=document.getElementById('introVeil');
+    if(!veil || !veil.classList || typeof requestAnimationFrame!=='function') return;   // stub DOM (harness) → no intro
+    var rm=false; try{ rm=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(_){}
+    if(rm || window.__SANDBOX){ try{ veil.remove(); }catch(_){} return; }
+    var vv=veil.querySelector('.in-ver'); if(vv) vv.textContent=APP_VERSION;
+    document.body.classList.add('intro');
+    veil.hidden=false;
+    var T=2300, t0=performance.now(), y0=GlobeState.yaw||0, n=0, done=false;
+    var ease=function(p){ return p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2; };
+    var fin=function(){
+      if(done) return; done=true;
+      try{ GlobeState._introInvert=false; GlobeState.yaw=y0; _rebuildGlobeQ(); GlobeState.dirty=true; globeMark(); }catch(_){}
+      document.body.classList.remove('intro');
+      veil.style.opacity='0'; veil.style.pointerEvents='none';
+      setTimeout(function(){ try{ veil.remove(); }catch(_){} }, 500);
+    };
+    veil.addEventListener('pointerdown', fin);
+    var step=function(now){
+      if(done) return;
+      if(++n>900){ fin(); return; }                       // hard cap — no environment may loop this
+      var p=Math.min(1,(now-t0)/T);
+      try{
+        GlobeState.yaw=y0 - ease(p)*Math.PI*2;
+        GlobeState._introInvert=(p>0.45 && p<0.72);       // the paper beat — real palette, in the renderer
+        _rebuildGlobeQ(); GlobeState.dirty=true; globeMark();
+      }catch(_){}
+      if(p>=1){ fin(); return; }
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }catch(_){}
+})();
 </script>
 </body>
 </html>
