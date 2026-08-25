@@ -1,18 +1,35 @@
-// v1.0.0 research merge — additions from 7 research packets into orgs.json/sites.json.
+// Research merge — additions from research packets into orgs.json/sites.json.
 // Policy: high-confidence rows only; parent resolved by name (exact-normalized, then
 // unique-substring); site resolved by alias-normalized base match; new sites only when
 // coords supplied; every skip is reported. Never invents anything.
+//
+// v1.0.1 hardening (the knowledge check): the v1.0.0 run deduped on exact
+// normalized names only, so paren/punctuation variants and same-parent
+// short/long names slipped through as 43 twin nodes, and rows skipped as
+// dupes never had their researched parent compared to the tree's. Now:
+//  - dupes are detected by AGGRESSIVE key too (parens stripped, alnum only);
+//  - a skipped dupe whose researched parent differs from the tree's is
+//    reported under parentConflicts — reconcile every one before shipping;
+//  - a row whose aggressive key prefix-matches an existing SIBLING (data-lint
+//    §7 twin rule: stem ≥10, remainder ≥4) is skipped as that sibling;
+//  - after the merge, any twin group touching a newly added org trips
+//    TWIN ALARM and a non-zero exit. data-lint §7 is the standing backstop.
 const fs=require('fs'), path=require('path');
 const ROOT='/home/user/a-org-2';
-const RES='/tmp/claude-0/-home-user-A-ORG/bcfb2bfb-349d-5555-87ec-f131b6c83651/scratchpad/research';
+const RES=process.env.RESEARCH_DIR||'/tmp/claude-0/-home-user-A-ORG/bcfb2bfb-349d-5555-87ec-f131b6c83651/scratchpad/research';
 const slug=t=>String(t).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const norm=t=>String(t).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/&amp;/g,'&').replace(/[^a-z0-9]+/g,' ').trim();
+const akey=t=>String(t).toLowerCase().replace(/\([^)]*\)/g,'').replace(/[^a-z0-9]+/g,'');
+// data-lint §7 twin rule: shorter key is a real stem of the longer one
+const twinPre=(a,b)=>{ const s=a.length<=b.length?a:b, t=a.length<=b.length?b:a;
+  return s.length>=10 && t.startsWith(s) && (t.length-s.length)>=4; };
 
 const OJ=JSON.parse(fs.readFileSync(path.join(ROOT,'data/orgs.json'),'utf8'));
 const SJ=JSON.parse(fs.readFileSync(path.join(ROOT,'data/sites.json'),'utf8'));
 const orgs=OJ.orgs, sites=SJ.sites;
 const orgById=new Map(orgs.map(o=>[o.id,o]));
 const orgByNorm=new Map(); orgs.forEach(o=>{ const k=norm(o.name); if(!orgByNorm.has(k)) orgByNorm.set(k,o); });
+const orgByAkey=new Map(); orgs.forEach(o=>{ const k=akey(o.name); if(!orgByAkey.has(k)) orgByAkey.set(k,o); });
 const siteById=new Map(sites.map(s=>[s.id,s]));
 const siteByNorm=new Map(); sites.forEach(s=>{ const k=norm(s.base); if(!siteByNorm.has(k)) siteByNorm.set(k,s); });
 
@@ -47,7 +64,8 @@ function findOrg(name){
   return hits.length===1?hits[0]:null;
 }
 
-const report={dedupeApplied:[],reparented:[],added:[],newSites:[],skippedDupe:[],skippedNoParent:[],skippedNoSite:[],skippedMed:[]};
+const report={dedupeApplied:[],reparented:[],added:[],newSites:[],skippedDupe:[],skippedNoParent:[],skippedNoSite:[],skippedMed:[],parentConflicts:[],twinAlarm:[]};
+const addedIds=new Set();
 
 // ── 1) dedupe (crosscheck packet) ──────────────────────────────────────────────
 const cx=JSON.parse(fs.readFileSync(path.join(RES,'crosscheck.json'),'utf8'));
@@ -76,9 +94,19 @@ for(const f of FILES){
   const pkt=JSON.parse(fs.readFileSync(path.join(RES,f),'utf8'));
   for(const row of (pkt.additions||pkt.missing||[])){
     if(row.confidence && row.confidence!=='high'){ report.skippedMed.push(row.name); continue; }
-    if(orgByNorm.has(norm(row.name))){ report.skippedDupe.push(row.name); continue; }
+    const ex=orgByNorm.get(norm(row.name))||orgByAkey.get(akey(row.name));
+    if(ex){
+      // dedupe WITH reconciliation: a skipped dupe whose researched parent
+      // disagrees with the tree is a finding, not a silent skip
+      const rp=findOrg(row.parent);
+      if(rp && ex.parent!==rp.id && ex.id!==rp.id)
+        report.parentConflicts.push(ex.name+'  tree: '+((orgById.get(ex.parent)||{}).name||ex.parent)+'  researched: '+rp.name);
+      report.skippedDupe.push(row.name); continue;
+    }
     const parent=findOrg(row.parent);
     if(!parent){ report.skippedNoParent.push(row.name+' (parent: '+row.parent+')'); continue; }
+    const sib=orgs.find(o=>o.parent===parent.id && twinPre(akey(o.name),akey(row.name)));
+    if(sib){ report.skippedDupe.push(row.name+' (prefix twin of sibling: '+sib.name+')'); continue; }
     // resolve or create the site
     let site=findSite(row.base,row.city,row.st);
     if(!site){
@@ -97,8 +125,31 @@ for(const f of FILES){
     const id0=slug(row.name); let id=id0, n=2;
     while(orgById.has(id)) id=id0+'-'+(n++);
     const org={id, name:row.name, parent:parent.id, lvl:Math.min(9,(parent.lvl||1)+1), root:parent.root||parent.id, site:site.id};
-    orgs.push(org); orgById.set(id,org); orgByNorm.set(norm(row.name),org);
+    orgs.push(org); orgById.set(id,org); orgByNorm.set(norm(row.name),org); orgByAkey.set(akey(row.name),org);
+    addedIds.add(id);
     report.added.push(row.name+' < '+parent.name+' @ '+site.id);
+  }
+}
+
+// ── 3b) TWIN ALARM — any twin group touching a newly added org fails the run ──
+{
+  const groups={};
+  orgs.forEach(o=>{ const k=akey(o.name); (groups[k]=groups[k]||[]).push(o); });
+  for(const k in groups){
+    const g=groups[k];
+    if(g.length>1 && g.some(o=>addedIds.has(o.id)))
+      report.twinAlarm.push(g.map(o=>o.name+(addedIds.has(o.id)?' [NEW]':'')).join('  ||  '));
+  }
+  const byParent={};
+  orgs.forEach(o=>{ (byParent[o.parent]=byParent[o.parent]||[]).push(o); });
+  for(const pid in byParent){
+    const kids=byParent[pid];
+    for(let i=0;i<kids.length;i++) for(let j=i+1;j<kids.length;j++){
+      const a=kids[i], b=kids[j];
+      if(!addedIds.has(a.id)&&!addedIds.has(b.id)) continue;
+      if(twinPre(akey(a.name),akey(b.name)))
+        report.twinAlarm.push('same-parent prefix: '+a.name+'  ||  '+b.name);
+    }
   }
 }
 
@@ -124,5 +175,12 @@ console.log(JSON.stringify({
   dedupe:report.dedupeApplied, reparented:report.reparented,
   skippedDupe:report.skippedDupe, skippedNoParent:report.skippedNoParent,
   skippedNoSite:report.skippedNoSite, skippedMed:report.skippedMed,
-  newSiteList:report.newSites
+  newSiteList:report.newSites,
+  parentConflicts:report.parentConflicts, twinAlarm:report.twinAlarm
 },null,1));
+if(report.twinAlarm.length){
+  console.error('TWIN ALARM: the merge created near-duplicate orgs — reconcile before shipping (data-lint §7 will also fail).');
+  process.exitCode=1;
+}
+if(report.parentConflicts.length)
+  console.error('PARENT CONFLICTS: '+report.parentConflicts.length+' skipped dupes disagree with the tree on parentage — verify and resolve each (dual-hats excepted), do not park.');

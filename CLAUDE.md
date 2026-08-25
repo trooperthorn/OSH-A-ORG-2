@@ -736,7 +736,8 @@ closeouts. The stepping label POLICY is now load-bearing:
   T2COM (TRADOC+AFC inactivated), USAWHC (FORSCOM/ARNORTH/ARSOUTH), ARTRANS
   (ex-SDDC), 4ID→I Corps. Flagged for the owner, NOT applied: CRS styles
   USAWHC an ACOM (kept under asccs shell); III Armored Corps reportedly moved
-  to USAWHC Aug 2026 (kept under USAREUR-AF pending owner call).
+  to USAWHC Aug 2026 (kept under USAREUR-AF pending owner call —
+  the WRONG call; see v1.0.1: verify-and-resolve, never park).
 - SCALE WITHOUT DILUTION: new depth is search/drill-only. Guard-class stations
   ship OFF by default (_FAM_DEFAULT_OFF). The map's default face is unchanged.
 - 1.0 polish: first-run coach (3 chips, once ever, a2Coached, gone at first
@@ -744,3 +745,42 @@ closeouts. The stepping label POLICY is now load-bearing:
   provenance rows in the ⋯ menu (live counts); first-ever boot suppresses the
   version toast (the coach owns that moment); stepper names ride RAW (no
   _bfAbbr — it turned "3rd MBCT, 10th Mtn Div" into "10th Mtn").
+
+## v1.0.1 — the knowledge check (owner: "1st ID reports to III Armoured Corps…
+## find where it reports to and why this wasn't caught; run this check across the board")
+- WHAT WAS WRONG: 1ID's direct link was right (III Armored Corps), but III AC
+  itself sat under USAREUR-AF. The July 2026 SecArmy order moved III AC to
+  USAWHC. My research agent FLAGGED the move and I parked it as "owner call"
+  instead of verifying and applying it. NEW LAW: a sourced, current
+  realignment gets verified and resolved in the same sweep — flag-and-park is
+  how a knowledge check fails. "Owner call" is reserved for genuine style/
+  policy choices (e.g. whether USAWHC is styled an ACOM), never for facts.
+- THE SECOND FAILURE CLASS: the v1.0.0 merge deduped on exact normalized names
+  only and skipped dupes WITHOUT reconciling parents. Result: 43 twin subtrees
+  ("Division East" vs "First Army Division East", "(MDC-P)" paren variants,
+  same-parent "1st Brigade Combat Team" vs "…, 82nd Airborne Division") and
+  silently unapplied researched parents. All 43 merged back to their LEGACY
+  ids (1,495 → 1,452); 1st Signal Bde → 311th SC(T) and 116th CBCT → 34th ID
+  applied. Merge rule: dedupe verdicts must reconcile EVERYTHING the dropped/
+  skipped row carried — parent, site, name — not just delete the row.
+- THE STANDING GUARDS (fix the class):
+  - data-lint §7 walks the org tree every run: unique ids, parents resolve,
+    acyclic (≤40 depth), org.site resolves, and SAME-PARENT TWIN detection —
+    aggressive key (parens stripped, alnum only) equality, plus prefix rule
+    `stem ≥10 chars && remainder ≥4` (the remainder floor keeps roman-numeral
+    siblings like "DCE Region I/II" legal).
+  - tools/research-merge.js now dedupes by aggressive key too, skips
+    prefix-twin siblings, reports parentConflicts on every skipped dupe whose
+    researched parent disagrees with the tree, and exits non-zero (TWIN
+    ALARM) if a merge run leaves a twin group touching a new org.
+- Across-the-board verification: the 20-link command spine re-checked against
+  current public sources — 18 confirmed; III AC fixed; SFAC inactivated
+  8 Jan 2026 (1st SFAB → USAWHC, 5th → USARPAC; dataset already correct).
+- /tmp/orgs.bak.json + /tmp/sites.bak.json are the pre-v1.0.0-merge state and
+  define the "legacy id" set the repair scripts key on (legacy id always
+  survives a twin merge — stable refs). Ephemeral to this container; the
+  durable rule is: back up data/*.json before any bulk merge and key merges
+  on the backup's id set.
+- Legacy-only oddities flagged for the OWNER (not auto-deleted): 80th TC
+  (USAR vs TASS trees), SSL/SSI duplicate pair, AAL/STE pair, the mangled
+  16th CAB node under DIVARTY, TF Spartan historical markers.

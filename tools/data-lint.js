@@ -113,5 +113,52 @@ const byId = new Map();
   }
 }
 
+
+// ── 7. THE ORG TREE (v1.0.1 — added after the 1st ID knowledge check: the v1.0.0
+//      merge created twin nodes the site-only lint could not see) ────────────────
+{
+  const OFILE = path.join(ROOT, 'data', 'orgs.json');
+  if (!fs.existsSync(OFILE)) bad('data/orgs.json missing');
+  else {
+    let orgs;
+    try { orgs = JSON.parse(fs.readFileSync(OFILE, 'utf8')).orgs; } catch (e) { orgs = null; bad('orgs.json unparsable: ' + e.message); }
+    if (orgs) {
+      const byId = new Map(orgs.map(o => [o.id, o]));
+      const dupIds = orgs.length - byId.size;
+      if (dupIds) bad(dupIds + ' duplicate org id(s)'); else console.log('✓ all ' + orgs.length + ' org ids unique');
+      const orphans = orgs.filter(o => o.parent && !byId.has(o.parent));
+      if (orphans.length) bad(orphans.length + ' org(s) with unresolvable parent: ' + orphans.slice(0,6).map(o=>o.id).join(' · '));
+      else console.log('✓ every org parent resolves');
+      let cyc = 0, deep = 0;
+      for (const o of orgs) { let cur = o, seen = new Set(), d = 0;
+        while (cur && cur.parent) { if (seen.has(cur.id)) { cyc++; break; } seen.add(cur.id); cur = byId.get(cur.parent); if (++d > 40) { cyc++; break; } }
+        deep = Math.max(deep, d); }
+      if (cyc) bad(cyc + ' org(s) in a parent cycle'); else console.log('✓ org tree acyclic (deepest chain ' + deep + ')');
+      const siteIds = new Set(sites.map(s => s.id));
+      const badSite = orgs.filter(o => o.site && !siteIds.has(o.site));
+      if (badSite.length) bad(badSite.length + ' org(s) pointing at missing sites: ' + badSite.slice(0,6).map(o=>o.id).join(' · '));
+      else console.log('✓ every org.site resolves to a real site');
+      // TWIN RULES (the 1st ID lesson): same parent may not hold two orgs whose
+      // aggressive keys match or extend each other — that is one unit written twice.
+      const key = n => String(n).toLowerCase().replace(/\([^)]*\)/g, '').replace(/[^a-z0-9]+/g, '');
+      const byParent = {};
+      orgs.forEach(o => { (byParent[o.parent] = byParent[o.parent] || []).push(o); });
+      const twins = [];
+      for (const pid in byParent) { const ks = byParent[pid];
+        for (let i = 0; i < ks.length; i++) for (let j = i + 1; j < ks.length; j++) {
+          const a = key(ks[i].name), b = key(ks[j].name);
+          if (!a || !b) continue;
+          // prefix counts only when the remainder is substantial — 'DCE Region I'
+          // vs 'DCE Region II' differ by a numeral and are DIFFERENT units
+          const pre = (s, t) => s.length >= 10 && t.startsWith(s) && (t.length - s.length) >= 4;
+          if (a === b || pre(a, b) || pre(b, a))
+            twins.push(ks[i].name + ' <> ' + ks[j].name);
+        } }
+      if (twins.length) { bad(twins.length + ' same-parent twin pair(s) — one unit written twice:'); twins.slice(0,12).forEach(t=>console.log('    ' + t)); }
+      else console.log('✓ no same-parent twins (aggressive-key + prefix rule)');
+    }
+  }
+}
+
 console.log((fails ? 'DATA LINT FAIL' : 'DATA LINT PASS') + (warns ? ' (' + warns + ' warning' + (warns === 1 ? '' : 's') + ')' : ''));
 process.exit(fails ? 1 : 0);
