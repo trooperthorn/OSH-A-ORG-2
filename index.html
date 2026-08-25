@@ -1075,6 +1075,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.32.3 • BRIEF TAP-AWAY (owner recording: "Selections getting stuck when
+//            editing brief mode"). The stuck-popup law (v0.22.0: one tap from
+//            gone) only lived on the CANVAS — but in the brief room the chart
+//            card and the object sheet cover most of the screen, so background
+//            taps hit DOM paper and no law applied: the edit sheet, the box
+//            popup and the focus dimming had no exit short of the nav ring.
+//            New last-resort branch in the click delegate: any tap that fell
+//            through every control and landed on brief paper releases the
+//            room — object sheet, popup, note/org forms, armed add (+bar),
+//            branch focus — and repaints. The globe canvas is excluded (its
+//            own tap law owns it; the click trailing a dot-tap must not undo
+//            the selection it just made).
 //   v0.32.2 • ✕ CLEARS THE BRIEF ROOM TOO (owner: "'X' button still does not
 //            clear on brief"). TWO defects stacked: (1) the satellite was
 //            DISABLED whenever no map site was selected (sel==null gate) — in
@@ -1686,7 +1698,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.32.2';
+const APP_VERSION = 'v0.32.3';
 const APP_UPDATED = '25 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -6042,6 +6054,30 @@ if(!window._odWired){
       if(next){ dz.classList.remove('dz-peek','dz-half','dz-full'); dz.classList.add(next); try{ _sheetFlag(); }catch(_){} }
       if(gp) return;
       if(next) return;
+    }
+    // v0.32.3 — BRIEF TAP-AWAY (owner recording: "Selections getting stuck when
+    // editing brief mode"). In the brief room the chart card + object sheet can
+    // cover the whole screen, so the CANVAS tap-away never gets a tap to see —
+    // background taps hit DOM paper and died here in the delegate. LAST branch,
+    // so every real control has already returned: a tap that landed on brief
+    // paper (stage ground, tree gaps, page ground) releases the room — sheet,
+    // popup, forms, armed add, branch focus. One tap, gone (the v0.22.0 law).
+    // #globeCanvas is excluded: the globe runs its own tap law (tapAtScreen),
+    // and the click that trails a dot-tap must not undo the selection it made.
+    if(document.body.classList.contains('brief-mode')){
+      const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navRow,#navDock,#legendPanel,#exportSheet,#appMenu,#titleBar,#clockTL,#clockTR,#bfArmBar,#errToast,#sbxNote');
+      if(!ctrl){
+        const dz2=document.getElementById('dossier');
+        const dirty=(_coId!=null)||(dz2&&!dz2.hidden)||GlobeState._bfFocus||GlobeState._bfAddUnder||GlobeState._bfAddArm||_bfAnnEdit||_orgForm;
+        if(dirty){
+          _bfAnnEdit=null; _orgForm=null;
+          GlobeState._bfFocus=null; GlobeState._bfAddUnder=null; GlobeState._bfAddArm=false;
+          try{ _bfArmHint(); }catch(_){}
+          try{ calloutHide(); }catch(_){}
+          try{ hideDossier(); }catch(_){}
+          try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
+        }
+      }
     }
   });
 }

@@ -622,3 +622,20 @@ closeouts. The stepping label POLICY is now load-bearing:
   deleting built work needs its own explicit, confirmed control.
 - Debug lesson recorded: when a button "does nothing", check .disabled before
   chasing listeners — element.click() on a disabled button fires no event.
+
+## v0.32.3 — brief tap-away (owner recording: "Selections getting stuck when editing brief mode")
+- THE GAP: the v0.22.0 stuck-popup law (one tap from gone) was implemented on
+  the CANVAS (tapAtScreen). In the brief room the chart card + object sheet
+  cover most of the screen — background taps land on DOM paper and used to
+  fall through the click delegate into nothing. The edit state (sheet, box
+  popup, focus dimming) had no exit but the nav ring.
+- FIX: LAST branch of the document click delegate — after every control has
+  returned — a tap on brief paper releases: object sheet, callout, note/org
+  forms, armed add (+_bfArmHint AFTER dropping the flag), branch focus; then
+  renderBrief+globeMark. #globeCanvas is EXCLUDED from this branch: the globe
+  has its own tap law, and the click that trails a dot-tap must not undo the
+  selection it just made. Keep the branch LAST and keep the exclusion list in
+  sync when new chrome ids arrive.
+- Harness gotcha recorded: the chart runs under CSS zoom (_bfFit) — Playwright
+  coordinate taps MISS chart boxes in this Chromium; dispatch element.click()
+  for box interactions in tests (owner devices hit-test fine, per recordings).
