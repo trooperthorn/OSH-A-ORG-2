@@ -555,3 +555,22 @@ closeouts. The stepping label POLICY is now load-bearing:
   the ✕ sat under BASE TIME at 96px. Clocks move ⇒ move this with them.
 - Cluster badges clamp fully on-screen (E=r+8, cx/cy clamped; hits use the clamped
   point). Pile chips max-width 178px.
+
+## v0.31.1 — the missing lakes + sharper lines (owner: "look at Wisconsin")
+- ROOT CAUSE, know it forever: world-atlas land-110m/land-50m contain NO lakes.
+  The Great Lakes never existed on this globe. Wisconsin/Michigan were black
+  voids: Michigan's entire lakeshore is a SINGLE-USE arc in states-10m, which
+  the interior-mesh rule (use>=2) skips by design.
+- FIX: _topoLakesShore() harvests states-10m single-use (coastal) arcs lying
+  FULLY inside {lon -93.5..-73.0, lat 41.3..49.6} → GLOBE_SHORE_RINGS, drawn
+  with the SAME ink as the ocean coast (they are coast). The fully-inside test
+  is load-bearing: it excludes NYC-harbor/Long Island/NJ Atlantic arcs (east/
+  south) and the 49th-parallel + Lake-of-the-Woods Canada border (west) that
+  would double-trace (v0.11.0 law). Canadian lakeshores aren't in a US states
+  file — international lakes draw their US shore; the dim countries mesh adds
+  the mid-lake border. Zero new data files.
+- Line inks sharpened (phone/near-black reality): states .45/0.7px → .60/0.9px;
+  countries .30/0.55px → .36/0.65px. Coast unchanged (.85/1.0).
+- NOT an audit finding: the UX audit tested flows and flagged faint CONNECTION
+  arcs (fixed v0.29); basemap geography ink was never in its scope. If a future
+  audit round runs, include a "geography reads" check per region.

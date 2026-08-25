@@ -1065,6 +1065,21 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.31.1 • THE MISSING LAKES + SHARPER LINES (owner: "some map lines are now
+//            very dim or not showing... Look at Wisconsin"). Root cause: the
+//            world-atlas land layer has NO lakes — the Great Lakes never
+//            existed on the globe, so Wisconsin/Michigan were black voids
+//            edged only by 0.7px/.45 hairlines (and Michigan's whole lakeshore
+//            is a single-use arc the interior mesh skips entirely). Fix: the
+//            states-10m file already ships the shoreline — its single-use
+//            (coastal) arcs inside the Great Lakes window now draw as
+//            GLOBE_SHORE_RINGS with the SAME ink as the ocean coast; the
+//            fully-inside window test keeps NYC-harbor/Atlantic/NJ arcs and
+//            the 49th-parallel Canada border out (no double tracing, the
+//            v0.11.0 law). State mesh sharpened .45/0.7 → .60/0.9; country
+//            mesh .30/0.55 → .36/0.65. Not an audit finding — the audit
+//            flagged faint CONNECTION arcs (fixed v0.29); basemap geography
+//            ink was never tested. Zero new data files.
 //   v0.31.0 • NAMES AS SELECTED (owner recording, AMC 2/7 · TACOM: "you don't have
 //            to display all names at the same time... show the names as selected").
 //            With an org driving the map the chain goes QUIET: the All view is
@@ -1623,7 +1638,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.31.0';
+const APP_VERSION = 'v0.31.1';
 const APP_UPDATED = '25 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -1896,6 +1911,7 @@ const GLOBE_FALLBACK_RINGS = [[[-168, 65.5], [-166, 68.5], [-161, 70.3], [-156, 
 let GLOBE_RINGS = GLOBE_FALLBACK_RINGS;   // [[ [lon,lat],... ], ... ]
 try{ Object.defineProperty(window,'GLOBE_RINGS',{get:function(){ return GLOBE_RINGS; }}); }catch(_){}   // debug/harness contract: readable from window
 let GLOBE_STATE_RINGS = [];               // US state borders (lat/lon), loaded at runtime
+let GLOBE_SHORE_RINGS = [];               // Great Lakes US shorelines (v0.31.1) — the land layer has no lakes
 // v0.24.0 — US STATES as brief subjects (ported from A-ORG-1). GLOBE_STATE_SHAPES
 // (already loaded by loadStateBorders) supplies the polygons; these centroids
 // place the label and frame the camera.
@@ -2005,14 +2021,23 @@ function drawGlobe(cv, ctx){
   ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.85')+')'; ctx.lineWidth=(wGlow?1.4:1.0);
   ctx.fillStyle=(W&&W.land)?('rgba('+wLand+',.96)'):(wGlow?('rgba('+wAcc+',.30)'):('rgba('+wLand+',.96)'));
   for(const ring of GLOBE_RINGS){ drawGlobePath(ctx,m, ring, true); }
-  // World COUNTRY borders — very thin, dim, global context layer.
+  // GREAT LAKES SHORELINES (v0.31.1, owner: "look at Wisconsin") — world-atlas
+  // land has NO lakes, so the lakes region was a black void bounded by hairlines.
+  // These are the states-10m single-use (coastal) arcs inside the lakes window,
+  // drawn with the SAME ink as the ocean coast: they are coast.
+  if(GLOBE_SHORE_RINGS && GLOBE_SHORE_RINGS.length){
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.85')+')'; ctx.lineWidth=(wGlow?1.4:1.0);
+    for(const ring of GLOBE_SHORE_RINGS){ drawGlobePath(ctx,m, ring, false); }
+  }
+  // World COUNTRY borders — thin, dim, global context layer.
   if(GLOBE_COUNTRY_RINGS && GLOBE_COUNTRY_RINGS.length){
-    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.34':'.30')+')'; ctx.lineWidth=0.55;
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.38':'.36')+')'; ctx.lineWidth=0.65;
     for(const ring of GLOBE_COUNTRY_RINGS){ drawGlobePath(ctx,m, ring, false); }
   }
-  // US state borders — thin lines drawn over the land fill (no fill, no glow).
+  // US state borders — over the land fill (no fill, no glow). v0.31.1 sharpened
+  // (owner: "very dim"): .45/0.7px hairlines vanished on phones over near-black.
   if(GLOBE_STATE_RINGS && GLOBE_STATE_RINGS.length){
-    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.62':'.45')+')'; ctx.lineWidth=(wGlow?0.8:0.7);
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.66':'.60')+')'; ctx.lineWidth=(wGlow?0.9:0.9);
     for(const ring of GLOBE_STATE_RINGS){ drawGlobePath(ctx,m, ring, false); }
   }
   // m5 owns every marker/label/link/brief overlay (A-ORG-1: drawGlobeMarkers et al).
@@ -3580,6 +3605,7 @@ async function loadStateBorders(){
       const rings=_topoInteriorMesh(topo,'states', _geo?null:_albersUsaInvert);
       if(rings && rings.length>=30){
         GLOBE_STATE_RINGS=rings; _statesLoaded=true;
+        try{ GLOBE_SHORE_RINGS=_topoLakesShore(topo,'states', _geo?null:_albersUsaInvert); }catch(_){ GLOBE_SHORE_RINGS=[]; }
         try{ GLOBE_STATE_SHAPES=_namedStateShapes(topo, _geo); }catch(_){ GLOBE_STATE_SHAPES=null; }
         if(window.GlobeState){ GlobeState.dirty=true; }
         return;
@@ -3652,6 +3678,46 @@ function _topoInteriorMesh(topo, objName, projInvert){
       line.push(projInvert ? projInvert(px,py) : [px,py]);
     }
     if(line.length>1) out.push(line);
+  }
+  return out;
+}
+
+// v0.31.1 (owner: "some map lines very dim or not showing — look at Wisconsin"):
+// world-atlas land carries NO lakes, so the Great Lakes never existed on the
+// globe — Wisconsin and Michigan were black voids edged only by the dim interior
+// mesh (Michigan's entire lakeshore is single-use, so the mesh skipped it).
+// The states-10m file already SHIPS the missing geometry: its single-use arcs
+// are the coastline. This harvests the ones lying FULLY inside the Great Lakes
+// window — the fully-inside test is load-bearing: it excludes the Atlantic/NYC
+// harbor arcs (east of -73), the NJ coast (south of 41.3), and the 49th-parallel
+// / Lake-of-the-Woods Canada border (west of -93.5) that would double-trace the
+// land coast or the countries mesh. Canadian shores aren't in a US states file,
+// so the international lakes draw their US shore (plus the dim mid-lake border
+// from the countries layer) — honest for a US installations map.
+function _topoLakesShore(topo, objName, projInvert){
+  const tr=topo.transform, arcs=topo.arcs;
+  const obj=topo.objects && topo.objects[objName]; if(!obj) return [];
+  const use=new Array(arcs.length).fill(0);
+  function tally(ix){ for(const i of ix) use[i<0?~i:i]++; }
+  for(const g of (obj.geometries||[])){
+    if(g.type==='Polygon'){ for(const r of g.arcs) tally(r); }
+    else if(g.type==='MultiPolygon'){ for(const poly of g.arcs) for(const r of poly) tally(r); }
+  }
+  const LO0=-93.5, LO1=-73.0, LA0=41.3, LA1=49.6;
+  const out=[];
+  for(let i=0;i<arcs.length;i++){
+    if(use[i]!==1) continue;                   // shared border → the mesh owns it
+    let x=0,y=0; const line=[]; let lo0=999,lo1=-999,la0=99,la1=-99;
+    for(const d of arcs[i]){
+      let px,py;
+      if(tr){ x+=d[0]; y+=d[1]; px=x*tr.scale[0]+tr.translate[0]; py=y*tr.scale[1]+tr.translate[1]; }
+      else { px=d[0]; py=d[1]; }
+      const pt=projInvert ? projInvert(px,py) : [px,py];
+      if(!pt) continue;
+      line.push(pt);
+      if(pt[0]<lo0)lo0=pt[0]; if(pt[0]>lo1)lo1=pt[0]; if(pt[1]<la0)la0=pt[1]; if(pt[1]>la1)la1=pt[1];
+    }
+    if(line.length>1 && lo0>=LO0 && lo1<=LO1 && la0>=LA0 && la1<=LA1) out.push(line);
   }
   return out;
 }
