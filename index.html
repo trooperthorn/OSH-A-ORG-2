@@ -689,9 +689,13 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   #clockTL{top:calc(env(safe-area-inset-top,0px) + 64px); left:18px}
   #clockTR{top:calc(env(safe-area-inset-top,0px) + 64px); right:18px}
   #clockTR:hover{filter:brightness(1.15)}
-  /* dossier becomes a right-hand panel; still a plain inset scroll container */
-  #dossier{left:auto; right:24px; width:400px;
-    top:calc(env(safe-area-inset-top,0px) + 84px); bottom:auto;
+  /* v0.32.0 ONE SURFACE (owner: "initial pop up on the left side and then
+     details show on the right? Pick one and expand off the same pop up"):
+     the dossier panel now occupies the EXACT rail the docked card lives on
+     (left, 400px, same top) — Details reads as the card expanding in place,
+     and the sheet's ✕ collapses it back to the card on the same spot. */
+  #dossier{left:var(--safe-l); right:auto; width:400px;
+    top:calc(env(safe-area-inset-top,0px) + 114px); bottom:auto;
     max-height:calc(100vh - 180px); max-height:calc(100dvh - 180px)}
   #stageBar{bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
   /* hovers live ONLY here */
@@ -878,8 +882,15 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-dcount{flex:none; font:700 10px/1 var(--mono); color:var(--signal); letter-spacing:.02em}
 .co-up{color:var(--signal); font-weight:800; margin-right:1px}   /* solid orange = reports-to */
 /* v0.21.0 CONNECTION TOGGLES + STEPPER — nothing draws on the globe until asked */
-.co-note{margin-top:6px; font:600 10.5px/1.45 var(--body); color:var(--dim)}
-.co-conx{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+/* v0.32.0 — the connections LEDGER: MAP · BASE · HQ as parallel rows (mono key
+   column), replacing the stepper-headline + fine-print notes the owner flagged */
+.co-cxled{display:flex; flex-direction:column; gap:5px; margin-top:8px}
+.co-cxrow{display:flex; align-items:center; gap:7px; padding:6px 8px; border-radius:10px;
+  background:rgba(0,0,0,.22); box-shadow:inset 0 0 0 1px var(--line);
+  font:600 11px/1.35 var(--body); color:var(--text)}
+.co-cxk{flex:none; min-width:34px; font:700 8.5px/1 var(--mono); letter-spacing:.08em;
+  text-transform:uppercase; color:var(--faint)}
+.co-cxv{flex:1; min-width:0}
 .co-tgl{appearance:none;-webkit-appearance:none; cursor:pointer; margin:0; padding:6px 10px;
   border:0; border-radius:9px; background:rgba(0,0,0,.28); color:var(--dim);
   box-shadow:0 0 0 1px var(--line); font:700 11px/1 var(--body); letter-spacing:.01em;
@@ -888,7 +899,6 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-tgl.on{color:var(--accent); background:linear-gradient(180deg, rgba(60,46,14,.96), rgba(32,24,8,.96));
   box-shadow:0 0 0 1.5px var(--accent), 0 0 14px rgba(245,215,110,.32)}
 .co-tgl.on .co-up{color:var(--accent)}
-.co-step{display:flex; align-items:center; gap:6px; margin-top:7px}
 .co-stepb{appearance:none;-webkit-appearance:none; cursor:pointer; margin:0; flex:none;
   width:30px; height:30px; border:0; border-radius:8px; background:rgba(0,0,0,.28);
   color:var(--accent); box-shadow:0 0 0 1px var(--line); font:800 15px/1 var(--body)}
@@ -1065,6 +1075,19 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.32.0 • ONE SURFACE + THE LEDGER (owner, desktop screenshots). 1) "Pop up
+//            on the left, details on the right — pick one": the desktop dossier
+//            panel now sits on the EXACT rail the docked card occupies (left,
+//            400px, same top) — Details expands off the same popup, ✕ collapses
+//            back to the card in place. 2) Connect ALL now names every
+//            connection end (the overview); stepping still names ONLY the
+//            stepped target (v0.31.0 law) — "show all → each name populates,
+//            click through 1 by 1 → just the specific name". 3) The conx
+//            section's "All 3 shown" + fine-print notes became the LEDGER:
+//            parallel MAP · BASE · HQ rows with mono keys, the stepper riding
+//            the MAP row, the real base name ("12 subordinates here on Fort
+//            Bragg"), the HQ line toggle on the HQ row. Honest-copy law kept:
+//            MAP + BASE = UNITS, said in place, no footnotes.
 //   v0.31.1 • THE MISSING LAKES + SHARPER LINES (owner: "some map lines are now
 //            very dim or not showing... Look at Wisconsin"). Root cause: the
 //            world-atlas land layer has NO lakes — the Great Lakes never
@@ -1638,7 +1661,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.31.1';
+const APP_VERSION = 'v0.32.0';
 const APP_UPDATED = '25 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -3102,17 +3125,19 @@ function drawGlobeMarkers(ctx, m){
 
     // chain-member labels draw at ANY zoom AND through the Names/USACE toggles —
     // a selected command string keeps its names (v0.12.0 owner directive).
-    // v0.31.0 NAMES AS SELECTED (owner recording, AMC 2/7 · TACOM): with an org
-    // driving the map the chain stays QUIET — printing every member at once
-    // "takes away from the visual". A name prints only where the user is looking:
-    // the selected site, the currently STEPPED subordinate (forced — collision
-    // culled ARL/ARTRANS, the one name that mattered), and the far end of a
-    // shown HQ line. All view = arcs only; each step names its own target.
+    // v0.31.0 NAMES AS SELECTED (owner recording, AMC 2/7 · TACOM), refined
+    // v0.32.0 (owner: "for Show all connections you can have each name populate;
+    // when you click through 1 by 1 just populate the specific name"):
+    //   plain selection → only the selected site's name;
+    //   Connect ALL     → every connection end names itself (the overview);
+    //   stepping        → ONLY the stepped target's name, force-placed;
+    //   HQ line on      → its far end names itself too.
     if(onChain){
       const _rl=GlobeState._relList;
       const _stpSite=(GlobeState._showSubs&&GlobeState._relStep!=null&&GlobeState._relStep>=0&&_rl&&_rl[GlobeState._relStep])?_rl[GlobeState._relStep].siteId:null;
       const _isStep=(_stpSite!=null&&inst.id===_stpSite);
-      const _named=!GlobeState.selOrg || isSel || _isStep || (GlobeState._showHQ&&isUp);
+      const _allView=(GlobeState._showSubs && _stpSite==null);
+      const _named=!GlobeState.selOrg || isSel || _isStep || (_allView&&isDown) || (GlobeState._showHQ&&isUp);
       if(_named){
       // v0.27.1: the chain map names each site by the org the chain put there
       // (selected org / parent / child); a site's default unit string never
@@ -5075,31 +5100,41 @@ function _coRender(){
       try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parent=anc; break; } } }catch(_){}
       const rl=GlobeState._relList||[];
       const hereN=Math.max(0, unitsN-subN);
+      // v0.32.0 THE LEDGER (owner: "'all shown + addition on base' is confusing \u2014
+      // the on-base comes across as fine print"). Three PARALLEL rows with mono
+      // keys \u2014 MAP (owns the stepper) \u00b7 BASE \u00b7 HQ \u2014 same visual weight, the real
+      // base name instead of "this base", nothing footnoted. Honest-copy law
+      // holds: MAP subN + BASE hereN = the card's UNITS count, each said in place.
+      const bs0=GlobeState.sel?siteById(GlobeState.sel):null;
+      const bn=(bs0&&bs0.base)||'this base';
+      h+='<div class="co-cxled">';
       if(subN){
         const st=GlobeState._relStep; const stepping=(st!=null&&st>=0&&st<rl.length);
         const label=stepping?((st+1)+' / '+subN+' \u00b7 '+_bfAbbr(rl[st]?rl[st].name:''))
-                            :('All '+subN+' shown');
-        h+='<div class="co-step">'
+                            :('All '+subN+' on the map');
+        h+='<div class="co-cxrow">'
+          +'<span class="co-cxk">Map</span>'
           +'<button class="co-stepb" type="button" data-costep="prev" aria-label="Previous subordinate">\u2039</button>'
           +'<span class="co-stepn">'+esc(label)+'</span>'
           +'<button class="co-stepb" type="button" data-costep="next" aria-label="Next subordinate">\u203a</button>'
           +'<button class="co-stepall'+(stepping?'':' on')+'" type="button" data-costep="all">All</button>'
           +'</div>';
-        if(hereN) h+='<div class="co-note">+ '+hereN+' more subordinate'+(hereN===1?'':'s')+' here on this base</div>';
+        if(hereN) h+='<div class="co-cxrow"><span class="co-cxk">Base</span><span class="co-cxv">'+hereN+' subordinate'+(hereN===1?'':'s')+' here on '+esc(bn)+'</span></div>';
       } else if(unitsN){
-        h+='<div class="co-note">All '+unitsN+' subordinate'+(unitsN===1?'':'s')+' are HERE on this base \u2014 no lines to draw</div>';
+        h+='<div class="co-cxrow"><span class="co-cxk">Base</span><span class="co-cxv">All '+unitsN+' subordinate'+(unitsN===1?'':'s')+' are here on '+esc(bn)+' \u2014 nothing to draw</span></div>';
       } else {
-        h+='<div class="co-note">No mapped subordinate connections</div>';
+        h+='<div class="co-cxrow"><span class="co-cxk">Map</span><span class="co-cxv">No mapped subordinate connections</span></div>';
       }
       if(parent){
         const pSid=(typeof ogEffSite==='function')?ogEffSite(parent.id):null;
         if(pSid && GlobeState.sel && pSid===GlobeState.sel){
-          h+='<div class="co-note"><span class="co-up">\u2191</span> HQ \u00b7 '+esc(_bfAbbr(parent.name))+' \u2014 here on this base</div>';
+          h+='<div class="co-cxrow"><span class="co-cxk">HQ</span><span class="co-cxv">'+esc(_bfAbbr(parent.name))+' \u2014 here on '+esc(bn)+'</span></div>';
         } else {
-          h+='<div class="co-conx"><button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq">'
-            +'<span class="co-up">\u2191</span> '+(GlobeState._showHQ?'Hide':'Show')+' HQ line \u00b7 '+esc(_bfAbbr(parent.name))+'</button></div>';
+          h+='<div class="co-cxrow"><span class="co-cxk">HQ</span><button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq">'
+            +'<span class="co-up">\u2191</span> '+(GlobeState._showHQ?'Hide line':'Show line')+' \u00b7 '+esc(_bfAbbr(parent.name))+'</button></div>';
         }
       }
+      h+='</div>';
     }
   }
   if(brief || o){

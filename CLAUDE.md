@@ -574,3 +574,19 @@ closeouts. The stepping label POLICY is now load-bearing:
 - NOT an audit finding: the UX audit tested flows and flagged faint CONNECTION
   arcs (fixed v0.29); basemap geography ink was never in its scope. If a future
   audit round runs, include a "geography reads" check per region.
+
+## v0.32.0 — one surface + the ledger (owner, desktop screenshots)
+- ONE SURFACE (desktop ≥1100px): #dossier lives on the SAME rail as the docked
+  card — left:var(--safe-l), 400px, top safe+114 (identical numbers to
+  #calloutCard.co-docked). Details = the card expanding in place; the sheet ✕
+  returns the card to the same spot. If the card's dock geometry ever moves,
+  move the desktop dossier WITH it — split rails was the owner complaint.
+- LABEL POLICY (final form): plain selection → selected name only; Connect ALL
+  → every connection end named (best-effort placement); STEPPING → only the
+  stepped target (forced + _bfAbbr fallback); HQ line on → its end named.
+  _allView flag in the dot-loop label gate. Don't collapse these cases.
+- THE LEDGER: conx section = .co-cxled with parallel .co-cxrow rows, mono
+  .co-cxk keys MAP · BASE · HQ. Stepper rides the MAP row; BASE says the real
+  base name; HQ row holds the co-located note or the Show-line toggle.
+  .co-note/.co-conx/.co-step CSS deleted with their markup (dead-lint).
+  Honest-copy law continues: MAP subN + BASE hereN = UNITS count, in place.
