@@ -687,3 +687,12 @@ closeouts. The stepping label POLICY is now load-bearing:
   Earth 50m family (land + lakes + countries + states from the same geometry).
   Consistent by construction; restores Canadian lakeshores; retires the
   offset-line class permanently. ~1 release; adds data/ files.
+
+## v0.33.2 — the build stamp (owner: "how can we track current build through the app?")
+- #verTag: APP_VERSION under the wordmark, faint mono, pointer-events:none,
+  visible in BOTH rooms, rides the title bar's gesture fade. Every screenshot
+  and recording now self-documents its build — the review-truth loop closes:
+  toast = a NEW build arrived (once); stamp = the CURRENT build (always);
+  ⋯ menu row + wordmark long-press sheet = full detail (version + date).
+- The stamp is populated from APP_VERSION in the boot block (single source —
+  never hand-write a version into markup). Keep it OUT of interactive paths.

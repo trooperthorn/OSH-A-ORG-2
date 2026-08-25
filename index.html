@@ -260,6 +260,14 @@ body{
 }
 @media(min-width:1100px){ #wordmark{font-size:21px} }
 #wordmark{ -webkit-user-select:none; user-select:none; -webkit-touch-callout:none }
+/* v0.33.2 — THE BUILD STAMP (owner: "how can we track current build through the
+   app?"): the running version sits under the wordmark, always on screen, so
+   every screenshot and recording self-documents which build it shows. Quiet by
+   design (faint mono); it rides the title bar's gesture fade. Not a control —
+   the wordmark long-press door stays the interactive path to diagnostics. */
+#verTag{position:absolute; left:50%; transform:translateX(-50%); top:37px;
+  font:600 8.5px/1 var(--mono); letter-spacing:.14em; color:var(--faint);
+  opacity:.9; pointer-events:none; -webkit-user-select:none; user-select:none}
 
 /* CHROME YIELDS (v0.8.0 automation): while a gesture is moving the globe, every
    floating surface steps back so the world owns the screen; it breathes back in
@@ -1000,6 +1008,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      the wordmark; everything pertinent lives in the globe button's ring. -->
 <header id="titleBar">
   <h1 id="wordmark">A&thinsp;-&thinsp;O&thinsp;R&thinsp;G&thinsp;-&thinsp;2</h1>
+  <span id="verTag" aria-label="Build version"></span>
 </header>
 
 <!-- SEARCH — standalone, one job (map is the default room; modes flip on the globe button) -->
@@ -1075,6 +1084,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.33.2 • THE BUILD STAMP (owner: "how can we track current build or
+//            version through the app?"). The running version now lives under
+//            the wordmark — #verTag, faint mono, always on screen in both
+//            rooms, riding the title bar's gesture fade — so every screenshot
+//            and recording self-documents its build. Together with v0.33.1:
+//            the toast announces a NEW build once; the stamp names the
+//            CURRENT build always; the ⋯ menu row and the wordmark long-press
+//            maintenance sheet carry the full version + date detail.
 //   v0.33.1 • REVIEW TRUTH (owner judged v0.33.0's basemap fix "not fixed" from
 //            a screenshot showing the PRE-v0.33 dim 110m border — the PWA's
 //            service worker serves the previous build on the first load after
@@ -1722,13 +1739,15 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.33.1';
+const APP_VERSION = 'v0.33.2';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
 // boots, so the reviewer always knows which build they are looking at. The
 // auto-update reload (top of file) brings new builds in; this stamp proves it.
 try{
+  // v0.33.2: the permanent stamp — every frame of the app names its build
+  var _vt=document.getElementById('verTag'); if(_vt) _vt.textContent=APP_VERSION;
   setTimeout(function(){
     try{
       var seen=localStorage.getItem('a2VerSeen');
