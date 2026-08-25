@@ -832,3 +832,23 @@ closeouts. The stepping label POLICY is now load-bearing:
   brief-room form that skips those reset sites WILL get stuck — that class of
   bug shipped twice before (v0.32.2/v0.32.3).
 
+## v1.0.4 — no overlapping surfaces (owner recording: "pop ups overlap… only show 3 at a time")
+- TEXT FORMS LIVE IN SHEETS, NEVER IN CHART CHROME. The v1.0.3 inline
+  group-name form in the chart foot collapsed to a sliver under the iOS
+  keyboard + AutoFill bar (typed text invisible). Every "New group" door now
+  opens _bfGroupSheet in the dossier — the same rc-form grammar as rename and
+  note, which the keyboard already coexists with. Smoke fails the build if
+  bf-grprow ever reappears in chart HTML.
+- STICKY IS THE PICKER'S CONTRACT ONLY. #dossier .rc-acts was sticky with a
+  transparent-top gradient; over scrolled sheet content it read as a second
+  overlapping pop-up in the owner's recording. The sticky rule is now scoped
+  to .bf-picksticky (the ＋ picker's commit row — a long list genuinely needs
+  its commit reachable). Any other sheet's action row flows with the content.
+- THE THREE-ROW LAW (owner, across the board): a floating list shows ~3 rows
+  and scrolls. #searchResults is capped at 172px on phone AND desktop (the
+  desktop 60vh override is gone). Apply the same cap to any future floating
+  list; sheet-internal lists (picker) scroll inside the sheet and are exempt.
+- Surface budget: at most the docked chart + ONE sheet-or-callout + one toast
+  on screen. Sheets and the callout are already mutually exclusive; keep it
+  that way — a fourth simultaneous surface is a bug by definition.
+

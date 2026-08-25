@@ -343,7 +343,9 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
   position:absolute; z-index:30;
   bottom:calc(env(safe-area-inset-bottom,0px) + 144px);   /* opens UPWARD, flush on the pill */
   left:max(var(--safe-l), calc(50% - 300px)); right:max(var(--safe-r), calc(50% - 300px));
-  max-height:44vh; max-height:48dvh;
+  /* v1.0.4 THREE-ROW LAW (owner): a floating list shows ~3 rows and scrolls —
+     a taller stack of pop-up rows starts burying the room behind it */
+  max-height:172px;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   border-radius:var(--r-card); padding:4px;
 }
@@ -549,9 +551,6 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   outline:1.4px dashed var(--bfc,var(--t1)); outline-offset:-1.4px}
 .bf-box.bf-grp.bf-tinted{background:color-mix(in srgb, var(--bfc) 10%, rgba(0,0,0,.14))}
 .bf-grptag{font:700 7px/1 var(--mono); letter-spacing:.16em; color:var(--faint)}
-.bf-grprow{display:flex; gap:6px; align-items:center; margin:6px 0 2px}
-.bf-grprow .rc-in{flex:1; margin:0}
-.bf-grprow .bf-act{flex:none; margin:0}
 /* the fold caret sits under its box and carries the hidden count */
 /* v0.26.0 — the per-object ops: ＋ add subordinates · ✎ edit. Small and quiet so
    the box stays minimal, but always reachable without opening anything first. */
@@ -584,7 +583,11 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 .bf-picksub{flex:none; max-width:38%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   font:500 10px/1.2 var(--body); color:var(--dim)}
 #dossier .bf-picklist{max-height:46vh}
-#dossier .rc-acts{position:sticky; bottom:0; padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
+/* v1.0.4 — sticky is the PICKER's contract only (its commit button must stay
+   reachable over a long list). On every other sheet the acts row flows with
+   the content: a sticky, see-through row over sheet text read as a second
+   pop-up in the owner's recording. */
+#dossier .rc-acts.bf-picksticky{position:sticky; bottom:0; padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
   background:linear-gradient(180deg, transparent, var(--panel) 22%)}
 .bf-commit.in{background:var(--accent); color:#1a1305; box-shadow:none}
 .bf-commit.in:active{filter:brightness(1.1)}
@@ -733,7 +736,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   /* top edge centers; corners come free for the clocks */
   #searchPill{left:0; right:0; width:560px; margin-inline:auto}
   #searchResults{left:0; right:0; width:560px; margin-inline:auto;
-    bottom:calc(env(safe-area-inset-bottom,0px) + 160px); max-height:60vh; max-height:60dvh}
+    bottom:calc(env(safe-area-inset-bottom,0px) + 160px)}   /* three-row law holds on desktop too */
   #themeSwitch{top:calc(env(safe-area-inset-top,0px) + 12px); right:24px}
   /* clocks take the true corners */
   /* below the title tiles — the SELECT cell is a live button and must never
@@ -1136,6 +1139,21 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.0.4 • NO OVERLAPPING SURFACES (owner recording: "pop ups overlap,
+//            can't see the text, double pop ups when trying to edit… only
+//            show 3 pop ups at a time"). Three fixes for the classes, not
+//            the cases: (1) the v1.0.3 inline group-name form collapsed
+//            under the phone keyboard — text forms live in SHEETS, never in
+//            chart chrome: every "New group" door (foot, empty state, ＋
+//            picker) now opens _bfGroupSheet, the same form grammar as
+//            rename/note; (2) the sheet's action row was sticky with a
+//            see-through gradient — over scrolled content it read as a
+//            second pop-up: sticky is now the PICKER's contract only, every
+//            other sheet's actions flow with the content; (3) THE THREE-ROW
+//            LAW: a floating list shows ~3 rows and scrolls — search
+//            results capped at 172px on phone AND desktop. Smoke enforces
+//            all three (no inline form in chart HTML, group sheet renders,
+//            picker keeps its sticky).
 //   v1.0.3 • GROUPS IN THE BRIEF (owner: "allow to make groups in brief mode
 //            as a filler organization to help with hierarchy"). A GROUP is an
 //            owner-named filler node — "Enablers", "TF Alpha" — that exists
@@ -1873,7 +1891,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.0.3';
+const APP_VERSION = 'v1.0.4';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -4824,16 +4842,11 @@ function renderBrief(){
   if(!memN){
     h+='<div class="bf-empty"><b>The brief is empty</b>'
       +'<span>Search an organization or a US state below to place it on the diagram.</span>'
-      +'<button type="button" class="bf-addsel" data-bfsearch="1">Search to add</button>';
-    // v1.0.3 — a build can START from a group scaffold, not only from a real org
-    if(window._bfGrpForm){
-      h+='<div class="bf-grprow"><input class="rc-in" id="bfGrpNm" type="text" maxlength="40" placeholder="Group name — e.g. Enablers" autocomplete="off">'
-        +'<button class="bf-act in" type="button" data-bfgrpcreate="">Create</button>'
-        +'<button class="bf-act" type="button" data-bfgrpcancel="1" aria-label="Cancel">✕</button></div>';
-    } else {
-      h+='<button type="button" class="bf-addsel" data-bfgrpnew="1">⊞ Start with a group</button>';
-    }
-    h+='</div>';
+      +'<button type="button" class="bf-addsel" data-bfsearch="1">Search to add</button>'
+      // v1.0.3 — a build can START from a group scaffold; v1.0.4: the name form
+      // lives in the SHEET (the inline foot form fought the keyboard and lost)
+      +'<button type="button" class="bf-addsel" data-bfgrpnew="">⊞ Start with a group</button>'
+      +'</div>';
     el.innerHTML=h; return;
   }
   const C=_briefChainMap({all:true});
@@ -4918,16 +4931,11 @@ function renderBrief(){
       return (hid.has(r)?'':'')+nodeHtml(r,1);
     }).join('')+'</ul></div>';
   // v1.0.3 \u2014 the foot offers BOTH build moves: a real org (search) or a GROUP
-  // (an owner-named filler node that shapes the hierarchy). The group button
-  // becomes its inline name form in place; \u2715 or tap-away puts it back.
-  if(window._bfGrpForm){
-    h+='<div class="bf-foot bf-grprow"><input class="rc-in" id="bfGrpNm" type="text" maxlength="40" placeholder="Group name \u2014 e.g. Enablers, TF Alpha" autocomplete="off">'
-      +'<button class="bf-act in" type="button" data-bfgrpcreate="">Create</button>'
-      +'<button class="bf-act" type="button" data-bfgrpcancel="1" aria-label="Cancel">\u2715</button></div>';
-  } else {
-    h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">\u2295 Add organization</button>'
-      +'<button type="button" class="bf-act" data-bfgrpnew="1">\u229e New group</button></div>';
-  }
+  // (an owner-named filler node that shapes the hierarchy). v1.0.4: the name
+  // form opens in the SHEET (_bfGroupSheet) \u2014 the inline foot form collapsed
+  // under the phone keyboard in the owner's recording. Never bring it back.
+  h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">\u2295 Add organization</button>'
+    +'<button type="button" class="bf-act" data-bfgrpnew="">\u229e New group</button></div>';
   el.innerHTML=h;
   try{ _bfFit(); }catch(_){}
 }
@@ -5778,9 +5786,8 @@ function _bfAddSheet(pk){
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
     +'<div class="od-sub">Tick as many as you need \u2014 they all land under this organization.</div>';
   h+='<input class="rc-in bf-pickq" id="bfPickQ" type="text" placeholder="Search all organizations and states\u2026" value="'+escA(window._bfPickQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
-  // v1.0.3 \u2014 or create a GROUP right here: a named filler node under this parent
-  h+='<div class="bf-grprow"><input class="rc-in" id="bfGrpNmP" type="text" maxlength="40" placeholder="Or create a group under '+escA(_bfAbbr(par.n))+'\u2026" autocomplete="off">'
-    +'<button class="bf-act in" type="button" data-bfgrpcreate="'+escA(pk)+'">Create</button></div>';
+  // v1.0.3 \u2014 or create a GROUP under this parent (v1.0.4: opens the name sheet)
+  h+='<button type="button" class="bf-act in bf-addsub" data-bfgrpnew="'+escA(pk)+'">\u229e New group under '+esc(_bfAbbr(par.n))+'\u2026</button>';
   if(own && q.length<2) h+='<div class="bf-subhead">Its subordinates \u00b7 '+own+'</div>';
   else if(q.length>=2) h+='<div class="bf-subhead">Matches \u00b7 '+shown.length+'</div>';
   h+='<div class="bf-picklist">';
@@ -5796,7 +5803,7 @@ function _bfAddSheet(pk){
       +'</button>';
   });
   h+='</div>';
-  h+='<div class="rc-row rc-acts">'
+  h+='<div class="rc-row rc-acts bf-picksticky">'
     +'<button class="bf-act bf-commit'+(pick.size?' in':'')+'" type="button" data-bfpickadd="'+escA(pk)+'"'+(pick.size?'':' disabled')+'>'
       +(pick.size?('Add '+pick.size+' under '+esc(_bfAbbr(par.n))):'Select organizations to add')+'</button>'
     +(pick.size?'<button class="bf-act" type="button" data-bfpickclear="1">Clear</button>':'')
@@ -5808,6 +5815,33 @@ function _bfAddSheet(pk){
   host.classList.add('dz-full');
   host.hidden=false; host.scrollTop=0;
   _sheetFlag();
+}
+// v1.0.4 — THE GROUP SHEET: one small form in the dossier, the same grammar as
+// rename/note (the v1.0.3 inline foot form collapsed under the phone keyboard —
+// a text form ALWAYS lives in a sheet, never in the chart chrome).
+function _bfGroupSheet(pk){
+  const host=document.getElementById('dossier'); if(!host) return;
+  const par=pk?bfNode(pk):null;
+  if(pk && !par) return;
+  try{ calloutHide(); }catch(_){}
+  _odInjectCSS();
+  const esc=_odEsc, escA=_odEscA;
+  window._bfGrpForm={p:par?par.k:null};
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">New group'+(par?(' under '+esc(_bfAbbr(par.n))):'')+'</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
+    +'<div class="od-sub">A filler element you name — it shapes the hierarchy and lives only on this diagram.</div>'
+    +'<div class="rc-form">'
+    +'<input class="rc-in" id="bfGrpNm" type="text" maxlength="40" placeholder="Group name — e.g. Enablers, TF Alpha" autocomplete="off" autocapitalize="words" spellcheck="false">'
+    +'<div class="rc-btns"><span class="od-sp"></span>'
+    +'<button class="rc-cancel" type="button" data-bfgrpcancel="1">Cancel</button>'
+    +'<button class="rc-save" type="button" data-bfgrpcreate="'+escA(par?par.k:'')+'">Create</button></div></div>';
+  host.innerHTML=h;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add('dz-half');
+  host.hidden=false; host.scrollTop=0;
+  _sheetFlag();
+  try{ const f=document.getElementById('bfGrpNm'); f&&f.focus(); }catch(_){}
 }
 // batch add — push every pick, then save/render ONCE (adding twenty one-at-a-time
 // would re-render and re-frame the globe twenty times)
@@ -6163,20 +6197,22 @@ if(!window._odWired){
       bfNote(id, f?f.value:''); _bfAnnEdit=null; _bfObjSheet(id); return; }
     const bc=e.target.closest('[data-bfanncancel]');
     if(bc){ const id=_bfAnnEdit; _bfAnnEdit=null; if(id) _bfObjSheet(id); return; }
-    // ---- v1.0.3 GROUPS — create (foot / empty state / ＋ picker) and rename ----
+    // ---- v1.0.3 GROUPS (v1.0.4: the name form is a SHEET — _bfGroupSheet) ----
     const bgn=e.target.closest('[data-bfgrpnew]');
-    if(bgn){ window._bfGrpForm=1; try{ renderBrief(); }catch(_){}
-      try{ const f=document.getElementById('bfGrpNm'); f&&f.focus(); }catch(_){} return; }
+    if(bgn){ try{ _bfGroupSheet(bgn.getAttribute('data-bfgrpnew')||null); }catch(_){} return; }
     const bgx=e.target.closest('[data-bfgrpcancel]');
-    if(bgx){ window._bfGrpForm=null; try{ renderBrief(); }catch(_){} return; }
+    if(bgx){ const st=window._bfGrpForm; window._bfGrpForm=null;
+      if(st && st.p){ try{ _bfAddSheet(st.p); return; }catch(_){} }   // came from the picker → back to it
+      try{ hideDossier(); }catch(_){} return; }
     const bgc=e.target.closest('[data-bfgrpcreate]');
     if(bgc){ const pk2=bgc.getAttribute('data-bfgrpcreate')||null;
-      const inp=bgc.parentElement?bgc.parentElement.querySelector('input'):null;
+      const inp=document.getElementById('bfGrpNm');
       const nm=String((inp&&inp.value)||'').trim();
       if(!nm){ try{ inp&&inp.focus(); }catch(_){} return; }   // a group needs a name — no silent blanks
       window._bfGrpForm=null;
       bfAddCustom(nm, pk2);                                   // _bfPush renders + reframes
-      if(pk2){ try{ _bfAddSheet(pk2); }catch(_){} }           // the picker stays — keep filling the group's parent
+      if(pk2){ try{ _bfAddSheet(pk2); }catch(_){} }           // back to the picker — keep filling this parent
+      else { try{ hideDossier(); }catch(_){} }
       try{ _bfToast('Group “'+nm.slice(0,28)+'” added'+(pk2?(' under '+_bfAbbr((bfNode(pk2)||{}).n||'')):'')); }catch(_){}
       return; }
     const brn=e.target.closest('[data-bfrnedit]');

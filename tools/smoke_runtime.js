@@ -446,6 +446,19 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       const chart=global.renderBrief && (function(){ global.renderBrief(); return IDS['briefStage']?IDS['briefStage'].innerHTML:''; })();
       if(chart && (chart.indexOf('bf-grp')<0 || chart.indexOf('GROUP')<0)){
         fails++; console.log('✗ GROUP box missing its dashed class / engraved tag in the chart'); }
+      // v1.0.4 — the name form is a SHEET, never inline chart chrome (the owner's
+      // recording: the inline foot form collapsed under the phone keyboard)
+      if(chart && chart.indexOf('bf-grprow')>=0){ fails++; console.log('✗ inline group form back in the chart — v1.0.4 banned it'); }
+      if(chart && chart.indexOf('data-bfgrpnew')<0){ fails++; console.log('✗ chart foot lost its New group door'); }
+      if(typeof global._bfGroupSheet==='function'){
+        global._bfGroupSheet(grp.k);
+        const dz=IDS['dossier']?IDS['dossier'].innerHTML:'';
+        if(dz.indexOf('bfGrpNm')<0 || dz.indexOf('data-bfgrpcreate')<0){
+          fails++; console.log('✗ _bfGroupSheet did not render the name form'); }
+      } else { fails++; console.log('✗ _bfGroupSheet missing'); }
+      global._bfAddSheet && global._bfAddSheet(grp.k);
+      const dz2=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      if(dz2 && dz2.indexOf('bf-picksticky')<0){ fails++; console.log('✗ picker commit row lost its sticky contract'); }
       global.Brief.remove(grp.k);
       if(global.Brief.has('amc')){ fails++; console.log('✗ GROUP removal must cascade its subtree'); }
       if(!fails) console.log('  ✓ groups: create-under + nest real org + rename (group-only) + chart tag + cascade remove');
