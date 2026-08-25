@@ -1075,6 +1075,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.32.2 • ✕ CLEARS THE BRIEF ROOM TOO (owner: "'X' button still does not
+//            clear on brief"). TWO defects stacked: (1) the satellite was
+//            DISABLED whenever no map site was selected (sel==null gate) — in
+//            the brief room that is always, so every tap died before any
+//            handler ran; ✕ is the room reset and is now always live. (2)
+//            clearAll was written for the map room: in brief it nulled
+//            _bfFocus but never re-rendered the chart, left the chip popup,
+//            open annotation/org forms, the multi-add pick, branch folds and
+//            the minimized chart untouched. Now it closes the popup, resets
+//            every brief view state and REPAINTS. The built diagram is kept
+//            (✕ clears the view, never deletes work) — a toast says "View
+//            cleared — your diagram is kept" so the button visibly answers.
 //   v0.32.1 • THE CLEAR WINDOW (owner recording #3, AMC stepper: "This again…" —
 //            6/7 ARTRANS hidden behind the card, 7/7's arc off-screen). Every
 //            camera fit centered on the CANVAS, but the docked card owns the
@@ -1674,7 +1686,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.32.1';
+const APP_VERSION = 'v0.32.2';
 const APP_UPDATED = '25 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -4780,6 +4792,20 @@ function clearAll(){
   try{ const r=document.getElementById('searchResults'); if(r){ r.innerHTML=''; r.classList.remove('sr-open'); } }catch(_){}
   try{ ['legendPanel','exportSheet','appMenu'].forEach(function(id){
     const p=document.getElementById(id); if(p) p.hidden=true; }); }catch(_){}
+  // v0.32.2 (owner: "'X' button still does not clear on brief"): the brief room
+  // now ACTUALLY clears — popup, open forms, multi-pick, folds, minimized chart —
+  // and the chart REPAINTS (the old path nulled _bfFocus but never re-rendered,
+  // so ✕ looked dead). The built diagram is KEPT: ✕ clears the view, it never
+  // deletes work; the toast says so out loud.
+  try{ if(typeof calloutHide==='function') calloutHide(); }catch(_){}
+  try{ _bfAnnEdit=null; _orgForm=null; window._bfPick=null; GlobeState._bfAddArm=false; GlobeState._bfFold={};
+    if(typeof _bfArmHint==='function') _bfArmHint();   // again — the earlier call ran while _bfAddArm was still true (top-level arm kept its bar)
+  }catch(_){}
+  try{ document.body.classList.remove('chart-min'); }catch(_){}
+  try{ if(document.body.classList.contains('brief-mode')){
+    renderBrief();
+    if(typeof _bfToast==='function') _bfToast('View cleared — your diagram is kept');
+  } }catch(_){}
   try{ globeMark(); }catch(_){}
 }
 try{ window.clearAll=clearAll; }catch(_){}
@@ -7257,7 +7283,11 @@ function bootShell(){
       var bk=document.getElementById('navSat-back');
       if(bk) bk.disabled=!((GlobeState._undo||[]).length);
       var cl=document.getElementById('navSat-clear');
-      if(cl) cl.disabled=(GlobeState.sel==null);
+      // v0.32.2 (owner: "'X' still does not clear on brief"): the sel==null gate
+      // made ✕ a DEAD button in the brief room (no map selection there, ever) —
+      // and even in the map room ✕ has a job with nothing selected (fly home,
+      // close panels). ✕ is the room reset: always live.
+      if(cl) cl.disabled=false;
       var zo=document.getElementById('navSat-zoomout');
       if(zo) zo.disabled=(GlobeState.zoom<=1.01);
       var zi=document.getElementById('navSat-zoomin');

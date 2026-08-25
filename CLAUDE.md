@@ -605,3 +605,20 @@ closeouts. The stepping label POLICY is now load-bearing:
   DEVCOM(6) + XVIII(3) on phone AND desktop, asserting per step that the
   stepped target AND the selected diamond project inside _clearBand() (see
   scratchpad sweep.js pattern — port it forward). 32/32 green at ship time.
+
+## v0.32.2 — ✕ clears the brief room (owner: "'X' still does not clear on brief")
+- TWO stacked defects; know both: (1) _nvSet disabled navSat-clear whenever
+  GlobeState.sel==null — in brief that is ALWAYS, so taps died before any
+  handler (a disabled <button> swallows clicks silently — the bug was
+  invisible to handler-level debugging). ✕ is the room reset: always enabled.
+  Never gate a satellite on map-room state that a whole room lacks.
+- (2) clearAll was map-room-only: it nulled _bfFocus but never called
+  renderBrief() (no repaint = "looks dead"), and left calloutHide, _bfAnnEdit/
+  _orgForm, window._bfPick, _bfAddArm (call _bfArmHint AFTER dropping it —
+  the first call runs while it's still true and keeps the bar), _bfFold,
+  body.chart-min untouched. All cleared now; brief mode also re-renders and
+  toasts "View cleared — your diagram is kept".
+- LAW: ✕ clears VIEW state in both rooms. It never deletes brief nodes —
+  deleting built work needs its own explicit, confirmed control.
+- Debug lesson recorded: when a button "does nothing", check .disabled before
+  chasing listeners — element.click() on a disabled button fires no event.
