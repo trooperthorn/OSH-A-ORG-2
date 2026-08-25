@@ -1075,6 +1075,19 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.32.1 • THE CLEAR WINDOW (owner recording #3, AMC stepper: "This again…" —
+//            6/7 ARTRANS hidden behind the card, 7/7's arc off-screen). Every
+//            camera fit centered on the CANVAS, but the docked card owns the
+//            top ~45% of a phone and a 400px rail on desktop — so half the
+//            stepped targets landed under glass. New _clearBand() measures the
+//            map the user can actually SEE (canvas − docked card − search
+//            pill) and _bandAim() both FITS the spread inside that window and
+//            CENTERS the flight on it. Wired into _flyPair (each step),
+//            _flyFitChain (Connect/All landing) and _flyFitPts (cluster tap).
+//            Review contract upgraded to match: every step of AMC(7)/DEVCOM(6)/
+//            XVIII(3) is now driven on phone AND desktop with an in-band
+//            assertion per step — sampling a few steps is what let this class
+//            ship three times.
 //   v0.32.0 • ONE SURFACE + THE LEDGER (owner, desktop screenshots). 1) "Pop up
 //            on the left, details on the right — pick one": the desktop dossier
 //            panel now sits on the EXACT rail the docked card occupies (left,
@@ -1661,7 +1674,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.32.0';
+const APP_VERSION = 'v0.32.1';
 const APP_UPDATED = '25 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -4664,6 +4677,9 @@ function _flyFitChain(){
     let maxSep=0;
     vs.forEach(function(v){ let dot=cv[0]*v[0]+cv[1]*v[1]+cv[2]*v[2]; dot=Math.max(-1,Math.min(1,dot));
       maxSep=Math.max(maxSep, Math.acos(dot)/d); });
+    // v0.32.1: the whole web must fit in the CLEAR window, centered there.
+    const aim=_bandAim(cLat, cLon, maxSep*2, 1.0, 4.8);
+    if(aim){ flyToLatLon(aim.lat, aim.lon, aim.zoom); return; }
     const span=maxSep*2*1.15;                                // full width + breathing room
     const zoom = span>150?1.0 : span>110?1.15 : span>75?1.5 : span>45?2.0 : span>22?2.6 : span>10?3.4 : 4.4;
     flyToLatLon(cLat, cLon, zoom);
@@ -4683,10 +4699,52 @@ function _flyFitPts(pts, minZoom){
     let maxSep=0;
     vs.forEach(function(v){ let dot=cv2[0]*v[0]+cv2[1]*v[1]+cv2[2]*v[2]; dot=Math.max(-1,Math.min(1,dot));
       maxSep=Math.max(maxSep, Math.acos(dot)/d); });
+    // v0.32.1: same clear-window law as the pair/chain fits.
+    const aim=_bandAim(cLat, cLon, maxSep*2, minZoom||1.7, 4.8);
+    if(aim){ flyToLatLon(aim.lat, aim.lon, aim.zoom); return; }
     const span=maxSep*2*1.2;
     const zoom=Math.max(minZoom||1.7, span>60?1.7 : span>30?2.2 : span>14?2.9 : span>6?3.8 : 4.8);
     flyToLatLon(cLat, cLon, zoom);
   }catch(_){}
+}
+// ── THE CLEAR WINDOW (v0.32.1, owner recording #3: "This again…") ─────────────
+// Every fit used to center on the CANVAS — but the docked card owns the top
+// ~45% of a phone (and a 400px left rail on desktop), so about half the stepped
+// targets landed under the glass or off-frame. The camera must aim at the map
+// the user can SEE: canvas minus the docked card minus the search pill.
+function _clearBand(){
+  try{
+    const cv=document.getElementById('globeCanvas'); if(!cv||!cv.getBoundingClientRect) return null;
+    const cr=cv.getBoundingClientRect(); if(!(cr.width>0&&cr.height>0)) return null;
+    let x0=cr.left, y0=cr.top, x1=cr.right, y1=cr.bottom;
+    const co=document.getElementById('calloutCard');
+    if(co && !co.hidden && co.classList && co.classList.contains('co-docked')){
+      const r=co.getBoundingClientRect();
+      if(r.width > 0.7*cr.width) y0=Math.max(y0, r.bottom);   // phone: top band
+      else x0=Math.max(x0, r.right);                          // desktop: left rail
+    }
+    const sp=document.getElementById('searchPill');
+    if(sp && sp.getBoundingClientRect){ const r=sp.getBoundingClientRect(); if(r.height>0 && r.top>y0+80) y1=Math.min(y1, r.top); }
+    if(x1-x0<120 || y1-y0<120) return null;
+    return { cx:(x0+x1)/2-cr.left, cy:(y0+y1)/2-cr.top, w:x1-x0, h:y1-y0, W:cr.width, H:cr.height };
+  }catch(_){ return null; }
+}
+// Aim so (midLat,midLon) sits at the clear window's CENTER and an angular
+// spread of sepDeg fits inside it (north-up small-offset approximation —
+// exact enough for fits well inside the disc). Null when no live DOM/band.
+function _bandAim(midLat, midLon, sepDeg, zMin, zMax){
+  const band=_clearBand(); if(!band) return null;
+  const m=GlobeState.__mCss; if(!m||!m.R||!GlobeState.zoom) return null;
+  const R1=m.R/GlobeState.zoom;                              // globe px radius per zoom unit
+  const sepRad=Math.max(0.002, sepDeg*Math.PI/180);
+  const chord=2*Math.sin(Math.min(Math.PI/2, sepRad/2));
+  let zoom=(0.72*Math.min(band.w, band.h))/(R1*chord);
+  zoom=Math.max(zMin||1.05, Math.min(zMax||7.8, zoom));
+  const k=R1*zoom*Math.PI/180;                               // px per degree at target zoom
+  const lat=midLat + (band.cy - band.H/2)/k;                 // pair midpoint → band center, not canvas center
+  const cosL=Math.max(0.25, Math.cos(midLat*Math.PI/180));
+  const lon=midLon - (band.cx - band.W/2)/(k*cosL);
+  return { lat:Math.max(-80,Math.min(80,lat)), lon:lon, zoom:zoom };
 }
 function _flyPair(aLat,aLon,bLat,bLon){
   try{
@@ -4698,8 +4756,10 @@ function _flyPair(aLat,aLon,bLat,bLon){
     const cLat=Math.asin(Math.max(-1,Math.min(1,m[2]/L)))/d, cLon=Math.atan2(m[1],m[0])/d;
     let dot=va[0]*vb[0]+va[1]*vb[1]+va[2]*vb[2]; dot=Math.max(-1,Math.min(1,dot));
     const sep=Math.acos(dot)/d;                              // degrees apart
-    // v0.31.0 (re-verify): near-co-located pairs (DEVCOM→ARL, Aberdeen→Adelphi)
-    // earned deeper rungs — at 5.2 they read as one dot and the step showed nothing.
+    // v0.32.1: fit + center the pair in the CLEAR window (see _clearBand above).
+    const aim=_bandAim(cLat, cLon, sep, 1.05, 7.8);
+    if(aim){ flyToLatLon(aim.lat, aim.lon, aim.zoom); return; }
+    // DOM-less fallback (harness): the v0.31.0 separation ladder.
     const zoom = sep>120?1.05 : sep>80?1.3 : sep>45?1.8 : sep>20?2.4 : sep>8?3.2 : sep>3?4.2 : sep>1.2?5.4 : sep>0.45?6.6 : 7.8;
     flyToLatLon(cLat, cLon, zoom);
   }catch(_){}

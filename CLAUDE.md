@@ -590,3 +590,18 @@ closeouts. The stepping label POLICY is now load-bearing:
   base name; HQ row holds the co-located note or the Show-line toggle.
   .co-note/.co-conx/.co-step CSS deleted with their markup (dead-lint).
   Honest-copy law continues: MAP subN + BASE hereN = UNITS count, in place.
+
+## v0.32.1 — the clear window (owner recording #3: "This again…")
+- LAW: every camera fit aims at the CLEAR WINDOW — canvas minus the docked
+  card minus the search pill — never the canvas center. _clearBand() measures
+  it live (phone: top band; desktop: left rail; co-docked only); _bandAim()
+  fits the angular spread inside it AND offsets the flight center so the
+  midpoint lands at the band's center. Wired into _flyPair, _flyFitChain,
+  _flyFitPts (harness/DOM-less runs fall back to the old ladders). Any NEW
+  camera fit must go through _bandAim or state why not.
+- WHY IT SHIPPED BROKEN 3x: step verification SAMPLED 1-3 steps per chain, and
+  the sampled ones happened to land in the visible strip. REVIEW CONTRACT NOW:
+  camera/stepper work is verified by driving EVERY step of at least AMC(7) +
+  DEVCOM(6) + XVIII(3) on phone AND desktop, asserting per step that the
+  stepped target AND the selected diamond project inside _clearBand() (see
+  scratchpad sweep.js pattern — port it forward). 32/32 green at ship time.
