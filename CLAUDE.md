@@ -639,3 +639,26 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Harness gotcha recorded: the chart runs under CSS zoom (_bfFit) — Playwright
   coordinate taps MISS chart boxes in this Chromium; dispatch element.click()
   for box interactions in tests (owner devices hit-test fine, per recordings).
+
+## v0.33.0 — one source per edge (owner: "traced unevenly 3 times — resolve in its entirety")
+- THE LAYERING LAW (supersedes the v0.31.1 lakes-window hack): every basemap
+  edge draws ONCE, from the best source that has it.
+  · Ocean coast → land-50m alone. Nobody retraces it.
+  · ALL US inland edges (Great Lakes shores, US-Canada, US-Mexico, AK-Canada,
+    small islands 50m lacks) → states-10m single-use arcs via _shoreHarvest():
+    per-POINT classification against the live 50m coast (0.3° grid hash, own+8
+    neighbors ≈ 0.6°), split into inland segments with one-point reach into
+    the coast zone so borders meet the coast without gaps. Arc-level rules
+    CANNOT work — Maine's single arc is half ocean coast, half land border.
+  · Other countries → countries-110m mesh with every arc the USA polygon
+    touches dropped (_topoInteriorMesh exclGeom param). The coarse offset US
+    border was the third trace.
+- _shoreHarvest() re-runs on each land rung (110m→50m) — the classifier keys
+  off whichever coast is live; the load race is harmless. _US_EDGE_CAND holds
+  the decoded single-use lines between runs.
+- Inks (Lumen flat): coast + US edges .92/1.1px · states .62/0.95px ·
+  countries .36/0.65px. Hierarchy comes from WEIGHT, never from doubling.
+  Any new geometry layer must state which existing layer yields to it.
+- Verified: 49th parallel, Great Lakes, St. Lawrence, Maine (the split-arc
+  case), US-Mexico, PNW border-meets-coast, CONUS + world — full-res crops,
+  all single lines. NE zone data probe: 7 border segments live there.
