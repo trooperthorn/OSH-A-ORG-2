@@ -531,6 +531,8 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 #dossier .bf-picklist{max-height:46vh}
 #dossier .rc-acts{position:sticky; bottom:0; padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
   background:linear-gradient(180deg, transparent, var(--panel) 22%)}
+.bf-commit.in{background:var(--accent); color:#1a1305; box-shadow:none}
+.bf-commit.in:active{filter:brightness(1.1)}
 .bf-toast{position:fixed; left:50%; transform:translateX(-50%) translateY(8px); z-index:60;
   bottom:calc(env(safe-area-inset-bottom,0px) + 180px); padding:9px 14px; border-radius:12px;
   background:linear-gradient(180deg, rgba(60,46,14,.98), rgba(32,24,8,.98));
@@ -872,8 +874,8 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   font:500 10px/1.25 var(--body); color:var(--dim)}
 .co-dcount{flex:none; font:700 10px/1 var(--mono); color:var(--signal); letter-spacing:.02em}
 .co-up{color:var(--signal); font-weight:800; margin-right:1px}   /* solid orange = reports-to */
-.co-dn{color:var(--accent); font-weight:800; margin-right:1px}   /* dashed yellow = subordinates */
 /* v0.21.0 CONNECTION TOGGLES + STEPPER — nothing draws on the globe until asked */
+.co-note{margin-top:6px; font:600 10.5px/1.45 var(--body); color:var(--dim)}
 .co-conx{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
 .co-tgl{appearance:none;-webkit-appearance:none; cursor:pointer; margin:0; padding:6px 10px;
   border:0; border-radius:9px; background:rgba(0,0,0,.28); color:var(--dim);
@@ -882,7 +884,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-tgl:active{filter:brightness(1.3)}
 .co-tgl.on{color:var(--accent); background:linear-gradient(180deg, rgba(60,46,14,.96), rgba(32,24,8,.96));
   box-shadow:0 0 0 1.5px var(--accent), 0 0 14px rgba(245,215,110,.32)}
-.co-tgl.on .co-up,.co-tgl.on .co-dn{color:var(--accent)}
+.co-tgl.on .co-up{color:var(--accent)}
 .co-step{display:flex; align-items:center; gap:6px; margin-top:7px}
 .co-stepb{appearance:none;-webkit-appearance:none; cursor:pointer; margin:0; flex:none;
   width:30px; height:30px; border:0; border-radius:8px; background:rgba(0,0,0,.28);
@@ -919,6 +921,27 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .co-tail{position:absolute; left:50%; bottom:-6px; width:12px; height:12px;
   background:var(--glass-lo); transform:rotate(45deg);
   box-shadow:1px 1px 0 0 var(--line)}
+/* v0.29.0 — THE DOCKED CARD (audit #1): in the map room the card lives in the
+   top band, full-width on phones, a 400px panel on desktop. The map below stays
+   clear; the tail dies (nothing to point at — the diamond on the dot points). */
+/* v0.29.0 (audit #9): while a sheet is open past peek, the globe FAB steps
+   aside and the sheet keeps clear air under its last row. */
+body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s ease}
+#dossier{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 88px)}
+#calloutCard.co-docked{
+  left:var(--safe-l) !important; right:var(--safe-r); top:calc(env(safe-area-inset-top,0px) + 96px) !important;
+  width:auto; max-height:42vh; max-height:42dvh; overflow-y:auto;
+  -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+}
+#calloutCard.co-docked .co-tail{display:none}
+@media(min-width:1100px){
+  #calloutCard.co-docked{ right:auto; width:400px; max-height:64vh }
+}
+/* while a section is open the icon tiles shrink to a slim tab row — the section
+   is the content now (owner: minimal, expand on demand) */
+.co-icrow.mini .co-ic{flex-direction:row; min-height:32px; gap:5px; padding:5px 8px}
+.co-icrow.mini .co-ic b{min-height:0}
+.co-icrow.mini .co-ic svg{width:12px;height:12px}
 #calloutCard.co-below .co-tail{bottom:auto; top:-6px; box-shadow:-1px -1px 0 0 var(--line)}
 #calloutCard.co-clamped .co-tail{display:none}
 
@@ -982,6 +1005,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
     <button id="navSat-zoomin" class="nv-sat glass" type="button" aria-label="Zoom in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
     <button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
     <button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button>
+    <button id="navSat-brief" class="nv-sat glass" type="button" aria-label="Switch between Map and Brief"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="5" rx="1.4"></rect><path d="M7.2 9v3.2M7.2 12.2H5m2.2 0h2.2M5 12.2v2.6m4.4-2.6v2.6"></path><rect x="3" y="14.8" width="4" height="4.4" rx="1.2"></rect><rect x="7.4" y="14.8" width="4" height="4.4" rx="1.2"></rect><path d="M14.5 6.5h5.5M14.5 10h5.5M14.5 13.5h4"></path></svg></button>
   </div>
 </div>
 
@@ -1028,6 +1052,32 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v0.29.0 • THE AUDIT RELEASE (owner: "deploy a team of agents… view this from
+//            the standpoint of app users"). A 6-journey UX audit (27 ranked
+//            findings) drove one coherent redesign instead of another patch.
+//            THE DOCKED CARD (#1, the owner's screenshot): in the map room the
+//            callout no longer floats over the subject — it DOCKS to the top
+//            band (full-width phone / 400px desktop panel), leaving ~75% of the
+//            screen clear map; the selected diamond is the pointer. While a
+//            section is open the icon tiles shrink to a slim tab row, and the
+//            connections section is one stepper line — no header, no tower.
+//            LABELS (#2): #calloutCard/#briefStage/#navRow joined the chrome
+//            exclusion zones — canvas text never ghosts under glass again.
+//            HONEST COPY (#5/#18): "+N more subordinates here on this base",
+//            "All N are HERE — no lines to draw", a static "HQ · here" line for
+//            co-located parents, org cards say "Host Base · ST", SUBS→UNITS.
+//            ARCS (#8): the all view draws at 2.1px/0.8 (was 1.3/0.5 — invisible).
+//            CHAIN OF COMMAND FIRST (#3): an org's Details leads with Reports
+//            to + Subordinates; the 72-row tenant roster folds into an accordion.
+//            Category shells (ASCCs…) left the rendered chain (#27). STATE PICK
+//            LANDS (#4): map-room Texas flies there + toast pointing at the
+//            Brief room. NO SHEET SLAM (#12): a brief-room add = chart + toast.
+//            ROOT ARM BAR (#13). Dossier ✕ closes ONLY the dossier (#14). Stale
+//            card folds when search focuses (#15). BRIEF SATELLITE (#16): the
+//            room switch is a labeled ring button, not a secret 3s hold. FAB
+//            steps aside under open sheets (#9). Commit buttons outweigh Clear
+//            (#22). Depth chips hide on 1-level charts (#24). Desktop boots on
+//            the Army footprint (#25).
 //   v0.28.0 • CONNECT ZOOMS OUT (owner: "apply a zoom out to show the connections
 //            across the map"). Turning connections on now FRAMES THE WHOLE WEB:
 //            _flyFitChain gathers the selected site + every subordinate arc
@@ -1524,7 +1574,7 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v0.28.0';
+const APP_VERSION = 'v0.29.0';
 const APP_UPDATED = '21 August 2026';
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2821,7 +2871,7 @@ function drawGlobeLinks(ctx, m){
     if(st!=null && st>=0 && st<GlobeState._cmdLinkArcs.length){
       drawSubtleArcs(ctx, m, [GlobeState._cmdLinkArcs[st]], T.accent, 2.4, 0.95, true);   // 1-by-1: isolate one, bright
     } else {
-      drawSubtleArcs(ctx, m, GlobeState._cmdLinkArcs, T.accent, 1.3, 0.5, false, [2.5,5]);  // all, dim
+      drawSubtleArcs(ctx, m, GlobeState._cmdLinkArcs, T.accent, 2.1, 0.8, false, [2.5,5]);  // all view — v0.29.0 audit #8: it must READ
     }
   }
   if(GlobeState._showHQ && GlobeState._hqArc && GlobeState._hqArc.length){
@@ -2838,7 +2888,8 @@ function _gChromeZones(m){
     if(cr && cr.width>0 && cr.height>0){
       const kx=W/cr.width, ky=H/cr.height, live=[], PAD=4;
       const sels=['#searchPill','#searchResults','#dossier','#titleBar',
-                  '#clockTL','#clockTR','#navGlobe'];
+                  '#clockTL','#clockTR','#navGlobe',
+                  '#calloutCard','#briefStage','#navRow'];   // v0.29.0 audit: canvas text must never ghost under glass
       for(const s of sels){
         const el=document.querySelector(s); if(!el) continue;
         const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
@@ -3851,7 +3902,12 @@ function searchSelect(id){
     if(st) try{ flyToLatLon(st.lat, st.lon, Math.max(GlobeState.zoom||1, 2.2)); }catch(_){}
     if(document.body.classList.contains('brief-mode')){
       if(!bfNode(id)) bfAddState(_stn, GlobeState._bfFocus||null);
-      try{ _bfObjSheet(id); }catch(_){}
+      try{ _bfToast(_stn+' added to the brief'); }catch(_){}
+    } else {
+      // v0.29.0 (audit #4): a map-room state pick must not be a silent dead end —
+      // fly there, fold the stale card, and say where highlighting lives.
+      try{ calloutHide(); }catch(_){}
+      try{ _bfToast(_stn+' \u2014 highlight it from the Brief room'); }catch(_){}
     }
     return;
   }
@@ -3866,8 +3922,15 @@ function searchSelect(id){
       if(hs && hs.lat!=null) try{ flyToLatLon(hs.lat, hs.lon, Math.max(GlobeState.zoom||1, 2.4)); }catch(_){}
       // v0.25.0 — a brief-room pick PLACES the organization: under the armed parent
       // when "Add a subordinate under X" armed one, else nested naturally. One tap.
-      try{ if(!bfHas(oid)) bfAdd(oid); }catch(_){}
-      try{ _bfObjSheet(oid); }catch(_){}
+      // v0.29.0 (audit #12): NO sheet slam after the add — the chart updating IS
+      // the payoff; a toast confirms. The ✎ on the new box opens its sheet.
+      try{
+        const was=bfHas(oid);
+        if(!was){ bfAdd(oid);
+          const nd=bfNode(oid);
+          if(nd) _bfToast((nd.n||'Added')+(nd.p?(' \u2014 under '+_bfAbbr((bfNode(nd.p)||{}).n||'')):' added'));
+        } else { _bfObjSheet(oid); }               // picking an existing member = open it
+      }catch(_){}
       return;
     }
     if(sid && typeof selectSite==='function'){ selectSite(sid, {orgId:oid}); return; }
@@ -3890,6 +3953,15 @@ function searchSelect(id){
   try{ if(typeof showDossier==='function') showDossier(s.id); }catch(_){}
 }
 
+// v0.29.0 (audit #15): the moment the user starts a NEW search, the old card
+// folds — the next pick draws its own. Selection state survives; only the glass goes.
+if(!window.__coSearchFold){ window.__coSearchFold=true;
+  document.addEventListener('focusin', function(e){
+    if(!e.target || e.target.id!=='searchInput') return;
+    if(document.body.classList.contains('brief-mode')) return;
+    try{ if(_coId!=null) calloutHide(); }catch(_){}
+  });
+}
 // ---- bottom search vs the phone keyboard (v0.14.0) ----------------------------
 if(!window.__sbKbWired){ window.__sbKbWired=true;
   try{
@@ -4264,10 +4336,11 @@ function renderBrief(){
   }
   // ── the CONTROL BAR: fit/zoom + the depth dial. Minimal, one row.
   const zpc=GlobeState._bfZoom?(Math.round(GlobeState._bfZoom*100)+'%'):'Fit';
+  const _deep=C.order.some(function(k){ return C.nodes[k].lvl>1; });   // v0.29.0 audit #24
   h+='<div class="bf-bar">'
-    +'<span class="bf-seg">'+[1,2,3,4].map(function(n){
+    +(_deep?('<span class="bf-seg">'+[1,2,3,4].map(function(n){
         return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+'">L'+n+'</button>';
-      }).join('')+'</span>'
+      }).join('')+'</span>'):'')
     +'<span class="bf-seg bf-zseg">'
       +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">\u2212</button>'
       +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
@@ -4497,8 +4570,16 @@ function showDossier(id){
   try{ host.setAttribute('aria-label', s.base+' — dossier'); }catch(_){}
   host.scrollTop=0;                                // deviation 7: whole card into view
   _odStageClearSync(true);
+  _sheetFlag();
 }
 
+function _sheetFlag(){
+  try{
+    const h=document.getElementById('dossier');
+    const open=h && !h.hidden && (h.classList.contains('dz-half')||h.classList.contains('dz-full'));
+    document.body.classList.toggle('sheet-open', !!open);
+  }catch(_){}
+}
 function hideDossier(){
   const host=document.getElementById('dossier'); if(!host) return;
   host.hidden=true;
@@ -4510,6 +4591,7 @@ function hideDossier(){
   host.classList.remove('dz-half','dz-full','fan-open'); host.classList.add('dz-peek');
   try{ host.setAttribute('aria-label','Dossier'); }catch(_){}
   _odStageClearSync(false);
+  _sheetFlag();
 }
 
 // sheet tab + inline-form state (v0.4.0 datastore). The v0.8.0 compact card
@@ -4536,7 +4618,9 @@ function _odRender(s){
   // selection's ORG (GlobeState.selOrg); ancestors and subordinates are org
   // hops rendered with their effective sites.
   const selOg=(GlobeState.selOrg && typeof orgOf==='function') ? orgOf(GlobeState.selOrg) : null;
-  const chain=selOg ? ogChainUp(selOg.id) : [];
+  const chain=selOg ? ogChainUp(selOg.id).filter(function(p){
+    return !(typeof _OG_CATS!=='undefined' && _OG_CATS[p.id]);   // v0.29.0 audit #27: grouping shells aren't commands
+  }) : [];
   const kids=selOg ? ogKids(selOg.id) : [];
   const hosted=(typeof ogAtSite==='function') ? ogAtSite(s.id) : [];
 
@@ -4587,18 +4671,20 @@ function _odRender(s){
     +'</div>';
   if(_odTab!=='ov') return h+_rcRender(s.id, _odTab);
 
-  // STATIONED HERE — every org the A-ORG-1 tree puts at this site; tapping a
-  // row re-aims the chain picture at that org (no site change, no duplicates).
-  if(hosted.length>1){
-    h+='<div class="od-sec od-sec-up">At '+_odEsc(s.base)+' <b>'+hosted.length+'</b></div>'
-      +hosted.map(function(og){
+  // STATIONED HERE — every org the A-ORG-1 tree puts at this site. v0.29.0
+  // (audit #3): when an ORG drives the sheet, the chain of command leads and this
+  // roster folds into an accordion — nobody scrolls 72 tenants to find "Reports
+  // to". On the base's own sheet the roster still leads.
+  const hostedRows=(hosted.length>1)?hosted.map(function(og){
         const on=selOg && selOg.id===og.id;
         return '<button class="od-crumb'+(on?' od-crumb-on':'')+'" type="button" data-ogsel="'+_odEscA(og.id)+'">'
           +'<span class="bd-nm"><b>'+_odEsc(og.name)+'</b></span>'
           +'<span class="od-sp"></span>'
           +(on?'<span class="od-crumb-tag">CHAIN</span>':'')
           +'</button>';
-      }).join('');
+      }).join(''):'';
+  if(hostedRows && !selOg){
+    h+='<div class="od-sec od-sec-up">At '+_odEsc(s.base)+' <b>'+hosted.length+'</b></div>'+hostedRows;
   }
 
   // UP — the reporting line as crumb ROWS, direct parent first → HQDA last
@@ -4642,6 +4728,10 @@ function _odRender(s){
     h+='<div class="od-sec od-sec-down">Subordinate orgs</div>'
       +'<div class="od-note">No subordinates on file.</div>';
   }
+  // v0.29.0 (audit #3): the tenant roster rides BEHIND the chain on an org sheet
+  if(hostedRows && selOg){
+    h+=_disc('od-hosted','At '+_odEsc(s.base), hostedRows, {count:hosted.length, def:false});
+  }
   return h;
 }
 
@@ -4680,7 +4770,8 @@ function _coRender(){
   const name=o?o.name:(ag?ag.name:((sOg&&sOg.name)||s.base));
   const sub=o?('Custom org'+(o.base&&siteById(o.base)?(' · '+siteById(o.base).base):''))
             :(ag?((agHost?agHost.base:'')+((agHost&&agHost.st)?(' · '+agHost.st):''))
-                 :(s.st||''));                     // v0.27.0: the base card's title IS the base — the sub adds only the state
+                 :(sOg?(s.base+(s.st?(' \u00b7 '+s.st):''))    // an ORG card says WHERE it sits (audit #18)
+                      :(s.st||'')));               // the base card's title IS the base — the sub adds only the state
   const nrec=(s&&typeof recCount==='function')?recCount(_coId):0;
   const brief=document.body.classList.contains('brief-mode');
   let h='<div class="co-head"><div class="co-name">'+esc(name)+'</div>'
@@ -4701,11 +4792,11 @@ function _coRender(){
     const subN=(GlobeState._cmdLinkArcs&&GlobeState._cmdLinkArcs.length)?GlobeState._cmdLinkArcs.length:0;
     const canConx=isBase ? unitsN>0 : (subN>0 || true);   // an org always has at least its HQ line
     const sec=window._coSec||null;
-    // ── the icon row
-    h+='<div class="co-icrow">';
+    // ── the icon row (mini tabs while a section is open — the section is the content)
+    h+='<div class="co-icrow'+(sec?' mini':'')+'">';
     if(unitsN) h+='<button type="button" class="co-ic'+(sec==='units'?' on':'')+'" data-coic="units" aria-label="'+(isBase?'Units on this base':'Subordinate units')+'">'
       +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"></rect></svg>'
-      +'<b>'+unitsN+'</b><span>'+(isBase?'Units':'Subs')+'</span></button>';
+      +'<b>'+unitsN+'</b><span>Units</span></button>';
     if(canConx) h+='<button type="button" class="co-ic'+(sec==='conx'?' on':'')+'" data-coic="conx" aria-label="Show connections">'
       +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2.2"></circle><circle cx="12" cy="6" r="2.2"></circle><circle cx="19" cy="19" r="2.2"></circle><path d="M6.5 17L10.5 8M13.5 8l4 9"></path></svg>'
       +'<b>&nbsp;</b><span>Connect</span></button>';
@@ -4759,26 +4850,36 @@ function _coRender(){
     // ── CONNECTIONS — the arcs are live while this section is open; the stepper
     // clicks through them 1 by 1; the HQ line is one more tap.
     if(sec==='conx' && briefSubj){
-      let parentName=null;
-      try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parentName=anc.name; break; } } }catch(_){}
+      // v0.29.0 (audit #5): the numbers must AGREE on screen. subN = arcs that can
+      // draw; hereN = subordinates co-located on this very base (no arc to draw).
+      let parent=null;
+      try{ for(const anc of ogChainUp(briefSubj)){ if(!(typeof _OG_CATS!=='undefined'&&_OG_CATS[anc.id])){ parent=anc; break; } } }catch(_){}
       const rl=GlobeState._relList||[];
+      const hereN=Math.max(0, unitsN-subN);
       if(subN){
         const st=GlobeState._relStep; const stepping=(st!=null&&st>=0&&st<rl.length);
         const label=stepping?((st+1)+' / '+subN+' \u00b7 '+_bfAbbr(rl[st]?rl[st].name:''))
                             :('All '+subN+' shown');
-        h+='<div class="co-drillhead"><span class="co-dn">\u2193</span> Subordinate connections</div>';
         h+='<div class="co-step">'
           +'<button class="co-stepb" type="button" data-costep="prev" aria-label="Previous subordinate">\u2039</button>'
           +'<span class="co-stepn">'+esc(label)+'</span>'
           +'<button class="co-stepb" type="button" data-costep="next" aria-label="Next subordinate">\u203a</button>'
           +'<button class="co-stepall'+(stepping?'':' on')+'" type="button" data-costep="all">All</button>'
           +'</div>';
+        if(hereN) h+='<div class="co-note">+ '+hereN+' more subordinate'+(hereN===1?'':'s')+' here on this base</div>';
+      } else if(unitsN){
+        h+='<div class="co-note">All '+unitsN+' subordinate'+(unitsN===1?'':'s')+' are HERE on this base \u2014 no lines to draw</div>';
       } else {
-        h+='<div class="co-drillhead">No mapped subordinate connections</div>';
+        h+='<div class="co-note">No mapped subordinate connections</div>';
       }
-      if(parentName){
-        h+='<div class="co-conx"><button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq">'
-          +'<span class="co-up">\u2191</span> '+(GlobeState._showHQ?'Hide':'Show')+' HQ line \u00b7 '+esc(_bfAbbr(parentName))+'</button></div>';
+      if(parent){
+        const pSid=(typeof ogEffSite==='function')?ogEffSite(parent.id):null;
+        if(pSid && GlobeState.sel && pSid===GlobeState.sel){
+          h+='<div class="co-note"><span class="co-up">\u2191</span> HQ \u00b7 '+esc(_bfAbbr(parent.name))+' \u2014 here on this base</div>';
+        } else {
+          h+='<div class="co-conx"><button class="co-tgl'+(GlobeState._showHQ?' on':'')+'" type="button" data-cotgl="hq">'
+            +'<span class="co-up">\u2191</span> '+(GlobeState._showHQ?'Hide':'Show')+' HQ line \u00b7 '+esc(_bfAbbr(parent.name))+'</button></div>';
+        }
       }
     }
   }
@@ -4822,15 +4923,24 @@ function _coPlace(){
   const c=document.getElementById('calloutCard');
   if(!c || _coId==null || c.hidden) return;
   try{
+    const brief=document.body.classList.contains('brief-mode');
+    if(!brief){
+      // v0.29.0 (audit #1 — every journey hit it): the map card DOCKS to the top
+      // band instead of parking over the subject. The globe below stays clear;
+      // the selected dot keeps its diamond + label as the pointer.
+      c.classList.add('co-docked'); c.classList.remove('co-below','co-clamped');
+      c.style.left=''; c.style.top=''; c.style.opacity=''; c.style.pointerEvents='auto';
+      const drill=c.querySelector('.co-drill'); if(drill) drill.style.maxHeight='';
+      return;
+    }
+    c.classList.remove('co-docked');
     const a=_coAnchor();
-    if(!a || a.back){ c.style.opacity='0'; c.style.pointerEvents='none'; return; }  // far hemisphere / matrix not ready: hide, returns on rotate (a dead id self-hides in _coRender)
+    if(!a || a.back){ c.style.opacity='0'; c.style.pointerEvents='none'; return; }  // far hemisphere: hide, returns on rotate (a dead id self-hides in _coRender)
     c.style.opacity=''; c.style.pointerEvents='auto';
     const vw=window.innerWidth||390, vh=window.innerHeight||844;
-    const topSafe=112, botSafe=vh-168;                    // clear of the clocks / search bar + globe
-    // v0.19.0: a tall navigator (drill list) is capped to the band; the list
-    // scrolls inside so the card never bleeds under the search bar or globe.
+    const topSafe=112, botSafe=vh-168;
     const drill=c.querySelector('.co-drill');
-    if(drill) drill.style.maxHeight='';                   // natural first, then cap to fit
+    if(drill) drill.style.maxHeight='';
     let w=c.offsetWidth||236, hgt=c.offsetHeight||110;
     if(drill && hgt>(botSafe-topSafe)){
       const dh=Math.max(84, drill.offsetHeight-(hgt-(botSafe-topSafe)));
@@ -4841,13 +4951,11 @@ function _coPlace(){
     let y=above ? a.y-hgt-18 : a.y+18;
     let clamped=false;
     if(!above && (y+hgt)>botSafe){
-      y=Math.max(topSafe, botSafe-hgt); clamped=true;      // dock into the band; the dot still pulses on the globe
+      y=Math.max(topSafe, botSafe-hgt); clamped=true;
     }
+    c.style.left=x+'px'; c.style.top=y+'px';
     c.classList.toggle('co-below', !above && !clamped);
     c.classList.toggle('co-clamped', clamped);
-    c.style.left=Math.round(x)+'px'; c.style.top=Math.round(y)+'px';
-    const t=c.querySelector('.co-tail');
-    if(t) t.style.left=Math.max(12, Math.min(a.x-x-6, w-24))+'px';
   }catch(_){}
 }
 // v0.24.0 — \u21c4 MOVE UNDER: re-parent a diagram node from its sheet
@@ -4925,16 +5033,17 @@ const BF_PALETTE=['#ffffff','#c9d4dd','#8d99ae','#fff3b0','#ffdc46','#d4a017',
 function _bfArmHint(){
   let el=document.getElementById('bfArmBar');
   const k=GlobeState._bfAddUnder, nd=k?bfNode(k):null;
-  if(!nd){ if(el) el.remove(); return; }
+  const root=!nd && GlobeState._bfAddArm;                      // v0.29.0 audit #13: a top-level add arms visibly too
+  if(!nd && !root){ if(el) el.remove(); return; }
   if(!el){ el=document.createElement('div'); el.id='bfArmBar'; document.body.appendChild(el); }
   el.className='bf-armbar';
-  el.innerHTML='<span>Adding under <b>'+_odEsc(_bfAbbr(nd.n))+'</b> \u2014 search below</span>'
+  el.innerHTML='<span>'+(nd?('Adding under <b>'+_odEsc(_bfAbbr(nd.n))+'</b>'):'Adding to the brief')+' \u2014 search below</span>'
     +'<button type="button" data-bfdisarm="1" aria-label="Cancel">\u2715</button>';
 }
 // every add path funnels through here so the armed parent is honoured exactly once
 function _bfTakeParent(fallback){
   const k=GlobeState._bfAddUnder;
-  GlobeState._bfAddUnder=null;
+  GlobeState._bfAddUnder=null; GlobeState._bfAddArm=false;
   try{ _bfArmHint(); }catch(_){}
   return (k && bfNode(k)) ? k : fallback;
 }
@@ -4999,7 +5108,7 @@ function _bfAddSheet(pk){
   });
   h+='</div>';
   h+='<div class="rc-row rc-acts">'
-    +'<button class="bf-act'+(pick.size?' in':'')+'" type="button" data-bfpickadd="'+escA(pk)+'"'+(pick.size?'':' disabled')+'>'
+    +'<button class="bf-act bf-commit'+(pick.size?' in':'')+'" type="button" data-bfpickadd="'+escA(pk)+'"'+(pick.size?'':' disabled')+'>'
       +(pick.size?('Add '+pick.size+' under '+esc(_bfAbbr(par.n))):'Select organizations to add')+'</button>'
     +(pick.size?'<button class="bf-act" type="button" data-bfpickclear="1">Clear</button>':'')
     +'</div>';
@@ -5009,6 +5118,7 @@ function _bfAddSheet(pk){
   host.classList.remove('dz-peek','dz-half','dz-full');
   host.classList.add('dz-full');
   host.hidden=false; host.scrollTop=0;
+  _sheetFlag();
 }
 // batch add — push every pick, then save/render ONCE (adding twenty one-at-a-time
 // would re-render and re-frame the globe twenty times)
@@ -5104,6 +5214,7 @@ function _bfPlainSheet(k){
   host.classList.remove('dz-peek','dz-half','dz-full');
   host.classList.add('dz-'+(kept==='full'?'full':'half'));
   host.hidden=false; host.scrollTop=0;
+  _sheetFlag();
   return true;
 }
 function _bfObjSheet(id){
@@ -5276,7 +5387,13 @@ if(!window._odWired){
   document.addEventListener('click', function(e){
     if(!e.target || !e.target.closest) return;
     const x=e.target.closest('[data-odclose]');
-    if(x){ selectSite(null); return; }
+    if(x){
+      // v0.29.0 (audit #14): ✕ on the sheet means "close this sheet" — never
+      // "wipe my selection, arcs and stepper mid-walk". The card returns; the
+      // nav ring's labeled Clear is the full reset.
+      try{ hideDossier(); }catch(_){}
+      try{ if(GlobeState.sel && !document.body.classList.contains('brief-mode')) calloutShow(GlobeState.sel); }catch(_){}
+      return; }
     const tb=e.target.closest('[data-odtab]');
     if(tb){ _odSetTab(tb.getAttribute('data-odtab')); return; }
     const fn=e.target.closest('[data-odfan]');
@@ -5467,7 +5584,7 @@ if(!window._odWired){
     // v0.23.0 — "Add another organization" focuses the org search (owner: build the
     // brief by SEARCHING real orgs, not free-text). Close the sheet so search is clear.
     const bdis=e.target.closest('[data-bfdisarm]');
-    if(bdis){ GlobeState._bfAddUnder=null; try{ _bfArmHint(); }catch(_){} return; }
+    if(bdis){ GlobeState._bfAddUnder=null; GlobeState._bfAddArm=false; try{ _bfArmHint(); }catch(_){} return; }
     // v0.25.0 — fold a branch (the caret carries the hidden count)
     const bfd=e.target.closest('[data-bffold]');
     if(bfd){ const k=bfd.getAttribute('data-bffold');
@@ -5486,6 +5603,7 @@ if(!window._odWired){
       // v0.25.0 — an "Add subordinate" from a BOX arms that org as the parent, so the
       // next search pick lands UNDER it. A bare "Add organization" clears the target.
       GlobeState._bfAddUnder=bsr.getAttribute('data-bfunder')||null;
+      GlobeState._bfAddArm=!GlobeState._bfAddUnder && document.body.classList.contains('brief-mode');
       try{ hideDossier(); }catch(_){} try{ calloutHide(); }catch(_){}
       try{ _bfArmHint(); }catch(_){}
       const si=document.getElementById('searchInput'); if(si){ try{ si.focus(); si.select&&si.select(); }catch(_){} } return; }
@@ -5535,7 +5653,7 @@ if(!window._odWired){
       let i=order.findIndex(function(c){ return dz.classList.contains(c); });
       if(i<0) i=0;
       const next= gp ? order[(i+1)%3] : (i===0?'dz-half':null);
-      if(next){ dz.classList.remove('dz-peek','dz-half','dz-full'); dz.classList.add(next); }
+      if(next){ dz.classList.remove('dz-peek','dz-half','dz-full'); dz.classList.add(next); try{ _sheetFlag(); }catch(_){} }
       if(gp) return;
       if(next) return;
     }
@@ -6665,10 +6783,11 @@ function bootShell(){
   // Desktop radius factor (PORT of A-ORG-1 ~L22187; re-checked on resize below).
   try{ if(window.matchMedia && matchMedia('(min-width:1100px)').matches){ GlobeState.baseK=0.88; } }catch(_){}
 
-  // Initial orientation (PORT of A-ORG-1 ~L15810 — Atlantic overview).
+  // Initial orientation — v0.29.0 (audit #25): open ON the Army footprint. CONUS
+  // fills the disc with Europe on the horizon, instead of empty mid-Atlantic.
   try{
     if(!GlobeState._qInit && typeof _faceLonLatAngles==='function'){
-      _faceLonLatAngles(-40, 20); GlobeState._qInit=true;
+      _faceLonLatAngles(-78, 33); GlobeState._qInit=true;
     }
   }catch(_){}
 
@@ -6829,6 +6948,9 @@ function bootShell(){
       if(e.target.closest('#navSat-zoomin')){
         try{ GlobeState._touched=true; GlobeState.zoom=Math.min(28, GlobeState.zoom*1.45); globeMark(); }catch(_){}
         _nvSet(true); return; }
+      if(e.target.closest('#navSat-brief')){ _nvSet(false);
+        try{ setMode(document.body.classList.contains('brief-mode')?'map':'brief'); }catch(_){}
+        return; }
       if(e.target.closest('#navSat-saved')){ _nvSet(false); try{ _svOpenSheet(); }catch(_){} return; }
       if(e.target.closest('#navSat-layers')){ _nvSet(false);
         try{

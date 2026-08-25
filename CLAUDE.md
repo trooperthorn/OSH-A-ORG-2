@@ -482,3 +482,21 @@ TOP-DOWN org chart, rebuilt sleek for Lumen. If you touch it, keep these:
   (window._coSec==='conx' replaces the normal fly — check BEFORE the keepCam fly),
   and data-costep 'all'. Stepping keeps _flyPair (parent+subordinate dive); All is
   the pull-back. Camera grammar: Connect/All = wide, step = dive.
+
+## v0.29.0 — the audit release (owner: "test as a user/audience, not can-we-execute")
+A 6-journey UX audit (workflow: first-open, connections, search, brief-build, desktop,
+details — each judging SCREENSHOTS, not return values) produced 27 ranked findings.
+Full list: /tmp scratchpad tasks/we7u737z5.output. This release fixed ranks 1-5, 8, 9,
+12-16, 18, 22, 24, 25, 27. STILL OPEN (next round): #6 double-tap-zoom vs 25px hit
+radius, #7 per-site IANA timezones (data work), #10 co-located dot disambiguation,
+#17 grip drag (touchmove detents), #19 cluster badge merge/fit, #20 SELECT chip label,
+#21 result-count honesty, #23 stripe discoverability, #26 empty-tab copy.
+- THE DOCKED CARD: map-room callout docks top-band (co-docked class; _coPlace early
+  path). Brief room keeps anchored behavior. The dot's diamond is the pointer. NEVER
+  reintroduce a center-anchored map card — every audit journey flagged it.
+- Chrome exclusion: #calloutCard/#briefStage/#navRow are in _gChromeZones, so canvas
+  labels can't ghost under glass (cache is per-frame; adding ids is enough).
+- Honest copy law: any count shown next to another count must agree on screen —
+  subN (arcs) vs unitsN (kids) differences are SAID ("+N here on this base").
+- Dossier ✕ = close the sheet only. Ring Clear = the full reset. Keep it that way.
+- setMode has a labeled door now (navSat-brief); the 3s hold remains as the fast path.
