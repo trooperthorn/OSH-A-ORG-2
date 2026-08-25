@@ -1,0 +1,7 @@
+{"additions":[
+{"name":"U.S. Army Corrections Command","abbr":"ACC","parent":"drus","echelon":"command","base":"Fort Leavenworth","city":"Fort Leavenworth","st":"KS","lat":null,"lon":null,"sources":["https://www.army.mil/corrections"],"confidence":"high"}
+],"dedupe":[
+{"keep":"18th Theater Medical Command","drop":["18th Medical Command (Deployment Support)","18th Theater Medical Command (formerly 18th Medical Command (Deployment Support) / 18th MEDCOM (DS))"],"reason":"redesignated 17 Jul 2025; DVIDS unit/18TMC"},
+{"keep":"U.S. Army Southern European Task Force, Africa (SETAF-AF)","drop":["SETAF-AF"],"reason":"same unit, Vicenza IT; bare abbr row is a duplicate"},
+{"keep":"USARCENT (Forward)","drop":["USARCENT (Forward) / Operational Command Post"],"reason":"same forward HQ at Camp Arifjan; OCP is doctrinal descriptor"}
+],"notes":["T2COM current (TRADOC inactivated Sep 2025, AFC Oct 2025)","USAWHC activated 5 Dec 2025 (FORSCOM/ARNORTH/ARSOUTH inactivate ~15 Oct 2026); CRS styles USAWHC an ACOM — owner call, left under asccs","ARTRANS = ex-SDDC (redesignated 24 Sep 2025), dual-hatted AMC MSC + ASCC to USTRANSCOM","JMC merged into ASC under AMC — not a top-level gap","Army Corrections Command = only missing DRU (est. 2023, Fort Leavenworth)"]}

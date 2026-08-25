@@ -711,3 +711,36 @@ closeouts. The stepping label POLICY is now load-bearing:
   approximation; gold does not survive the round trip). Never reintroduce it.
 - The version toast waits until 3.6s (after the veil) — nothing may crash the
   title sequence.
+
+## v1.0.0 — FIRST OFFICIAL RELEASE (owner: "PM this to 1.0; other users start here")
+- THE RESEARCH PIPELINE (the scalable build-out the owner asked for — reuse it):
+  1. Parallel research agents, one per command family, WebSearch-ONLY (direct
+     fetch of dvidshub.net/army.mil is egress-blocked; search snippets carry
+     the facts). Each returns strict JSON rows {name, abbr, parent-by-name,
+     echelon, base, city, st, lat/lon (only for non-marquee stations), sources,
+     confidence}. HIGH-confidence rows only get merged — med/low are dropped
+     and logged, never guessed at.
+  2. tools/research-merge.js: dedupe verdicts → reparent ops → additions
+     (parent resolved by normalized name; station resolved via alias map +
+     normalized base match; NEW sites only when coords supplied, guard/oconus
+     grp+cls policy, unit always set); regenerates data/*.json AND the inline
+     A1ORGS/SITES literals in lockstep (smoke enforces the pairing).
+  3. Source packets live in data/research/*.json — every added org carries its
+     citations there. data/orgs.json src string names the sweep.
+- v1.0.0 sweep: +96 orgs (→1,495), +9 sites (→285): division BCT/DIVARTY/CAB/
+  DSB sets for 11 divisions, First Army Div East/West brigades, 4 MRCs + Army
+  MEDCENs + MRDC institutes, INSCOM theater/functional MI, NETCOM signal
+  commands, USASOC to Ranger/160th battalion depth, ARNG division BCTs, Army
+  Corrections Command (the one missing DRU), dedupes of 2025-26 redesignation
+  variants (18th TMC · SETAF-AF · USARCENT Fwd). 2026 ATI facts verified:
+  T2COM (TRADOC+AFC inactivated), USAWHC (FORSCOM/ARNORTH/ARSOUTH), ARTRANS
+  (ex-SDDC), 4ID→I Corps. Flagged for the owner, NOT applied: CRS styles
+  USAWHC an ACOM (kept under asccs shell); III Armored Corps reportedly moved
+  to USAWHC Aug 2026 (kept under USAREUR-AF pending owner call).
+- SCALE WITHOUT DILUTION: new depth is search/drill-only. Guard-class stations
+  ship OFF by default (_FAM_DEFAULT_OFF). The map's default face is unchanged.
+- 1.0 polish: first-run coach (3 chips, once ever, a2Coached, gone at first
+  touch; reduced-motion shows instantly per the base-state CSS trick); About +
+  provenance rows in the ⋯ menu (live counts); first-ever boot suppresses the
+  version toast (the coach owns that moment); stepper names ride RAW (no
+  _bfAbbr — it turned "3rd MBCT, 10th Mtn Div" into "10th Mtn").
