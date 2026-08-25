@@ -879,6 +879,21 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 .db-sql{display:block; margin:6px 0; padding:8px 10px; border-radius:8px; background:rgba(0,0,0,.25);
   box-shadow:inset 0 0 0 1px var(--line); font:600 10px/1.6 var(--mono); color:var(--text);
   user-select:text; -webkit-user-select:text; overflow-x:auto; white-space:nowrap}
+/* v1.2.0 — the boot reconnect chip: settings exist, session is offline, one tap */
+#dbChip{position:fixed; left:50%; transform:translateX(-50%) translateY(-6px); z-index:40;
+  top:calc(env(safe-area-inset-top,0px) + 96px);
+  display:inline-flex; align-items:center; gap:8px; padding:8px 8px 8px 13px; border-radius:16px;
+  appearance:none;-webkit-appearance:none; border:0; cursor:pointer;
+  background:linear-gradient(180deg, rgba(60,46,14,.97), rgba(32,24,8,.97));
+  box-shadow:0 0 0 1.3px var(--accent), 0 8px 22px -10px rgba(0,0,0,.7);
+  color:var(--accent); font:700 11.5px/1 var(--body);
+  opacity:0; transition:opacity .25s ease, transform .25s ease}
+#dbChip.in{opacity:1; transform:translateX(-50%) translateY(0)}
+#dbChip.busy{opacity:.6}
+#dbChip .dbc-dot{width:7px; height:7px; border-radius:50%; background:var(--accent);
+  box-shadow:0 0 8px rgba(245,215,110,.8); flex:none}
+#dbChip .dbc-x{width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center;
+  justify-content:center; background:rgba(0,0,0,.35); color:var(--faint); font:800 11px/1 var(--body); flex:none}
 .rc-form{display:flex; flex-direction:column; gap:8px; padding:12px; margin:10px 0 2px;
   border-radius:12px; background:rgba(0,0,0,.4); box-shadow:0 0 0 1.5px var(--accent)}
 .rc-in{
@@ -1162,6 +1177,23 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.2.0 • THE WHOLE WORKING SET ON THE BOARD + THE RECONNECT CHIP (owner:
+//            "execute both"). The database board now carries everything you
+//            build, not just records: the BRIEF DIAGRAM (groups included)
+//            and SAVED VIEWS ride the same a2_records row and mirror across
+//            devices — records merge per-organization newest-wins as before;
+//            the diagram and the view list each merge as one blob, newest
+//            edit wins (offline edits survive reboots via a persisted edit
+//            clock in kv). Remote merges write storage directly — never
+//            through the save path — so a merge can never echo back out.
+//            THE CHIP: when connect settings exist but the session is
+//            offline, a small gold chip appears after the boot title —
+//            "Reconnect database" — one tap goes live (the library still
+//            loads only at that tap; ✕ dismisses; it quietly retires after
+//            25 s and returns next boot; a failed tap opens the full sheet
+//            with the reason). Smoke: board snapshot carries brief+views,
+//            newest-wins holds in both directions, chip renders only with
+//            stored settings.
 //   v1.1.0 • THE ID REGISTRY + THE DATABASE DOOR (owner: "Add ID section in
 //            between overview and people… used to tag all the People, Specs,
 //            Notes and Links… ensure this information is not stored local —
@@ -1933,7 +1965,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.1.0';
+const APP_VERSION = 'v1.2.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -6121,7 +6153,7 @@ function _rcIdPane(id){
   const esc=_odEsc, escA=_odEscA;
   const ids=recIds(id); const s0=siteById(id);
   let h='<div class="rc-note">Tracking IDs'+(s0?(' for '+esc(s0.base)):'')+' — people, specs, notes and links all file under one. '
-    +(( typeof _dbState!=='undefined' && _dbState==='live')?'Database connected — this data lives off-device.':'Connect the database (⋯ menu) so this data lives off-device.')+'</div>';
+    +(( typeof _dbState!=='undefined' && _dbState==='live')?'Database connected — this data lives off-device.':'Connect the database (hold the A-ORG-2 mark → Database) so this data lives off-device.')+'</div>';
   ids.forEach(function(x){
     const n=recIdCount(id,x); const open=(_rcIdSel===x);
     h+='<div class="rc-row rc-idrow'+(open?' on':'')+'">'
@@ -6767,7 +6799,10 @@ function _rdbOpen(){
       try{
         const tv=_rdb.transaction('kv','readonly');
         const gv=tv.objectStore('kv').get('views');
-        gv.onsuccess=function(){ const v=gv.result&&gv.result.v; if(Array.isArray(v)) SAVEDV=v; };
+        gv.onsuccess=function(){ const v=gv.result&&gv.result.v;
+          if(Array.isArray(v)) SAVEDV=v;                                         // legacy bare array
+          else if(v && Array.isArray(v.list)){ SAVEDV=v.list; _svMod=v.mod||0; } // v1.2.0 wrapped shape
+        };
       }catch(_){}
       try{
         const ts2=_rdb.transaction('kv','readonly');
@@ -6817,7 +6852,10 @@ function _rdbOpen(){
         // no client loads, nothing connects, until the owner taps Connect.
         const tdb=_rdb.transaction('kv','readonly');
         const gdb=tdb.objectStore('kv').get('dbcfg');
-        gdb.onsuccess=function(){ const v=gdb.result&&gdb.result.v; if(v&&v.url) _dbCfg=v; };
+        gdb.onsuccess=function(){ const v=gdb.result&&gdb.result.v; if(v&&v.url){ _dbCfg=v;
+          // v1.2.0 — the reconnect chip waits out the boot title, then offers one tap
+          try{ setTimeout(_dbChipShow, Math.max(600, 6200-performance.now())); }catch(_){}
+        } };
       }catch(_){}
       try{
         const tzx=_rdb.transaction('kv','readonly');
@@ -6837,6 +6875,7 @@ function _rdbOpen(){
         gb.onsuccess=function(){
           const v=gb.result&&gb.result.v;
           if(v){
+            _bfMod=v.mod||0;                       // v1.2.0: board merge baseline
             BRIEF.hide=Array.isArray(v.hide)?v.hide.slice():[];
             if(Array.isArray(v.nodes)){
               // v2 — the stored diagram, exactly as the owner arranged it
@@ -6897,6 +6936,7 @@ function _rdbOpen(){
 // BRIEF.mem / BRIEF.ann stay as maintained MIRRORS so exports and the harnesses
 // keep reading one shape; _bfSync rebuilds them after every mutation.
 const BRIEF={ nodes:[], mem:[], ann:{}, hide:[] };
+let _bfMod=0;                                     // v1.2.0: last local edit — the board merges newest-wins
 function _bfSync(){
   BRIEF.mem=BRIEF.nodes.map(function(n){ return n.k; });
   const a={}; BRIEF.nodes.forEach(function(n){ if(n.tx) a[n.k]=n.tx; });
@@ -6904,8 +6944,10 @@ function _bfSync(){
 }
 function _bfSave(){
   _bfSync();
+  _bfMod=Date.now();                              // v1.2.0: the board merges newest-wins
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
-    tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide}}); } }catch(_){}
+    tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, mod:_bfMod}}); } }catch(_){}
+  try{ dbPush(); }catch(_){}                      // the diagram rides the database board too
 }
 function bfNode(k){ for(const n of BRIEF.nodes) if(n.k===k) return n; return null; }
 function bfKids(k){ return BRIEF.nodes.filter(function(n){ return (n.p||null)===(k||null); }); }
@@ -7152,7 +7194,13 @@ try{ window.Orgs={ add:orgAdd, remove:orgRemove, of:orgKidsOf, byId:orgById, lis
 
 // ---- SAVED VIEWS (v0.6.0) — camera + selection + mode, recalled in one tap ----
 let SAVEDV=[];
-function _svSave(){ try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'views', v:SAVEDV}); } }catch(_){} }
+let _svMod=0;                                     // v1.2.0: last local edit — the board merges newest-wins
+function _svSave(){
+  _svMod=Date.now();                              // v1.2.0: views ride the database board
+  // kv keeps the wrapped shape; the loader accepts the legacy bare array too
+  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'views', v:{v:1, list:SAVEDV, mod:_svMod}}); } }catch(_){}
+  try{ dbPush(); }catch(_){}
+}
 function svCapture(){
   const sel=GlobeState.sel?siteById(GlobeState.sel):null;
   SAVEDV.unshift({
@@ -7261,11 +7309,17 @@ function ensureSupabase(){
     document.head.appendChild(sc);
   });
 }
-function _dbSnapshot(){ return {v:1, records:RECORDS}; }
+function _dbSnapshot(){
+  // v1.2.0 — the board carries the whole working set: records, the brief
+  // diagram (groups included) and saved views. Each part merges newest-wins.
+  return {v:2, records:RECORDS,
+    brief:{nodes:BRIEF.nodes, hide:BRIEF.hide, mod:_bfMod},
+    views:{list:SAVEDV, mod:_svMod}};
+}
 function _dbApply(data){
-  if(!data || !data.records) return;
+  if(!data) return;
   let took=0;
-  Object.keys(data.records).forEach(function(k){
+  Object.keys(data.records||{}).forEach(function(k){
     const r2=data.records[k]; if(!r2||!r2.id) return;
     if(!r2.ids) r2.ids=[];
     const loc=RECORDS[k];
@@ -7274,10 +7328,57 @@ function _dbApply(data){
       try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite'); tx.objectStore('records').put(r2); } }catch(_){}
     }
   });
+  // v1.2.0 — the brief diagram: one blob, newest edit wins. Write kv DIRECTLY
+  // (never through _bfSave — that would dbPush the merge back out, an echo).
+  if(data.brief && Array.isArray(data.brief.nodes) && (data.brief.mod||0)>(_bfMod||0)){
+    const seen={};
+    BRIEF.nodes=data.brief.nodes.filter(function(n){
+      if(!n || typeof n.k!=='string' || seen[n.k]) return false;
+      if(n.t==='org' && !((typeof orgOf==='function'&&orgOf(n.r))||(typeof orgById==='function'&&orgById(n.r)))) return false;
+      seen[n.k]=1; return true;
+    });
+    BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
+    BRIEF.hide=Array.isArray(data.brief.hide)?data.brief.hide.slice():[];
+    _bfMod=data.brief.mod; _bfSync();
+    try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
+      tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, mod:_bfMod}}); } }catch(_){}
+    took++;
+    try{ if(document.body.classList.contains('brief-mode')){ renderBrief(); globeMark(); } }catch(_){}
+  }
+  // v1.2.0 — saved views: same law
+  if(data.views && Array.isArray(data.views.list) && (data.views.mod||0)>(_svMod||0)){
+    SAVEDV=data.views.list.slice(); _svMod=data.views.mod;
+    try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
+      tx.objectStore('kv').put({k:'views', v:{v:1, list:SAVEDV, mod:_svMod}}); } }catch(_){}
+    took++;
+  }
   if(took){
     try{ const dz=document.getElementById('dossier');
       if(dz && !dz.hidden && GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
   }
+}
+// ── v1.2.0 THE RECONNECT CHIP — settings exist but this session is offline:
+// one tap goes live. The law holds — NOTHING foreign loads until the tap.
+function _dbChipShow(){
+  try{
+    if(!_dbCfg || !_dbCfg.url || _db) return;
+    if(!document.body || !document.createElement) return;
+    if(document.getElementById('dbChip')) return;
+    const el=document.createElement('button');
+    el.id='dbChip'; el.type='button';
+    el.innerHTML='<span class="dbc-dot"></span>Reconnect database<span class="dbc-x" data-dbchipx="1" role="button" aria-label="Not now">✕</span>';
+    el.addEventListener('click', function(ev){
+      if(ev.target && ev.target.closest && ev.target.closest('[data-dbchipx]')){ el.remove(); return; }
+      el.classList.add('busy'); el.disabled=true;
+      dbConnect().then(function(ok){ try{ el.remove(); }catch(_){}
+        if(ok){ try{ _bfToast('Database live — records save off-device'); }catch(_){} }
+        else { try{ _dbSheet(); }catch(_){} }      // trouble → the full sheet says why
+      });
+    });
+    document.body.appendChild(el);
+    setTimeout(function(){ try{ el.classList.add('in'); }catch(_){} }, 60);
+    setTimeout(function(){ try{ if(!el.disabled) el.remove(); }catch(_){} }, 25000);   // quiet exit; it returns next boot
+  }catch(_){}
 }
 function dbPush(){
   if(!_db || !_dbCfg) return;                     // not connected: IndexedDB cache only
@@ -7331,7 +7432,8 @@ function dbDisconnect(silent){
   _dbCh=null; _db=null;
   if(!silent) _dbSetState('off','Disconnected — new records stay on this device until you reconnect.');
 }
-try{ window.DB={ connect:dbConnect, disconnect:dbDisconnect, push:dbPush, state:function(){ return _dbState; } }; }catch(_){}
+try{ window.DB={ connect:dbConnect, disconnect:dbDisconnect, push:dbPush, state:function(){ return _dbState; },
+  chip:_dbChipShow, _setCfg:function(c){ _dbCfg=c; } }; }catch(_){}   // chip/_setCfg: harness hooks (smoke drives the boot chip)
 // ── the connect sheet (⋯ menu → Database). URL + key + board, Connect,
 // status, and a fold-away first-time setup note with the exact SQL.
 function _dbSheet(){
@@ -7343,7 +7445,7 @@ function _dbSheet(){
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">Database</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
-    +'<div class="od-sub">Your records — people, specs, notes, links and their IDs — live in YOUR database, off this device. Nothing loads until you tap Connect (the zero-foreign-code-at-boot law).</div>'
+    +'<div class="od-sub">Your working set — records with their IDs, the brief diagram, saved views — lives in YOUR database, off this device, mirrored to every device on this board. Nothing loads until you tap Connect (the zero-foreign-code-at-boot law).</div>'
     +'<div class="rc-form">'
     +'<input class="rc-in" id="dbUrl" type="text" placeholder="Project URL — xxxxx.supabase.co" value="'+escA(cfg.url||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
     +'<input class="rc-in" id="dbKey" type="text" placeholder="Publishable / anon key" value="'+escA(cfg.key||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'

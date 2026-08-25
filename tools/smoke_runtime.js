@@ -389,7 +389,32 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         ok=false; fails++; console.log('✗ database sheet missing url/status/setup'); }
     } else { ok=false; fails++; console.log('✗ _dbSheet missing'); }
     try{ global.hideDossier(); }catch(_){}
-    if(ok) console.log('  ✓ ID registry (NEW mint · associate · tag · untag-on-delete · tab order · form box) + database door boot-inert');
+    // v1.2.0 — the board carries brief + views; merges are newest-wins; the
+    // reconnect chip exists, and stays silent without stored settings
+    const snap=global._dbSnapshot();
+    if(!snap.brief || !Array.isArray(snap.brief.nodes) || !snap.views || !Array.isArray(snap.views.list)){
+      ok=false; fails++; console.log('✗ board snapshot missing brief/views'); }
+    const far=Date.now()+9e9;
+    global._dbApply({brief:{nodes:[{k:'cx:remote1',n:'Remote Group',p:null,t:'custom',r:null,c:'',sh:0,tx:''}],hide:[],mod:far},
+                     views:{list:[{n:'Remote view'}],mod:far}});
+    if(!global.Brief.node('cx:remote1')){ ok=false; fails++; console.log('✗ newer remote brief did not apply'); }
+    const s2=global._dbSnapshot();
+    if(!s2.views.list.length || s2.views.list[0].n!=='Remote view'){ ok=false; fails++; console.log('✗ newer remote views did not apply'); }
+    global._dbApply({brief:{nodes:[],hide:[],mod:1}, views:{list:[],mod:1}});   // OLDER — must be ignored
+    if(!global.Brief.node('cx:remote1') || !global._dbSnapshot().views.list.length){
+      ok=false; fails++; console.log('✗ older remote blob clobbered newer local state'); }
+    global.Brief.remove('cx:remote1');
+    global._dbApply({views:{list:[],mod:far+1}});                               // clean the test view (newest wins)
+    if(typeof global.DB.chip!=='function'){ ok=false; fails++; console.log('✗ reconnect chip missing'); }
+    global.DB.chip();                                                            // no cfg → must not render
+    if(global.document.getElementById('dbChip')){ ok=false; fails++; console.log('✗ chip rendered without stored settings'); }
+    global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'a-org-2'});
+    global.DB.chip();
+    const chipEl=global.document.getElementById('dbChip');
+    if(!chipEl){ ok=false; fails++; console.log('✗ chip did not render with stored settings'); }
+    else { try{ chipEl.remove(); }catch(_){} }
+    global.DB._setCfg(null);
+    if(ok) console.log('  ✓ board carries brief+views (newest-wins both ways) · reconnect chip gated on stored settings');
   }catch(e){ fails++; console.log('✗ ID/DB probe: '+e.message); }
 
   // ── PROBE: v0.13.0 the HAND-BUILT brief — members only, derived L1-L4,

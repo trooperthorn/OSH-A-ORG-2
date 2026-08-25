@@ -877,3 +877,20 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Harness hook: _odUI.form(kind) drives the add-form from smoke (closure
   state; do not try to set _rcForm from outside — it silently does nothing).
 
+## v1.2.0 — the whole working set on the board + the reconnect chip
+- The db snapshot is now {v:2, records, brief:{nodes,hide,mod}, views:{list,mod}}.
+  Records merge per-record newest-wins; the brief diagram and the saved-view
+  list each merge as ONE BLOB, newest edit wins. The edit clocks (_bfMod,
+  _svMod) persist inside kv 'brief' and kv 'views' so offline edits from a
+  previous session still out-rank an older remote blob. kv 'views' is now
+  {v, list, mod}; the loader still accepts the legacy bare array.
+- MERGE LAW: _dbApply writes IndexedDB DIRECTLY, never through _bfSave/_svSave
+  /_recSave — the save paths call dbPush, and a merge that re-pushes is an
+  echo loop. Any future board field follows the same pattern: save path
+  stamps a mod + pushes; apply path compares mods + writes storage raw.
+- THE RECONNECT CHIP (#dbChip): shows only when dbcfg exists AND the session
+  is not connected, after the boot title (6.2 s floor). One tap = dbConnect
+  (the library loads at the tap, not before — the law holds); ✕ dismisses;
+  auto-retires at 25 s; a FAILED tap opens the Database sheet so the reason
+  is readable. Harness hooks: DB.chip() + DB._setCfg() (closure state).
+
