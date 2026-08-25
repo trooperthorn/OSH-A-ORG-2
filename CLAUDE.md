@@ -662,3 +662,28 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Verified: 49th parallel, Great Lakes, St. Lawrence, Maine (the split-arc
   case), US-Mexico, PNW border-meets-coast, CONUS + world — full-res crops,
   all single lines. NE zone data probe: 7 border segments live there.
+
+## v0.33.1 — review truth + THE MACRO DIRECTIVES (advisory session with the owner)
+- The owner judged v0.33.0 "not fixed" from a screenshot of the PRE-v0.33 build
+  (diagnostic: the dim 110m US-Canada border, which v0.33.0 deleted, was
+  visible). The SW serves the previous build on the first post-deploy load;
+  auto-update reloads seconds later. Every build now toasts "A-ORG-2 vX.Y.Z"
+  once on its first boot (a2VerSeen) so nobody reviews a stale build unknowingly.
+- STANDING MACRO LAWS distilled from this session — apply them unprompted:
+  1. THE TWICE RULE: the same bug FAMILY appearing twice means stop patching
+     and re-architect the layer it lives in. (Wisconsin should have triggered
+     the one-source-per-edge rebuild; it took three rounds.)
+  2. INVARIANTS OVER INSTANCES: convert every owner complaint into the
+     invariant behind it ("every boundary is exactly one line at every zoom,
+     worldwide"), fix the invariant, then SWEEP all sites where it can break —
+     never just the complaint site.
+  3. EVERY FIX SHIPS ITS TEST: the check that would have caught the bug goes
+     into the suite or the standing verification sweep in the same release.
+  4. ADVISE BEFORE ARCHITECTURAL PATCHES: when a fix could be a patch or a
+     rebuild, present the recommendation and cost first — the owner decides
+     macro direction.
+- KNOWN OPEN OPTION (offered, awaiting owner decision): single-family basemap —
+  replace the mixed land-50m/countries-110m/states-10m stack with one Natural
+  Earth 50m family (land + lakes + countries + states from the same geometry).
+  Consistent by construction; restores Canadian lakeshores; retires the
+  offset-line class permanently. ~1 release; adds data/ files.
