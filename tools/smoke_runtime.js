@@ -352,6 +352,46 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     }
   }catch(e){ fails++; console.log('✗ RECORDS probe: '+e.message); }
 
+  // ── PROBE: v1.1.0 THE ID REGISTRY + THE DATABASE DOOR ──
+  try{
+    let ok=true;
+    // NEW auto-generates, entering an existing ID associates (never duplicates)
+    const a=global.Records.addId('fort-bragg','NEW');
+    if(a!=='ID-001'){ ok=false; fails++; console.log('✗ ID: NEW did not mint ID-001 (got '+a+')'); }
+    const b=global.Records.addId('fort-bragg','TF-EAGLE');
+    const c=global.Records.addId('fort-bragg','tf-eagle');
+    if(b!=='TF-EAGLE' || c!=='TF-EAGLE' || global.Records.ids('fort-bragg').length!==2){
+      ok=false; fails++; console.log('✗ ID: dedupe/associate failed ('+JSON.stringify(global.Records.ids('fort-bragg'))+')'); }
+    // items tag with xid; counts see them; deleting an ID untags, never deletes
+    global.Records.add('fort-bragg','notes',{text:'Tagged note', xid:'TF-EAGLE'});
+    if(global.Records.idCount('fort-bragg','TF-EAGLE')!==1){ ok=false; fails++; console.log('✗ ID: idCount missed the tagged note'); }
+    // the ID tab renders between Overview and People, pane + form select present
+    global.showDossier('fort-bragg'); global._odUI.rec(true); global._odSetTab('xid');
+    const dzh=IDS['dossier'].innerHTML;
+    const iTab=dzh.indexOf('data-odtab="xid"'), iPpl=dzh.indexOf('data-odtab="people"'), iOv=dzh.indexOf('data-odtab="ov"');
+    if(!(iOv>=0 && iTab>iOv && iPpl>iTab)){ ok=false; fails++; console.log('✗ ID tab not between Overview and People'); }
+    if(dzh.indexOf('rcIdNew')<0 || dzh.indexOf('TF-EAGLE')<0){ ok=false; fails++; console.log('✗ ID pane missing add row / IDs'); }
+    global._odSetTab('people'); global._odUI.form('people'); global.showDossier('fort-bragg');
+    const dzf=IDS['dossier'].innerHTML;
+    if(dzf.indexOf('rcFid')<0 || dzf.indexOf('NEW')<0){ ok=false; fails++; console.log('✗ record form lost its ID box'); }
+    global._odUI.form(null); global._odSetTab('ov'); global._odUI.rec(false);
+    global.Records.delId('fort-bragg','TF-EAGLE');
+    const r0=global.Records.of('fort-bragg');
+    if(global.Records.ids('fort-bragg').length!==1 || r0.notes[0].xid!==''){ ok=false; fails++; console.log('✗ ID delete must untag, not delete'); }
+    // the database door: boot-inert (zero foreign code), API present, sheet renders
+    if(typeof global.ensureSupabase!=='function' || !global.DB){ ok=false; fails++; console.log('✗ database door missing'); }
+    if(global.document.getElementById('sbLib') || typeof global.supabase!=='undefined'){
+      ok=false; fails++; console.log('✗ ZERO-FOREIGN-CODE VIOLATION: database library present at boot'); }
+    global.DB.push();                                   // disconnected → must be a silent no-op
+    if(typeof global._dbSheet==='function'){ global._dbSheet();
+      const dzq=IDS['dossier'].innerHTML;
+      if(dzq.indexOf('dbUrl')<0 || dzq.indexOf('dbStatus')<0 || dzq.indexOf('a2_records')<0){
+        ok=false; fails++; console.log('✗ database sheet missing url/status/setup'); }
+    } else { ok=false; fails++; console.log('✗ _dbSheet missing'); }
+    try{ global.hideDossier(); }catch(_){}
+    if(ok) console.log('  ✓ ID registry (NEW mint · associate · tag · untag-on-delete · tab order · form box) + database door boot-inert');
+  }catch(e){ fails++; console.log('✗ ID/DB probe: '+e.message); }
+
   // ── PROBE: v0.13.0 the HAND-BUILT brief — members only, derived L1-L4,
   //           group eyes + depth filter, picker, snapshot rows, export ──
   try{

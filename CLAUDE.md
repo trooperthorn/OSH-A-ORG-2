@@ -852,3 +852,28 @@ closeouts. The stepping label POLICY is now load-bearing:
   on screen. Sheets and the callout are already mutually exclusive; keep it
   that way — a fourth simultaneous surface is a bug by definition.
 
+## v1.1.0 — the ID registry + the database door (owner: "not stored local")
+- IDs live ON the record (r.ids, items carry item.xid) so they ride _recSave,
+  the database push, backups and exports with zero extra plumbing. recAddId
+  mints ID-001-style labels for NEW/blank, associates case-insensitively for
+  an existing entry, never duplicates. recDelId UNTAGS — deleting an ID must
+  never delete data. The ID tab sits between Overview and People; every
+  record form carries the "Files under ID" box (existing · NEW · No ID; the
+  last choice sticks via _rcLastXid).
+- THE DATABASE DOOR is A-ORG-1's inception contract, ported verbatim:
+  ensureSupabase() lazy-injects the client ONLY on manual Connect (⋯ menu →
+  Database); nothing foreign at boot — smoke fails the build if #sbLib or
+  window.supabase exists at boot, and dead-lint allowlists exactly the one
+  CDN URL. One board row in table a2_records {id, data jsonb, updated_at,
+  updated_by}; realtime channel filtered to the board; updated_by kills echo;
+  merge is per-record newest-mod-wins. All record mutations funnel through
+  _recSave → dbPush (debounced 700 ms) — new write paths MUST keep doing so.
+- HONESTY CLAUSE (tell the owner, keep in copy): a PWA cannot be zero-local —
+  IndexedDB remains the OFFLINE CACHE so the app opens in a dead zone, and
+  the connect config (URL/key/board) is kept on-device so the sheet prefills.
+  The DATABASE is the source of truth whenever connected; Connect is manual
+  each session by law. The owner supplies their own Supabase project (table
+  DDL is in the Database sheet's fold-away setup note).
+- Harness hook: _odUI.form(kind) drives the add-form from smoke (closure
+  state; do not try to set _rcForm from outside — it silently does nothing).
+

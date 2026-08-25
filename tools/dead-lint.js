@@ -109,12 +109,17 @@ if (deadFns.length) {
 {
   const scripts = [...src.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
   const noCmt = scripts.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').map(l => l.replace(/^\s*\/\/.*$/, '').replace(/([^:])\/\/.*$/, '$1')).join('\n');
-  const hits = [...noCmt.matchAll(/https?:\/\/[^\s'"`)]+/g)].map(m => m[0]);
+  // v1.1.0 THE ONE EXCEPTION — the database door. ensureSupabase() lazy-injects
+  // exactly this library on MANUAL Connect only; smoke enforces that no #sbLib
+  // script and no window.supabase global exist at boot. Anything else stays banned.
+  const ALLOW = [/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/];
+  const hits = [...noCmt.matchAll(/https?:\/\/[^\s'"`)]+/g)].map(m => m[0])
+    .filter(h => !ALLOW.some(a => a.test(h)));
   if (hits.length) {
     bad(hits.length + ' cross-origin URL literal(s) in script code (zero-foreign-code law):');
     hits.slice(0, 8).forEach(h => console.log('    ' + h));
   } else {
-    console.log('✓ no cross-origin URL literals in script code');
+    console.log('✓ no cross-origin URL literals in script code (database CDN allowlisted, boot-inert)');
   }
 }
 

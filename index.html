@@ -856,6 +856,29 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 }
 .rc-add:active{background:var(--accent-wash)}
 .rc-note{font:500 11px/1.4 var(--body); color:var(--dim); padding:2px 2px 8px}
+/* v1.1.0 THE ID REGISTRY — chips on rows, the ID pane, the form's ID box */
+.rc-xid{flex:none; align-self:flex-start; font:800 8.5px/1 var(--mono); letter-spacing:.06em;
+  color:var(--accent); padding:3px 6px; border-radius:6px; box-shadow:inset 0 0 0 1px var(--accent)}
+.rc-idrow{align-items:center}
+.rc-idrow .rc-idbtn{appearance:none;-webkit-appearance:none; border:0; background:none; margin:0; padding:0;
+  cursor:pointer; text-align:left; color:var(--accent); font:800 12.5px/1.3 var(--mono); letter-spacing:.05em}
+.rc-idrow.on{box-shadow:inset 0 0 0 1.4px var(--accent)}
+.rc-idit{margin-left:14px; opacity:.92}
+.rc-sublab{font:700 9px/1 var(--mono); letter-spacing:.12em; color:var(--faint);
+  text-transform:uppercase; padding:4px 2px 0}
+.rc-idsel{appearance:none;-webkit-appearance:none}
+/* the database door — status line states */
+.db-status{font:600 11px/1.4 var(--body); color:var(--dim); padding:6px 2px}
+.db-status.db-live{color:var(--accent)}
+.db-status.db-error{color:#ff5f50}
+.db-status.db-connecting{color:var(--text)}
+.am-dbchip{float:right; font:800 8.5px/1 var(--mono); letter-spacing:.08em; padding:3px 6px;
+  border-radius:6px; box-shadow:inset 0 0 0 1px var(--line); color:var(--faint)}
+.am-dbchip.am-db-live{color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
+.am-dbchip.am-db-error{color:#ff5f50; box-shadow:inset 0 0 0 1px #ff5f50}
+.db-sql{display:block; margin:6px 0; padding:8px 10px; border-radius:8px; background:rgba(0,0,0,.25);
+  box-shadow:inset 0 0 0 1px var(--line); font:600 10px/1.6 var(--mono); color:var(--text);
+  user-select:text; -webkit-user-select:text; overflow-x:auto; white-space:nowrap}
 .rc-form{display:flex; flex-direction:column; gap:8px; padding:12px; margin:10px 0 2px;
   border-radius:12px; background:rgba(0,0,0,.4); box-shadow:0 0 0 1.5px var(--accent)}
 .rc-in{
@@ -1139,6 +1162,25 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.1.0 • THE ID REGISTRY + THE DATABASE DOOR (owner: "Add ID section in
+//            between overview and people… used to tag all the People, Specs,
+//            Notes and Links… ensure this information is not stored local —
+//            the database concept during inception"). IDs: a new ID tab sits
+//            between Overview and People on every org card — enter an ID or
+//            type NEW (mints ID-001, ID-002…); every record form now carries
+//            a "Files under ID" box (existing IDs · NEW · No ID, last choice
+//            sticks); rows and exports wear their ID chip; the ID pane lists
+//            what files under each ID; deleting an ID untags, never deletes.
+//            THE DATABASE: ⋯ menu → Database — paste your own Supabase
+//            project URL + key, tap Connect, and records (people·specs·
+//            notes·links·IDs) live OFF-DEVICE in your database: one board
+//            row (jsonb), realtime mirroring across devices, newest-record-
+//            wins merge, echo-guarded. The A-ORG-1 inception contract holds
+//            verbatim: ZERO foreign code at boot — the client library is
+//            injected only when Connect is tapped (smoke enforces boot-
+//            inert; dead-lint allowlists exactly that one URL); Connect is
+//            manual each session; the device keeps only an offline cache so
+//            the app still opens in a dead zone.
 //   v1.0.4 • NO OVERLAPPING SURFACES (owner recording: "pop ups overlap,
 //            can't see the text, double pop ups when trying to edit… only
 //            show 3 pop ups at a time"). Three fixes for the classes, not
@@ -1891,7 +1933,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.0.4';
+const APP_VERSION = 'v1.1.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -5234,7 +5276,8 @@ const RC_KINDS={
 };
 function _odSetTab(t){ _odTab=t; _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); }
 // harness hook (smoke drives the compact card's pop-out state; not UI surface)
-try{ window._odUI={ fan:function(v){ _odFan=!!v; }, rec:function(v){ _odShowRec=!!v; } }; }catch(_){}
+try{ window._odUI={ fan:function(v){ _odFan=!!v; }, rec:function(v){ _odShowRec=!!v; },
+  form:function(kind){ _rcForm=kind?{kind:kind, idx:null}:null; } }; }catch(_){}   // form: harness drives the add-form (v1.1.0 ID box probe)
 try{ window._odSetTab=_odSetTab; }catch(_){}
 
 function _odRender(s){
@@ -5285,14 +5328,19 @@ function _odRender(s){
   // ── the hidden detail (▤): Overview + the four record kinds ──
   const rec=(typeof recordOf==='function')?recordOf(s.id):null;
   const cnt=function(k){ return rec?rec[k].length:0; };
-  if(_odTab!=='ov' && !RC_KINDS[_odTab]) _odTab='ov';
+  if(_odTab!=='ov' && _odTab!=='xid' && !RC_KINDS[_odTab]) _odTab='ov';
+  // v1.1.0 — ID between Overview and People (owner: "this will be used to tag
+  // all the People, Specs, Notes and Links")
+  const idsN=(rec&&rec.ids)?rec.ids.length:0;
   h+='<div class="od-tabs">'
     +'<button type="button" class="od-tab'+(_odTab==='ov'?' on':'')+'" data-odtab="ov">Overview</button>'
+    +'<button type="button" class="od-tab'+(_odTab==='xid'?' on':'')+'" data-odtab="xid">ID'+(idsN?(' · '+idsN):'')+'</button>'
     +Object.keys(RC_KINDS).map(function(k){
       const c=cnt(k);
       return '<button type="button" class="od-tab'+(_odTab===k?' on':'')+'" data-odtab="'+k+'">'+RC_KINDS[k].n+(c?(' · '+c):'')+'</button>';
     }).join('')
     +'</div>';
+  if(_odTab==='xid') return h+_rcIdPane(s.id);
   if(_odTab!=='ov') return h+_rcRender(s.id, _odTab);
 
   // STATIONED HERE — every org the A-ORG-1 tree puts at this site. v0.29.0
@@ -6065,6 +6113,41 @@ if(!window.__bfSubWired){ window.__bfSubWired=true;
   });
 }
 
+// ── v1.1.0 THE ID PANE — the registry between Overview and People. Every ID
+// lists what files under it; deleting an ID untags, never deletes. The pane
+// says where this data LIVES (database when connected, this device until then).
+let _rcIdSel=null;                                    // ID expanded in the pane
+function _rcIdPane(id){
+  const esc=_odEsc, escA=_odEscA;
+  const ids=recIds(id); const s0=siteById(id);
+  let h='<div class="rc-note">Tracking IDs'+(s0?(' for '+esc(s0.base)):'')+' — people, specs, notes and links all file under one. '
+    +(( typeof _dbState!=='undefined' && _dbState==='live')?'Database connected — this data lives off-device.':'Connect the database (⋯ menu) so this data lives off-device.')+'</div>';
+  ids.forEach(function(x){
+    const n=recIdCount(id,x); const open=(_rcIdSel===x);
+    h+='<div class="rc-row rc-idrow'+(open?' on':'')+'">'
+      +'<button type="button" class="rc-top rc-idbtn" data-rcidsel="'+escA(x)+'">'+esc(x)+'</button>'
+      +'<span class="rc-sub">'+n+' item'+(n===1?'':'s')+'</span>'
+      +'<button type="button" class="od-ico rc-dots" data-rciddel="'+escA(x)+'" aria-label="Remove '+escA(x)+' (items keep their data, lose the tag)">✕</button>'
+      +'</div>';
+    if(open){
+      const r=recordOf(id)||{};
+      Object.keys(RC_KINDS).forEach(function(k){
+        (r[k]||[]).forEach(function(it){
+          if(it.xid!==x) return;
+          const K=RC_KINDS[k];
+          h+='<div class="rc-row rc-idit"><span class="rc-top">'+esc(it[K.k1]||'')+'</span>'
+            +'<span class="rc-sub">'+RC_KINDS[k].n+(K.k2&&it[K.k2]?(' · '+esc(it[K.k2])):'')+'</span></div>';
+        });
+      });
+      if(!n) h+='<div class="rc-note rc-idit">Nothing filed under '+esc(x)+' yet — new records offer it in their ID box.</div>';
+    }
+  });
+  if(!ids.length) h+='<div class="rc-note">No IDs yet. Add one below — or just save any record: it creates its ID on the spot.</div>';
+  h+='<div class="rc-form"><input class="rc-in" id="rcIdNew" type="text" maxlength="24" placeholder="Enter an ID — or type NEW" autocomplete="off" autocapitalize="characters">'
+    +'<div class="rc-btns"><span class="od-sp"></span>'
+    +'<button class="rc-save" type="button" data-rcidadd="1">Add ID</button></div></div>';
+  return h;
+}
 function _rcRender(id, kind){
   const K=RC_KINDS[kind]; const rec=recordOf(id); const items=rec?rec[kind]:[];
   let h='';
@@ -6077,6 +6160,7 @@ function _rcRender(id, kind){
     else { top=it.label||''; sub=it.url||''; }
     h+='<div class="rc-row">'
       +(kind==='links'&&it.url?('<a class="rc-top" href="'+_odEscA(it.url)+'" target="_blank" rel="noopener">'+_odEsc(top)+'</a>'):('<span class="rc-top">'+_odEsc(top)+'</span>'))
+      +(it.xid?('<span class="rc-xid">'+_odEsc(it.xid)+'</span>'):'')
       +(sub?('<span class="rc-sub">'+_odEsc(sub)+'</span>'):'')
       +'<button class="od-ico rc-dots" type="button" data-rcedit="'+i+'" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
       +'</div>';
@@ -6092,9 +6176,21 @@ function _rcRender(id, kind){
 }
 function _rcFormHTML(kind, it, idx){
   const K=RC_KINDS[kind];
+  // v1.1.0 — every record files under an ID (owner law): the form offers the
+  // existing IDs, NEW (creates the next one), or No ID. Last choice sticks.
+  const sid=GlobeState.sel, ids=sid?recIds(sid):[];
+  let cur=it?(it.xid||''):((window._rcLastXid&&ids.indexOf(window._rcLastXid)>=0)?window._rcLastXid:null);
+  if(cur===null && !ids.length) cur='NEW';
+  if(cur===null) cur='NEW';
+  let idSel='<div class="rc-sublab">Files under ID</div><select class="rc-in rc-idsel" id="rcFid">'
+    +ids.map(function(x){ return '<option value="'+_odEscA(x)+'"'+(cur===x?' selected':'')+'>'+_odEsc(x)+'</option>'; }).join('')
+    +'<option value="NEW"'+(cur==='NEW'?' selected':'')+'>NEW — creates '+_odEsc(sid?_recNextId(sid):'ID-001')+'</option>'
+    +'<option value=""'+(cur===''?' selected':'')+'>No ID</option>'
+    +'</select>';
   return '<div class="rc-form">'
     +'<input class="rc-in" id="rcF1" type="text" placeholder="'+_odEscA(K.f1)+'" value="'+_odEscA(it?(it[K.k1]||''):'')+'">'
     +(K.f2?('<input class="rc-in" id="rcF2" type="text" placeholder="'+_odEscA(K.f2)+'" value="'+_odEscA(it?(it[K.k2]||''):'')+'">'):'')
+    +idSel
     +'<div class="rc-btns">'
     +(idx!=null?('<button class="rc-del" type="button" data-rcdel="'+idx+'">Delete</button>'):'')
     +'<span class="od-sp"></span>'
@@ -6109,6 +6205,16 @@ function _rcCommit(idx){
   const v1=(f1&&f1.value||'').trim(), v2=(f2&&f2.value||'').trim();
   if(!v1){ _rcForm=null; showDossier(id); return; }   // empty first field = never save a blank row
   const item={}; item[K.k1]=v1; if(K.k2) item[K.k2]=v2;
+  // v1.1.0 — the ID association (existing · NEW · none); a typed-new value
+  // funnels through recAddId so the registry always knows every tag in use
+  const fid=document.getElementById('rcFid');
+  if(fid){
+    let xv=fid.value;
+    if(xv==='NEW') xv=recAddId(id);
+    else if(xv && recIds(id).indexOf(xv)<0) xv=recAddId(id, xv);
+    item.xid=xv||'';
+    window._rcLastXid=xv||'';
+  }
   if(idx==null||idx==='') recAdd(id,_rcForm.kind,item); else recUpdate(id,_rcForm.kind,parseInt(idx,10),item);
   _rcForm=null; showDossier(id);
 }
@@ -6153,6 +6259,24 @@ if(!window._odWired){
     if(rc0){ _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
     const rd=e.target.closest('[data-rcdel]');
     if(rd){ const id=GlobeState.sel; if(id){ recRemove(id,_odTab,parseInt(rd.getAttribute('data-rcdel'),10)); _rcForm=null; showDossier(id); } return; }
+    // ---- v1.1.0 THE ID REGISTRY (the ID tab's own three moves) ----
+    const xa=e.target.closest('[data-rcidadd]');
+    if(xa){ const id=GlobeState.sel; if(id){
+        const f=document.getElementById('rcIdNew');
+        const made=recAddId(id, f?f.value:'');
+        window._rcLastXid=made; _rcIdSel=made;
+        showDossier(id);
+      } return; }
+    const xs=e.target.closest('[data-rcidsel]');
+    if(xs){ const x=xs.getAttribute('data-rcidsel'); _rcIdSel=(_rcIdSel===x)?null:x;
+      if(GlobeState.sel) showDossier(GlobeState.sel); return; }
+    const xd=e.target.closest('[data-rciddel]');
+    if(xd){ const id=GlobeState.sel; if(id){
+        recDelId(id, xd.getAttribute('data-rciddel'));
+        if(_rcIdSel===xd.getAttribute('data-rciddel')) _rcIdSel=null;
+        try{ _bfToast('ID removed — its items kept their data, lost the tag'); }catch(_){}
+        showDossier(id);
+      } return; }
     const sc=e.target.closest('[data-svcap]');
     if(sc){ svCapture(); _svOpenSheet(); return; }
     const sg=e.target.closest('[data-svgo]');
@@ -6560,7 +6684,7 @@ function _odInjectCSS(){
 let RECORDS=Object.create(null);
 let _rdb=null;
 
-function _recBlank(id){ return {v:1, id:id, people:[], specs:[], notes:[], links:[], mod:0}; }
+function _recBlank(id){ return {v:1, id:id, people:[], specs:[], notes:[], links:[], ids:[], mod:0}; }
 function recordOf(id){ return RECORDS[id]||null; }
 function recCount(id){
   const r=RECORDS[id]; if(!r) return 0;
@@ -6570,6 +6694,7 @@ function _recSave(id){
   const r=RECORDS[id]; if(!r) return;
   r.mod=Date.now();
   try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite'); tx.objectStore('records').put(r); } }catch(_){}
+  try{ dbPush(); }catch(_){}                          // v1.1.0: the database is the source of truth when connected
 }
 function recAdd(id, kind, item){
   if(!RECORDS[id]) RECORDS[id]=_recBlank(id);
@@ -6584,6 +6709,40 @@ function recUpdate(id, kind, idx, item){
 function recRemove(id, kind, idx){
   const r=RECORDS[id]; if(!r||!r[kind]) return;
   r[kind].splice(idx,1); _recSave(id);
+}
+// ---- v1.1.0 THE ID REGISTRY — owner law: every person, spec, note and link
+// files under a tracking ID ("enter the ID or type NEW"). IDs live on the
+// record (r.ids) so they ride _recSave, the database push, every backup and
+// every export with zero extra plumbing. Items carry item.xid.
+function recIds(id){ const r=RECORDS[id]; return (r&&r.ids)||[]; }
+function _recNextId(id){
+  let mx=0;
+  recIds(id).forEach(function(x){ const m=/^ID-(\d+)$/.exec(x); if(m) mx=Math.max(mx,parseInt(m[1],10)); });
+  return 'ID-'+String(mx+1).padStart(3,'0');
+}
+function recAddId(id, label){
+  if(!RECORDS[id]) RECORDS[id]=_recBlank(id);
+  const r=RECORDS[id]; if(!r.ids) r.ids=[];
+  label=String(label||'').trim().slice(0,24);
+  if(!label || /^new$/i.test(label)) label=_recNextId(id);
+  const hit=r.ids.find(function(x){ return x.toLowerCase()===label.toLowerCase(); });
+  if(hit) return hit;                                    // entering an existing ID associates, never duplicates
+  r.ids.push(label); _recSave(id);
+  return label;
+}
+function recDelId(id, label){
+  const r=RECORDS[id]; if(!r||!r.ids) return;
+  const i=r.ids.indexOf(label); if(i<0) return;
+  r.ids.splice(i,1);
+  // items survive — they just lose the tag (deleting an ID never deletes data)
+  ['people','specs','notes','links'].forEach(function(k){ (r[k]||[]).forEach(function(it){ if(it.xid===label) it.xid=''; }); });
+  _recSave(id);
+}
+function recIdCount(id, label){
+  const r=RECORDS[id]; if(!r) return 0;
+  let n=0;
+  ['people','specs','notes','links'].forEach(function(k){ (r[k]||[]).forEach(function(it){ if(it.xid===label) n++; }); });
+  return n;
 }
 function _rdbOpen(){
   try{
@@ -6600,7 +6759,7 @@ function _rdbOpen(){
         const tx=_rdb.transaction('records','readonly');
         const all=tx.objectStore('records').getAll();
         all.onsuccess=function(){
-          (all.result||[]).forEach(function(r){ if(r&&r.id) RECORDS[r.id]=r; });
+          (all.result||[]).forEach(function(r){ if(r&&r.id){ if(!r.ids) r.ids=[]; RECORDS[r.id]=r; } });   // v1.1.0: pre-ID records gain the registry
           // a selection made before the load finished re-renders with its records
           try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
         };
@@ -6652,6 +6811,13 @@ function _rdbOpen(){
           }
           try{ if(document.body.classList.contains('brief-mode')){ renderBrief(); globeMark(); } }catch(_){}
         };
+      }catch(_){}
+      try{
+        // v1.1.0 — the database CONFIG prefills the connect sheet. Config only:
+        // no client loads, nothing connects, until the owner taps Connect.
+        const tdb=_rdb.transaction('kv','readonly');
+        const gdb=tdb.objectStore('kv').get('dbcfg');
+        gdb.onsuccess=function(){ const v=gdb.result&&gdb.result.v; if(v&&v.url) _dbCfg=v; };
       }catch(_){}
       try{
         const tzx=_rdb.transaction('kv','readonly');
@@ -7049,7 +7215,158 @@ function recRestore(obj){
   try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
   return n;
 }
-try{ window.Records={ add:recAdd, update:recUpdate, remove:recRemove, of:recordOf, count:recCount, backup:recBackup, restore:recRestore }; }catch(_){}
+try{ window.Records={ add:recAdd, update:recUpdate, remove:recRemove, of:recordOf, count:recCount, backup:recBackup, restore:recRestore,
+  ids:recIds, addId:recAddId, delId:recDelId, idCount:recIdCount }; }catch(_){}
+
+/* ═══ v1.1.0 THE DATABASE DOOR — the inception concept, finally built.
+   Records (People · Specs · Notes · Links · the ID registry) live in the
+   owner's own database (Supabase), not on the device. The A-ORG-1 contract
+   holds verbatim: ZERO foreign code at boot — the client library is injected
+   by ensureSupabase() only when the owner taps Connect; Connect is manual
+   each session. One board row carries the whole records map (jsonb), a
+   realtime channel mirrors other devices, updated_by kills echo loops.
+   IndexedDB stays as the offline cache under it (a PWA must open in a dead
+   zone); the database is the source of truth whenever connected. ═══ */
+let _db=null, _dbCh=null, _dbCfg=null, _dbState='off', _dbMsg='Not connected';
+let _dbPushT=null;
+const _dbClientId=Math.random().toString(36).slice(2)+Date.now().toString(36);
+const DB_TABLE='a2_records';
+function _dbSetState(st, msg){
+  _dbState=st; _dbMsg=msg||'';
+  try{ const el=document.getElementById('dbStatus');
+    if(el){ el.textContent=_dbMsg;
+      el.className='db-status '+(st==='live'?'db-live':(st==='error'?'db-error':(st==='connecting'?'db-connecting':'db-off'))); } }catch(_){}
+  try{ const ch=document.querySelector('.am-dbchip');
+    if(ch){ ch.textContent=(st==='live')?'LIVE':(st==='connecting'?'…':(st==='error'?'ERR':'OFF'));
+      ch.className='am-dbchip '+(st==='live'?'am-db-live':(st==='error'?'am-db-error':'am-db-off')); } }catch(_){}
+}
+function _dbCfgSave(cfg){
+  _dbCfg=cfg;
+  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'dbcfg', v:cfg}); } }catch(_){}
+}
+function ensureSupabase(){
+  return new Promise(function(res){
+    if(window.supabase && window.supabase.createClient) return res(true);
+    var ex=document.getElementById('sbLib');
+    if(ex){
+      ex.addEventListener('load', function(){ res(!!(window.supabase&&window.supabase.createClient)); }, {once:true});
+      ex.addEventListener('error', function(){ res(false); }, {once:true});
+      return;
+    }
+    var sc=document.createElement('script');
+    sc.id='sbLib'; sc.crossOrigin='anonymous';
+    sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7';   // dead-lint allowlisted: injected on MANUAL Connect only
+    sc.onload=function(){ res(!!(window.supabase&&window.supabase.createClient)); };
+    sc.onerror=function(){ _dbSetState('error','Database library failed to load (offline or CDN blocked) — the app is unaffected.'); res(false); };
+    document.head.appendChild(sc);
+  });
+}
+function _dbSnapshot(){ return {v:1, records:RECORDS}; }
+function _dbApply(data){
+  if(!data || !data.records) return;
+  let took=0;
+  Object.keys(data.records).forEach(function(k){
+    const r2=data.records[k]; if(!r2||!r2.id) return;
+    if(!r2.ids) r2.ids=[];
+    const loc=RECORDS[k];
+    if(!loc || (r2.mod||0)>=(loc.mod||0)){       // newest record wins, per record
+      RECORDS[k]=r2; took++;
+      try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite'); tx.objectStore('records').put(r2); } }catch(_){}
+    }
+  });
+  if(took){
+    try{ const dz=document.getElementById('dossier');
+      if(dz && !dz.hidden && GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+  }
+}
+function dbPush(){
+  if(!_db || !_dbCfg) return;                     // not connected: IndexedDB cache only
+  clearTimeout(_dbPushT);
+  _dbPushT=setTimeout(async function(){
+    try{
+      const { error }=await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
+        updated_at:new Date().toISOString(), updated_by:_dbClientId });
+      if(error) _dbSetState('error','Save to database failed: '+error.message);
+      else _dbSetState('live','Database live — saved '+new Date().toLocaleTimeString());
+    }catch(e){ _dbSetState('error','Save error: '+(e&&e.message||e)); }
+  }, 700);
+}
+async function dbPullOnce(){
+  try{
+    const { data, error }=await _db.from(DB_TABLE).select('data,updated_by').eq('id',_dbCfg.board).maybeSingle();
+    if(error){ _dbSetState('error','Load failed: '+error.message+' — is the '+DB_TABLE+' table created?'); return false; }
+    if(data && data.data) _dbApply(data.data);
+    else await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
+      updated_at:new Date().toISOString(), updated_by:_dbClientId });   // first device seeds the board
+    return true;
+  }catch(e){ _dbSetState('error','Load error: '+(e&&e.message||e)); return false; }
+}
+async function dbConnect(){
+  const cfg=_dbCfg;
+  if(!cfg || !cfg.url || !cfg.key){ _dbSetState('off','Not configured — enter the project URL and key.'); return false; }
+  _dbSetState('connecting','Connecting…');
+  const ok=await ensureSupabase();
+  if(!ok) return false;
+  try{
+    dbDisconnect(true);
+    _db=window.supabase.createClient(cfg.url, cfg.key, { realtime:{ params:{ eventsPerSecond:5 } } });
+    const pulled=await dbPullOnce();
+    if(!pulled){ _db=null; return false; }
+    _dbCh=_db.channel('a2-'+cfg.board)
+      .on('postgres_changes', { event:'*', schema:'public', table:DB_TABLE, filter:'id=eq.'+cfg.board }, function(payload){
+        const row=payload.new||{};
+        if(row.updated_by===_dbClientId) return;   // our own write echoing back
+        if(row.data) _dbApply(row.data);
+      })
+      .subscribe(function(status){
+        if(status==='SUBSCRIBED') _dbSetState('live','Database live — records save off-device and mirror your other devices.');
+        else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT') _dbSetState('error','Realtime channel error — saves still reach the database; live mirroring may lag.');
+      });
+    _dbSetState('live','Connected — records now live in your database.');
+    return true;
+  }catch(e){ _dbSetState('error','Connect failed: '+(e&&e.message||e)); _db=null; return false; }
+}
+function dbDisconnect(silent){
+  try{ if(_dbCh && _db) _db.removeChannel(_dbCh); }catch(_){}
+  _dbCh=null; _db=null;
+  if(!silent) _dbSetState('off','Disconnected — new records stay on this device until you reconnect.');
+}
+try{ window.DB={ connect:dbConnect, disconnect:dbDisconnect, push:dbPush, state:function(){ return _dbState; } }; }catch(_){}
+// ── the connect sheet (⋯ menu → Database). URL + key + board, Connect,
+// status, and a fold-away first-time setup note with the exact SQL.
+function _dbSheet(){
+  const host=document.getElementById('dossier'); if(!host) return;
+  try{ calloutHide(); }catch(_){}
+  _odInjectCSS();
+  const esc=_odEsc, escA=_odEscA;
+  const cfg=_dbCfg||{};
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">Database</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
+    +'<div class="od-sub">Your records — people, specs, notes, links and their IDs — live in YOUR database, off this device. Nothing loads until you tap Connect (the zero-foreign-code-at-boot law).</div>'
+    +'<div class="rc-form">'
+    +'<input class="rc-in" id="dbUrl" type="text" placeholder="Project URL — xxxxx.supabase.co" value="'+escA(cfg.url||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
+    +'<input class="rc-in" id="dbKey" type="text" placeholder="Publishable / anon key" value="'+escA(cfg.key||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
+    +'<input class="rc-in" id="dbBoard" type="text" maxlength="40" placeholder="Board name (default: a-org-2)" value="'+escA(cfg.board||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
+    +'<div class="rc-btns">'
+    +(_db?'<button class="rc-del" type="button" data-dbdisconnect="1">Disconnect</button>':'')
+    +'<span class="od-sp"></span>'
+    +'<button class="rc-save" type="button" data-dbconnect="1">'+(_db?'Reconnect':'Connect')+'</button>'
+    +'</div></div>'
+    +'<div id="dbStatus" class="db-status '+(_dbState==='live'?'db-live':(_dbState==='error'?'db-error':'db-off'))+'">'+esc(_dbMsg)+'</div>';
+  h+=_disc('db-setup','First-time setup (once, in your Supabase project)',
+    '<div class="rc-note">1. Create a free project at supabase.com.<br>2. SQL editor → run:<br>'
+    +'<code class="db-sql">create table '+DB_TABLE+' (id text primary key, data jsonb, updated_at timestamptz, updated_by text);<br>'
+    +'alter publication supabase_realtime add table '+DB_TABLE+';</code><br>'
+    +'3. Project Settings → API: copy the URL and the anon key into the boxes above.<br>'
+    +'4. Keep the project private (RLS off on this table is fine for a personal board; add policies if you ever share the key).</div>', {def:false});
+  h+='<div class="rc-note">Connect is manual each session. The device keeps an offline cache so the app opens anywhere; the database is the source of truth whenever you are connected.</div>';
+  host.innerHTML=h;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add('dz-full');
+  host.hidden=false; host.scrollTop=0;
+  _sheetFlag();
+}
 
 
 /* ══════════ module: s6-export ══════════ */
@@ -7191,22 +7508,22 @@ function _xpDossierBody(sn){
     const R=recs[sn.selection.id];
     if(R.people.length){
       h+='<h2>People ('+R.people.length+')</h2><table><tr><th>Name</th><th>Role</th></tr>';
-      R.people.forEach(function(p){ h+='<tr><td>'+esc(p.name||'')+'</td><td>'+esc(p.role||'')+'</td></tr>'; });
+      R.people.forEach(function(p){ h+='<tr><td>'+(p.xid?('['+esc(p.xid)+'] '):'')+esc(p.name||'')+'</td><td>'+esc(p.role||'')+'</td></tr>'; });
       h+='</table>';
     }
     if(R.specs.length){
       h+='<h2>Technical specs ('+R.specs.length+')</h2><table><tr><th>Label</th><th>Value</th></tr>';
-      R.specs.forEach(function(x){ h+='<tr><td>'+esc(x.label||'')+'</td><td>'+esc(x.value||'')+'</td></tr>'; });
+      R.specs.forEach(function(x){ h+='<tr><td>'+(x.xid?('['+esc(x.xid)+'] '):'')+esc(x.label||'')+'</td><td>'+esc(x.value||'')+'</td></tr>'; });
       h+='</table>';
     }
     if(R.notes.length){
       h+='<h2>Notes ('+R.notes.length+')</h2><table><tr><th>Date</th><th>Note</th></tr>';
-      R.notes.forEach(function(x){ h+='<tr><td>'+esc(x.ts?new Date(x.ts).toLocaleDateString():'')+'</td><td>'+esc(x.text||'')+'</td></tr>'; });
+      R.notes.forEach(function(x){ h+='<tr><td>'+esc(x.ts?new Date(x.ts).toLocaleDateString():'')+'</td><td>'+(x.xid?('['+esc(x.xid)+'] '):'')+esc(x.text||'')+'</td></tr>'; });
       h+='</table>';
     }
     if(R.links.length){
       h+='<h2>Links ('+R.links.length+')</h2><table><tr><th>Label</th><th>URL</th></tr>';
-      R.links.forEach(function(x){ h+='<tr><td>'+esc(x.label||'')+'</td><td>'+esc(x.url||'')+'</td></tr>'; });
+      R.links.forEach(function(x){ h+='<tr><td>'+(x.xid?('['+esc(x.xid)+'] '):'')+esc(x.label||'')+'</td><td>'+esc(x.url||'')+'</td></tr>'; });
       h+='</table>';
     }
   }
@@ -7819,6 +8136,10 @@ function bootShell(){
       var m=document.getElementById('appMenu'); if(!m) return;
       var _rn=0; try{ for(var k in RECORDS) _rn+=recCount(k); }catch(_){}
       m.innerHTML='<div class="am-row am-ver">A-ORG-2 '+APP_VERSION+' · '+APP_UPDATED+'</div>'
+        // v1.1.0 — the database door: records live off-device once connected
+        +'<button class="am-row" type="button" data-am="db">Database — records off-device'
+          +'<span class="am-dbchip '+(_dbState==='live'?'am-db-live':(_dbState==='error'?'am-db-error':'am-db-off'))+'">'
+          +(_dbState==='live'?'LIVE':(_dbState==='connecting'?'…':(_dbState==='error'?'ERR':'OFF')))+'</span></button>'
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
         +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
@@ -7851,6 +8172,21 @@ function bootShell(){
       if(!e.target||!e.target.closest) return;
       var d=e.target.closest('[data-am="diag"]');
       if(d){ try{ window._diagDump&&_diagDump(); }catch(_){} var m=document.getElementById('appMenu'); if(m) m.hidden=true; return; }
+      var dbm=e.target.closest('[data-am="db"]');
+      if(dbm){ var m0=document.getElementById('appMenu'); if(m0) m0.hidden=true;
+        try{ _dbSheet(); }catch(_){} return; }
+      var dbc=e.target.closest('[data-dbconnect]');
+      if(dbc){
+        try{
+          var u=(document.getElementById('dbUrl')||{}).value||'', k2=(document.getElementById('dbKey')||{}).value||'', b2=(document.getElementById('dbBoard')||{}).value||'';
+          u=String(u).trim(); if(u && u.indexOf('://')<0) u='https://'+u;
+          _dbCfgSave({url:u, key:String(k2).trim(), board:(String(b2).trim()||'a-org-2')});
+          dbConnect().then(function(){ try{ _dbSheet(); }catch(_){} });
+          _dbSetState('connecting','Connecting…');
+        }catch(_){}
+        return; }
+      var dbx=e.target.closest('[data-dbdisconnect]');
+      if(dbx){ dbDisconnect(); try{ _dbSheet(); }catch(_){} return; }
       var bk=e.target.closest('[data-am="backup"]');
       if(bk){ try{ recBackup(); }catch(_){} var m2=document.getElementById('appMenu'); if(m2) m2.hidden=true; return; }
       var rst=e.target.closest('[data-am="restore"]');
