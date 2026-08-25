@@ -521,3 +521,37 @@ radius, #7 per-site IANA timezones (data work), #10 co-located dot disambiguatio
 - Copy: BASE TIME —:— chip (#20) · "close matches" headline counts _s>=38 only (#21)
   · "Highlight color & stripes" (#23) · empty record tabs self-describe (#26) ·
   .co-name wraps two lines (#11).
+
+## v0.31.0 — names as selected (owner recording: AMC 2/7 · TACOM)
+Owner law: "When clicking through subordinates, you don't have to display all names at
+the same time... You can show the names as selected." Plus the wfct595di re-verification
+closeouts. The stepping label POLICY is now load-bearing:
+- NAMES AS SELECTED: with an org driving the map (GlobeState.selOrg), chain-member
+  labels in the dot loop print ONLY for: the selected site, the currently stepped
+  subordinate (_relList[_relStep].siteId), and the HQ end while _showHQ is on.
+  The All view is arcs + the HQ's own name, nothing else. Do NOT re-add
+  all-chain-names — that was the flood the owner recorded twice.
+- FORCED STEP LABEL: _placeGlobeLabel gained opts.force (skips label-rect collision,
+  keeps chrome + edge discipline). The stepped site passes force:true. If the FULL
+  name cannot be placed (ARL's 30-char title fits neither side of a mid-screen dot
+  on a phone — the |x-ax|>4 clamp guard rejects both anchors), the label RETRIES
+  with _bfAbbr's short form ("ARL"), which always fits. A stepped name silently
+  vanishing is the bug this exists to prevent; keep the fallback.
+- _flyPair rungs deepened: sep>1.2→5.4, >0.45→6.6, else 7.8. Know the limit: APG↔
+  Adelphi (0.8°) is ~14 CSS px apart even at 6.6 — zoom cannot separate them; the
+  forced short label is what makes the step read.
+- FAB flag: the [data-codetail] handler calls _sheetFlag() after its dz-half
+  promotion (it was the ONE path that missed it — FAB floated over sheet rows).
+  Any new code that swaps dz-peek/half/full classes must call _sheetFlag().
+- PEEK IS A HANDLE: #dossier.dz-peek hides .od-tabs and everything after it (CSS
+  sibling rule) — the bottom band belongs to the globe FAB, nothing tappable may
+  sit under it. Peek = grip + name + head icons only.
+- Grip rubber-bands under the finger (damped 0.28, ±48px, transition:none inline,
+  cleared on pointerup/pointercancel). Release still snaps detents; keep both.
+- Search headline counts ROWS ON SCREEN: "closest N shown" when total>shown, else
+  "N matches". Never print res.total (fuzzy inflation) and never a count that
+  disagrees with visible rows (the 5-over-6 miscount).
+- Docked card top is 114px — fully below the corner clocks (58px + ~52px chip);
+  the ✕ sat under BASE TIME at 96px. Clocks move ⇒ move this with them.
+- Cluster badges clamp fully on-screen (E=r+8, cx/cy clamped; hits use the clamped
+  point). Pile chips max-width 178px.
