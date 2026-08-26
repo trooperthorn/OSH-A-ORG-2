@@ -536,6 +536,10 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   margin:0 0 4px; padding:2px 0; cursor:pointer; -webkit-tap-highlight-color:transparent;
   font:800 10.5px/1 var(--body); letter-spacing:.22em; color:var(--faint); text-align:left}
 .ch-head .ch-n{margin-left:auto; letter-spacing:.06em; color:var(--dim)}
+/* v1.5.1 — brief-only view toggles on the chart head: names + connecting
+   lines. ON = accent; OFF = dimmed hollow. Map room never sees these. */
+.ch-head .bf-vw{color:var(--accent)}
+.ch-head .bf-vw.off{color:var(--faint); background:transparent; opacity:.6}
 /* ═══ v0.25.0 THE HIERARCHY CHART (A-ORG-1's technique, sleek Lumen build) ═══
    A real TOP-DOWN org chart: nested ul/li, boxes centred under their parent, and
    connector risers drawn with ::before/::after so there is no SVG to keep in sync.
@@ -1235,6 +1239,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.5.1 • QUIET THE GLOBE (owner: "brief mode only: toggle off names and
+//            connecting lines when needed"). Two toggles on the chart head,
+//            beside Export: Aa hides every name on the brief globe, the
+//            line icon hides the connecting arcs — tap again to bring them
+//            back. Reachable with the chart open OR minimized (the head is
+//            always on screen), gold when on, dimmed when off, and scoped
+//            to the brief room only: the map room never sees these flags.
+//            Session-state by design — a fresh open always starts loud.
 //   v1.5.0 • STACK A LEVEL (owner: "stack specified parts of the hierarchy
 //            vertically or horizontally — keep horizontal by default, pick
 //            L2, L3, L4 to stack vertically"). The chart bar grew a STACK
@@ -2100,7 +2112,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.5.0';
+const APP_VERSION = 'v1.5.1';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3931,7 +3943,7 @@ function _hexTrip(hex){
 function drawBriefArcs(ctx, m){
   GlobeState.__bfC=_briefChainMap();                 // links draw first each frame — nodes reuse this
   try{ drawBriefStates(ctx, m, false); }catch(_){}   // v0.24.0: state washes sit UNDER the arcs and dots
-  if(GlobeState._linesOff) return;
+  if(GlobeState._linesOff || GlobeState._bfLinesOff) return;   // v1.5.1: brief-only lines toggle
   const C=GlobeState.__bfC, groups={};
   for(const key of C.order){
     const n=C.nodes[key]; if(!n.parent||n.lat==null) continue;
@@ -3953,7 +3965,7 @@ function drawBriefNodes(ctx, m){
   const C=GlobeState.__bfC||(GlobeState.__bfC=_briefChainMap());
   const zb=Math.min(2.4, 1 + (GlobeState.zoom-1)*0.14);
   const zb2=Math.min(2.1, 0.85+zb*0.16);
-  const dotsOff=!!GlobeState._dotsOff, namesOff=!!GlobeState._namesOff;
+  const dotsOff=!!GlobeState._dotsOff, namesOff=!!(GlobeState._namesOff||GlobeState._bfNamesOff);   // v1.5.1: brief-only names toggle
   // v1.4.2 THE FAN (owner: "some selections get stuck over others") — objects
   // sharing one spot (JBLM RSN + JBLM ECCSP…) no longer pile on a single dot:
   // co-located nodes spread on a small screen-space ring around the true
@@ -5070,6 +5082,8 @@ function renderBrief(){
   const memN=(BRIEF.nodes||[]).length;
   let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
     +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
+    +'<span class="od-ico bf-vw'+(GlobeState._bfNamesOff?' off':'')+'" data-bfnm="1" role="button" aria-label="'+(GlobeState._bfNamesOff?'Show names on the globe':'Hide names on the globe')+'" title="Names on the globe">Aa</span>'
+    +'<span class="od-ico bf-vw'+(GlobeState._bfLinesOff?' off':'')+'" data-bfln="1" role="button" aria-label="'+(GlobeState._bfLinesOff?'Show connecting lines':'Hide connecting lines')+'" title="Connecting lines"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span>'
     +'<span class="od-ico" data-xpbtn="1" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
     +'</button>';
   if(!memN){
@@ -6736,6 +6750,12 @@ if(!window._odWired){
       if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel);
       else hideDossier();
       return; }
+    const bnm=e.target.closest('[data-bfnm]');
+    if(bnm){ GlobeState._bfNamesOff=!GlobeState._bfNamesOff;
+      try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
+    const bln=e.target.closest('[data-bfln]');
+    if(bln){ GlobeState._bfLinesOff=!GlobeState._bfLinesOff;
+      try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
     const cm=e.target.closest('[data-chmin]');
     if(cm){ if(!e.target.closest('[data-xpbtn]')){
         document.body.classList.toggle('chart-min');
