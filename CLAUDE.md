@@ -1055,3 +1055,23 @@ closeouts. The stepping label POLICY is now load-bearing:
   tools, sheet buttons) answers the finger with a spring-curve transform —
   cubic-bezier(.34,1.56,.64,1) for small chips, (.32,1.4,.45,1) for cards.
   New interactive chrome must ship with this feedback.
+
+## v1.10.0 — the fluid chart (owner: "operate like iOS/Twitter — build it as its own release")
+- FLIP over the whole chart: _bfFlipCapture at renderBrief's top (rects by
+  data-bfobj key), _bfFlipPlay after _bfFit settles (zoom + centering must
+  land FIRST or deltas lie). Movers: transitions off → transform back to
+  the old spot (deltas ÷ per-box effective scale rect.width/offsetWidth —
+  the CSS-zoom compensation) → forced reflow → release; the stylesheet
+  spring carries the glide. New boxes: .bf-enter (opacity 0, scale .85)
+  removed after two rAFs.
+- Guards, all mandatory: null when chart-min, when no prior boxes, under
+  prefers-reduced-motion; >560px deltas snap (teleports beat streaks);
+  everything try/catch (stub DOM in smoke has no rects).
+- LAW: the animation is PURE PRESENTATION — the DOM is final from the
+  first frame. Anything reading the chart (hit-tests, exports, harnesses)
+  must never wait on or know about the glide. Interruptible by design:
+  a re-render mid-glide captures the box's CURRENT visual rect (gBCR
+  includes the transform) and re-FLIPs from there.
+- Proof pattern for motion: rAF-sample gBCR in-page (the trajectory
+  201→…→591→571 with overshoot IS the spring); single screenshots lie
+  about animation, headless first-paint lags ~60ms.
