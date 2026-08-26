@@ -619,23 +619,30 @@ body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
   padding:0 4px 3px; border-radius:12px; box-shadow:inset 0 0 0 1px var(--line-tree)}
 .bf-kids.bf-krow2{padding-top:7px}
 .bf-kids.bf-krow2::before{display:none}
-/* v1.5.0 — a STACKED level: column litter with left-rail elbow connectors.
-   Horizontal is the default; these rules only enter through .bf-vert. */
-.bf-kids.bf-vert{flex-direction:column; align-items:flex-start; padding:8px 0 0 26px}
-.bf-kids.bf-vert::before{display:none}
-.bf-vert>.bf-li{padding:5px 0 3px 16px; align-items:flex-start}
+/* v1.5.0 — a STACKED level. v1.11.3 (owner: "stack the L4s directly under
+   the L3, compact, and fix the connector alignment"): the column sits tight
+   under its parent with 6px gaps, and the connectors are ONE straight rail —
+   a drop from the parent into the first card, per-card rails bridging card
+   center to card center (they pass cleanly left of any nested subtree), and
+   a short stub into each card's left edge at exactly half the uniform 48px
+   card height. No more floating elbows. Horizontal stays the default. */
+.bf-kids.bf-vert{flex-direction:column; align-items:flex-start; gap:6px;
+  padding:10px 0 0 30px}
+.bf-kids.bf-vert::before{content:''; display:block; position:absolute;
+  left:16px; top:0; width:0; height:34px; border:0 none;
+  border-left:1.4px solid var(--line-tree)}
+.bf-vert>.bf-li{padding:0; align-items:flex-start}
 .bf-vert>.bf-li::before,
 .bf-vert>.bf-li:first-child::before,
 .bf-vert>.bf-li:last-child::before,
 .bf-vert>.bf-li:only-child::before{content:''; display:block; position:absolute;
-  left:-10px; right:auto; top:-14px; width:24px; height:38px;
-  border:0 none; border-left:1.4px solid var(--line-tree); border-bottom:1.4px solid var(--line-tree);
-  border-radius:0 0 0 9px}
+  left:-14px; right:auto; top:24px; width:14px; height:0;
+  border:0 none; border-top:1.4px solid var(--line-tree); border-radius:0}
 .bf-vert>.bf-li::after,
 .bf-vert>.bf-li:first-child::after,
 .bf-vert>.bf-li:last-child::after,
 .bf-vert>.bf-li:only-child::after{content:''; display:block; position:absolute;
-  left:-10px; right:auto; top:24px; bottom:-6px; width:0; height:auto;
+  left:-14px; right:auto; top:24px; bottom:-30px; width:0; height:auto;
   border:0 none; border-left:1.4px solid var(--line-tree); border-radius:0}
 .bf-vert>.bf-li:last-child::after{display:none}
 .bf-vseg{align-items:center}
@@ -1343,6 +1350,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.11.3 • THE STRAIGHT RAIL (owner: "stack the L4s directly under the
+//            L3, compact, and fix the alignment of the connecting lines on
+//            the left of each L4"). Stacked columns rebuilt: the litter
+//            sits tight under its parent with 6px gaps, and the connectors
+//            are one clean rail — a drop from the parent into the first
+//            card, straight segments bridging card center to card center,
+//            and a stub meeting each card's left edge at exactly half the
+//            uniform card height. The floating elbows are gone.
 //   v1.11.2 • UNIFORM OBJECTS (owner reference chart: "objects on chart
 //            should be uniform in terms of shape and size"). One card size
 //            for every chart object — 124×48, content centered, names and
@@ -2333,7 +2348,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.11.2';
+const APP_VERSION = 'v1.11.3';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first

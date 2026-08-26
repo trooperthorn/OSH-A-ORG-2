@@ -1120,3 +1120,14 @@ closeouts. The stepping label POLICY is now load-bearing:
   102px. Never let content stretch a card — the diagram sits on one grid.
   Verified by measuring offsetWidth×offsetHeight across mixed kinds
   (org/group/place/state) and asserting ONE unique size.
+
+## v1.11.3 — the straight rail (owner: stacked litters under the parent, compact, aligned)
+- Stacked-column connectors are ONE system: ul::before = drop from the
+  parent to the first card's center (left:16px, height:34px = 10px pad +
+  24 half-card); per-li ::after = rail bridging card center to NEXT card
+  center (top:24px → bottom:-30px = 6px gap + 24), so it passes cleanly
+  left of any nested subtree; per-li ::before = 14px stub into the card's
+  left edge at top:24px. ALL constants derive from the uniform 124×48 card
+  and the 6px gap — if either ever changes, re-derive 24/30/34 together.
+- Geometry proof: assert one unique card x per column, column center
+  within 20px of the parent's center, and gaps === [6] via gBCR.
