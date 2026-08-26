@@ -1102,3 +1102,14 @@ closeouts. The stepping label POLICY is now load-bearing:
   cells transparent, ON = filled var(--accent) pill with #141006 ink. All
   cell rules SCOPED under .bf-seg (a legacy .bf-depth block would win
   otherwise — that was the 'Fit highlight looks off' bug).
+
+## v1.11.1 — the double border (owner: shared borders show BOTH colors)
+- State outlines are clipped to their OWN polygon and stroked at 2× width
+  (3.6 → 1.8 visible): only the inner half paints, so every selection hugs
+  the inside of its border. Neighboring selections therefore sit side by
+  side — a double line on shared borders in both colors — with zero
+  adjacency detection. Stripes draw inside the same clip.
+- Law: state outline rendering must stay inside-clipped; a centered stroke
+  brings back last-drawn-wins overwriting on shared borders.
+- Canvas proof pattern: pixel-scan getImageData for both hex colors and
+  assert a cross-color pair within a few px along the border.

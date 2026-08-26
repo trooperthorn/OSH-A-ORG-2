@@ -1339,6 +1339,15 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.11.1 • THE DOUBLE BORDER (owner: "when bordering states have
+//            different color outlines, do a double line on the shared
+//            border so each state is fully outlined by the selected
+//            color"). Every state outline is now clipped to its own
+//            polygon and stroked at double width — only the inner half
+//            paints, so each selection hugs the inside of its border.
+//            Where two selections touch, their outlines sit side by side
+//            as a double line in both colors; nothing overwrites, and no
+//            adjacency detection is needed. Stripes ride the same clip.
 //   v1.11.0 • ALWAYS ON + HOVER OPS + SEGMENT POLISH (owner, three asks).
 //            AUTO-CONNECT: the first successful Connect turns auto-reconnect
 //            on — every later open brings the database live by itself, so
@@ -2314,7 +2323,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.11.0';
+const APP_VERSION = 'v1.11.1';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -4149,19 +4158,24 @@ function drawBriefStates(ctx, m, labels){
         }
         if(behind) continue;
         ctx.closePath();
-        // v1.6.0 (owner: "no need to put a dot in the state as well as
-        // highlighting — just keep the border"): the translucent wash is gone,
-        // a state/territory selection is its bright outline alone. Stripes
-        // stay an explicit owner toggle.
-        ctx.lineWidth=1.7; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.95)'; ctx.stroke();
+        // v1.6.0: no wash, no dot — the border alone. v1.11.1 (owner: "when
+        // bordering states have different colors, do a double line on the
+        // shared border so each state is fully outlined in its own color"):
+        // the stroke is CLIPPED to the state's own polygon and drawn at
+        // double width, so only the INNER half paints. Every outline hugs
+        // the inside of its border — neighbors sit side by side instead of
+        // overwriting, a double line exactly where selections touch, with
+        // no adjacency math at all. Stripes stay an explicit owner toggle.
+        ctx.save(); ctx.clip();
+        ctx.lineWidth=3.6; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.95)'; ctx.stroke();
         if(n.stripe){
-          ctx.save(); ctx.clip();
           ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.8)';
           const hh=by1-by0;
           ctx.beginPath();
           for(let hx=bx0-hh; hx<bx1; hx+=7){ ctx.moveTo(hx,by1+1); ctx.lineTo(hx+hh+2,by0-1); }
-          ctx.stroke(); ctx.restore();
+          ctx.stroke();
         }
+        ctx.restore();
       }
       ctx.restore();
     } else {
