@@ -539,6 +539,43 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 /* v1.5.1 — brief-only view toggles on the chart head: names + connecting
    lines. ON = accent; OFF = dimmed hollow. Map room never sees these. */
 .ch-head .bf-vw{color:var(--accent)}
+/* v1.7.0 — THE LEDGER: right-side drawer (IDs · records · saved briefs) */
+#ledger{position:fixed; inset:0; z-index:58; pointer-events:none}
+#ledger .ld-scrim{position:absolute; inset:0; background:rgba(12,9,3,.42); opacity:0; transition:opacity .24s ease}
+#ledger .ld-panel{position:absolute; top:0; right:0; bottom:0; width:min(370px,88vw);
+  transform:translateX(103%); transition:transform .26s ease;
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);
+  border-radius:0; border-left:1px solid var(--accent-wash)}
+#ledger.on{pointer-events:auto}
+#ledger.on .ld-scrim{opacity:1}
+#ledger.on .ld-panel{transform:none}
+.ld-head{display:flex; align-items:center; gap:8px; margin-bottom:6px}
+.ld-title{font-weight:900; font-size:15px; letter-spacing:.06em; color:var(--text)}
+.ld-seclab{margin:14px 0 6px; font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+.ld-row{display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--accent-wash)}
+.ld-row .bf-act{flex:0 0 auto; width:auto; min-width:0; margin:0; padding:6px 12px; font-size:11.5px}
+.ld-row .ld-sub{white-space:nowrap}
+.ld-main{flex:1; min-width:0}
+.ld-n{font-weight:800; font-size:13px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.ld-sub{font-size:11px; color:var(--faint)}
+.ld-pad{padding:6px 0 2px; line-height:1.45}
+.ld-org{display:flex; align-items:center; gap:8px; margin-top:10px}
+.ld-orgbtn{background:none; border:0; padding:2px 0; font:inherit; font-weight:900; font-size:12.5px; color:var(--accent-deep, var(--accent)); text-align:left; cursor:pointer}
+.ld-tot{font-size:10.5px; font-weight:800; color:var(--faint)}
+.ld-idrow{display:flex; align-items:center; gap:8px; padding:4px 0 4px 12px}
+.ld-id{flex:1; min-width:0; font-weight:800; font-size:12px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.ld-untag{color:var(--faint); font-style:italic; font-weight:600}
+.ld-cts{display:flex; gap:6px}
+.ld-ct{font-size:10.5px; font-weight:800; color:var(--dim, var(--faint)); letter-spacing:.02em}
+/* v1.7.0 — ASSET INVENTORY rows in the object sheets */
+.bf-invl{display:flex; flex-direction:column}
+.bf-invrow{display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--accent-wash)}
+.bf-invq{min-width:44px; font-weight:900; font-size:12.5px; text-align:right; color:var(--accent-deep, var(--accent))}
+.bf-invd{flex:1; min-width:0; font-size:12.5px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bf-invin{display:flex; gap:8px}
+.bf-invin .bf-invqin{flex:0 0 72px}
+.bf-invin .rc-in{min-width:0}
 .ch-head .bf-vw.off{color:var(--faint); background:transparent; opacity:.6}
 /* ═══ v0.25.0 THE HIERARCHY CHART (A-ORG-1's technique, sleek Lumen build) ═══
    A real TOP-DOWN org chart: nested ul/li, boxes centred under their parent, and
@@ -1239,6 +1276,20 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.7.0 • SAVED BRIEFS + THE LEDGER + ASSET INVENTORY (owner, three asks).
+//            SAVE BRIEF: named snapshots of the whole diagram (nodes, hide,
+//            stacking — inventories included) on a 24-deep shelf that rides
+//            the database board newest-wins, so a brief saved on the phone
+//            opens on the desk. Loading replaces the working brief and syncs
+//            the replacement. THE LEDGER: a right-side drawer (chart-head ▤
+//            or ⋯ menu → Ledger), not a room — the saved-brief shelf on top
+//            (save current · load with a replace-confirm arm · delete), then
+//            the ID registry grouped by installation: every ID with its
+//            People/Specs/Notes/Links counts plus an untagged row; tapping
+//            an installation jumps to it on the map. ASSET INVENTORY: every
+//            brief object sheet grows a QTY × description list (add/remove,
+//            40 rows max) stored ON the node — it persists locally, rides
+//            the board, and travels inside saved briefs.
 //   v1.6.0 • TERRITORIES + ILLUMINATED STARS (owner, two asks). ONE: District
 //            of Columbia, Guam, Virgin Islands and Puerto Rico are US
 //            States/Territories — searchable, brief-addable, real border
@@ -2135,7 +2186,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.6.0';
+const APP_VERSION = 'v1.7.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -5206,6 +5257,7 @@ function renderBrief(){
   const memN=(BRIEF.nodes||[]).length;
   let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
     +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
+    +'<span class="od-ico" data-bfledger="1" role="button" aria-label="Ledger — IDs, records and saved briefs" title="Ledger">▤</span>'
     +'<span class="od-ico bf-vw'+(GlobeState._bfNamesOff?' off':'')+'" data-bfnm="1" role="button" aria-label="'+(GlobeState._bfNamesOff?'Show names on the globe':'Hide names on the globe')+'" title="Names on the globe">Aa</span>'
     +'<span class="od-ico bf-vw'+(GlobeState._bfLinesOff?' off':'')+'" data-bfln="1" role="button" aria-label="'+(GlobeState._bfLinesOff?'Show connecting lines':'Hide connecting lines')+'" title="Connecting lines"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span>'
     +'<span class="od-ico" data-xpbtn="1" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
@@ -5507,7 +5559,7 @@ function clearAll(){
   // so ✕ looked dead). The built diagram is KEPT: ✕ clears the view, it never
   // deletes work; the toast says so out loud.
   try{ if(typeof calloutHide==='function') calloutHide(); }catch(_){}
-  try{ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null; window._bfPick=null; GlobeState._bfAddArm=false; GlobeState._bfFold={};
+  try{ _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null; window._bfPick=null; GlobeState._bfAddArm=false; GlobeState._bfFold={};
     if(typeof _bfArmHint==='function') _bfArmHint();   // again — the earlier call ran while _bfAddArm was still true (top-level arm kept its bar)
   }catch(_){}
   try{ document.body.classList.remove('chart-min'); }catch(_){}
@@ -5530,7 +5582,7 @@ function tapAtScreen(x, y){
   if(document.body && document.body.classList.contains('brief-mode')){
     // v0.7.0: the brief globe is the destination — a chain dot opens its popup.
     const bs=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
-    if(bs && bs.id!=null){ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){}
+    if(bs && bs.id!=null){ _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){}
       GlobeState._bfFocus=bs.id;                     // v0.20.0: a globe chain-node tap focuses its branch too
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
       return; }
@@ -6115,6 +6167,7 @@ try{ window.Callout={ show:calloutShow, hide:calloutHide, id:function(){ return 
 // object shows almost nothing; the popup shows everything). One sheet for chain
 // dots, chart chips, and custom orgs, in either room. ---------------------------
 let _bfAnnEdit=null;                                 // id with the annotation form open
+let _bfInvEdit=null;                                 // v1.7.0: node key with the asset-inventory add form open
 let _bfRnEdit=null;                                  // v1.0.3: group key with the rename form open
 let _orgForm=null;                                   // {parent} when add-subordinate is open
 // v0.24.0 — THE SELECTIONS (A-ORG-1's briefing ability). Everything the owner can
@@ -6360,6 +6413,33 @@ function _bfSelections(k){
     +'\u2295 Add a subordinate under '+esc(_bfNodeLbl(nd))+'</button>';
   return h;
 }
+// v1.7.0 ASSET INVENTORY — the section every brief object sheet carries:
+// rows of QTY × description with remove, and an add form (text forms live in
+// sheets — this IS a sheet). Data sits on the node (nd.inv), so it persists
+// locally, rides the board, and travels inside saved briefs.
+function _bfInvHTML(k){
+  const nd=bfNode(k); if(!nd) return '';
+  const esc=_odEsc, escA=_odEscA;
+  const inv=Array.isArray(nd.inv)?nd.inv:[];
+  let b='';
+  if(inv.length){
+    b+='<div class="bf-invl">'+inv.map(function(it,i){
+      return '<div class="bf-invrow"><span class="bf-invq">'+esc(it.q||'—')+'</span><span class="bf-invd">'+esc(it.d)+'</span>'
+        +'<button class="od-ico" type="button" data-bfinvdel="'+escA(k)+'" data-bfinvi="'+i+'" aria-label="Remove item">✕</button></div>';
+    }).join('')+'</div>';
+  }
+  if(_bfInvEdit===k){
+    b+='<div class="rc-form bf-invform">'
+      +'<div class="bf-invin"><input class="rc-in bf-invqin" id="bfInvQ" type="text" inputmode="numeric" maxlength="10" placeholder="QTY">'
+      +'<input class="rc-in" id="bfInvD" type="text" maxlength="60" placeholder="Description (e.g. JLTV, generators)"></div>'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-bfinvcancel="1">Cancel</button>'
+      +'<button class="rc-save" type="button" data-bfinvsave="'+escA(k)+'">Add</button></div></div>';
+  } else {
+    b+='<button class="bf-act in" type="button" data-bfinvadd="'+escA(k)+'">⊕ Add asset</button>';
+  }
+  return _disc('bf-inv', 'Asset inventory'+(inv.length?(' · '+inv.length):''), b, {def:inv.length>0||_bfInvEdit===k});
+}
 // a STATE or a free-text box has no installation record — it gets its own compact
 // sheet: the name, its note, the selections, and remove.
 function _bfPlainSheet(k){
@@ -6393,6 +6473,7 @@ function _bfPlainSheet(k){
       +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(k)+'" aria-label="Edit note"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button></div>';
   }
   h+=_bfSelections(k);
+  h+=_bfInvHTML(k);                                  // v1.7.0: assets on every brief object
   h+='<div class="rc-row rc-acts">';
   if(!nd.tx && _bfAnnEdit!==k) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(k)+'">Add note</button>';
   if(nd.t==='custom' && _bfRnEdit!==k) h+='<button class="bf-act in" type="button" data-bfrnedit="'+escA(k)+'">Rename</button>';
@@ -6493,7 +6574,7 @@ function _bfObjSheet(id){
     +'</div></div>';
   h+=_disc('bf-custom','Add a custom org (advanced)', customH, {def:false});
   // v0.24.0: an org already IN the diagram gets the same selections
-  if(sid && bfHas(sid)){ try{ h+=_bfSelections(_bfOrgId(sid)||sid); }catch(_){} }
+  if(sid && bfHas(sid)){ try{ const _ik=_bfOrgId(sid)||sid; h+=_bfSelections(_ik); h+=_bfInvHTML(_ik); }catch(_){} }   // v1.7.0: assets ride the org sheet too
   // action rail: note · add/remove
   h+='<div class="rc-row rc-acts">';
   if(sid && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(sid)+'">Add note</button>';
@@ -6757,6 +6838,26 @@ if(!window._odWired){
       bfRename(id, f?f.value:''); _bfRnEdit=null; _bfObjSheet(id); return; }
     const brc=e.target.closest('[data-bfrncancel]');
     if(brc){ const id=_bfRnEdit; _bfRnEdit=null; if(id) _bfObjSheet(id); return; }
+    // ---- v1.7.0 ASSET INVENTORY (QTY × description rows on any brief object) ----
+    const ivA=e.target.closest('[data-bfinvadd]');
+    if(ivA){ const id=ivA.getAttribute('data-bfinvadd'); _bfInvEdit=id; _bfAnnEdit=null; _bfRnEdit=null; _bfObjSheet(id);
+      try{ const f=document.getElementById('bfInvQ'); f&&f.focus(); }catch(_){} return; }
+    const ivS=e.target.closest('[data-bfinvsave]');
+    if(ivS){ const id=ivS.getAttribute('data-bfinvsave'); const nd=bfNode(id);
+      const q=String(((document.getElementById('bfInvQ')||{}).value)||'').trim();
+      const d=String(((document.getElementById('bfInvD')||{}).value)||'').trim();
+      if(!d){ try{ const f=document.getElementById('bfInvD'); f&&f.focus(); }catch(_){} return; }   // an asset needs a description
+      if(nd){ if(!Array.isArray(nd.inv)) nd.inv=[];
+        nd.inv.push({q:q.slice(0,10), d:d.slice(0,60)});
+        nd.inv=_bfInvClean(nd.inv); _bfSave(); }
+      _bfInvEdit=null; _bfObjSheet(id); return; }
+    const ivC=e.target.closest('[data-bfinvcancel]');
+    if(ivC){ const id=_bfInvEdit; _bfInvEdit=null; if(id) _bfObjSheet(id); return; }
+    const ivD=e.target.closest('[data-bfinvdel]');
+    if(ivD){ const id=ivD.getAttribute('data-bfinvdel'), ix=+ivD.getAttribute('data-bfinvi');
+      const nd=bfNode(id);
+      if(nd && Array.isArray(nd.inv) && ix>=0 && ix<nd.inv.length){ nd.inv.splice(ix,1); _bfSave(); }
+      _bfObjSheet(id); return; }
     // ---- v0.7.0 object popup + chart + custom orgs ----
     const bfc=e.target.closest('[data-bffocusclear]');
     if(bfc){ GlobeState._bfFocus=null; try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
@@ -6790,7 +6891,7 @@ if(!window._odWired){
       try{ if(n) _bfToast(n+' organization'+(n===1?'':'s')+' added under '+_bfNodeLbl(bfNode(pk))); }catch(_){}
       return; }
     const bo=e.target.closest('[data-bfobj]');
-    if(bo){ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null;
+    if(bo){ _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null;
       const id=bo.getAttribute('data-bfobj');
       const r=bo.getBoundingClientRect();
       calloutShow(id, {x:r.left+r.width/2, y:r.bottom+4});
@@ -6869,11 +6970,13 @@ if(!window._odWired){
       try{ _sheetFlag(); }catch(_){}   // v0.31.0 (re-verify): Details opens at half — the FAB must step aside HERE too
       return; }
     const ox=e.target.closest('[data-objx]');
-    if(ox){ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null;
+    if(ox){ _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null;
       // in map mode the popup sits over a live selection — closing restores its card
       if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel);
       else hideDossier();
       return; }
+    const blg=e.target.closest('[data-bfledger]');
+    if(blg){ try{ _ledgerOpen(); }catch(_){} return; }   // v1.7.0: head door to the ledger — never minimizes the chart
     const bnm=e.target.closest('[data-bfnm]');
     if(bnm){ GlobeState._bfNamesOff=!GlobeState._bfNamesOff;
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
@@ -6977,7 +7080,7 @@ if(!window._odWired){
         const dz2=document.getElementById('dossier');
         const dirty=(_coId!=null)||(dz2&&!dz2.hidden)||GlobeState._bfFocus||GlobeState._bfAddUnder||GlobeState._bfAddArm||_bfAnnEdit||_bfRnEdit||window._bfGrpForm||_orgForm;
         if(dirty){
-          _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null;
+          _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null;
           GlobeState._bfFocus=null; GlobeState._bfAddUnder=null; GlobeState._bfAddArm=false;
           try{ _bfArmHint(); }catch(_){}
           try{ calloutHide(); }catch(_){}
@@ -7189,6 +7292,14 @@ function _rdbOpen(){
         };
       }catch(_){}
       try{
+        // v1.7.0 — the saved-brief shelf
+        const tb7=_rdb.transaction('kv','readonly');
+        const gb7=tb7.objectStore('kv').get('briefs');
+        gb7.onsuccess=function(){ const v=gb7.result&&gb7.result.v;
+          if(v && Array.isArray(v.list)){ SAVEDB=v.list; _sbMod=v.mod||0; }
+        };
+      }catch(_){}
+      try{
         const ts2=_rdb.transaction('kv','readonly');
         const gs2=ts2.objectStore('kv').get('session');
         gs2.onsuccess=function(){
@@ -7276,6 +7387,8 @@ function _rdbOpen(){
                   sh:n.sh?1:0, tx:String(n.tx||'').slice(0,80)};
                 // v1.4.0 — a PLACE keeps its pinned spot + host-base label
                 if(typeof n.la==='number' && typeof n.lo==='number'){ m2.la=n.la; m2.lo=n.lo; m2.bs=String(n.bs||'').slice(0,60); }
+                // v1.7.0 — the asset inventory rides the node
+                if(Array.isArray(n.inv) && n.inv.length){ const iv=_bfInvClean(n.inv); if(iv.length) m2.inv=iv; }
                 return m2;
               });
               BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
@@ -7336,6 +7449,17 @@ function _bfSave(){
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
     tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod}}); } }catch(_){}
   try{ dbPush(); }catch(_){}                      // the diagram rides the database board too
+}
+// v1.7.0 ASSET INVENTORY (owner: "in brief object pop out need an asset
+// inventory list to add QTYs and descriptions for specific sites"). Rows of
+// {q:qty-text, d:description} live ON the node, so they ride kv 'brief', the
+// board snapshot and saved briefs with zero extra plumbing. This sanitizer is
+// the single gate every load path uses (kv, board, saved-brief restore).
+function _bfInvClean(a){
+  if(!Array.isArray(a)) return [];
+  return a.slice(0,40)
+    .map(function(it){ return {q:String((it&&it.q)||'').slice(0,10), d:String((it&&it.d)||'').slice(0,60)}; })
+    .filter(function(it){ return it.d; });
 }
 function bfNode(k){ for(const n of BRIEF.nodes) if(n.k===k) return n; return null; }
 function bfKids(k){ return BRIEF.nodes.filter(function(n){ return (n.p||null)===(k||null); }); }
@@ -7650,6 +7774,160 @@ function _svOpenSheet(){
   host.hidden=false;
 }
 try{ window.Views={ capture:svCapture, recall:svRecall, remove:svRemove, list:function(){ return SAVEDV.slice(); }, open:_svOpenSheet }; }catch(_){}
+
+// ── v1.7.0 SAVED BRIEFS (owner: "need a save brief function that saves it to
+// be accessed across multiple devices"). Named snapshots of the whole diagram
+// (nodes + hide + vert — inventories ride inside the nodes), stored in kv
+// 'briefs' and riding the database board as ONE newest-wins blob — exactly
+// the views law. Loading REPLACES the working brief through _bfSave, so the
+// replacement itself syncs to the other devices too.
+let SAVEDB=[];
+let _sbMod=0;
+function _sbSave(){
+  _sbMod=Date.now();
+  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'briefs', v:{v:1, list:SAVEDB, mod:_sbMod}}); } }catch(_){}
+  try{ dbPush(); }catch(_){}                      // saved briefs ride the board
+}
+function sbCapture(name){
+  const roots=BRIEF.nodes.filter(function(n){ return !n.p; });
+  const nm=String(name||'').trim().slice(0,60)
+    || ((roots[0]?(roots[0].n+' · '):'')+new Date().toLocaleDateString());
+  SAVEDB.unshift({ n:nm, ts:Date.now(),
+    nodes:JSON.parse(JSON.stringify(BRIEF.nodes)),
+    hide:(BRIEF.hide||[]).slice(), vert:(BRIEF.vert||[]).slice() });
+  if(SAVEDB.length>24) SAVEDB.pop();              // same shelf depth as views
+  _sbSave();
+  return nm;
+}
+function sbLoad(i){
+  const b=SAVEDB[i]; if(!b || !Array.isArray(b.nodes)) return false;
+  const seen={};
+  BRIEF.nodes=JSON.parse(JSON.stringify(b.nodes)).filter(function(n){
+    if(!n || typeof n.k!=='string' || seen[n.k]) return false;
+    if(n.t==='org' && !((typeof orgOf==='function'&&orgOf(n.r))||(typeof orgById==='function'&&orgById(n.r)))) return false;
+    seen[n.k]=1; return true;
+  }).map(function(n){ if(n.inv) n.inv=_bfInvClean(n.inv); return n; });
+  BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
+  BRIEF.hide=(b.hide||[]).slice(); BRIEF.vert=(b.vert||[]).slice();
+  _bfSave();
+  try{ setMode('brief'); renderBrief(); globeMark(); _bfFrame(); }catch(_){}
+  return true;
+}
+function sbRemove(i){ SAVEDB.splice(i,1); _sbSave(); }
+try{ window.Briefs={ save:sbCapture, load:sbLoad, remove:sbRemove, list:function(){ return SAVEDB.slice(); } }; }catch(_){}
+
+// ── v1.7.0 THE LEDGER (owner: "component of this app that clearly reflects
+// the IDs / People / Specs / Notes / Briefs saved in a logical manner …
+// maybe a side panel pop out"). A right-side drawer, not a room: the
+// saved-brief shelf on top (save current, load, delete), then the ID
+// registry grouped by installation — every ID with its People/Specs/Notes/
+// Links tag counts, plus an 'untagged' row so nothing hides. Reads live
+// state on every open; tapping an installation jumps to it on the map.
+let _ldSaveArm=false, _ldLoadArm=-1;
+function _lgSiteName(id){
+  const s=siteById(id); if(s) return s.base;
+  const o=(typeof orgById==='function'&&orgById(id))||(typeof orgOf==='function'&&orgOf(id));
+  return o?o.name:id;
+}
+function _ldCounts(c){
+  return '<span class="ld-cts">'
+    +'<span class="ld-ct" title="People">P'+c.people+'</span>'
+    +'<span class="ld-ct" title="Specs">S'+c.specs+'</span>'
+    +'<span class="ld-ct" title="Notes">N'+c.notes+'</span>'
+    +'<span class="ld-ct" title="Links">L'+c.links+'</span></span>';
+}
+function _ledgerHTML(){
+  const esc=_odEsc, escA=_odEscA;
+  let h='<div class="ld-head"><div class="ld-title">▤ Ledger</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-ldclose="1" aria-label="Close">✕</button></div>';
+  // ── BRIEFS — the cross-device shelf
+  h+='<div class="ld-seclab">Briefs</div>';
+  const bn=BRIEF.nodes.length;
+  if(_ldSaveArm){
+    h+='<div class="rc-form"><input class="rc-in" id="ldBriefName" type="text" maxlength="60" placeholder="Name this brief">'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-ldsavecancel="1">Cancel</button>'
+      +'<button class="rc-save" type="button" data-ldsavego="1">Save</button></div></div>';
+  } else {
+    h+='<button class="bf-act in" type="button" data-ldsave="1"'+(bn?'':' disabled')+'>Save current brief ('+bn+' object'+(bn===1?'':'s')+')</button>';
+  }
+  if(SAVEDB.length){
+    SAVEDB.forEach(function(b,i){
+      const armed=(_ldLoadArm===i);
+      h+='<div class="ld-row"><div class="ld-main"><div class="ld-n">'+esc(b.n)+'</div>'
+        +'<div class="ld-sub">'+(Array.isArray(b.nodes)?b.nodes.length:0)+' objects · '+new Date(b.ts||0).toLocaleDateString()+'</div></div>'
+        +'<button class="bf-act'+(armed?'':' in')+'" type="button" data-ldload="'+i+'">'+(armed?'Replace current?':'Load')+'</button>'
+        +'<button class="od-ico" type="button" data-lddel="'+i+'" aria-label="Delete saved brief">✕</button></div>';
+    });
+  } else h+='<div class="ld-sub ld-pad">No saved briefs yet — save one here and open it on any connected device.</div>';
+  // ── ID REGISTRY — grouped by installation, counts per ID
+  h+='<div class="ld-seclab">ID registry</div>';
+  let any=false;
+  Object.keys(RECORDS).sort(function(a,b){ return _lgSiteName(a).localeCompare(_lgSiteName(b)); }).forEach(function(id){
+    const r=RECORDS[id]; if(!r) return;
+    const tot=recCount(id), ids=(r.ids||[]);
+    if(!tot && !ids.length) return;
+    any=true;
+    h+='<div class="ld-org"><button class="ld-orgbtn" type="button" data-ldgo="'+escA(id)+'">'+esc(_lgSiteName(id))+'</button><span class="ld-tot">'+tot+'</span></div>';
+    ids.forEach(function(lb){
+      const c={people:0,specs:0,notes:0,links:0};
+      ['people','specs','notes','links'].forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(it.xid===lb) c[kk]++; }); });
+      h+='<div class="ld-idrow"><span class="ld-id">'+esc(lb)+'</span>'+_ldCounts(c)+'</div>';
+    });
+    const un={people:0,specs:0,notes:0,links:0}; let unN=0;
+    ['people','specs','notes','links'].forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(!it.xid){ un[kk]++; unN++; } }); });
+    if(unN) h+='<div class="ld-idrow"><span class="ld-id ld-untag">untagged</span>'+_ldCounts(un)+'</div>';
+  });
+  if(!any) h+='<div class="ld-sub ld-pad">Nothing logged yet. Open an installation on the map and use its ID tab — People, Specs, Notes and Links land here as you tag them.</div>';
+  h+='<div class="ld-sub ld-pad">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
+    ?'Database LIVE — everything above mirrors your other devices.'
+    :'Connect the database (hold the A-ORG-2 mark → Database) to mirror this across devices.')+'</div>';
+  return h;
+}
+function _ledgerEl(){
+  let el=document.getElementById('ledger');
+  if(!el){
+    el=document.createElement('aside');
+    el.id='ledger';
+    el.innerHTML='<div class="ld-scrim" data-ldclose="1"></div><div class="ld-panel glass"></div>';
+    document.body.appendChild(el);
+    el.addEventListener('click', _ledgerTap);
+  }
+  return el;
+}
+function _ledgerRender(){
+  const el=_ledgerEl(); const p=el.querySelector?el.querySelector('.ld-panel'):null;
+  if(p) p.innerHTML=_ledgerHTML();
+}
+function _ledgerOpen(){
+  const el=_ledgerEl(); _ldSaveArm=false; _ldLoadArm=-1; _ledgerRender();
+  try{ requestAnimationFrame(function(){ el.classList.add('on'); }); }catch(_){ el.classList.add('on'); }
+}
+function _ledgerClose(){ const el=document.getElementById('ledger'); if(el) el.classList.remove('on'); }
+function _ledgerTap(e){
+  const t=e.target; if(!t||!t.closest) return;
+  if(t.closest('[data-ldclose]')){ _ledgerClose(); return; }
+  if(t.closest('[data-ldsave]')){ _ldSaveArm=true; _ledgerRender();
+    try{ const i2=document.getElementById('ldBriefName'); i2&&i2.focus(); }catch(_){} return; }
+  if(t.closest('[data-ldsavecancel]')){ _ldSaveArm=false; _ledgerRender(); return; }
+  if(t.closest('[data-ldsavego]')){
+    const nm=(document.getElementById('ldBriefName')||{}).value||'';
+    sbCapture(nm); _ldSaveArm=false; _ledgerRender();
+    try{ _bfToast('Brief saved'+(((typeof _dbState!=='undefined')&&_dbState==='live')?' — on the board for your other devices':' — connect the database to sync it')); }catch(_){}
+    return; }
+  const ld=t.closest('[data-ldload]');
+  if(ld){ const i2=+ld.getAttribute('data-ldload');
+    if(_ldLoadArm!==i2){ _ldLoadArm=i2; _ledgerRender(); return; }   // first tap arms — loading replaces the working brief
+    _ldLoadArm=-1;
+    if(sbLoad(i2)){ _ledgerClose(); try{ _bfToast('Brief loaded'); }catch(_){} }
+    return; }
+  const dl=t.closest('[data-lddel]');
+  if(dl){ sbRemove(+dl.getAttribute('data-lddel')); _ldLoadArm=-1; _ledgerRender(); return; }
+  const go=t.closest('[data-ldgo]');
+  if(go){ const id=go.getAttribute('data-ldgo'); _ledgerClose();
+    try{ setMode('map'); if(siteById(id)) selectSite(id); }catch(_){} return; }
+}
+try{ window.Ledger={ open:_ledgerOpen, close:_ledgerClose, html:_ledgerHTML }; }catch(_){}
 function recBackup(){
   const out={v:1, app:'A-ORG-2', generated:new Date().toISOString(), records:RECORDS};
   _xpDownload('a-org-2-records-'+_xpStamp()+'.json','application/json',JSON.stringify(out,null,1));
@@ -7716,7 +7994,8 @@ function _dbSnapshot(){
   // diagram (groups included) and saved views. Each part merges newest-wins.
   return {v:2, records:RECORDS,
     brief:{nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod},
-    views:{list:SAVEDV, mod:_svMod}};
+    views:{list:SAVEDV, mod:_svMod},
+    briefs:{list:SAVEDB, mod:_sbMod}};             // v1.7.0: the saved-brief shelf rides too
 }
 function _dbApply(data){
   if(!data) return;
@@ -7754,6 +8033,14 @@ function _dbApply(data){
     try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
       tx.objectStore('kv').put({k:'views', v:{v:1, list:SAVEDV, mod:_svMod}}); } }catch(_){}
     took++;
+  }
+  // v1.7.0 — saved briefs: same law (write kv directly — never via _sbSave, echo law)
+  if(data.briefs && Array.isArray(data.briefs.list) && (data.briefs.mod||0)>(_sbMod||0)){
+    SAVEDB=data.briefs.list.slice(); _sbMod=data.briefs.mod;
+    try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
+      tx.objectStore('kv').put({k:'briefs', v:{v:1, list:SAVEDB, mod:_sbMod}}); } }catch(_){}
+    took++;
+    try{ const lp=document.getElementById('ledger'); if(lp && lp.classList.contains('on')) _ledgerRender(); }catch(_){}
   }
   if(took){
     try{ const dz=document.getElementById('dossier');
@@ -8645,6 +8932,8 @@ function bootShell(){
         +'<button class="am-row" type="button" data-am="db">Database — records off-device'
           +'<span class="am-dbchip '+(_dbState==='live'?'am-db-live':(_dbState==='error'?'am-db-error':'am-db-off'))+'">'
           +(_dbState==='live'?'LIVE':(_dbState==='connecting'?'…':(_dbState==='error'?'ERR':'OFF')))+'</span></button>'
+        // v1.7.0 — the ledger door (also on the brief chart head)
+        +'<button class="am-row" type="button" data-am="ledger">Ledger — IDs, records &amp; saved briefs</button>'
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
         +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
@@ -8680,6 +8969,9 @@ function bootShell(){
       var dbm=e.target.closest('[data-am="db"]');
       if(dbm){ var m0=document.getElementById('appMenu'); if(m0) m0.hidden=true;
         try{ _dbSheet(); }catch(_){} return; }
+      var lgm=e.target.closest('[data-am="ledger"]');
+      if(lgm){ var mL=document.getElementById('appMenu'); if(mL) mL.hidden=true;
+        try{ _ledgerOpen(); }catch(_){} return; }
       var dbc=e.target.closest('[data-dbconnect]');
       if(dbc){
         try{

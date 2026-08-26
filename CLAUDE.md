@@ -976,3 +976,25 @@ closeouts. The stepping label POLICY is now load-bearing:
   eccsp:'#FF7BD9' orchid} — class colors OUTSIDE the tier streams, never
   green; leader lines and labels keep tier shades. Both toggles (dots Aa)
   govern stars exactly as they governed dots.
+
+## v1.7.0 — saved briefs · the ledger · asset inventory (owner, three asks)
+- SAVED BRIEFS: SAVEDB/_sbMod, kv 'briefs' {v:1,list,mod}, snapshot key
+  `briefs` — EXACTLY the views law (newest-wins blob; _dbApply writes kv
+  directly, never via _sbSave — echo law). sbCapture deep-copies nodes;
+  sbLoad re-validates org refs and re-cleans inv, then goes through _bfSave
+  so the load itself syncs. Shelf capped at 24 like views.
+- THE LEDGER: right drawer #ledger (.ld-* classes — .lg-* belongs to the
+  LEGEND, never reuse it), doors = chart-head ▤ + ⋯ menu row. Shelf on top
+  (save arms an inline name form; Load is a TWO-TAP arm 'Replace current?';
+  ✕ deletes), then ID registry grouped by installation with per-ID
+  P/S/N/L counts + an 'untagged' row. _ledgerHTML() is the pure builder —
+  smoke asserts on its string. Inside .ld-row, .bf-act must stay
+  width:auto (its default 100% ate the row — fixed in CSS).
+- ASSET INVENTORY: nd.inv=[{q≤10ch,d≤60ch}] ≤40 rows, blank-desc rows drop
+  (_bfInvClean — the ONE sanitizer every load path calls: kv m2 strip,
+  sbLoad; _dbApply passes whole nodes so it rides free). Section on BOTH
+  sheets (_bfPlainSheet + _bfObjSheet org path) via _bfInvHTML; the _disc
+  accordion opens by default only when rows exist. _bfInvEdit joins the
+  _bfAnnEdit/_bfRnEdit clear-sites (now 5 sites × 5 fields).
+- Size watch: ship-lint now warns at 91.7% of the 900KB budget — plan a
+  prune before the next big feature.

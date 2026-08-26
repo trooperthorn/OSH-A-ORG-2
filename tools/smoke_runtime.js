@@ -619,6 +619,49 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(gk) global.Brief.remove(gk);
       if(tok) console.log('  ✓ territories + stars: DC/PR/Guam/VI on roster · outline rings decode (VI aliased) · star classifier rsn/eccsp/null · Guam anchors');
     }
+    // v1.7.0 — SAVED BRIEFS + LEDGER + ASSET INVENTORY: inventory sanitizes and
+    // rides node/snapshot/saved-brief; the shelf captures, loads back, merges
+    // newest-wins from the board; the ledger HTML carries briefs + ID registry
+    {
+      let wok=true;
+      global.Brief.addGroup('Inv Host');
+      const ih=global.Brief.list().map(k=>global.Brief.node(k)).find(n=>n&&n.t==='custom'&&n.n==='Inv Host');
+      const ndI=global.bfNode(ih.k);
+      ndI.inv=global._bfInvClean([{q:'12',d:'JLTV'},{q:'',d:'Generators'},{q:'3',d:''}]);
+      if(!ndI.inv || ndI.inv.length!==2){ wok=false; fails++; console.log('✗ INV sanitizer: blank description must drop, blank qty must keep — got '+JSON.stringify(ndI.inv)); }
+      global._bfSave();
+      const snI=global._dbSnapshot();
+      const snNode=(snI.brief.nodes||[]).find(function(n){ return n.k===ih.k; });
+      if(!snNode || !snNode.inv || snNode.inv.length!==2){ wok=false; fails++; console.log('✗ INV must ride the board snapshot on its node'); }
+      // saved briefs: capture → shelf + snapshot; load restores nodes with inv
+      const nm=global.Briefs.save('Test Shelf Brief');
+      if(nm!=='Test Shelf Brief' || global.Briefs.list().length<1 || global.Briefs.list()[0].n!=='Test Shelf Brief'){ wok=false; fails++; console.log('✗ SAVED BRIEF capture failed'); }
+      if(!(global._dbSnapshot().briefs && global._dbSnapshot().briefs.list.length>=1)){ wok=false; fails++; console.log('✗ SAVED BRIEFS must ride the board snapshot'); }
+      global.Brief.remove(ih.k);
+      if(global.bfNode(ih.k)){ wok=false; fails++; console.log('✗ probe setup: group did not remove'); }
+      if(!global.Briefs.load(0)){ wok=false; fails++; console.log('✗ SAVED BRIEF load refused'); }
+      const back=global.bfNode(ih.k);
+      if(!back || !back.inv || back.inv.length!==2){ wok=false; fails++; console.log('✗ SAVED BRIEF load must restore the node WITH its inventory'); }
+      // board merge: a NEWER remote shelf replaces, an older one is ignored
+      global._dbApply({briefs:{list:[{n:'Remote Shelf', ts:1, nodes:[], hide:[], vert:[]}], mod:Date.now()+50}});
+      if(global.Briefs.list().length!==1 || global.Briefs.list()[0].n!=='Remote Shelf'){ wok=false; fails++; console.log('✗ SAVED BRIEFS newest-wins merge failed'); }
+      global._dbApply({briefs:{list:[], mod:1}});
+      if(global.Briefs.list().length!==1){ wok=false; fails++; console.log('✗ SAVED BRIEFS: an OLDER remote shelf must not clobber'); }
+      // ledger: briefs shelf + ID registry with per-ID counts
+      global.recAddId('fort-bragg','ID-900');
+      global.recAdd('fort-bragg','people',{name:'Ledger Probe', xid:'ID-900'});
+      const lh=global.Ledger.html();
+      if(lh.indexOf('Save current brief')<0 || lh.indexOf('Remote Shelf')<0){ wok=false; fails++; console.log('✗ LEDGER must carry the saved-brief shelf'); }
+      if(lh.indexOf('Fort Bragg')<0 || lh.indexOf('ID-900')<0 || lh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ LEDGER ID registry must show the org, the ID and its P count'); }
+      // head door present on the chart
+      global.renderBrief();
+      if((IDS['briefStage']?IDS['briefStage'].innerHTML:'').indexOf('data-bfledger')<0){ wok=false; fails++; console.log('✗ LEDGER door missing from the chart head'); }
+      // cleanup
+      try{ (global.RECORDS['fort-bragg'].people||[]).pop(); global.recDelId('fort-bragg','ID-900'); }catch(_){}
+      global.Briefs.remove(0);
+      global.Brief.remove(ih.k);
+      if(wok) console.log('  ✓ saved briefs + ledger + inventory: sanitize · ride snapshot · capture/load with inv · newest-wins shelf · ledger shows shelf + ID counts · head door');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');
