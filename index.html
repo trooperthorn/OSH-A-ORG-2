@@ -565,35 +565,37 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   padding:0 4px 3px; border-radius:12px; box-shadow:inset 0 0 0 1px var(--line-tree)}
 .bf-kids.bf-krow2{padding-top:7px}
 .bf-kids.bf-krow2::before{display:none}
-/* THE BOX — minimal: the name, a quiet station line, nothing else */
+/* THE BOX (v1.3.0 MATTE — owner: "sleek, bold text, their chosen color matte
+   fill"). The box IS its color now: a flat matte fill of the tier's deep hue
+   or the owner's picked swatch, name in heavy ink computed for contrast
+   (_bfInk). No washes, no rings, no gloss — fill + ink + one soft drop. */
 .bf-box{position:relative; cursor:pointer; -webkit-tap-highlight-color:transparent;
-  min-width:66px; max-width:132px; padding:6px 10px; border-radius:10px;
+  min-width:66px; max-width:132px; padding:7px 11px; border-radius:11px;
   display:flex; flex-direction:column; align-items:center; gap:1px;
-  background:var(--panel-2); box-shadow:0 0 0 1.3px var(--bfc,var(--t1)), var(--drop);
-  transition:box-shadow .16s ease, opacity .16s ease}
+  background:var(--bfc,var(--t1)); color:var(--bfink,#FDF8E7); box-shadow:var(--drop);
+  transition:box-shadow .16s ease, opacity .16s ease, filter .16s ease}
 .bf-box:active{filter:brightness(1.12)}
-.bf-nm{font:800 10.5px/1.25 var(--body); color:var(--bfc,var(--t1));
+.bf-nm{font:900 10.5px/1.25 var(--body); color:var(--bfink,#FDF8E7); letter-spacing:.01em;
   max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.bf-st{font:600 8.5px/1.2 var(--mono); letter-spacing:.03em; color:var(--faint);
+.bf-st{font:600 8.5px/1.2 var(--mono); letter-spacing:.03em; color:var(--bfink,#FDF8E7); opacity:.7;
   max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bf-t1{--bfc:var(--t1)} .bf-t2{--bfc:var(--t2)} .bf-t3{--bfc:var(--t3)} .bf-t4{--bfc:var(--t4)}
 .bf-box.bf-dim{opacity:.28}
 .bf-box.bf-foc{box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(var(--accent-rgb),.35)}
-.bf-box.bf-tinted{background:color-mix(in srgb, var(--bfc) 16%, var(--panel-2))}
 /* v1.0.3 GROUPS — an owner-named filler element that shapes the hierarchy.
-   Dashed ring + engraved tag: reads as structure, never as a real unit. */
-.bf-box.bf-grp{background:rgba(0,0,0,.14); box-shadow:var(--drop);
-  outline:1.4px dashed var(--bfc,var(--t1)); outline-offset:-1.4px}
-.bf-box.bf-grp.bf-tinted{background:color-mix(in srgb, var(--bfc) 10%, rgba(0,0,0,.14))}
-.bf-grptag{font:700 7px/1 var(--mono); letter-spacing:.16em; color:var(--faint)}
+   v1.3.0: the matte fill stays; the dash moves to INK so filler still reads
+   as structure on any color. */
+.bf-box.bf-grp{outline:1.4px dashed color-mix(in srgb, var(--bfink,#FDF8E7) 60%, transparent);
+  outline-offset:-3px}
+.bf-grptag{font:700 7px/1 var(--mono); letter-spacing:.16em; color:var(--bfink,#FDF8E7); opacity:.6}
 /* the fold caret sits under its box and carries the hidden count */
 /* v0.26.0 — the per-object ops: ＋ add subordinates · ✎ edit. Small and quiet so
    the box stays minimal, but always reachable without opening anything first. */
 .bf-ops{display:flex; gap:4px; margin-top:4px}
 .bf-op{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:0;
   width:20px; height:20px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;
-  background:rgba(0,0,0,.22); color:var(--bfc,var(--dim));
-  box-shadow:inset 0 0 0 1px var(--line); font:800 12px/1 var(--body)}
+  background:color-mix(in srgb, var(--bfink,#FDF8E7) 14%, transparent); color:var(--bfink,#FDF8E7);
+  font:800 12px/1 var(--body)}
 .bf-op:active{filter:brightness(1.3)}
 .bf-box.bf-dim .bf-ops{opacity:.5}
 .bf-caret{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:3px 0 0;
@@ -1212,6 +1214,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.3.0 • MATTE OBJECTS IN THE BRIEF (owner: "make them sleek with bold
+//            text with their chosen color matte fill"). The chart box IS its
+//            color now: a flat matte fill — the tier's deep hue by default,
+//            the owner's picked swatch when one is chosen — with the name in
+//            heavy 900-weight ink whose shade is computed from the fill's
+//            luminance (dark ink on light swatches, cream on deep ones). No
+//            more washes, rings or glass on objects: fill + ink + one soft
+//            drop. Station line and GROUP tag ride in the same ink, dimmed;
+//            the ＋/✎ ops sit as ink chips; a group keeps its dashed outline,
+//            now drawn in ink so filler reads on any color. Tier hue
+//            families (L1 · L2 cools · L3 warms · L4 roses) are untouched —
+//            they simply moved from the ring to the body of the box.
 //   v1.2.2 • THE APP DIAGNOSES ITS OWN PIPELINE (owner's dump: five straight
 //            sw.js failures in one session — the v1.2.1 ladder ran, so the
 //            page is fresh from the network while that ONE origin file keeps
@@ -2021,7 +2035,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.2.2';
+const APP_VERSION = 'v1.3.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -5019,12 +5033,13 @@ function renderBrief(){
     const tier=Math.min(4,n.lvl);
     const tcls='bf-t'+tier;                                  // quote-adjacent for dead-lint
     const col=n.color||'';
-    const sty=col?(' style="--bfc:'+col+'"'):'';
+    // v1.3.0 MATTE: a chosen color IS the fill — its ink is picked by luminance
+    const sty=col?(' style="--bfc:'+col+';--bfink:'+_bfInk(col)+'"'):'';
     const stn=(n.kind==='state')?'state':((n.lat!=null&&n.kind==='org')?_bfBaseOf(n.ref):'');
     // v1.0.3 — a GROUP (custom filler node) wears a dashed ring + engraved tag
     const grp=(n.kind==='custom')?' bf-grp':'';
     let r='<li class="bf-li">';
-    r+='<div class="bf-box '+tcls+grp+dim+isFoc+(col?' bf-tinted':'')+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
+    r+='<div class="bf-box '+tcls+grp+dim+isFoc+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
       +'<span class="bf-nm">'+esc(_bfAbbr(n.name))+'</span>'
       +(grp?'<span class="bf-grptag">GROUP</span>':'')
       +(stn?('<span class="bf-st">'+esc(stn)+'</span>'):'')
@@ -5090,6 +5105,17 @@ function _bfCenter(wrap,tree){
 }
 function _bfBaseOf(orgId){
   try{ const s=siteById(ogEffSite(orgId)||''); return s?s.base:''; }catch(_){ return ''; }
+}
+// v1.3.0 — ink for a matte fill: relative luminance picks dark ink on light
+// swatches, cream ink on deep ones (the brief room's tier hues are all deep).
+function _bfInk(hex){
+  try{
+    const h=String(hex).replace('#','');
+    const L=0.2126*(parseInt(h.slice(0,2),16)/255)
+          +0.7152*(parseInt(h.slice(2,4),16)/255)
+          +0.0722*(parseInt(h.slice(4,6),16)/255);
+    return L>0.58?'#221A08':'#FDF8E7';
+  }catch(_){ return '#FDF8E7'; }
 }
 try{ window.renderBrief=renderBrief; }catch(_){}
 

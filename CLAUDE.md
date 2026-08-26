@@ -906,3 +906,13 @@ closeouts. The stepping label POLICY is now load-bearing:
   assets config sane ⇒ the client's single-try registration was the only
   suspect left. The stamp/toast review-truth stack keeps paying rent.
 
+## v1.3.0 — matte objects in the brief (owner: bold text, chosen-color matte fill)
+- The chart box IS its color: flat matte fill (tier deep hue by default, the
+  picked swatch when chosen), name at 900 weight in ink computed by _bfInk
+  (relative luminance > 0.58 → dark #221A08, else cream #FDF8E7). Everything
+  on the box — station line, GROUP tag, ＋/✎ ops, the group dash — rides
+  var(--bfink), so any fill stays legible. bf-tinted (the 16% wash) is
+  RETIRED; never reintroduce washes or rings on chart objects.
+- Tier law intact: L1/L2 cools/L3 warms/L4 roses moved from ring to body —
+  same hue families, same semantics, no green on brief data.
+
