@@ -1214,6 +1214,21 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.4.0 • BRIEF-ONLY PLACES (owner: "10 new locations only in brief mode…
+//            same location as their State National Guard dot" + 2 more).
+//            A PLACE is a diagram object that pins its OWN spot on the
+//            globe — it exists only in the brief room; the map roster never
+//            lists it. The fixed dozen: California · Utah · Texas · Alabama
+//            · Nebraska · Minnesota · Massachusetts RSN (each at its State
+//            National Guard dot), TARC RSN (National Guard Bureau HQ,
+//            Arlington), Fort Bragg RSN + Fort Bragg ECCSP (Fort Bragg),
+//            JBLM RSN + JBLM ECCSP (JBLM). They ride every ＋ picker under
+//            "Brief-only locations" (searchable; one already placed drops
+//            out), draw their dot at the anchor base, show the host base as
+//            their station line, take colors/moves/notes/IDs like any
+//            object, and never wear the GROUP tag — a place is a real
+//            object, not filler. Coords resolve from the live site at add
+//            time; placed nodes keep them (board-portable, offline-safe).
 //   v1.3.0 • MATTE OBJECTS IN THE BRIEF (owner: "make them sleek with bold
 //            text with their chosen color matte fill"). The chart box IS its
 //            color now: a flat matte fill — the tier's deep hue by default,
@@ -2035,7 +2050,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.3.0';
+const APP_VERSION = 'v1.4.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3755,7 +3770,8 @@ function _briefChainMap(opts){
     const lvl=lvlOf(nd.k), root=rootOf(nd.k), tier=Math.min(4,lvl);
     if(!all && (hid.has(root) || lvl>depth)) return;
     let lat=null, lon=null;
-    if(nd.t==='state'){
+    if(nd.t==='custom' && nd.la!=null){ lat=nd.la; lon=nd.lo; }   // v1.4.0: a PLACE pins its own spot
+    else if(nd.t==='state'){
       const st=(typeof US_STATES!=='undefined')?US_STATES.find(function(s){ return s.n===nd.r; }):null;
       if(st){ lat=st.lat; lon=st.lon; }
     } else if(nd.t==='org'){
@@ -3766,7 +3782,7 @@ function _briefChainMap(opts){
     const fam=BF_STREAMS[tier];
     out.nodes[nd.k]={id:nd.k, tier:tier, lvl:lvl, shade:fam[tierN[tier]++ % fam.length],
       parent:(nd.p&&byK[nd.p])?nd.p:null, root:root, lat:lat, lon:lon, name:nd.n,
-      kind:nd.t, ref:nd.r, color:nd.c||'', stripe:!!nd.sh, note:nd.tx||'',
+      kind:nd.t, ref:nd.r, color:nd.c||'', stripe:!!nd.sh, note:nd.tx||'', bs:nd.bs||'', pinned:(nd.la!=null),
       // "custom" stays what it always meant — NOT a stock A1ORGS record: a
       // free-text box, or an org the owner created. Chart order still favours them.
       custom:(nd.t==='custom') || (nd.t==='org' && typeof orgById==='function' && !!orgById(nd.r))};
@@ -5035,9 +5051,12 @@ function renderBrief(){
     const col=n.color||'';
     // v1.3.0 MATTE: a chosen color IS the fill — its ink is picked by luminance
     const sty=col?(' style="--bfc:'+col+';--bfink:'+_bfInk(col)+'"'):'';
-    const stn=(n.kind==='state')?'state':((n.lat!=null&&n.kind==='org')?_bfBaseOf(n.ref):'');
-    // v1.0.3 — a GROUP (custom filler node) wears a dashed ring + engraved tag
-    const grp=(n.kind==='custom')?' bf-grp':'';
+    const stn=(n.kind==='state')?'state'
+      :((n.kind==='custom'&&n.pinned)?(n.bs||'')                    // v1.4.0: a PLACE names its host base
+      :((n.lat!=null&&n.kind==='org')?_bfBaseOf(n.ref):''));
+    // v1.0.3 — a GROUP wears a dashed ring + engraved tag;
+    // v1.4.0 — a PLACE (pinned custom) is a real object, not filler: no dash, no tag
+    const grp=(n.kind==='custom'&&!n.pinned)?' bf-grp':'';
     let r='<li class="bf-li">';
     r+='<div class="bf-box '+tcls+grp+dim+isFoc+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
       +'<span class="bf-nm">'+esc(_bfAbbr(n.name))+'</span>'
@@ -5943,6 +5962,15 @@ function _bfAddSheet(pk){
     }
   }
   const shown=rows.filter(function(r){ return q.length<2 ? true : (_srFold(r.name+' '+r.sub).indexOf(q)>=0); });
+  // v1.4.0 — the BRIEF-ONLY PLACES roster rides every picker: offered in full
+  // when browsing, matchable when searching; one already on the diagram drops out
+  const places=[];
+  BF_PLACES.forEach(function(p){
+    if(bfNode(p.k)) return;
+    const hs=siteById(p.site);
+    places.push({id:p.k, name:p.n, sub:hs?hs.base:''});
+  });
+  const placesShown=places.filter(function(r){ return q.length<2 ? true : (_srFold(r.name+' '+r.sub).indexOf(q)>=0); });
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">Add under '+esc(_bfAbbr(par.n))+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
@@ -5953,7 +5981,7 @@ function _bfAddSheet(pk){
   if(own && q.length<2) h+='<div class="bf-subhead">Its subordinates \u00b7 '+own+'</div>';
   else if(q.length>=2) h+='<div class="bf-subhead">Matches \u00b7 '+shown.length+'</div>';
   h+='<div class="bf-picklist">';
-  if(!shown.length){
+  if(!shown.length && !placesShown.length){
     h+='<div class="rc-note">'+(q.length>=2?'No matches.':'No subordinates on record \u2014 search above to add any organization or state.')+'</div>';
   }
   shown.slice(0,240).forEach(function(r){
@@ -5965,6 +5993,19 @@ function _bfAddSheet(pk){
       +'</button>';
   });
   h+='</div>';
+  if(placesShown.length){
+    h+='<div class="bf-subhead">Brief-only locations \u00b7 '+placesShown.length+'</div>';
+    h+='<div class="bf-picklist">';
+    placesShown.forEach(function(r){
+      const on=pick.has(r.id);
+      h+='<button type="button" class="bf-pickrow'+(on?' on':'')+'" data-bfpick="'+escA(r.id)+'">'
+        +'<span class="bf-pickck">'+(on?'\u2713':'')+'</span>'
+        +'<span class="bf-picknm">'+esc(r.name)+'</span>'
+        +(r.sub?('<span class="bf-picksub">'+esc(r.sub)+'</span>'):'')
+        +'</button>';
+    });
+    h+='</div>';
+  }
   h+='<div class="rc-row rc-acts bf-picksticky">'
     +'<button class="bf-act bf-commit'+(pick.size?' in':'')+'" type="button" data-bfpickadd="'+escA(pk)+'"'+(pick.size?'':' disabled')+'>'
       +(pick.size?('Add '+pick.size+' under '+esc(_bfAbbr(par.n))):'Select organizations to add')+'</button>'
@@ -6005,6 +6046,27 @@ function _bfGroupSheet(pk){
   _sheetFlag();
   try{ const f=document.getElementById('bfGrpNm'); f&&f.focus(); }catch(_){}
 }
+// ── v1.4.0 BRIEF-ONLY PLACES (owner: "10 new locations only in brief mode…
+// same location as their State National Guard dot"). A PLACE is a custom
+// node that carries its OWN coordinates — it draws its dot at a real
+// installation's spot but exists only on the brief diagram; the map room
+// never lists it. The roster is fixed here; coords resolve from the live
+// site at add time so a corrected base position carries through.
+const BF_PLACES=[
+  {k:'px:california-rsn',    n:'California RSN',    site:'california-national-guard'},
+  {k:'px:utah-rsn',          n:'Utah RSN',          site:'utah-national-guard'},
+  {k:'px:texas-rsn',         n:'Texas RSN',         site:'texas-national-guard'},
+  {k:'px:alabama-rsn',       n:'Alabama RSN',       site:'alabama-national-guard'},
+  {k:'px:nebraska-rsn',      n:'Nebraska RSN',      site:'nebraska-national-guard'},
+  {k:'px:minnesota-rsn',     n:'Minnesota RSN',     site:'minnesota-national-guard'},
+  {k:'px:massachusetts-rsn', n:'Massachusetts RSN', site:'massachusetts-national-guard'},
+  {k:'px:tarc-rsn',          n:'TARC RSN',          site:'arlington'},               // National Guard Bureau HQ
+  {k:'px:fort-bragg-rsn',    n:'Fort Bragg RSN',    site:'fort-bragg'},
+  {k:'px:jblm-rsn',          n:'JBLM RSN',          site:'jblm'},
+  {k:'px:jblm-eccsp',        n:'JBLM ECCSP',        site:'jblm'},
+  {k:'px:fort-bragg-eccsp',  n:'Fort Bragg ECCSP',  site:'fort-bragg'},
+];
+function bfPlaceOf(k){ for(const p of BF_PLACES) if(p.k===k) return p; return null; }
 // batch add — push every pick, then save/render ONCE (adding twenty one-at-a-time
 // would re-render and re-frame the globe twenty times)
 function bfAddMany(ids, parent){
@@ -6012,6 +6074,14 @@ function bfAddMany(ids, parent){
   let n=0;
   ids.forEach(function(id){
     if(bfNode(id)) return;
+    // v1.4.0 — a PLACE: custom node with its own pinned coordinates
+    const px=bfPlaceOf(id);
+    if(px){
+      const hs=siteById(px.site); if(!hs) return;
+      BRIEF.nodes.push({k:px.k, n:px.n, p:parent||null, t:'custom', r:null,
+        la:hs.lat, lo:hs.lon, bs:hs.base, c:'', sh:0, tx:''}); n++;
+      return;
+    }
     const st=bfStateName(id);
     if(st){
       const s2=(typeof US_STATES!=='undefined')?US_STATES.find(function(x){ return x.n===st; }):null;
@@ -6079,7 +6149,9 @@ function _bfPlainSheet(k){
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">'+esc(nd.n)+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
-    +'<div class="od-sub">'+(nd.t==='state'?'US state \u00b7 highlighted on the globe':'Group \u00b7 a filler element on this diagram')+'</div>';
+    +'<div class="od-sub">'+(nd.t==='state'?'US state \u00b7 highlighted on the globe'
+      :((nd.la!=null)?('Brief-only location \u00b7 at '+_odEsc(nd.bs||'its pinned spot'))
+      :'Group \u00b7 a filler element on this diagram'))+'</div>';
   // v1.0.3 \u2014 a group is the owner's own object, so it renames in place
   if(nd.t==='custom' && _bfRnEdit===k){
     h+='<div class="rc-form">'
@@ -6967,10 +7039,13 @@ function _rdbOpen(){
                 if(n.t==='org' && !((typeof orgOf==='function'&&orgOf(n.r))||(typeof orgById==='function'&&orgById(n.r)))) return false;
                 seen[n.k]=1; return true;
               }).map(function(n){
-                return {k:n.k, n:String(n.n||n.k).slice(0,80), p:(typeof n.p==='string'?n.p:null),
+                const m2={k:n.k, n:String(n.n||n.k).slice(0,80), p:(typeof n.p==='string'?n.p:null),
                   t:(n.t==='state'||n.t==='custom')?n.t:'org', r:(n.r==null?null:n.r),
                   c:(/^#[0-9a-fA-F]{6}$/.test(String(n.c||''))?String(n.c).toLowerCase():''),
                   sh:n.sh?1:0, tx:String(n.tx||'').slice(0,80)};
+                // v1.4.0 — a PLACE keeps its pinned spot + host-base label
+                if(typeof n.la==='number' && typeof n.lo==='number'){ m2.la=n.la; m2.lo=n.lo; m2.bs=String(n.bs||'').slice(0,60); }
+                return m2;
               });
               BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
               _bfSync();
@@ -7208,6 +7283,8 @@ function bfDepth(n){
   try{ globeMark(); }catch(_){}
 }
 try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, addGroup:bfAddCustom,
+  addPlace:function(k,parent){ return bfAddMany([k], parent||null); },
+  places:function(){ return BF_PLACES.slice(); },
   remove:bfRemove, rename:bfRename,
   move:bfMove, reorder:bfReorder, color:bfColor, stripe:bfStripe,
   note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth,

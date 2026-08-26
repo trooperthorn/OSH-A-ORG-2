@@ -528,6 +528,29 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(global.Brief.has('amc')){ fails++; console.log('✗ GROUP removal must cascade its subtree'); }
       if(!fails) console.log('  ✓ groups: create-under + nest real org + rename (group-only) + chart tag + cascade remove');
     }
+    // v1.4.0 — BRIEF-ONLY PLACES: 12 in the roster, every anchor site real,
+    // a place pins its OWN coords (never its parent's), shows its host base
+    // in the chart, and never wears the GROUP tag
+    {
+      let pok=true;
+      const roster=global.Brief.places();
+      if(roster.length!==12){ pok=false; fails++; console.log('✗ PLACES roster must hold 12, got '+roster.length); }
+      roster.forEach(function(p){ if(!global.siteById(p.site)){ pok=false; fails++; console.log('✗ PLACE anchor missing: '+p.site); } });
+      global.Brief.add('fort-bragg');                     // parent at Bragg
+      global.Brief.addPlace('px:california-rsn', 'usawhc');
+      const pn=global.Brief.node('px:california-rsn');
+      const ca=global.siteById('california-national-guard');
+      if(!pn || pn.la!==ca.lat || pn.lo!==ca.lon){ pok=false; fails++; console.log('✗ PLACE did not pin the anchor coords'); }
+      const C=global._briefChainMap({all:true});
+      const cn=C.nodes['px:california-rsn'];
+      if(!cn || cn.lat!==ca.lat || cn.lon!==ca.lon || !cn.pinned){ pok=false; fails++; console.log('✗ chain map must use the place own spot'); }
+      global.renderBrief();
+      const ch2=IDS['briefStage']?IDS['briefStage'].innerHTML:'';
+      if(ch2 && (ch2.indexOf('California National Guard')<0)){ pok=false; fails++; console.log('✗ PLACE box missing its host-base line'); }
+      if(ch2 && />GROUP<[\s\S]*California RSN|California RSN[\s\S]{0,200}>GROUP</.test(ch2)){ pok=false; fails++; console.log('✗ PLACE must not wear the GROUP tag'); }
+      global.Brief.remove('px:california-rsn'); global.Brief.remove('fort-bragg');
+      if(pok) console.log('  ✓ places: roster of 12 · anchors real · pinned coords in node+chain · host-base line · no GROUP tag');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');

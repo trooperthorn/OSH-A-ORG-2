@@ -916,3 +916,18 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Tier law intact: L1/L2 cools/L3 warms/L4 roses moved from ring to body —
   same hue families, same semantics, no green on brief data.
 
+## v1.4.0 — brief-only places (owner: locations that exist only in brief mode)
+- A PLACE is a custom node carrying its OWN coords ({la,lo,bs} on the node);
+  _briefChainMap uses them before the ride-the-parent fallback, so its globe
+  dot sits at the anchor base. The fixed roster is BF_PLACES (12: seven state
+  RSNs at their State NG dots, TARC RSN at Arlington/NGB, Bragg+JBLM RSN and
+  ECCSP pairs). Offered ONLY in the brief ＋ picker ("Brief-only locations",
+  searchable, placed ones drop out) — the map room and the shared search
+  index never see them (rooms stay severed).
+- A pinned custom is NOT a group: no dash, no GROUP tag; its station line is
+  the host base. Coords resolve from the live site AT ADD TIME and are stored
+  on the node — board-portable and offline-safe. kv loader and the board
+  merge pass la/lo/bs through; strip-lists must keep doing so.
+- Extending the roster = add a row to BF_PLACES (k 'px:…', n, site id). Keys
+  are stable ids — never rename a k once shipped (placed nodes keep it).
+
