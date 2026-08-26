@@ -591,6 +591,34 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Brief.remove('px:fort-bragg-rsn'); global.Brief.remove('px:fort-bragg-eccsp');
       if(cok) console.log('  ✓ co-located callout: shared prefix sheds · empty remainder keeps full · unrelated untouched · Bragg pair shares the spot');
     }
+    // v1.6.0 — TERRITORIES + STARS: DC/PR/Guam/Virgin Islands on the roster
+    // with real outline rings (owner's 'Virgin Islands' name aliased to the
+    // payload's long form), Guam addable as a state node at its own spot,
+    // and the star classifier (RSN → 'rsn', ECCSP → 'eccsp', all else null)
+    {
+      let tok=true;
+      ['District of Columbia','Puerto Rico','Guam','Virgin Islands'].forEach(function(nm){
+        if(!global.US_STATES.some(function(s){ return s.n===nm; })){ tok=false; fails++; console.log('✗ TERRITORY missing from US_STATES roster: '+nm); }
+      });
+      try{
+        const topo=JSON.parse(fs.readFileSync(__dirname+'/../data/states-10m.json','utf8'));
+        const shapes=global._namedStateShapes(topo, true);
+        ['District of Columbia','Puerto Rico','Guam','Virgin Islands'].forEach(function(nm){
+          const r=shapes && shapes[nm];
+          if(!r || !r.length || !r.some(function(g){ return g && g.length>=3; })){ tok=false; fails++; console.log('✗ TERRITORY outline rings missing: '+nm); }
+        });
+      }catch(e){ tok=false; fails++; console.log('✗ TERRITORY shape decode: '+e.message); }
+      if(global._bfStarKind({kind:'custom',name:'Fort Bragg RSN'})!=='rsn'){ tok=false; fails++; console.log('✗ STAR classifier: RSN suffix must read rsn'); }
+      if(global._bfStarKind({kind:'custom',name:'JBLM ECCSP'})!=='eccsp'){ tok=false; fails++; console.log('✗ STAR classifier: ECCSP suffix must read eccsp'); }
+      if(global._bfStarKind({kind:'custom',name:'Region 1'})!==null){ tok=false; fails++; console.log('✗ STAR classifier: plain custom must stay a dot'); }
+      if(global._bfStarKind({kind:'state',name:'Texas RSN'})!==null){ tok=false; fails++; console.log('✗ STAR classifier: non-custom kinds must stay null'); }
+      global.Brief.addState('Guam');
+      const CG=global._briefChainMap({all:true});
+      const gk=Object.keys(CG.nodes).find(function(k){ return CG.nodes[k].kind==='state' && CG.nodes[k].name==='Guam'; });
+      if(!gk || Math.abs(CG.nodes[gk].lat-13.45)>0.01){ tok=false; fails++; console.log('✗ Guam state node missing or mis-anchored'); }
+      if(gk) global.Brief.remove(gk);
+      if(tok) console.log('  ✓ territories + stars: DC/PR/Guam/VI on roster · outline rings decode (VI aliased) · star classifier rsn/eccsp/null · Guam anchors');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');

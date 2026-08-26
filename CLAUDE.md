@@ -955,3 +955,24 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Verbatim-name law (v1.4.1) reconciliation: verbatim governs SOLO
   placement and the chart boxes always; only a globe fan cluster — where
   the spot itself carries the shared name — sheds the prefix.
+
+## v1.6.0 — territories + illuminated stars (owner, two asks)
+- US_STATES holds 54: 50 states + DC + Puerto Rico + Guam + 'Virgin Islands'
+  (owner's name — _namedStateShapes aliases the payload's 'United States
+  Virgin Islands' key; never rename the roster entry without keeping the
+  alias). data/states-10m.json is GEOGRAPHIC lon/lat and carries all four
+  territory outlines; smoke decodes them.
+- STATE LAW CHANGED: a selected state/territory is its bright border ALONE —
+  no translucent wash, no centroid dot, no fan seat, no hit-list entry
+  (drawBriefNodes skips kind 'state'; drawBriefStates owns outline + label).
+  Stripes remain an explicit owner toggle.
+- Bug unearthed: drawBriefStates' label phase referenced `bodyFont`, a
+  drawGlobeMarkers LOCAL — swallowed ReferenceError, state names had never
+  drawn from that path (the dot's label covered it). Fixed to T.body. The
+  try{}catch around drawBriefStates calls can hide exactly this class:
+  when a canvas layer goes silent, test the function bare.
+- ILLUMINATED STARS: _bfStarKind(n) — custom node named '… RSN' → 'rsn',
+  '… ECCSP' → 'eccsp', all else null (dot). BF_STAR={rsn:'#6FE3FF' ice,
+  eccsp:'#FF7BD9' orchid} — class colors OUTSIDE the tier streams, never
+  green; leader lines and labels keep tier shades. Both toggles (dots Aa)
+  govern stars exactly as they governed dots.

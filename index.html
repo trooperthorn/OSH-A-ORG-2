@@ -1239,6 +1239,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.6.0 • TERRITORIES + ILLUMINATED STARS (owner, two asks). ONE: District
+//            of Columbia, Guam, Virgin Islands and Puerto Rico are US
+//            States/Territories — searchable, brief-addable, real border
+//            outlines from the states payload ('Virgin Islands' aliases the
+//            file's long-form name). And the state law changed: a selected
+//            state/territory shows ONLY its bright border — the translucent
+//            wash and the centroid dot are gone (stripes stay an owner
+//            toggle). TWO: RSN and ECCSP objects mark with illuminated
+//            stars instead of dots — every RSN in ice (#6FE3FF), every
+//            ECCSP in orchid (#FF7BD9), glow + dark keyline, chosen for
+//            contrast on the gold-on-black globe. Class colors sit outside
+//            the tier streams; leader lines and labels keep tier shades.
 //   v1.5.2 • THE CO-LOCATED CALLOUT (owner: "for locations like Fort Bragg
 //            and JBLM that have a RSN and ECCSP, have 2 small lines pointing
 //            to the location and each one says RSN and ECCSP showing they
@@ -2123,7 +2135,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.5.2';
+const APP_VERSION = 'v1.6.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -2458,7 +2470,13 @@ const US_STATES=[
   {n:'Texas',lat:31.4,lon:-99.3},{n:'Utah',lat:39.3,lon:-111.7},{n:'Vermont',lat:44.0,lon:-72.7},
   {n:'Virginia',lat:37.5,lon:-78.8},{n:'Washington',lat:47.4,lon:-120.4},{n:'West Virginia',lat:38.6,lon:-80.6},
   {n:'Wisconsin',lat:44.6,lon:-89.7},{n:'Wyoming',lat:43.0,lon:-107.5},{n:'District of Columbia',lat:38.9,lon:-77.02},
-  {n:'Puerto Rico',lat:18.22,lon:-66.42}
+  {n:'Puerto Rico',lat:18.22,lon:-66.42},
+  // v1.6.0 (owner: "add DC, Guam, Virgin Islands and Puerto Rico as part of
+  // US States/Territories") — DC + PR were already on the roster; Guam and the
+  // Virgin Islands join here. The states-10m payload carries all four outlines
+  // in real lon/lat (verified at add time); 'Virgin Islands' is the owner's
+  // name — _namedStateShapes aliases the file's 'United States Virgin Islands'.
+  {n:'Guam',lat:13.45,lon:144.79},{n:'Virgin Islands',lat:18.0,lon:-64.85}
 ];
 try{ window.US_STATES=US_STATES; }catch(_){}
 let GLOBE_STATE_SHAPES=null;               // {stateName:[rings]} — filled by loadStateBorders
@@ -3841,6 +3859,19 @@ function _bfFanShort(lbls){
   if(!pre) return lbls.slice();
   return lbls.map(function(s,i){ const r=w[i].slice(pre).join(' '); return r||s; });
 }
+// v1.6.0 ILLUMINATED STARS (owner: "use illuminated star for RSNs instead of
+// dots — same for ECCSPs but a different color; all RSNs same color, all
+// ECCSPs same color"). Class colors, deliberately OUTSIDE the tier streams
+// and never green (brief-data law): RSN = ice, ECCSP = orchid — both read
+// against the gold basemap and the black globe, and against each other.
+const BF_STAR={rsn:'#6FE3FF', eccsp:'#FF7BD9'};
+function _bfStarKind(n){
+  if(!n || (n.kind||n.t)!=='custom') return null;
+  const s=String(n.name||n.n||'');
+  if(/\sRSN$/.test(s)) return 'rsn';
+  if(/\sECCSP$/.test(s)) return 'eccsp';
+  return null;
+}
 // v0.13.0 THE HAND-BUILT BRIEF (owner directive: no auto-subtrees, EVER — the
 // v0.11.0 walker dumped whole A-ORG-1 commands onto the globe). The chain map
 // now renders ONLY orgs the owner explicitly added (BRIEF.mem). Levels are
@@ -3913,7 +3944,7 @@ function drawBriefStates(ctx, m, labels){
   if(!document.body.classList.contains('brief-mode')) return;
   if(typeof GLOBE_STATE_SHAPES==='undefined' || !GLOBE_STATE_SHAPES) return;
   const C=GlobeState.__bfC; if(!C || !C.order || !C.order.length) return;
-  if(labels && GlobeState._namesOff) return;          // Names toggle silences state labels too
+  if(labels && (GlobeState._namesOff || GlobeState._bfNamesOff)) return;   // Names toggles (map + v1.5.1 brief Aa) silence state labels too
   const T=_mTok();
   for(const k of C.order){
     const n=C.nodes[k];
@@ -3939,7 +3970,10 @@ function drawBriefStates(ctx, m, labels){
         }
         if(behind) continue;
         ctx.closePath();
-        ctx.fillStyle='rgba('+R+','+G+','+B+',0.26)'; ctx.fill();
+        // v1.6.0 (owner: "no need to put a dot in the state as well as
+        // highlighting — just keep the border"): the translucent wash is gone,
+        // a state/territory selection is its bright outline alone. Stripes
+        // stay an explicit owner toggle.
         ctx.lineWidth=1.7; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.95)'; ctx.stroke();
         if(n.stripe){
           ctx.save(); ctx.clip();
@@ -3956,7 +3990,10 @@ function drawBriefStates(ctx, m, labels){
       const pt=_projectLonLat(n.lon, n.lat, m); if(pt[2]<0) continue;
       const fs=(m.w<560?12:11);
       ctx.save();
-      ctx.font='800 '+fs+'px '+bodyFont; ctx.textBaseline='middle';
+      // v1.6.0: was `bodyFont` — a drawGlobeMarkers LOCAL, so this whole phase
+      // threw a swallowed ReferenceError and state names never drew from here
+      // (the centroid dot's label covered for it until the dot retired).
+      ctx.font='800 '+fs+'px '+T.body; ctx.textBaseline='middle';
       const tw=ctx.measureText(n.name).width;
       const pl=_placeGlobeLabel(ctx, pt[0], pt[1], tw, m, GlobeState.__gLbl, {h:14});
       if(pl){
@@ -4007,6 +4044,7 @@ function drawBriefNodes(ctx, m){
   const _fanN={}, _fanI={}, _fanM={};
   for(const key of C.order){
     const n0=C.nodes[key];
+    if(n0.kind==='state') continue;                   // v1.6.0: states are border-only — no dot, no fan seat
     if(n0.lat==null||n0.lon==null) continue;
     const fk=n0.lat.toFixed(4)+','+n0.lon.toFixed(4);
     _fanN[fk]=(_fanN[fk]||0)+1;
@@ -4024,6 +4062,9 @@ function drawBriefNodes(ctx, m){
   }
   for(const key of C.order){
     const n=C.nodes[key];
+    // v1.6.0 (owner): a state/territory shows ONLY its border — drawBriefStates
+    // owns the outline and the label; no centroid dot, no dot-anchored label.
+    if(n.kind==='state') continue;
     if(n.lat==null||n.lon==null) continue;
     const p=_projectLonLat(n.lon, n.lat, m);
     if(p[2]<0) continue;
@@ -4051,16 +4092,38 @@ function drawBriefNodes(ctx, m){
         }
         ctx.globalAlpha=1;
       }
-      ctx.globalAlpha=fade;
-      ctx.beginPath(); ctx.arc(sx, sy, dotR, 0, Math.PI*2);
-      ctx.fillStyle='#ffffff'; ctx.fill();
-      ctx.lineWidth=1.0; ctx.strokeStyle='rgba(8,7,4,.9)'; ctx.stroke();
-      ctx.beginPath(); ctx.arc(sx, sy, dotR+3.4, 0, Math.PI*2);
-      ctx.lineWidth=(n.tier===1?2.2:1.6);
-      ctx.strokeStyle='rgba('+n.shade+','+(n.tier===1?0.95:0.88)+')'; ctx.stroke();
-      if(n.tier===1){
-        ctx.beginPath(); ctx.arc(sx, sy, dotR+6.6, 0, Math.PI*2);
-        ctx.lineWidth=1.1; ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.stroke();
+      const _sk=_bfStarKind(n);
+      if(_sk){
+        // v1.6.0: RSN / ECCSP objects mark with an ILLUMINATED STAR in their
+        // class color — glow + twin fill is the illumination, a dark keyline
+        // keeps the points crisp over the gold basemap.
+        const col=BF_STAR[_sk], sR=dotR+4.4;
+        ctx.globalAlpha=fade;
+        ctx.save();
+        ctx.beginPath();
+        for(let i2=0;i2<10;i2++){
+          const rr=(i2%2===0)?sR:sR*0.44, aa=-Math.PI/2 + i2*(Math.PI/5);
+          const qx=sx+Math.cos(aa)*rr, qy=sy+Math.sin(aa)*rr;
+          if(i2===0) ctx.moveTo(qx,qy); else ctx.lineTo(qx,qy);
+        }
+        ctx.closePath();
+        ctx.shadowColor=col; ctx.shadowBlur=13;
+        ctx.fillStyle=col; ctx.fill(); ctx.fill();
+        ctx.shadowBlur=0;
+        ctx.lineWidth=1; ctx.strokeStyle='rgba(8,7,4,.9)'; ctx.stroke();
+        ctx.restore();
+      } else {
+        ctx.globalAlpha=fade;
+        ctx.beginPath(); ctx.arc(sx, sy, dotR, 0, Math.PI*2);
+        ctx.fillStyle='#ffffff'; ctx.fill();
+        ctx.lineWidth=1.0; ctx.strokeStyle='rgba(8,7,4,.9)'; ctx.stroke();
+        ctx.beginPath(); ctx.arc(sx, sy, dotR+3.4, 0, Math.PI*2);
+        ctx.lineWidth=(n.tier===1?2.2:1.6);
+        ctx.strokeStyle='rgba('+n.shade+','+(n.tier===1?0.95:0.88)+')'; ctx.stroke();
+        if(n.tier===1){
+          ctx.beginPath(); ctx.arc(sx, sy, dotR+6.6, 0, Math.PI*2);
+          ctx.lineWidth=1.1; ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.stroke();
+        }
       }
       ctx.globalAlpha=1;
       GlobeState._screen.push({inst:{id:key, base:n.name, lat:n.lat, lon:n.lon, _bf:true}, sx:sx, sy:sy, depth:p[2]});
@@ -4450,6 +4513,9 @@ function _namedStateShapes(topo, geographic){
     else if(g.type==='MultiPolygon'){ for(const poly of g.arcs) for(const r of poly) rings.push(ringFor(r)); }
     out[nm]=geographic? rings : rings.map(function(r){ return r.map(function(pt){ const v=_albersUsaInvert(pt[0],pt[1]); return (v&&v.length===2)?v:null; }).filter(Boolean); });
   }
+  // v1.6.0: the roster names territories the owner's way — alias the file's
+  // long-form key so 'Virgin Islands' finds its rings.
+  if(out['United States Virgin Islands'] && !out['Virgin Islands']) out['Virgin Islands']=out['United States Virgin Islands'];
   return out;
 }
 
@@ -4626,9 +4692,9 @@ function _searchEntries(){
   if(typeof US_STATES!=='undefined'){
     for(const st of US_STATES){
       _srEntries.push({
-        id:_bfStateKey(st.n), base:st.n, sub:'US state',
+        id:_bfStateKey(st.n), base:st.n, sub:'US state / territory',
         baseF:_srFold(st.n), unitF:'', stF:_srFold(st.n),
-        allF:_srFold(st.n+' us state')
+        allF:_srFold(st.n+' us state territory')
       });
     }
   }
@@ -6305,7 +6371,7 @@ function _bfPlainSheet(k){
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">'+esc(nd.n)+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
-    +'<div class="od-sub">'+(nd.t==='state'?'US state \u00b7 highlighted on the globe'
+    +'<div class="od-sub">'+(nd.t==='state'?'US state / territory \u00b7 outlined on the globe'
       :((nd.la!=null)?('Brief-only location \u00b7 at '+_odEsc(nd.bs||'its pinned spot'))
       :'Group \u00b7 a filler element on this diagram'))+'</div>';
   // v1.0.3 \u2014 a group is the owner's own object, so it renames in place
