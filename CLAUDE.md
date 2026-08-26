@@ -1075,3 +1075,30 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Proof pattern for motion: rAF-sample gBCR in-page (the trajectory
   201→…→591→571 with overshoot IS the spring); single screenshots lie
   about animation, headless first-paint lags ~60ms.
+
+## v1.10.0 — the fluid chart (owner: iOS/Twitter movement, own release)
+- FLIP: _bfFlipCapture at renderBrief top, _bfFlipPlay AFTER _bfFit (zoom +
+  centering must settle first). Deltas ÷ per-box effective scale
+  (rect.width/offsetWidth) = CSS-zoom compensation. New boxes: .bf-enter,
+  removed after two rAFs. Guards: chart-min, no priors, reduced-motion,
+  >560px snaps. PURE PRESENTATION — DOM final from frame one; interruptible
+  (re-capture reads the mid-glide visual rect).
+- Motion proof pattern: rAF-sample gBCR in-page; single screenshots lie,
+  headless first paint lags ~60ms.
+
+## v1.11.0 — always on · hover ops · segment polish (owner, three asks)
+- AUTO-CONNECT amends the boot-inert law BY THE OWNER: boot still loads
+  zero foreign code until the FIRST manual Connect; success sets
+  dbcfg.auto=1 (only when auto==null — an explicit off is never
+  overridden). Boot: _dbAutoBoot() when auto, else chip; failure ALWAYS
+  degrades to the chip (.catch included — stub DOM rejects). Deliberate
+  Disconnect stands auto down. Toggle = data-dbauto in the Database sheet.
+  Smoke: inert w/o config · respects OFF · fires with ON · toggle present.
+- HOVER OPS: .bf-ops is an absolute inset:0 overlay — out of the box's
+  layout (boxes ~40px, was ~70). @media(hover:hover) reveals chips and
+  dims the face (.bf-nm .14). Touch: no ops — the sheet leads with the
+  same actions. Never re-add layout-consuming controls to .bf-box.
+- SEGMENTS: iOS grammar — .bf-seg is a quiet rounded track (inset hairline),
+  cells transparent, ON = filled var(--accent) pill with #141006 ink. All
+  cell rules SCOPED under .bf-seg (a legacy .bf-depth block would win
+  otherwise — that was the 'Fit highlight looks off' bug).

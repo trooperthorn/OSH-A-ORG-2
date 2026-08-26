@@ -705,6 +705,21 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(nh.indexOf('data-bfadd')<0){ gok=false; fails++; console.log('✗ NON-member sheet must lead with Add to brief'); }
       if(gok) console.log('  ✓ ui grammar: bar captions LEVELS/STACK/ZOOM · labeled head tools + divider · filled primary · quiet edits · hide in Arrange · danger rail last · non-member note gated');
     }
+    // v1.11.0 — AUTO-RECONNECT: no config → inert; auto:0 → inert (chip
+    // path); auto:1 → dbConnect engages; the Database sheet carries the toggle
+    {
+      let auk=true;
+      if(global._dbAutoBoot()){ auk=false; fails++; console.log('✗ AUTO must be a no-op with no config'); }
+      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:0});
+      if(global._dbAutoBoot()){ auk=false; fails++; console.log('✗ AUTO must respect the explicit OFF'); }
+      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:1});
+      if(!global._dbAutoBoot()){ auk=false; fails++; console.log('✗ AUTO with auto:1 must fire the connect'); }
+      if(global.DB.state()!=='connecting'){ auk=false; fails++; console.log('✗ AUTO did not engage dbConnect (state '+global.DB.state()+')'); }
+      global.dbDisconnect(true); global.DB._setCfg(null);
+      global._dbSheet();
+      if((IDS['dossier']?IDS['dossier'].innerHTML:'').indexOf('data-dbauto')<0){ auk=false; fails++; console.log('✗ AUTO toggle missing from the Database sheet'); }
+      if(auk) console.log('  ✓ auto-reconnect: inert without config · respects OFF · fires with ON · sheet toggle present');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');
