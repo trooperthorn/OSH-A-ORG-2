@@ -1214,6 +1214,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.4.1 • NAMES VERBATIM (owner: "All RSNs and ECCSPs should be labeled
+//            'name RSN' or 'name ECCSP'"). The abbreviator was squeezing
+//            owner-named objects to their all-caps token — "California RSN"
+//            became "RSN" on the globe. New law: an object the owner NAMED
+//            (place or group) shows that name verbatim, everywhere — globe
+//            label, chart box, picker heads, arm bar, toasts (_bfNodeLbl).
+//            Real Army orgs keep abbreviating; their official names are
+//            long by nature and were never the owner's words.
 //   v1.4.0 • BRIEF-ONLY PLACES (owner: "10 new locations only in brief mode…
 //            same location as their State National Guard dot" + 2 more).
 //            A PLACE is a diagram object that pins its OWN spot on the
@@ -2050,7 +2058,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.4.0';
+const APP_VERSION = 'v1.4.1';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3734,6 +3742,10 @@ const _BF_SHORT={Infantry:'Inf',Armored:'Armd',Airborne:'Abn',Division:'Div',Bri
   Battalion:'Bn',Command:'Cmd',Support:'Spt',Mountain:'Mtn',Military:'Mil',Theater:'Thtr',
   Mission:'Msn',Regiment:'Regt',Artillery:'Arty',Medical:'Med',Cavalry:'Cav',Intelligence:'Intel',
   Ammunition:'Ammo',Depot:'Dep',Arsenal:'Ars',Training:'Trng',Readiness:'Rdns',General:'Gen'};
+// v1.4.1 — an owner-named object (group or place) shows the name it was
+// given, verbatim: "California RSN" must never squeeze to "RSN". Real orgs
+// keep abbreviating (their official names are long by nature).
+function _bfNodeLbl(nd){ return (nd && nd.t==='custom') ? String(nd.n||'') : _bfAbbr(nd?nd.n:''); }
 function _bfAbbr(name){
   const s=String(name||'');
   const p=s.match(/\(([A-Za-z0-9&\- ]{2,10})\)/); if(p) return p[1];
@@ -3923,7 +3935,7 @@ function drawBriefNodes(ctx, m){
       GlobeState._screen.push({inst:{id:key, base:n.name, lat:n.lat, lon:n.lon, _bf:true}, sx:sx, sy:sy, depth:p[2]});
     }
     if(!namesOff){
-      const nm=_bfAbbr(n.name);
+      const nm=(n.kind==='custom')?n.name:_bfAbbr(n.name);
       const fs=(m.w<560?12:11);
       ctx.save(); ctx.textBaseline='middle'; ctx.font='800 '+fs+'px '+T.body;
       const tw=ctx.measureText(nm).width;
@@ -4613,7 +4625,7 @@ function searchSelect(id){
         const was=bfHas(oid);
         if(!was){ bfAdd(oid);
           const nd=bfNode(oid);
-          if(nd) _bfToast((nd.n||'Added')+(nd.p?(' \u2014 under '+_bfAbbr((bfNode(nd.p)||{}).n||'')):' added'));
+          if(nd) _bfToast((nd.n||'Added')+(nd.p?(' \u2014 under '+_bfNodeLbl(bfNode(nd.p))):' added'));
         } else { _bfObjSheet(oid); }               // picking an existing member = open it
       }catch(_){}
       return;
@@ -5059,7 +5071,7 @@ function renderBrief(){
     const grp=(n.kind==='custom'&&!n.pinned)?' bf-grp':'';
     let r='<li class="bf-li">';
     r+='<div class="bf-box '+tcls+grp+dim+isFoc+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
-      +'<span class="bf-nm">'+esc(_bfAbbr(n.name))+'</span>'
+      +'<span class="bf-nm">'+esc((n.kind==='custom')?n.name:_bfAbbr(n.name))+'</span>'
       +(grp?'<span class="bf-grptag">GROUP</span>':'')
       +(stn?('<span class="bf-st">'+esc(stn)+'</span>'):'')
       // v0.26.0 — the two ops the owner asked for, right on the object: ＋ opens the
@@ -5799,7 +5811,7 @@ function _bfPickFoot(){
   const btn=document.querySelector('#dossier [data-bfpickadd]'); if(!btn) return;
   const pk=btn.getAttribute('data-bfpickadd'); const nd=bfNode(pk);
   const n=(window._bfPick||new Set()).size;
-  btn.textContent=n?('Add '+n+' under '+_bfAbbr(nd?nd.n:'')):'Select organizations to add';
+  btn.textContent=n?('Add '+n+' under '+_bfNodeLbl(nd)):'Select organizations to add';
   btn.classList.toggle('in', !!n);
   if(n) btn.removeAttribute('disabled'); else btn.setAttribute('disabled','');
   const cl=document.querySelector('#dossier [data-bfpickclear]');
@@ -5912,7 +5924,7 @@ function _bfArmHint(){
   if(!nd && !root){ if(el) el.remove(); return; }
   if(!el){ el=document.createElement('div'); el.id='bfArmBar'; document.body.appendChild(el); }
   el.className='bf-armbar';
-  el.innerHTML='<span>'+(nd?('Adding under <b>'+_odEsc(_bfAbbr(nd.n))+'</b>'):'Adding to the brief')+' \u2014 search below</span>'
+  el.innerHTML='<span>'+(nd?('Adding under <b>'+_odEsc(_bfNodeLbl(nd))+'</b>'):'Adding to the brief')+' \u2014 search below</span>'
     +'<button type="button" data-bfdisarm="1" aria-label="Cancel">\u2715</button>';
 }
 // every add path funnels through here so the armed parent is honoured exactly once
@@ -5972,12 +5984,12 @@ function _bfAddSheet(pk){
   });
   const placesShown=places.filter(function(r){ return q.length<2 ? true : (_srFold(r.name+' '+r.sub).indexOf(q)>=0); });
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
-  h+='<div class="od-head od-head-slim"><div class="od-name">Add under '+esc(_bfAbbr(par.n))+'</div><span class="od-sp"></span>'
+  h+='<div class="od-head od-head-slim"><div class="od-name">Add under '+esc(_bfNodeLbl(par))+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
     +'<div class="od-sub">Tick as many as you need \u2014 they all land under this organization.</div>';
   h+='<input class="rc-in bf-pickq" id="bfPickQ" type="text" placeholder="Search all organizations and states\u2026" value="'+escA(window._bfPickQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
   // v1.0.3 \u2014 or create a GROUP under this parent (v1.0.4: opens the name sheet)
-  h+='<button type="button" class="bf-act in bf-addsub" data-bfgrpnew="'+escA(pk)+'">\u229e New group under '+esc(_bfAbbr(par.n))+'\u2026</button>';
+  h+='<button type="button" class="bf-act in bf-addsub" data-bfgrpnew="'+escA(pk)+'">\u229e New group under '+esc(_bfNodeLbl(par))+'\u2026</button>';
   if(own && q.length<2) h+='<div class="bf-subhead">Its subordinates \u00b7 '+own+'</div>';
   else if(q.length>=2) h+='<div class="bf-subhead">Matches \u00b7 '+shown.length+'</div>';
   h+='<div class="bf-picklist">';
@@ -6008,7 +6020,7 @@ function _bfAddSheet(pk){
   }
   h+='<div class="rc-row rc-acts bf-picksticky">'
     +'<button class="bf-act bf-commit'+(pick.size?' in':'')+'" type="button" data-bfpickadd="'+escA(pk)+'"'+(pick.size?'':' disabled')+'>'
-      +(pick.size?('Add '+pick.size+' under '+esc(_bfAbbr(par.n))):'Select organizations to add')+'</button>'
+      +(pick.size?('Add '+pick.size+' under '+esc(_bfNodeLbl(par))):'Select organizations to add')+'</button>'
     +(pick.size?'<button class="bf-act" type="button" data-bfpickclear="1">Clear</button>':'')
     +'</div>';
   host.innerHTML=h;
@@ -6031,7 +6043,7 @@ function _bfGroupSheet(pk){
   const esc=_odEsc, escA=_odEscA;
   window._bfGrpForm={p:par?par.k:null};
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
-  h+='<div class="od-head od-head-slim"><div class="od-name">New group'+(par?(' under '+esc(_bfAbbr(par.n))):'')+'</div><span class="od-sp"></span>'
+  h+='<div class="od-head od-head-slim"><div class="od-name">New group'+(par?(' under '+esc(_bfNodeLbl(par))):'')+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
     +'<div class="od-sub">A filler element you name — it shapes the hierarchy and lives only on this diagram.</div>'
     +'<div class="rc-form">'
@@ -6135,7 +6147,7 @@ function _bfSelections(k){
   }
   // the whole point of a hierarchy: put an L2/L3/L4 under THIS specific organization
   h+='<button type="button" class="bf-act in bf-addsub" data-bfsearch="1" data-bfunder="'+escA(k)+'">'
-    +'\u2295 Add a subordinate under '+esc(_bfAbbr(nd.n))+'</button>';
+    +'\u2295 Add a subordinate under '+esc(_bfNodeLbl(nd))+'</button>';
   return h;
 }
 // a STATE or a free-text box has no installation record — it gets its own compact
@@ -6523,7 +6535,7 @@ if(!window._odWired){
       bfAddCustom(nm, pk2);                                   // _bfPush renders + reframes
       if(pk2){ try{ _bfAddSheet(pk2); }catch(_){} }           // back to the picker — keep filling this parent
       else { try{ hideDossier(); }catch(_){} }
-      try{ _bfToast('Group “'+nm.slice(0,28)+'” added'+(pk2?(' under '+_bfAbbr((bfNode(pk2)||{}).n||'')):'')); }catch(_){}
+      try{ _bfToast('Group “'+nm.slice(0,28)+'” added'+(pk2?(' under '+_bfNodeLbl(bfNode(pk2))):'')); }catch(_){}
       return; }
     const brn=e.target.closest('[data-bfrnedit]');
     if(brn){ const id=brn.getAttribute('data-bfrnedit'); _bfRnEdit=id; _bfAnnEdit=null; _bfObjSheet(id);
@@ -6563,7 +6575,7 @@ if(!window._odWired){
       window._bfPick=new Set(); window._bfPickQ='';
       const n=bfAddMany(ids, pk);
       try{ hideDossier(); }catch(_){}
-      try{ if(n) _bfToast(n+' organization'+(n===1?'':'s')+' added under '+_bfAbbr((bfNode(pk)||{}).n||'')); }catch(_){}
+      try{ if(n) _bfToast(n+' organization'+(n===1?'':'s')+' added under '+_bfNodeLbl(bfNode(pk))); }catch(_){}
       return; }
     const bo=e.target.closest('[data-bfobj]');
     if(bo){ _bfAnnEdit=null; _bfRnEdit=null; window._bfGrpForm=null; _orgForm=null;
