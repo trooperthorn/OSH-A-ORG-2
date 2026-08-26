@@ -552,22 +552,25 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 #ledger.on .ld-panel{transform:none}
 .ld-head{display:flex; align-items:center; gap:8px; margin-bottom:6px}
 .ld-title{font-weight:900; font-size:15px; letter-spacing:.06em; color:var(--text)}
-.ld-seclab{margin:14px 0 6px; font-size:10.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
-.ld-row{display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--accent-wash)}
-.ld-row .bf-act{flex:0 0 auto; width:auto; min-width:0; margin:0; padding:6px 12px; font-size:11.5px}
-.ld-row .ld-sub{white-space:nowrap}
-.ld-main{flex:1; min-width:0}
-.ld-n{font-weight:800; font-size:13px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .ld-sub{font-size:11px; color:var(--faint)}
 .ld-pad{padding:6px 0 2px; line-height:1.45}
-.ld-org{display:flex; align-items:center; gap:8px; margin-top:10px}
+.ld-org{display:flex; align-items:center; gap:8px; margin-top:12px}
 .ld-orgbtn{background:none; border:0; padding:2px 0; font:inherit; font-weight:900; font-size:12.5px; color:var(--accent-deep, var(--accent)); text-align:left; cursor:pointer}
 .ld-tot{font-size:10.5px; font-weight:800; color:var(--faint)}
-.ld-idrow{display:flex; align-items:center; gap:8px; padding:4px 0 4px 12px}
+/* an ID row is a BUTTON — tap unfolds the items filed under it */
+.ld-idrow{display:flex; align-items:center; gap:8px; width:100%; padding:5px 0 5px 12px;
+  background:none; border:0; border-bottom:1px solid var(--accent-wash); font:inherit; text-align:left; cursor:pointer}
+.ld-idrow.on{border-bottom-color:transparent}
+.ld-idrow.on .ld-id{color:var(--accent-deep, var(--accent))}
 .ld-id{flex:1; min-width:0; font-weight:800; font-size:12px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .ld-untag{color:var(--faint); font-style:italic; font-weight:600}
 .ld-cts{display:flex; gap:6px}
 .ld-ct{font-size:10.5px; font-weight:800; color:var(--dim, var(--faint)); letter-spacing:.02em}
+.ld-items{margin:0 0 6px 14px; padding:2px 0 4px 10px; border-left:2px solid var(--accent-wash)}
+.ld-it{display:flex; gap:8px; align-items:baseline; padding:3px 0}
+.ld-itk{flex:0 0 14px; font-size:10px; font-weight:900; color:var(--faint)}
+.ld-itx{flex:1; min-width:0; font-size:12px; color:var(--text); overflow-wrap:anywhere}
+.sb-arm{color:var(--accent-deep, var(--accent))}
 /* v1.7.0 — ASSET INVENTORY rows in the object sheets */
 .bf-invl{display:flex; flex-direction:column}
 .bf-invrow{display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--accent-wash)}
@@ -1276,6 +1279,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.8.0 • BRIEFS TO THE BRIEF ROOM, THE PANEL BECOMES THE REPOSITORY
+//            (owner: "don't need a brief ledger — need to save briefs as a
+//            whole; as information is input on the map, need an organized
+//            repository to reference and see what is saved"). The chart-head
+//            ▤ now opens a BRIEFS sheet in the brief room: save the whole
+//            diagram under a name, load one back (two-tap replace-confirm),
+//            delete — the shelf still rides the database board. The side
+//            panel is now the REPOSITORY, map data only (⋯ menu →
+//            Repository): records grouped by installation, every ID a row
+//            with P/S/N/L counts, and tapping an ID unfolds the ACTUAL
+//            saved items — names and roles, spec values, note text, links —
+//            plus the untagged row. Live merges refresh it while open.
 //   v1.7.0 • SAVED BRIEFS + THE LEDGER + ASSET INVENTORY (owner, three asks).
 //            SAVE BRIEF: named snapshots of the whole diagram (nodes, hide,
 //            stacking — inventories included) on a 24-deep shelf that rides
@@ -2186,7 +2201,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.7.0';
+const APP_VERSION = 'v1.8.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -5257,7 +5272,7 @@ function renderBrief(){
   const memN=(BRIEF.nodes||[]).length;
   let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
     +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
-    +'<span class="od-ico" data-bfledger="1" role="button" aria-label="Ledger — IDs, records and saved briefs" title="Ledger">▤</span>'
+    +'<span class="od-ico" data-bfbriefs="1" role="button" aria-label="Briefs — save or load a whole diagram" title="Briefs">▤</span>'
     +'<span class="od-ico bf-vw'+(GlobeState._bfNamesOff?' off':'')+'" data-bfnm="1" role="button" aria-label="'+(GlobeState._bfNamesOff?'Show names on the globe':'Hide names on the globe')+'" title="Names on the globe">Aa</span>'
     +'<span class="od-ico bf-vw'+(GlobeState._bfLinesOff?' off':'')+'" data-bfln="1" role="button" aria-label="'+(GlobeState._bfLinesOff?'Show connecting lines':'Hide connecting lines')+'" title="Connecting lines"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span>'
     +'<span class="od-ico" data-xpbtn="1" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
@@ -6774,6 +6789,27 @@ if(!window._odWired){
     if(sr){ svRemove(parseInt(sr.getAttribute('data-svrm'),10)); return; }
     const sx=e.target.closest('[data-svclose]');
     if(sx){ if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
+    // ---- v1.8.0 BRIEFS SHEET (save/load whole diagrams; the shelf rides the board) ----
+    const bsv=e.target.closest('[data-sbsave]');
+    if(bsv){ _sbArm=true; _sbLoadArm=-1; _sbOpenSheet();
+      try{ const f=document.getElementById('sbBriefName'); f&&f.focus(); }catch(_){} return; }
+    const bscx=e.target.closest('[data-sbsavecancel]');
+    if(bscx){ _sbArm=false; _sbOpenSheet(); return; }
+    const bsg=e.target.closest('[data-sbsavego]');
+    if(bsg){ const nm=String(((document.getElementById('sbBriefName')||{}).value)||'');
+      sbCapture(nm); _sbArm=false; _sbOpenSheet();
+      try{ _bfToast('Brief saved'+(((typeof _dbState!=='undefined')&&_dbState==='live')?' — on the board for your other devices':' — connect the database to sync it')); }catch(_){}
+      return; }
+    const bsl=e.target.closest('[data-sbload]');
+    if(bsl){ const i2=parseInt(bsl.getAttribute('data-sbload'),10);
+      if(_sbLoadArm!==i2){ _sbLoadArm=i2; _sbOpenSheet(); return; }   // first tap arms — loading replaces the working brief
+      _sbLoadArm=-1;
+      if(sbLoad(i2)){ hideDossier(); try{ _bfToast('Brief loaded'); }catch(_){} }
+      return; }
+    const bsr2=e.target.closest('[data-sbrm]');
+    if(bsr2){ sbRemove(parseInt(bsr2.getAttribute('data-sbrm'),10)); _sbLoadArm=-1; _sbOpenSheet(); return; }
+    const bsx2=e.target.closest('[data-sbclose]');
+    if(bsx2){ _sbArm=false; _sbLoadArm=-1; hideDossier(); return; }
     const tp=e.target.closest('[data-tzpick]');
     if(tp){ const r=CLOCK_REGIONS[parseInt(tp.getAttribute('data-tzpick'),10)];
       if(r) pickZone(r.tz, r.name); _tzOpenSheet(); return; }
@@ -6975,8 +7011,8 @@ if(!window._odWired){
       if(GlobeState.sel && !document.body.classList.contains('brief-mode')) showDossier(GlobeState.sel);
       else hideDossier();
       return; }
-    const blg=e.target.closest('[data-bfledger]');
-    if(blg){ try{ _ledgerOpen(); }catch(_){} return; }   // v1.7.0: head door to the ledger — never minimizes the chart
+    const blg=e.target.closest('[data-bfbriefs]');
+    if(blg){ _sbArm=false; _sbLoadArm=-1; try{ _sbOpenSheet(); }catch(_){} return; }   // v1.8.0: head door to the briefs shelf — never minimizes the chart
     const bnm=e.target.closest('[data-bfnm]');
     if(bnm){ GlobeState._bfNamesOff=!GlobeState._bfNamesOff;
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
@@ -7814,16 +7850,59 @@ function sbLoad(i){
   return true;
 }
 function sbRemove(i){ SAVEDB.splice(i,1); _sbSave(); }
-try{ window.Briefs={ save:sbCapture, load:sbLoad, remove:sbRemove, list:function(){ return SAVEDB.slice(); } }; }catch(_){}
+// v1.8.0 (owner: "don't need a brief ledger — need to be able to save briefs
+// as a whole"): the shelf lives in the BRIEF ROOM as its own sheet, off the
+// chart-head ▤ — save the whole diagram under a name, load one back (two-tap
+// arm: loading replaces the working brief), delete. The repository panel
+// carries map data only.
+let _sbArm=false, _sbLoadArm=-1;
+function _sbOpenSheet(){
+  const host=document.getElementById('dossier'); if(!host) return;
+  _odInjectCSS();
+  const esc=_odEsc;
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">Briefs</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-sbclose="1" aria-label="Close">✕</button></div>';
+  const bn=BRIEF.nodes.length;
+  if(_sbArm){
+    h+='<div class="rc-form"><input class="rc-in" id="sbBriefName" type="text" maxlength="60" placeholder="Name this brief">'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-sbsavecancel="1">Cancel</button>'
+      +'<button class="rc-save" type="button" data-sbsavego="1">Save</button></div></div>';
+  } else {
+    h+='<button class="rc-add" type="button" data-sbsave="1"'+(bn?'':' disabled')+'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save current brief ('+bn+' object'+(bn===1?'':'s')+')</button>';
+  }
+  if(SAVEDB.length){
+    SAVEDB.forEach(function(b,i){
+      const armed=(_sbLoadArm===i);
+      h+='<div class="rc-row">'
+        +'<button class="rc-top sv-go'+(armed?' sb-arm':'')+'" type="button" data-sbload="'+i+'">'+esc(b.n)+(armed?' — replace current?':'')+'</button>'
+        +'<span class="rc-sub">'+(Array.isArray(b.nodes)?b.nodes.length:0)+' objects · '+new Date(b.ts||0).toLocaleDateString()+'</span>'
+        +'<button class="od-ico rc-dots" type="button" data-sbrm="'+i+'" aria-label="Delete saved brief"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>'
+        +'</div>';
+    });
+  } else h+='<div class="rc-note">No saved briefs yet — save the current diagram and open it on any connected device.</div>';
+  h+='<div class="rc-note">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
+    ?'Database LIVE — saved briefs mirror your other devices.'
+    :'Connect the database (hold the A-ORG-2 mark → Database) to open saved briefs on other devices.')+'</div>';
+  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
+  host.innerHTML=h;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add(_kept==='full'?'dz-full':'dz-half');
+  host.hidden=false; host.scrollTop=0;
+  _sheetFlag();
+}
+try{ window.Briefs={ save:sbCapture, load:sbLoad, remove:sbRemove, list:function(){ return SAVEDB.slice(); }, open:_sbOpenSheet }; }catch(_){}
 
-// ── v1.7.0 THE LEDGER (owner: "component of this app that clearly reflects
-// the IDs / People / Specs / Notes / Briefs saved in a logical manner …
-// maybe a side panel pop out"). A right-side drawer, not a room: the
-// saved-brief shelf on top (save current, load, delete), then the ID
-// registry grouped by installation — every ID with its People/Specs/Notes/
-// Links tag counts, plus an 'untagged' row so nothing hides. Reads live
-// state on every open; tapping an installation jumps to it on the map.
-let _ldSaveArm=false, _ldLoadArm=-1;
+// ── v1.8.0 THE REPOSITORY (owner v1.7.0 correction: "don't need a brief
+// ledger … as information is input on the map — IDs, people, etc — need an
+// organized repository to reference and see what is saved"). A right-side
+// drawer for MAP DATA ONLY: records grouped by installation, every ID a row
+// with its People/Specs/Notes/Links counts, and TAPPING an ID unfolds the
+// actual saved items — names, values, notes, links — plus an 'untagged' row
+// so nothing hides. Saved briefs live in the brief room's own sheet now.
+// Reads live state on every open; tapping an installation opens it on the map.
+let _ldSel=null;                                   // expanded ID row ('siteId|label', '|~'=untagged)
 function _lgSiteName(id){
   const s=siteById(id); if(s) return s.base;
   const o=(typeof orgById==='function'&&orgById(id))||(typeof orgOf==='function'&&orgOf(id));
@@ -7836,47 +7915,52 @@ function _ldCounts(c){
     +'<span class="ld-ct" title="Notes">N'+c.notes+'</span>'
     +'<span class="ld-ct" title="Links">L'+c.links+'</span></span>';
 }
+// one saved item, rendered by its kind's own grammar (RC_KINDS fields)
+function _ldItem(kind, it){
+  const esc=_odEsc;
+  let tx='';
+  if(kind==='people')      tx=esc(it.name||'')+(it.role?(' — '+esc(it.role)):'');
+  else if(kind==='specs')  tx=esc(it.label||'')+(it.value?(': '+esc(it.value)):'');
+  else if(kind==='notes')  tx=esc(it.text||'');
+  else                     tx=esc(it.label||it.url||'')+((it.url&&it.label)?(' · '+esc(it.url)):'');
+  const K={people:'P',specs:'S',notes:'N',links:'L'}[kind];
+  return '<div class="ld-it"><span class="ld-itk">'+K+'</span><span class="ld-itx">'+(tx||'—')+'</span></div>';
+}
 function _ledgerHTML(){
   const esc=_odEsc, escA=_odEscA;
-  let h='<div class="ld-head"><div class="ld-title">▤ Ledger</div><span class="od-sp"></span>'
+  let h='<div class="ld-head"><div class="ld-title">▤ Repository</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-ldclose="1" aria-label="Close">✕</button></div>';
-  // ── BRIEFS — the cross-device shelf
-  h+='<div class="ld-seclab">Briefs</div>';
-  const bn=BRIEF.nodes.length;
-  if(_ldSaveArm){
-    h+='<div class="rc-form"><input class="rc-in" id="ldBriefName" type="text" maxlength="60" placeholder="Name this brief">'
-      +'<div class="rc-btns"><span class="od-sp"></span>'
-      +'<button class="rc-cancel" type="button" data-ldsavecancel="1">Cancel</button>'
-      +'<button class="rc-save" type="button" data-ldsavego="1">Save</button></div></div>';
-  } else {
-    h+='<button class="bf-act in" type="button" data-ldsave="1"'+(bn?'':' disabled')+'>Save current brief ('+bn+' object'+(bn===1?'':'s')+')</button>';
-  }
-  if(SAVEDB.length){
-    SAVEDB.forEach(function(b,i){
-      const armed=(_ldLoadArm===i);
-      h+='<div class="ld-row"><div class="ld-main"><div class="ld-n">'+esc(b.n)+'</div>'
-        +'<div class="ld-sub">'+(Array.isArray(b.nodes)?b.nodes.length:0)+' objects · '+new Date(b.ts||0).toLocaleDateString()+'</div></div>'
-        +'<button class="bf-act'+(armed?'':' in')+'" type="button" data-ldload="'+i+'">'+(armed?'Replace current?':'Load')+'</button>'
-        +'<button class="od-ico" type="button" data-lddel="'+i+'" aria-label="Delete saved brief">✕</button></div>';
-    });
-  } else h+='<div class="ld-sub ld-pad">No saved briefs yet — save one here and open it on any connected device.</div>';
-  // ── ID REGISTRY — grouped by installation, counts per ID
-  h+='<div class="ld-seclab">ID registry</div>';
+  h+='<div class="ld-sub ld-pad">Everything entered on the map — every ID and the People, Specs, Notes and Links filed under it. Tap an ID to read its items; tap an installation to open it on the map.</div>';
   let any=false;
   Object.keys(RECORDS).sort(function(a,b){ return _lgSiteName(a).localeCompare(_lgSiteName(b)); }).forEach(function(id){
     const r=RECORDS[id]; if(!r) return;
     const tot=recCount(id), ids=(r.ids||[]);
     if(!tot && !ids.length) return;
     any=true;
-    h+='<div class="ld-org"><button class="ld-orgbtn" type="button" data-ldgo="'+escA(id)+'">'+esc(_lgSiteName(id))+'</button><span class="ld-tot">'+tot+'</span></div>';
+    h+='<div class="ld-org"><button class="ld-orgbtn" type="button" data-ldgo="'+escA(id)+'">'+esc(_lgSiteName(id))+'</button><span class="ld-tot">'+tot+' item'+(tot===1?'':'s')+'</span></div>';
+    const KINDS=['people','specs','notes','links'];
+    const rowsFor=function(match){                 // match=null → untagged items
+      let out='';
+      KINDS.forEach(function(kk){ (r[kk]||[]).forEach(function(it){
+        const keep=(match==null)?(!it.xid):(it.xid===match);
+        if(keep) out+=_ldItem(kk, it);
+      }); });
+      return out;
+    };
     ids.forEach(function(lb){
       const c={people:0,specs:0,notes:0,links:0};
-      ['people','specs','notes','links'].forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(it.xid===lb) c[kk]++; }); });
-      h+='<div class="ld-idrow"><span class="ld-id">'+esc(lb)+'</span>'+_ldCounts(c)+'</div>';
+      KINDS.forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(it.xid===lb) c[kk]++; }); });
+      const key=id+'|'+lb, open=(_ldSel===key);
+      h+='<button type="button" class="ld-idrow'+(open?' on':'')+'" data-ldsel="'+escA(key)+'"><span class="ld-id">'+esc(lb)+'</span>'+_ldCounts(c)+'</button>';
+      if(open) h+='<div class="ld-items">'+(rowsFor(lb)||'<div class="ld-sub">Nothing filed under this ID yet.</div>')+'</div>';
     });
     const un={people:0,specs:0,notes:0,links:0}; let unN=0;
-    ['people','specs','notes','links'].forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(!it.xid){ un[kk]++; unN++; } }); });
-    if(unN) h+='<div class="ld-idrow"><span class="ld-id ld-untag">untagged</span>'+_ldCounts(un)+'</div>';
+    KINDS.forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(!it.xid){ un[kk]++; unN++; } }); });
+    if(unN){
+      const key=id+'|~', open=(_ldSel===key);
+      h+='<button type="button" class="ld-idrow'+(open?' on':'')+'" data-ldsel="'+escA(key)+'"><span class="ld-id ld-untag">untagged</span>'+_ldCounts(un)+'</button>';
+      if(open) h+='<div class="ld-items">'+rowsFor(null)+'</div>';
+    }
   });
   if(!any) h+='<div class="ld-sub ld-pad">Nothing logged yet. Open an installation on the map and use its ID tab — People, Specs, Notes and Links land here as you tag them.</div>';
   h+='<div class="ld-sub ld-pad">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
@@ -7900,34 +7984,21 @@ function _ledgerRender(){
   if(p) p.innerHTML=_ledgerHTML();
 }
 function _ledgerOpen(){
-  const el=_ledgerEl(); _ldSaveArm=false; _ldLoadArm=-1; _ledgerRender();
+  const el=_ledgerEl(); _ldSel=null; _ledgerRender();
   try{ requestAnimationFrame(function(){ el.classList.add('on'); }); }catch(_){ el.classList.add('on'); }
 }
 function _ledgerClose(){ const el=document.getElementById('ledger'); if(el) el.classList.remove('on'); }
 function _ledgerTap(e){
   const t=e.target; if(!t||!t.closest) return;
   if(t.closest('[data-ldclose]')){ _ledgerClose(); return; }
-  if(t.closest('[data-ldsave]')){ _ldSaveArm=true; _ledgerRender();
-    try{ const i2=document.getElementById('ldBriefName'); i2&&i2.focus(); }catch(_){} return; }
-  if(t.closest('[data-ldsavecancel]')){ _ldSaveArm=false; _ledgerRender(); return; }
-  if(t.closest('[data-ldsavego]')){
-    const nm=(document.getElementById('ldBriefName')||{}).value||'';
-    sbCapture(nm); _ldSaveArm=false; _ledgerRender();
-    try{ _bfToast('Brief saved'+(((typeof _dbState!=='undefined')&&_dbState==='live')?' — on the board for your other devices':' — connect the database to sync it')); }catch(_){}
-    return; }
-  const ld=t.closest('[data-ldload]');
-  if(ld){ const i2=+ld.getAttribute('data-ldload');
-    if(_ldLoadArm!==i2){ _ldLoadArm=i2; _ledgerRender(); return; }   // first tap arms — loading replaces the working brief
-    _ldLoadArm=-1;
-    if(sbLoad(i2)){ _ledgerClose(); try{ _bfToast('Brief loaded'); }catch(_){} }
-    return; }
-  const dl=t.closest('[data-lddel]');
-  if(dl){ sbRemove(+dl.getAttribute('data-lddel')); _ldLoadArm=-1; _ledgerRender(); return; }
+  const sl=t.closest('[data-ldsel]');
+  if(sl){ const k=sl.getAttribute('data-ldsel'); _ldSel=(_ldSel===k)?null:k; _ledgerRender(); return; }
   const go=t.closest('[data-ldgo]');
   if(go){ const id=go.getAttribute('data-ldgo'); _ledgerClose();
     try{ setMode('map'); if(siteById(id)) selectSite(id); }catch(_){} return; }
 }
-try{ window.Ledger={ open:_ledgerOpen, close:_ledgerClose, html:_ledgerHTML }; }catch(_){}
+try{ window.Repo={ open:_ledgerOpen, close:_ledgerClose, html:_ledgerHTML,
+  sel:function(k){ _ldSel=k; } }; }catch(_){}       // sel: harness hook — _ldSel is a closure var, unreachable otherwise
 function recBackup(){
   const out={v:1, app:'A-ORG-2', generated:new Date().toISOString(), records:RECORDS};
   _xpDownload('a-org-2-records-'+_xpStamp()+'.json','application/json',JSON.stringify(out,null,1));
@@ -8040,11 +8111,12 @@ function _dbApply(data){
     try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
       tx.objectStore('kv').put({k:'briefs', v:{v:1, list:SAVEDB, mod:_sbMod}}); } }catch(_){}
     took++;
-    try{ const lp=document.getElementById('ledger'); if(lp && lp.classList.contains('on')) _ledgerRender(); }catch(_){}
   }
   if(took){
     try{ const dz=document.getElementById('dossier');
       if(dz && !dz.hidden && GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+    // v1.8.0: an open repository re-reads whatever the merge brought in
+    try{ const lp=document.getElementById('ledger'); if(lp && lp.classList.contains('on')) _ledgerRender(); }catch(_){}
   }
 }
 // ── v1.2.0 THE RECONNECT CHIP — settings exist but this session is offline:
@@ -8932,8 +9004,8 @@ function bootShell(){
         +'<button class="am-row" type="button" data-am="db">Database — records off-device'
           +'<span class="am-dbchip '+(_dbState==='live'?'am-db-live':(_dbState==='error'?'am-db-error':'am-db-off'))+'">'
           +(_dbState==='live'?'LIVE':(_dbState==='connecting'?'…':(_dbState==='error'?'ERR':'OFF')))+'</span></button>'
-        // v1.7.0 — the ledger door (also on the brief chart head)
-        +'<button class="am-row" type="button" data-am="ledger">Ledger — IDs, records &amp; saved briefs</button>'
+        // v1.8.0 — the repository door (map data: IDs + everything filed under them)
+        +'<button class="am-row" type="button" data-am="repo">Repository — IDs &amp; saved map data</button>'
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
         +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
@@ -8969,7 +9041,7 @@ function bootShell(){
       var dbm=e.target.closest('[data-am="db"]');
       if(dbm){ var m0=document.getElementById('appMenu'); if(m0) m0.hidden=true;
         try{ _dbSheet(); }catch(_){} return; }
-      var lgm=e.target.closest('[data-am="ledger"]');
+      var lgm=e.target.closest('[data-am="repo"]');
       if(lgm){ var mL=document.getElementById('appMenu'); if(mL) mL.hidden=true;
         try{ _ledgerOpen(); }catch(_){} return; }
       var dbc=e.target.closest('[data-dbconnect]');

@@ -998,3 +998,19 @@ closeouts. The stepping label POLICY is now load-bearing:
   _bfAnnEdit/_bfRnEdit clear-sites (now 5 sites × 5 fields).
 - Size watch: ship-lint now warns at 91.7% of the 900KB budget — plan a
   prune before the next big feature.
+
+## v1.8.0 — owner correction: briefs to the brief room, panel = repository
+- Owner on v1.7.0: "don't need a brief ledger". LAW: the side panel
+  (#ledger, .ld-*) is the REPOSITORY — MAP DATA ONLY (records by
+  installation, per-ID P/S/N/L counts, tap an ID → the actual items
+  render via RC_KINDS field grammar: people name—role, specs label:value,
+  notes text, links label·url; 'untagged' row included). Never put brief
+  surfaces in it again.
+- Saved briefs live in the BRIEF ROOM: chart-head ▤ (data-bfbriefs) →
+  _sbOpenSheet in the dossier (the _svOpenSheet grammar) — save arms a
+  name form, load is a two-tap replace-confirm, delete ✕. Data layer
+  unchanged from v1.7.0 (SAVEDB/kv 'briefs'/board blob).
+- window.Repo={open,close,html,sel} — sel() is the harness hook for the
+  _ldSel closure var (the _rcForm lesson again). window.Ledger is gone.
+- Repository refresh moved into _dbApply's `took` block — ANY merge
+  (records included) re-renders an open panel, not just the briefs blob.

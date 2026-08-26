@@ -647,20 +647,29 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(global.Briefs.list().length!==1 || global.Briefs.list()[0].n!=='Remote Shelf'){ wok=false; fails++; console.log('✗ SAVED BRIEFS newest-wins merge failed'); }
       global._dbApply({briefs:{list:[], mod:1}});
       if(global.Briefs.list().length!==1){ wok=false; fails++; console.log('✗ SAVED BRIEFS: an OLDER remote shelf must not clobber'); }
-      // ledger: briefs shelf + ID registry with per-ID counts
+      // v1.8.0 — briefs live in the BRIEF ROOM's own sheet, off the chart head
+      global.Briefs.open();
+      const sh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      if(sh.indexOf('Save current brief')<0 || sh.indexOf('Remote Shelf')<0 || sh.indexOf('data-sbload')<0){ wok=false; fails++; console.log('✗ BRIEFS SHEET must carry save + the shelf'); }
+      // v1.8.0 — the repository: map data only, IDs unfold to their actual items
       global.recAddId('fort-bragg','ID-900');
-      global.recAdd('fort-bragg','people',{name:'Ledger Probe', xid:'ID-900'});
-      const lh=global.Ledger.html();
-      if(lh.indexOf('Save current brief')<0 || lh.indexOf('Remote Shelf')<0){ wok=false; fails++; console.log('✗ LEDGER must carry the saved-brief shelf'); }
-      if(lh.indexOf('Fort Bragg')<0 || lh.indexOf('ID-900')<0 || lh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ LEDGER ID registry must show the org, the ID and its P count'); }
-      // head door present on the chart
+      global.recAdd('fort-bragg','people',{name:'Ledger Probe', role:'S3', xid:'ID-900'});
+      let rh=global.Repo.html();
+      if(rh.indexOf('Repository')<0 || rh.indexOf('Fort Bragg')<0 || rh.indexOf('ID-900')<0 || rh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ REPOSITORY must show the org, the ID and its P count'); }
+      if(rh.indexOf('Save current brief')>=0 || rh.indexOf('Remote Shelf')>=0){ wok=false; fails++; console.log('✗ REPOSITORY must NOT carry the briefs shelf (owner: no brief ledger)'); }
+      if(rh.indexOf('Ledger Probe')>=0){ wok=false; fails++; console.log('✗ REPOSITORY items must stay folded until the ID is tapped'); }
+      global.Repo.sel('fort-bragg|ID-900');
+      rh=global.Repo.html();
+      if(rh.indexOf('Ledger Probe')<0 || rh.indexOf('S3')<0){ wok=false; fails++; console.log('✗ REPOSITORY expanded ID must show the saved item text'); }
+      global.Repo.sel(null);
+      // head door present on the chart — and it is the BRIEFS door now
       global.renderBrief();
-      if((IDS['briefStage']?IDS['briefStage'].innerHTML:'').indexOf('data-bfledger')<0){ wok=false; fails++; console.log('✗ LEDGER door missing from the chart head'); }
+      if((IDS['briefStage']?IDS['briefStage'].innerHTML:'').indexOf('data-bfbriefs')<0){ wok=false; fails++; console.log('✗ BRIEFS door missing from the chart head'); }
       // cleanup
       try{ (global.RECORDS['fort-bragg'].people||[]).pop(); global.recDelId('fort-bragg','ID-900'); }catch(_){}
       global.Briefs.remove(0);
       global.Brief.remove(ih.k);
-      if(wok) console.log('  ✓ saved briefs + ledger + inventory: sanitize · ride snapshot · capture/load with inv · newest-wins shelf · ledger shows shelf + ID counts · head door');
+      if(wok) console.log('  ✓ saved briefs + repository + inventory: sanitize · ride snapshot · capture/load with inv · newest-wins shelf · briefs sheet in room · repository unfolds items · head door');
     }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
