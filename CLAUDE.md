@@ -894,3 +894,15 @@ closeouts. The stepping label POLICY is now load-bearing:
   auto-retires at 25 s; a FAILED tap opens the Database sheet so the reason
   is readable. Harness hooks: DB.chip() + DB._setCfg() (closure state).
 
+## v1.2.1 — the update path survives a blip
+- ONE failed sw.js fetch used to strand the whole session (single register()
+  try, catch(){} swallow, raw script-error toast). Now: register retries on a
+  15s→2min ladder (5 tries) + on every foreground return while uncontrolled;
+  the sw.js script error toasts as an UPDATE-CHECK failure in plain words,
+  raw line preserved in __errLog. Never reduce the retry ladder to a single
+  try again — a phone opening seconds after a deploy WILL hit blips.
+- Field diagnosis pattern that found it: version stamp (v1.0.3) + toast text
+  named the exact failing URL; Cloudflare build green + CI green + wrangler
+  assets config sane ⇒ the client's single-try registration was the only
+  suspect left. The stamp/toast review-truth stack keeps paying rent.
+

@@ -33,6 +33,12 @@
       if(window.__errLog.length>10) window.__errLog.shift();
       if(hostNoise) return;   // preview-host boundary noise: logged, not toasted
       if(window._errToast){
+        // v1.2.1 — a failed sw.js fetch is an UPDATE-CHECK failure, not an app
+        // error: say what it means (the raw line stays in __errLog for diagnostics)
+        if(/sw\.js/.test(String(msg||'')+String(src||'')) && /load|fetch|failed/i.test(String(msg||''))){
+          window._errToast('Update check failed — running the installed version; will retry shortly.');
+          return;
+        }
         var at=(src?String(src).split('/').pop():'')||'';
         window._errToast(msg+((at||line)?(' @ '+(at||'inline')+(line?(':'+line):'')):''));
       }
@@ -58,14 +64,28 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
       if(window.__SANDBOX) return;
-      navigator.serviceWorker.register('sw.js').then(function(reg){
-        var kick=function(){ try{ reg.update(); }catch(_){ } };
-        setTimeout(kick, 6000);
-        setInterval(kick, 20*60*1000);
-        document.addEventListener('visibilitychange', function(){
-          if(document.visibilityState==='visible') kick();
+      // v1.2.1 — REGISTRATION RETRIES (the owner's stranded session, 25 Aug: ONE
+      // transient sw.js fetch failure left the whole session with no update path
+      // and a raw red script error). register() now retries with backoff and on
+      // every return to the app; the raw error toast for sw.js is translated
+      // into what it means (see the first-byte capture below the shell).
+      var _swTries=0;
+      var _swGo=function(){
+        navigator.serviceWorker.register('sw.js').then(function(reg){
+          var kick=function(){ try{ reg.update(); }catch(_){ } };
+          setTimeout(kick, 6000);
+          setInterval(kick, 20*60*1000);
+          document.addEventListener('visibilitychange', function(){
+            if(document.visibilityState==='visible') kick();
+          });
+        }).catch(function(){
+          if(++_swTries<=5) setTimeout(_swGo, Math.min(120000, 15000*_swTries));   // 15s → 2min ladder
         });
-      }).catch(function(){});
+      };
+      _swGo();
+      document.addEventListener('visibilitychange', function(){
+        if(document.visibilityState==='visible' && !navigator.serviceWorker.controller && _swTries>0) _swGo();
+      });
       var hadCtrl=!!navigator.serviceWorker.controller;
       navigator.serviceWorker.addEventListener('controllerchange', function(){
         if(!hadCtrl){ hadCtrl=true; return; }          // first install claiming — not an update
@@ -1177,6 +1197,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.2.1 • THE UPDATE PATH SURVIVES A BLIP (owner screenshot, 25 Aug: a
+//            phone opened minutes after a deploy caught one failed sw.js
+//            fetch — and was left with a raw red "Script …/sw.js load
+//            failed" toast, no retry, and a whole session stranded on the
+//            old build). Registration now retries on a 15s→2min ladder (5
+//            tries) and again whenever the app returns to the foreground
+//            uncontrolled; the raw script error is translated to what it
+//            means — "Update check failed — running the installed version;
+//            will retry shortly." — while the verbatim line still lands in
+//            __errLog for the diagnostics dump. Cloudflare, GitHub CI and
+//            the wrangler config were verified healthy end to end; the
+//            stranded session was the app's own single-try registration.
 //   v1.2.0 • THE WHOLE WORKING SET ON THE BOARD + THE RECONNECT CHIP (owner:
 //            "execute both"). The database board now carries everything you
 //            build, not just records: the BRIEF DIAGRAM (groups included)
@@ -1965,7 +1997,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.2.0';
+const APP_VERSION = 'v1.2.1';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
