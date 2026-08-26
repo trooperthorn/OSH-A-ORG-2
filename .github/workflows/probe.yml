@@ -1,0 +1,19 @@
+name: probe-deploy
+# Manual probe of the deployed site — fetches index.html and sw.js from a
+# GitHub runner (open egress) and prints status + headers + first bytes, so
+# serving problems can be diagnosed without a phone in the loop.
+on:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe index.html
+        run: |
+          curl -sS -D - -o /tmp/idx.html --max-time 30 https://a-org-2.philcase4.workers.dev/index.html | head -20
+          echo "--- first bytes ---"; head -c 200 /tmp/idx.html; echo
+          grep -o "APP_VERSION = '[^']*'" /tmp/idx.html || true
+      - name: Probe sw.js
+        run: |
+          curl -sS -D - -o /tmp/sw.js --max-time 30 https://a-org-2.philcase4.workers.dev/sw.js | head -20
+          echo "--- first bytes ---"; head -c 300 /tmp/sw.js; echo
