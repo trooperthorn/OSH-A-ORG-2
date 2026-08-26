@@ -79,6 +79,21 @@
             if(document.visibilityState==='visible') kick();
           });
         }).catch(function(){
+          // v1.2.2 — SELF-DIAGNOSIS (owner's dump showed 5 straight failures on
+          // ONE origin file): probe sw.js ourselves once and put the HTTP status
+          // + content-type in __errLog, so the next diagnostics dump names the
+          // cause (404 = not deployed · text/html = rewrite ate it · TypeError =
+          // blocked by a content filter / Lockdown Mode) instead of the symptom.
+          if(_swTries===0){
+            try{
+              fetch('sw.js', {cache:'no-store'}).then(function(r){
+                var ct=(r.headers && r.headers.get('content-type'))||'?';
+                window.__errLog.push({t:Date.now(), k:'swp', m:'sw.js probe: HTTP '+r.status+' · '+String(ct).slice(0,60), s:'', l:0, c:0, st:''});
+              }).catch(function(e2){
+                window.__errLog.push({t:Date.now(), k:'swp', m:'sw.js probe: fetch blocked ('+String(e2&&e2.message||e2).slice(0,80)+') — likely a content blocker, VPN filter, or Lockdown Mode', s:'', l:0, c:0, st:''});
+              });
+            }catch(_){}
+          }
           if(++_swTries<=5) setTimeout(_swGo, Math.min(120000, 15000*_swTries));   // 15s → 2min ladder
         });
       };
@@ -1197,6 +1212,15 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.2.2 • THE APP DIAGNOSES ITS OWN PIPELINE (owner's dump: five straight
+//            sw.js failures in one session — the v1.2.1 ladder ran, so the
+//            page is fresh from the network while that ONE origin file keeps
+//            failing; that is a filter or serving problem, not a blip). On
+//            the first registration failure the app now probes sw.js itself
+//            and writes the verdict into the diagnostics log: "HTTP 404" =
+//            not in the deployment · "text/html" = a rewrite swallowed it ·
+//            "fetch blocked (…)" = content blocker / VPN filter / Lockdown
+//            Mode. The next dump names the cause, not the symptom.
 //   v1.2.1 • THE UPDATE PATH SURVIVES A BLIP (owner screenshot, 25 Aug: a
 //            phone opened minutes after a deploy caught one failed sw.js
 //            fetch — and was left with a raw red "Script …/sw.js load
@@ -1997,7 +2021,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.2.1';
+const APP_VERSION = 'v1.2.2';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
