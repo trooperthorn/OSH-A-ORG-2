@@ -1239,6 +1239,17 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.5.2 • THE CO-LOCATED CALLOUT (owner: "for locations like Fort Bragg
+//            and JBLM that have a RSN and ECCSP, have 2 small lines pointing
+//            to the location and each one says RSN and ECCSP showing they
+//            are collocated"). Co-located brief objects now read as one
+//            place: each fanned dot draws a small leader line back to the
+//            true spot (with a shared tick AT the spot), and cluster labels
+//            shed their common prefix — "Fort Bragg RSN" + "Fort Bragg
+//            ECCSP" show as RSN and ECCSP beside their lines. Class-wide
+//            (_bfFanShort): any cluster sharing a word prefix shortens, an
+//            empty remainder keeps its full label, unrelated names pass
+//            through. Solo placement keeps the v1.4.1 verbatim name.
 //   v1.5.1 • QUIET THE GLOBE (owner: "brief mode only: toggle off names and
 //            connecting lines when needed"). Two toggles on the chart head,
 //            beside Export: Aa hides every name on the brief globe, the
@@ -2112,7 +2123,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.5.1';
+const APP_VERSION = 'v1.5.2';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3808,6 +3819,28 @@ function _bfAbbr(name){
   const short=s.split(/\s+/).map(function(w){ return _BF_SHORT[w]||w; }).join(' ');
   return short.length>18 ? short.slice(0,17)+'…' : short;
 }
+// v1.5.2 CO-LOCATED CALLOUT (owner: two small lines pointing to the location,
+// each labeled RSN / ECCSP, showing they are collocated). Labels inside one
+// fan cluster shed their shared leading words — the leader line says WHERE,
+// the label says WHICH. Class-wide, not Bragg-specific: any cluster whose
+// labels share a word prefix shortens; a member whose remainder would be
+// empty keeps its full label; unrelated labels pass through untouched. The
+// v1.4.1 verbatim-name law still governs solo placement — only a cluster,
+// where the spot itself carries the shared name, sheds the prefix.
+function _bfFanShort(lbls){
+  if(!lbls || lbls.length<2) return (lbls||[]).slice();
+  const w=lbls.map(function(s){ return String(s).trim().split(/\s+/); });
+  let pre=0;
+  for(;;){
+    const t=w[0][pre]; if(t==null) break;
+    let all=true;
+    for(let i=1;i<w.length;i++){ if(w[i][pre]!==t){ all=false; break; } }
+    if(!all) break;
+    pre++;
+  }
+  if(!pre) return lbls.slice();
+  return lbls.map(function(s,i){ const r=w[i].slice(pre).join(' '); return r||s; });
+}
 // v0.13.0 THE HAND-BUILT BRIEF (owner directive: no auto-subtrees, EVER — the
 // v0.11.0 walker dumped whole A-ORG-1 commands onto the globe). The chain map
 // now renders ONLY orgs the owner explicitly added (BRIEF.mem). Levels are
@@ -3971,12 +4004,23 @@ function drawBriefNodes(ctx, m){
   // co-located nodes spread on a small screen-space ring around the true
   // point, deterministic by chain order, so every dot is visible, tappable,
   // and anchors its own label. Solo nodes sit exactly on their spot.
-  const _fanN={}, _fanI={};
+  const _fanN={}, _fanI={}, _fanM={};
   for(const key of C.order){
     const n0=C.nodes[key];
     if(n0.lat==null||n0.lon==null) continue;
     const fk=n0.lat.toFixed(4)+','+n0.lon.toFixed(4);
     _fanN[fk]=(_fanN[fk]||0)+1;
+    (_fanM[fk]=_fanM[fk]||[]).push(key);
+  }
+  // v1.5.2: cluster labels shed the shared prefix (see _bfFanShort) — the
+  // leader line says where, the label says which (RSN / ECCSP).
+  const _fanS={};
+  for(const fk in _fanM){
+    if(_fanN[fk]<2) continue;
+    const ks=_fanM[fk];
+    const full=ks.map(function(k){ const nd=C.nodes[k]; return (nd.kind==='custom')?nd.name:_bfAbbr(nd.name); });
+    const sh=_bfFanShort(full);
+    ks.forEach(function(k,i){ if(sh[i]!==full[i]) _fanS[k]=sh[i]; });
   }
   for(const key of C.order){
     const n=C.nodes[key];
@@ -3986,13 +4030,27 @@ function drawBriefNodes(ctx, m){
     let sx=p[0], sy=p[1];
     const fade=Math.max(0.3, p[2]);
     const _fk=n.lat.toFixed(4)+','+n.lon.toFixed(4);
+    let _fanned=false, _fanFirst=false;
     if(_fanN[_fk]>1){
       const _i=(_fanI[_fk]=(_fanI[_fk]||0)+1)-1, _c=_fanN[_fk];
-      const _r=(_c===2?9:13), _a=-Math.PI/2 + _i*(Math.PI*2/_c);
+      const _r=(_c===2?15:18), _a=-Math.PI/2 + _i*(Math.PI*2/_c);   // v1.5.2: ring widened so the leader line reads
       sx+=Math.cos(_a)*_r; sy+=Math.sin(_a)*_r;
+      _fanned=true; _fanFirst=(_i===0);
     }
     const dotR=(n.tier===1?3.4:(n.tier===2?3.0:2.7))*zb2;
     if(!dotsOff){
+      if(_fanned){
+        // v1.5.2: each fanned dot draws a small leader line back to the true
+        // spot, plus one shared tick AT the spot — co-location at a glance.
+        ctx.globalAlpha=fade*0.85;
+        ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(sx, sy);
+        ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+n.shade+',.85)'; ctx.stroke();
+        if(_fanFirst){
+          ctx.beginPath(); ctx.arc(p[0], p[1], 1.8, 0, Math.PI*2);
+          ctx.fillStyle='rgba(255,255,255,.9)'; ctx.fill();
+        }
+        ctx.globalAlpha=1;
+      }
       ctx.globalAlpha=fade;
       ctx.beginPath(); ctx.arc(sx, sy, dotR, 0, Math.PI*2);
       ctx.fillStyle='#ffffff'; ctx.fill();
@@ -4008,7 +4066,7 @@ function drawBriefNodes(ctx, m){
       GlobeState._screen.push({inst:{id:key, base:n.name, lat:n.lat, lon:n.lon, _bf:true}, sx:sx, sy:sy, depth:p[2]});
     }
     if(!namesOff){
-      const nm=(n.kind==='custom')?n.name:_bfAbbr(n.name);
+      const nm=_fanS[key] || ((n.kind==='custom')?n.name:_bfAbbr(n.name));   // v1.5.2: cluster short label wins
       const fs=(m.w<560?12:11);
       ctx.save(); ctx.textBaseline='middle'; ctx.font='800 '+fs+'px '+T.body;
       const tw=ctx.measureText(nm).width;

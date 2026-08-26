@@ -573,6 +573,24 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Brief.remove(sr.k);
       if(sok) console.log('  ✓ stacking: horizontal default · L2 toggles vertical · rides the board · toggles back');
     }
+    // v1.5.2 — CO-LOCATED CALLOUT: cluster labels shed the shared prefix,
+    // an empty remainder keeps its full label, unrelated labels pass through,
+    // and the two Bragg places really share one spot so the fan+leaders engage
+    {
+      let cok=true;
+      const s1=global._bfFanShort(['Fort Bragg RSN','Fort Bragg ECCSP']);
+      if(s1[0]!=='RSN'||s1[1]!=='ECCSP'){ cok=false; fails++; console.log('✗ FANSHORT pair: '+JSON.stringify(s1)); }
+      const s2=global._bfFanShort(['Fort Bragg','Fort Bragg RSN','Fort Bragg ECCSP']);
+      if(s2[0]!=='Fort Bragg'||s2[1]!=='RSN'||s2[2]!=='ECCSP'){ cok=false; fails++; console.log('✗ FANSHORT empty remainder must keep the full label: '+JSON.stringify(s2)); }
+      const s3=global._bfFanShort(['California RSN','Utah RSN']);
+      if(s3[0]!=='California RSN'||s3[1]!=='Utah RSN'){ cok=false; fails++; console.log('✗ FANSHORT unrelated labels must pass through: '+JSON.stringify(s3)); }
+      global.Brief.addPlace('px:fort-bragg-rsn'); global.Brief.addPlace('px:fort-bragg-eccsp');
+      const C2=global._briefChainMap({all:true});
+      const fa=C2.nodes['px:fort-bragg-rsn'], fb=C2.nodes['px:fort-bragg-eccsp'];
+      if(!fa||!fb||fa.lat!==fb.lat||fa.lon!==fb.lon){ cok=false; fails++; console.log('✗ Bragg RSN + ECCSP must share one spot for the fan'); }
+      global.Brief.remove('px:fort-bragg-rsn'); global.Brief.remove('px:fort-bragg-eccsp');
+      if(cok) console.log('  ✓ co-located callout: shared prefix sheds · empty remainder keeps full · unrelated untouched · Bragg pair shares the spot');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');

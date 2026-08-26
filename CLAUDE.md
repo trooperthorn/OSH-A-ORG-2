@@ -941,3 +941,17 @@ closeouts. The stepping label POLICY is now load-bearing:
   with left-rail elbows — any new connector CSS must keep both schemes
   independent. Wide-litter wrapping (bf-kgroup) is horizontal-only.
 
+
+## v1.5.2 — the co-located callout (owner: two small lines pointing to the location, labeled RSN / ECCSP)
+- The v1.4.2 fan grew leader lines: every fanned dot draws a thin line back
+  to the TRUE spot, plus one shared white tick AT the spot (first cluster
+  member draws it). Fan ring widened to 15px (pairs) / 18px so the line
+  reads. Leaders belong to dot geometry — gated by dotsOff, NOT by the
+  v1.5.1 brief lines toggle (that governs hierarchy arcs only).
+- `_bfFanShort(labels)` — pure, class-wide: labels in one cluster shed
+  their common WORD prefix ("Fort Bragg RSN"+"Fort Bragg ECCSP" → RSN /
+  ECCSP); a member whose remainder would be empty keeps its full label;
+  unrelated labels pass through. smoke exercises all three shapes.
+- Verbatim-name law (v1.4.1) reconciliation: verbatim governs SOLO
+  placement and the chart boxes always; only a globe fan cluster — where
+  the spot itself carries the shared name — sheds the prefix.
