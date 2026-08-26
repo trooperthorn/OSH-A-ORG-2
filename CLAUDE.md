@@ -931,3 +931,13 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Extending the roster = add a row to BF_PLACES (k 'px:…', n, site id). Keys
   are stable ids — never rename a k once shipped (placed nodes keep it).
 
+## v1.5.0 — stack a level (owner: vertical/horizontal per level, horizontal default)
+- BRIEF.vert = the chart levels (2-4) whose litters lay out as a COLUMN;
+  persisted in kv 'brief' and on the board blob like hide. bfStack(n)
+  toggles; the STACK seg sits beside the depth dial (only when the chart is
+  deep). Levels deeper than 4 follow L4's setting (tier-law consistency).
+- .bf-vert overrides the connector system: the horizontal top-border scheme
+  is fully reset per child-position variant (first/last/only) and replaced
+  with left-rail elbows — any new connector CSS must keep both schemes
+  independent. Wide-litter wrapping (bf-kgroup) is horizontal-only.
+

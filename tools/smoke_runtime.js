@@ -551,6 +551,28 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Brief.remove('px:california-rsn'); global.Brief.remove('fort-bragg');
       if(pok) console.log('  ✓ places: roster of 12 · anchors real · pinned coords in node+chain · host-base line · no GROUP tag');
     }
+    // v1.5.0 — PER-LEVEL STACKING: horizontal by default, Brief.stack(n)
+    // toggles L2-L4 to a vertical column, persists on the brief blob
+    {
+      let sok=true;
+      global.Brief.addGroup('Stack Root');
+      const sr=global.Brief.list().map(k=>global.Brief.node(k)).find(n=>n&&n.t==='custom'&&n.n==='Stack Root');
+      global.Brief.addPlace('px:utah-rsn', sr.k); global.Brief.addPlace('px:texas-rsn', sr.k);
+      global.renderBrief();
+      let ch3=IDS['briefStage'].innerHTML;
+      if(ch3.indexOf('bf-vert')>=0){ sok=false; fails++; console.log('✗ STACK: vertical class present before any toggle'); }
+      if(ch3.indexOf('data-bfvert')<0){ sok=false; fails++; console.log('✗ STACK: bar toggles missing'); }
+      global.Brief.stack(2);
+      ch3=IDS['briefStage'].innerHTML;
+      if(ch3.indexOf('bf-vert')<0){ sok=false; fails++; console.log('✗ STACK: L2 vertical did not apply'); }
+      const snapV=global._dbSnapshot();
+      if(!snapV.brief.vert || snapV.brief.vert.indexOf(2)<0){ sok=false; fails++; console.log('✗ STACK: vert not on the board snapshot'); }
+      global.Brief.stack(2);
+      ch3=IDS['briefStage'].innerHTML;
+      if(ch3.indexOf('bf-vert')>=0){ sok=false; fails++; console.log('✗ STACK: toggle-off did not restore horizontal'); }
+      global.Brief.remove(sr.k);
+      if(sok) console.log('  ✓ stacking: horizontal default · L2 toggles vertical · rides the board · toggles back');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');

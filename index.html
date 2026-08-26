@@ -565,6 +565,27 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   padding:0 4px 3px; border-radius:12px; box-shadow:inset 0 0 0 1px var(--line-tree)}
 .bf-kids.bf-krow2{padding-top:7px}
 .bf-kids.bf-krow2::before{display:none}
+/* v1.5.0 — a STACKED level: column litter with left-rail elbow connectors.
+   Horizontal is the default; these rules only enter through .bf-vert. */
+.bf-kids.bf-vert{flex-direction:column; align-items:flex-start; padding:8px 0 0 26px}
+.bf-kids.bf-vert::before{display:none}
+.bf-vert>.bf-li{padding:5px 0 3px 16px; align-items:flex-start}
+.bf-vert>.bf-li::before,
+.bf-vert>.bf-li:first-child::before,
+.bf-vert>.bf-li:last-child::before,
+.bf-vert>.bf-li:only-child::before{content:''; display:block; position:absolute;
+  left:-10px; right:auto; top:-14px; width:24px; height:38px;
+  border:0 none; border-left:1.4px solid var(--line-tree); border-bottom:1.4px solid var(--line-tree);
+  border-radius:0 0 0 9px}
+.bf-vert>.bf-li::after,
+.bf-vert>.bf-li:first-child::after,
+.bf-vert>.bf-li:last-child::after,
+.bf-vert>.bf-li:only-child::after{content:''; display:block; position:absolute;
+  left:-10px; right:auto; top:24px; bottom:-6px; width:0; height:auto;
+  border:0 none; border-left:1.4px solid var(--line-tree); border-radius:0}
+.bf-vert>.bf-li:last-child::after{display:none}
+.bf-vseg{align-items:center}
+.bf-vlab{font:700 8px/1 var(--mono); letter-spacing:.14em; color:var(--faint); padding:0 5px 0 8px}
 /* THE BOX (v1.3.0 MATTE — owner: "sleek, bold text, their chosen color matte
    fill"). The box IS its color now: a flat matte fill of the tier's deep hue
    or the owner's picked swatch, name in heavy ink computed for contrast
@@ -1214,6 +1235,16 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.5.0 • STACK A LEVEL (owner: "stack specified parts of the hierarchy
+//            vertically or horizontally — keep horizontal by default, pick
+//            L2, L3, L4 to stack vertically"). The chart bar grew a STACK
+//            segment beside the depth dial: tap L2, L3 or L4 and every
+//            litter at that level lays out as a clean column with left-rail
+//            elbow connectors — tap again to go back to the horizontal row.
+//            Any mix works (L2 rows with L3 stacked, all three stacked…);
+//            wide-litter wrapping stays a horizontal-only concern. The
+//            choice is part of the diagram: it persists on the device and
+//            rides the database board to every connected screen.
 //   v1.4.2 • THE FAN (owner: "some selections get stuck over others").
 //            Brief objects sharing one location — JBLM RSN + JBLM ECCSP,
 //            the Fort Bragg pair, anything else stacked on a base — piled
@@ -2069,7 +2100,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.4.2';
+const APP_VERSION = 'v1.5.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -5071,6 +5102,11 @@ function renderBrief(){
     +(_deep?('<span class="bf-seg">'+[1,2,3,4].map(function(n){
         return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+'">L'+n+'</button>';
       }).join('')+'</span>'):'')
+    // v1.5.0 — STACK: pick levels that lay out vertically (horizontal default)
+    +(_deep?('<span class="bf-seg bf-vseg"><span class="bf-vlab">STACK</span>'+[2,3,4].map(function(n){
+        const on=(BRIEF.vert||[]).indexOf(n)>=0;
+        return '<button type="button" class="bf-dep'+(on?' on':'')+'" data-bfvert="'+n+'" aria-pressed="'+(on?'true':'false')+'" title="'+(on?'Lay L'+n+' out horizontally':'Stack L'+n+' vertically')+'">L'+n+'</button>';
+      }).join('')+'</span>'):'')
     +'<span class="bf-seg bf-zseg">'
       +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">\u2212</button>'
       +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
@@ -5116,6 +5152,11 @@ function renderBrief(){
     if(kids.length) r+='<button type="button" class="bf-caret'+(folded?' on':'')+'" data-bffold="'+escA(k)+'" aria-expanded="'+(folded?'false':'true')+'" aria-label="'+(folded?'Expand':'Collapse')+' branch">'
       +(folded?('+'+descN(k)):'\u25be')+'</button>';
     if(kids.length && !folded){
+      // v1.5.0 — a STACKED level lays its litter out as a column (left rail
+      // connectors); wrap logic is a horizontal concern and does not apply
+      if((BRIEF.vert||[]).indexOf(Math.min(4,lvl+1))>=0){
+        r+='<ul class="bf-kids bf-vert">'+kids.map(function(c){ return nodeHtml(c, lvl+1); }).join('')+'</ul>';
+      } else {
       // SIZING (A-ORG-1 §2.1): a wide litter wraps into rows instead of one endless
       // ribbon, so a 50-sibling chain still fits the pane at a readable size.
       let rows=[kids];
@@ -5126,6 +5167,7 @@ function renderBrief(){
         r+='<ul class="bf-kids'+(ri?' bf-krow2':'')+'">'+row.map(function(c){ return nodeHtml(c, lvl+1); }).join('')+'</ul>';
       });
       if(rows.length>1) r+='</div>';
+      }
     }
     return r+'</li>';
   };
@@ -6535,6 +6577,8 @@ if(!window._odWired){
     if(bey){ const k=bey.getAttribute('data-bfeye'); bfEye(k); try{ _bfObjSheet(k); }catch(_){} return; }
     const bdp=e.target.closest('[data-bfdepth]');
     if(bdp){ bfDepth(bdp.getAttribute('data-bfdepth')); return; }
+    const bvt=e.target.closest('[data-bfvert]');
+    if(bvt){ bfStack(bvt.getAttribute('data-bfvert')); return; }
     const br=e.target.closest('[data-bfrm]');
     if(br){ _bfAnnEdit=null; bfRemove(br.getAttribute('data-bfrm'));
       // map: bfRemove re-rendered the card in place (star flips back); in the
@@ -7073,6 +7117,7 @@ function _rdbOpen(){
           if(v){
             _bfMod=v.mod||0;                       // v1.2.0: board merge baseline
             BRIEF.hide=Array.isArray(v.hide)?v.hide.slice():[];
+            BRIEF.vert=Array.isArray(v.vert)?v.vert.slice():[];   // v1.5.0: per-level stacking
             if(Array.isArray(v.nodes)){
               // v2 — the stored diagram, exactly as the owner arranged it
               const seen={};
@@ -7134,7 +7179,7 @@ function _rdbOpen(){
 // node = { k:key, n:name, p:parentKey|null, t:kind, r:ref, c:color, sh:stripe, tx:note }
 // BRIEF.mem / BRIEF.ann stay as maintained MIRRORS so exports and the harnesses
 // keep reading one shape; _bfSync rebuilds them after every mutation.
-const BRIEF={ nodes:[], mem:[], ann:{}, hide:[] };
+const BRIEF={ nodes:[], mem:[], ann:{}, hide:[], vert:[] };   // vert: chart levels (2-4) stacked vertically
 let _bfMod=0;                                     // v1.2.0: last local edit — the board merges newest-wins
 function _bfSync(){
   BRIEF.mem=BRIEF.nodes.map(function(n){ return n.k; });
@@ -7145,7 +7190,7 @@ function _bfSave(){
   _bfSync();
   _bfMod=Date.now();                              // v1.2.0: the board merges newest-wins
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
-    tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, mod:_bfMod}}); } }catch(_){}
+    tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod}}); } }catch(_){}
   try{ dbPush(); }catch(_){}                      // the diagram rides the database board too
 }
 function bfNode(k){ for(const n of BRIEF.nodes) if(n.k===k) return n; return null; }
@@ -7311,6 +7356,18 @@ function bfNote(id, text){
   _bfSave();
   try{ renderBrief(); }catch(_){}
 }
+// v1.5.0 — STACK A LEVEL (owner: "pick a level L2, L3, L4 to stack
+// vertically; keep horizontal by default"). Toggles ride the diagram: kv,
+// the board, every device.
+function bfStack(n){
+  n=parseInt(n,10); if(!(n>=2&&n<=4)) return;
+  BRIEF.vert=BRIEF.vert||[];
+  const i=BRIEF.vert.indexOf(n);
+  if(i>=0) BRIEF.vert.splice(i,1); else BRIEF.vert.push(n);
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+}
 function bfEye(rootId){
   const hd=BRIEF.hide||(BRIEF.hide=[]);
   const i=hd.indexOf(rootId);
@@ -7329,7 +7386,7 @@ try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, addGr
   places:function(){ return BF_PLACES.slice(); },
   remove:bfRemove, rename:bfRename,
   move:bfMove, reorder:bfReorder, color:bfColor, stripe:bfStripe,
-  note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth,
+  note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth, stack:bfStack,
   node:bfNode, kids:bfKids, list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}
 
 
@@ -7514,7 +7571,7 @@ function _dbSnapshot(){
   // v1.2.0 — the board carries the whole working set: records, the brief
   // diagram (groups included) and saved views. Each part merges newest-wins.
   return {v:2, records:RECORDS,
-    brief:{nodes:BRIEF.nodes, hide:BRIEF.hide, mod:_bfMod},
+    brief:{nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod},
     views:{list:SAVEDV, mod:_svMod}};
 }
 function _dbApply(data){
@@ -7540,9 +7597,10 @@ function _dbApply(data){
     });
     BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
     BRIEF.hide=Array.isArray(data.brief.hide)?data.brief.hide.slice():[];
+    BRIEF.vert=Array.isArray(data.brief.vert)?data.brief.vert.slice():[];
     _bfMod=data.brief.mod; _bfSync();
     try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
-      tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, mod:_bfMod}}); } }catch(_){}
+      tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod}}); } }catch(_){}
     took++;
     try{ if(document.body.classList.contains('brief-mode')){ renderBrief(); globeMark(); } }catch(_){}
   }
