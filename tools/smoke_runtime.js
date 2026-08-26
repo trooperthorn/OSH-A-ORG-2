@@ -671,6 +671,40 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Brief.remove(ih.k);
       if(wok) console.log('  ✓ saved briefs + repository + inventory: sanitize · ride snapshot · capture/load with inv · newest-wins shelf · briefs sheet in room · repository unfolds items · head door');
     }
+    // v1.9.0 — UI GRAMMAR: bar captions, labeled head tools, sheet order
+    // (one filled primary · quiet identity edits · hide inside Arrange ·
+    // danger rail last), and the danger/quiet class vocabulary
+    {
+      let gok=true;
+      global.Brief.addGroup('Grammar Group');
+      const gg=global.Brief.list().map(k=>global.Brief.node(k)).find(n=>n&&n.t==='custom'&&n.n==='Grammar Group');
+      global.Brief.addPlace('px:utah-rsn', gg.k);            // depth 2 → the bar shows LEVELS/STACK
+      global.renderBrief();
+      const st2=IDS['briefStage']?IDS['briefStage'].innerHTML:'';
+      ['>LEVELS<','>STACK<','>ZOOM<'].forEach(function(cap){
+        if(st2.indexOf(cap)<0){ gok=false; fails++; console.log('✗ BAR caption missing: '+cap); } });
+      ['>Names<','>Lines<','>Briefs<','>Export<'].forEach(function(lb){
+        if(st2.indexOf('<span class="ch-lbl">'+lb.slice(1,-1)+'<')<0){ gok=false; fails++; console.log('✗ HEAD tool label missing: '+lb); } });
+      if(st2.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ HEAD cluster divider missing'); }
+      global._bfObjSheet(gg.k);
+      const gh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      if(gh.indexOf('bf-act bf-addsub')<0 || gh.indexOf('data-bfunder')<0){ gok=false; fails++; console.log('✗ SHEET primary (filled ⊕ Add a subordinate) missing'); }
+      if(gh.indexOf('bf-act in bf-addsub')>=0){ gok=false; fails++; console.log('✗ SHEET primary must be FILLED, not outline'); }
+      if(gh.indexOf('bf-qt')<0){ gok=false; fails++; console.log('✗ SHEET quiet identity buttons (rename/note) missing'); }
+      if(gh.indexOf('bf-act rm')<0){ gok=false; fails++; console.log('✗ SHEET danger rail (Remove) missing'); }
+      const iArr=gh.indexOf('Arrange'), iEye=gh.indexOf('data-bfeye'), iRm=gh.indexOf('data-bfrm'), iAdd=gh.indexOf('data-bfunder');
+      if(!(iArr>=0 && iEye>iArr)){ gok=false; fails++; console.log('✗ Hide-component must live INSIDE Arrange'); }
+      if(!(iAdd>=0 && iRm>iAdd)){ gok=false; fails++; console.log('✗ danger rail must come AFTER the primary'); }
+      global.Brief.remove(gg.k);
+      // review find (pre-existing, fixed v1.9.0): a NON-member org sheet must
+      // not offer Add-note — bfNote writes to the brief node, so the text of a
+      // note typed there silently vanished. It offers ★ Add to brief instead.
+      global._bfObjSheet('fort-riley');
+      const nh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      if(nh.indexOf('data-bfannedit')>=0){ gok=false; fails++; console.log('✗ NON-member sheet must not offer Add note (bfNote would eat it)'); }
+      if(nh.indexOf('data-bfadd')<0){ gok=false; fails++; console.log('✗ NON-member sheet must lead with Add to brief'); }
+      if(gok) console.log('  ✓ ui grammar: bar captions LEVELS/STACK/ZOOM · labeled head tools + divider · filled primary · quiet edits · hide in Arrange · danger rail last · non-member note gated');
+    }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);
     global.setMode('map');

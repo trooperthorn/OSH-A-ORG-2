@@ -539,6 +539,16 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 /* v1.5.1 — brief-only view toggles on the chart head: names + connecting
    lines. ON = accent; OFF = dimmed hollow. Map room never sees these. */
 .ch-head .bf-vw{color:var(--accent)}
+/* v1.9.0 — LABELED HEAD TOOLS: icon chip + caption, VIEW │ FILE clusters */
+.ch-tool{display:inline-flex; flex-direction:column; align-items:center; gap:1px; min-width:38px;
+  -webkit-tap-highlight-color:transparent}
+.ch-tool .od-ico, .ch-tool .ch-lbl{pointer-events:none}
+.ch-lbl{font:700 7px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+.ch-tool.off .ch-lbl{opacity:.55}
+.ch-div{flex:none; width:1px; height:22px; background:var(--line); margin:0 3px; align-self:center}
+body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
+/* v1.9.0 — the zoom segment rides the bar's right edge (structure left, view right) */
+.bf-zseg{margin-left:auto; align-items:center}
 /* v1.7.0 — THE LEDGER: right-side drawer (IDs · records · saved briefs) */
 #ledger{position:fixed; inset:0; z-index:58; pointer-events:none}
 #ledger .ld-scrim{position:absolute; inset:0; background:rgba(12,9,3,.42); opacity:0; transition:opacity .24s ease}
@@ -892,11 +902,17 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
    legend, callout and dossier so options expand only when needed, not by default
    (owner refs: FAQ accordion / Android expandable list). Header toggles the body;
    open state lives in GlobeState._discOpen so it survives a re-render. */
-.disc{border-radius:10px}
-.disc + .disc{margin-top:2px}
-.disc-h{display:flex; align-items:center; gap:8px; width:100%; border:none; background:rgba(0,0,0,.18);
-  cursor:pointer; padding:9px 11px; border-radius:9px; text-align:left;
-  font:800 10px/1 var(--mono); letter-spacing:.09em; text-transform:uppercase; color:var(--faint)}
+/* v1.9.0 (owner: "categories need to read as categories"): the header is no
+   longer a gray slab — an engraved uppercase label with a gold tick on a
+   hairline rule. Skin only; the _disc structure and handler are untouched. */
+.disc{border-radius:0}
+.disc + .disc{margin-top:0}
+.disc-h{display:flex; align-items:center; gap:8px; width:100%; border:none; background:none;
+  border-top:1px solid var(--accent-wash);
+  cursor:pointer; padding:12px 2px 10px; border-radius:0; text-align:left;
+  font:800 10px/1 var(--mono); letter-spacing:.13em; text-transform:uppercase; color:var(--dim)}
+.disc-h > span:first-child::before{content:''; display:inline-block; width:3px; height:11px;
+  margin-right:7px; border-radius:2px; background:var(--accent); vertical-align:-1px}
 .disc-h:active{background:var(--accent-wash)}
 .disc.open .disc-h{color:var(--accent)}
 .disc-h .disc-ct{margin-left:auto; padding-left:8px; font:700 10.5px/1 var(--mono); color:var(--faint)}
@@ -1022,6 +1038,14 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 }
 .bf-act.in{background:none; color:var(--accent); box-shadow:0 0 0 1.5px var(--accent)}
 .bf-act:active{filter:brightness(1.1)}
+/* v1.9.0 button vocabulary: exactly ONE filled primary per sheet; .in =
+   secondary outline; .bf-qt = quiet text (identity edits); .rm = destructive,
+   always last in the danger rail, never beside the primary. */
+.bf-act.rm{background:none; color:var(--danger); box-shadow:0 0 0 1.5px rgba(255,122,102,.4)}
+.bf-qt{appearance:none; -webkit-appearance:none; border:0; background:none; cursor:pointer;
+  display:flex; align-items:center; gap:6px; width:100%; min-height:38px; margin:2px 0 0;
+  padding:0 2px; color:var(--faint); font:700 12px/1 var(--body); text-align:left}
+.bf-qt:active{color:var(--accent)}
 .rc-acts{flex-wrap:wrap; gap:8px; min-height:0; padding-top:10px}
 .rc-acts .bf-act{min-height:40px; padding:0 14px; font-size:12px}
 .rc-acts:empty{display:none}
@@ -1279,6 +1303,22 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.9.0 • GROUPS OFF THE GLOBE + THE CONTROL CLEAN-UP (owner, two asks).
+//            ONE: groups are chart-only — an unpinned custom draws NOTHING
+//            on the globe (no star, no dot, no label, no tap target); its
+//            spot stays on the chain so connecting lines still route
+//            through. TWO: the controls got a design pass. Chart bar
+//            segments wear their category captions (LEVELS · STACK ·
+//            ZOOM, zoom on the right edge). Head tools are labeled chips —
+//            Names · Lines │ Briefs · Export — captions hide on the
+//            minimized pill. Object sheets now read top-to-bottom in one
+//            grammar: identity (rename/note as quiet text with the name) →
+//            ONE filled primary (⊕ Add a subordinate, or ★ Add to brief) →
+//            Quick add (counted category, folded when large) → Search all →
+//            Custom org → Appearance → Arrange (reports-to, order, hide) →
+//            Assets → a danger rail holding only Remove/Delete. Accordion
+//            headers stopped being gray slabs: engraved uppercase labels
+//            with a gold tick on hairline rules.
 //   v1.8.0 • BRIEFS TO THE BRIEF ROOM, THE PANEL BECOMES THE REPOSITORY
 //            (owner: "don't need a brief ledger — need to save briefs as a
 //            whole; as information is input on the map, need an organized
@@ -2201,7 +2241,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.8.0';
+const APP_VERSION = 'v1.9.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -4111,6 +4151,7 @@ function drawBriefNodes(ctx, m){
   for(const key of C.order){
     const n0=C.nodes[key];
     if(n0.kind==='state') continue;                   // v1.6.0: states are border-only — no dot, no fan seat
+    if(n0.kind==='custom' && !n0.pinned) continue;    // v1.9.0: GROUPS are chart-only — no globe presence at all
     if(n0.lat==null||n0.lon==null) continue;
     const fk=n0.lat.toFixed(4)+','+n0.lon.toFixed(4);
     _fanN[fk]=(_fanN[fk]||0)+1;
@@ -4131,6 +4172,12 @@ function drawBriefNodes(ctx, m){
     // v1.6.0 (owner): a state/territory shows ONLY its border — drawBriefStates
     // owns the outline and the label; no centroid dot, no dot-anchored label.
     if(n.kind==='state') continue;
+    // v1.9.0 (owner: "groups do not need a map data point in brief — they're
+    // used to group organizations on the hierarchy chart"): an UNPINNED custom
+    // (a group) draws nothing on the globe — no dot, no star, no label, no tap
+    // target. Its inherited coords stay on the chain node so arcs still route
+    // parent → group's spot → children (the connective tissue survives).
+    if(n.kind==='custom' && !n.pinned) continue;
     if(n.lat==null||n.lon==null) continue;
     const p=_projectLonLat(n.lon, n.lat, m);
     if(p[2]<0) continue;
@@ -5272,10 +5319,18 @@ function renderBrief(){
   const memN=(BRIEF.nodes||[]).length;
   let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
     +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
-    +'<span class="od-ico" data-bfbriefs="1" role="button" aria-label="Briefs — save or load a whole diagram" title="Briefs">▤</span>'
-    +'<span class="od-ico bf-vw'+(GlobeState._bfNamesOff?' off':'')+'" data-bfnm="1" role="button" aria-label="'+(GlobeState._bfNamesOff?'Show names on the globe':'Hide names on the globe')+'" title="Names on the globe">Aa</span>'
-    +'<span class="od-ico bf-vw'+(GlobeState._bfLinesOff?' off':'')+'" data-bfln="1" role="button" aria-label="'+(GlobeState._bfLinesOff?'Show connecting lines':'Hide connecting lines')+'" title="Connecting lines"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span>'
-    +'<span class="od-ico" data-xpbtn="1" role="button" aria-label="Export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span>'
+    // v1.9.0 (owner: label the tools): each head tool = icon chip + caption,
+    // clustered VIEW (Names · Lines) │ FILE (Briefs · Export). The data-
+    // attribute rides the wrapper — closest() delegation absorbs the move.
+    +'<span class="ch-tool'+(GlobeState._bfNamesOff?' off':'')+'" data-bfnm="1" role="button" aria-label="'+(GlobeState._bfNamesOff?'Show names on the globe':'Hide names on the globe')+'" title="Names on the globe">'
+      +'<span class="od-ico bf-vw'+(GlobeState._bfNamesOff?' off':'')+'">Aa</span><span class="ch-lbl">Names</span></span>'
+    +'<span class="ch-tool'+(GlobeState._bfLinesOff?' off':'')+'" data-bfln="1" role="button" aria-label="'+(GlobeState._bfLinesOff?'Show connecting lines':'Hide connecting lines')+'" title="Connecting lines">'
+      +'<span class="od-ico bf-vw'+(GlobeState._bfLinesOff?' off':'')+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span><span class="ch-lbl">Lines</span></span>'
+    +'<span class="ch-div" aria-hidden="true"></span>'
+    +'<span class="ch-tool" data-bfbriefs="1" role="button" aria-label="Briefs — save or load a whole diagram" title="Briefs">'
+      +'<span class="od-ico">▤</span><span class="ch-lbl">Briefs</span></span>'
+    +'<span class="ch-tool" data-xpbtn="1" role="button" aria-label="Export" title="Export">'
+      +'<span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span><span class="ch-lbl">Export</span></span>'
     +'</button>';
   if(!memN){
     h+='<div class="bf-empty"><b>The brief is empty</b>'
@@ -5303,8 +5358,10 @@ function renderBrief(){
   // ── the CONTROL BAR: fit/zoom + the depth dial. Minimal, one row.
   const zpc=GlobeState._bfZoom?(Math.round(GlobeState._bfZoom*100)+'%'):'Fit';
   const _deep=C.order.some(function(k){ return C.nodes[k].lvl>1; });   // v0.29.0 audit #24
+  // v1.9.0 (owner: "easily understand what each button does"): every segment
+  // wears its category caption — the bar reads LEVELS · STACK · ZOOM.
   h+='<div class="bf-bar">'
-    +(_deep?('<span class="bf-seg">'+[1,2,3,4].map(function(n){
+    +(_deep?('<span class="bf-seg bf-vseg"><span class="bf-vlab">LEVELS</span>'+[1,2,3,4].map(function(n){
         return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+'">L'+n+'</button>';
       }).join('')+'</span>'):'')
     // v1.5.0 — STACK: pick levels that lay out vertically (horizontal default)
@@ -5312,7 +5369,7 @@ function renderBrief(){
         const on=(BRIEF.vert||[]).indexOf(n)>=0;
         return '<button type="button" class="bf-dep'+(on?' on':'')+'" data-bfvert="'+n+'" aria-pressed="'+(on?'true':'false')+'" title="'+(on?'Lay L'+n+' out horizontally':'Stack L'+n+' vertically')+'">L'+n+'</button>';
       }).join('')+'</span>'):'')
-    +'<span class="bf-seg bf-zseg">'
+    +'<span class="bf-seg bf-zseg"><span class="bf-vlab">ZOOM</span>'
       +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">\u2212</button>'
       +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
       +'<button type="button" class="bf-zb" data-bfzoom="+" aria-label="Bigger">+</button>'
@@ -6402,8 +6459,12 @@ function _bfSelections(k){
   if(cur) apr+='<button type="button" class="bf-act" data-bfclr="'+escA(k)+'" data-bfc="">Reset to level color</button>';
   if(isState) apr+='<button type="button" class="bf-act'+(nd.sh?' in':'')+'" data-bfstripe="'+escA(k)+'">'
     +(nd.sh?'\u25a8 Striped fill ON':'\u25a8 Striped fill \u2014 stripe the state for attention')+'</button>';
-  let h=_disc('bf-appear'+(isState?'-st':''), isState?'Highlight color & stripes':'Color', apr, {def:false});
-  // ── position: re-parent anywhere (cycles refused), reorder among sisters
+  // v1.9.0 UI GRAMMAR (owner: "categories/information needs to be together"):
+  // this helper now returns exactly TWO categories — Appearance, then Arrange.
+  // The add-under primary moved to each sheet's BUILD slot (callers emit it),
+  // and the root hide/show toggle lives INSIDE Arrange (it is an arrangement
+  // concern — it used to float uncategorized between accordions).
+  let h=_disc('bf-appear'+(isState?'-st':''), isState?'Appearance · color & stripes':'Appearance · color', apr, {def:false});
   const desc={}; (function walk(x){ bfKids(x).forEach(function(c2){ desc[c2.k]=1; walk(c2.k); }); })(k);
   const opts=BRIEF.nodes.filter(function(x){ return x.k!==k && !desc[x.k]; });
   let pos='<div class="bf-sublab">Reports to</div>'
@@ -6415,18 +6476,22 @@ function _bfSelections(k){
   if(sibs.length>1) pos+='<div class="bf-sublab">Order \u00b7 '+(si+1)+' of '+sibs.length+'</div>'
     +'<div class="bf-ord"><button type="button" class="bf-act" data-bfmv="'+escA(k)+'" data-bfd="-1"'+(si<=0?' disabled':'')+'>\u25c0 Move left</button>'
     +'<button type="button" class="bf-act" data-bfmv="'+escA(k)+'" data-bfd="1"'+(si>=sibs.length-1?' disabled':'')+'>Move right \u25b6</button></div>';
-  h+=_disc('bf-pos', 'Position in the diagram', pos, {def:false});
-  // a ROOT can drop its whole component out of the picture (the old chart eye,
-  // now an option in the sheet rather than a chip on the diagram)
+  // the ROOT hide/show toggle rides inside Arrange (v1.9.0)
   if(!nd.p){
     const off=(BRIEF.hide||[]).indexOf(k)>=0;
-    h+='<button type="button" class="bf-act'+(off?'':' in')+'" data-bfeye="'+escA(k)+'">'
+    pos+='<button type="button" class="bf-act'+(off?'':' in')+'" data-bfeye="'+escA(k)+'">'
       +(off?'\u25c9 Show this component':'\u25cc Hide this component')+'</button>';
   }
-  // the whole point of a hierarchy: put an L2/L3/L4 under THIS specific organization
-  h+='<button type="button" class="bf-act in bf-addsub" data-bfsearch="1" data-bfunder="'+escA(k)+'">'
-    +'\u2295 Add a subordinate under '+esc(_bfNodeLbl(nd))+'</button>';
+  h+=_disc('bf-pos', 'Arrange \u00b7 reports to & order', pos, {def:false});
   return h;
+}
+// v1.9.0 \u2014 the BUILD primary every member sheet leads with: the ONE filled
+// action on the surface. Same data contract as always (search picker scoped
+// under this node); the long "\u2026under X" suffix lives in the aria-label.
+function _bfAddUnderBtn(k){
+  const nd=bfNode(k); if(!nd) return '';
+  return '<button type="button" class="bf-act bf-addsub" data-bfsearch="1" data-bfunder="'+_odEscA(k)+'"'
+    +' aria-label="Add a subordinate under '+_odEscA(_bfNodeLbl(nd))+'">\u2295 Add a subordinate</button>';
 }
 // v1.7.0 ASSET INVENTORY — the section every brief object sheet carries:
 // rows of QTY × description with remove, and an add form (text forms live in
@@ -6469,6 +6534,9 @@ function _bfPlainSheet(k){
     +'<div class="od-sub">'+(nd.t==='state'?'US state / territory \u00b7 outlined on the globe'
       :((nd.la!=null)?('Brief-only location \u00b7 at '+_odEsc(nd.bs||'its pinned spot'))
       :'Group \u00b7 a filler element on this diagram'))+'</div>';
+  // v1.9.0 identity zone: rename lives WITH the name (quiet text button),
+  // not in a footer rail \u2014 identity edits sit with the identity.
+  if(nd.t==='custom' && _bfRnEdit!==k) h+='<button class="bf-qt" type="button" data-bfrnedit="'+escA(k)+'">\u270e Rename</button>';
   // v1.0.3 \u2014 a group is the owner's own object, so it renames in place
   if(nd.t==='custom' && _bfRnEdit===k){
     h+='<div class="rc-form">'
@@ -6487,12 +6555,13 @@ function _bfPlainSheet(k){
     h+='<div class="rc-row"><i class="bf-ann">'+esc(nd.tx)+'</i>'
       +'<button class="od-ico rc-dots" type="button" data-bfannedit="'+escA(k)+'" aria-label="Edit note"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button></div>';
   }
+  // v1.9.0 order: note with identity · BUILD primary · Appearance/Arrange ·
+  // Assets · danger rail last (destructive only, never beside the primary)
+  if(!nd.tx && _bfAnnEdit!==k) h+='<button class="bf-qt" type="button" data-bfannedit="'+escA(k)+'">＋ Add note</button>';
+  h+=_bfAddUnderBtn(k);
   h+=_bfSelections(k);
   h+=_bfInvHTML(k);                                  // v1.7.0: assets on every brief object
-  h+='<div class="rc-row rc-acts">';
-  if(!nd.tx && _bfAnnEdit!==k) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(k)+'">Add note</button>';
-  if(nd.t==='custom' && _bfRnEdit!==k) h+='<button class="bf-act in" type="button" data-bfrnedit="'+escA(k)+'">Rename</button>';
-  h+='<button class="bf-act in" type="button" data-bfrm="'+escA(k)+'">Remove from brief</button></div>';
+  h+='<div class="rc-row rc-acts"><button class="bf-act rm" type="button" data-bfrm="'+escA(k)+'">Remove from brief</button></div>';
   const kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
   host.innerHTML=h;
   host.classList.remove('dz-peek','dz-half','dz-full');
@@ -6541,6 +6610,14 @@ function _bfObjSheet(id){
         +'</div>';
     }
   }
+  // v1.9.0 BUILD zone (owner: "logically read top to bottom — categories
+  // together"): note edit sits with identity, then the sheet's ONE filled
+  // primary — add-under for a member, Add-to-brief for a browsed org.
+  // note offer is MEMBER-only (review find, pre-existing): bfNote writes to
+  // the brief node — offering it on a not-yet-added org silently ate the text
+  if(sid && bfHas(sid) && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-qt" type="button" data-bfannedit="'+escA(sid)+'">＋ Add note</button>';
+  if(sid && bfHas(sid)) h+=_bfAddUnderBtn(_bfOrgId(sid)||sid);
+  else if(sid) h+='<button class="bf-act" type="button" data-bfadd="'+escA(sid)+'">★ Add to brief</button>';
   // v0.13.0 SUBORDINATES PICKER — the real A-ORG-1 kids of this org (plus its
   // user-built customs), one tap each. The brief grows ONLY this way (or ★):
   // no subtree ever auto-adds. Adding a kid pulls its parent in first so the
@@ -6558,19 +6635,22 @@ function _bfObjSheet(id){
     if(kidsAll.length){
       if(window._bfSubFor!==id){ window._bfSubFor=id; window._bfSubQ=''; }   // new subject: fresh filter
       const q=_srFold(window._bfSubQ||'');
-      h+='<div class="bf-subhead">Add a subordinate · tap + ('+kidsAll.length+')</div>';
-      if(kidsAll.length>8) h+='<input class="rc-in bf-subfilter" id="bfSubQ" type="text" placeholder="Filter '+kidsAll.length+' subordinates" value="'+escA(window._bfSubQ||'')+'" autocomplete="off">';
-      h+='<div class="bf-sub">';
+      // v1.9.0: the one-tap kid list is a counted CATEGORY (small litters
+      // arrive open, a 40-row litter arrives folded but countable)
+      let kh='<div class="bf-subhead">Real subordinates · tap +</div>';
+      if(kidsAll.length>8) kh+='<input class="rc-in bf-subfilter" id="bfSubQ" type="text" placeholder="Filter '+kidsAll.length+' subordinates" value="'+escA(window._bfSubQ||'')+'" autocomplete="off">';
+      kh+='<div class="bf-sub">';
       kidsAll.forEach(function(k){
         const isM=bfHas(k.id);
         const hs2=k.custom?null:siteById(ogEffSite(k.id)||'');
         const fold=_srFold(k.name+' '+(hs2?hs2.base:''));
-        h+='<div class="rc-row" data-bfsn="'+escA(fold)+'"'+((q && fold.indexOf(q)<0)?' hidden':'')+'><span class="rc-top">'+esc(k.name)+(k.custom?' *':'')+'</span>'
+        kh+='<div class="rc-row" data-bfsn="'+escA(fold)+'"'+((q && fold.indexOf(q)<0)?' hidden':'')+'><span class="rc-top">'+esc(k.name)+(k.custom?' *':'')+'</span>'
           +(hs2?('<span class="rc-sub">'+esc(hs2.base)+'</span>'):'')
           +'<button class="bf-subadd'+(isM?' in':'')+'" type="button" data-bfsub="'+escA(k.id)+'" data-bfhost="'+escA(id)+'" aria-label="'+(isM?'Remove from brief':'Add to brief')+'">'+(isM?'✓':'+')+'</button>'
           +'</div>';
       });
-      h+='</div>';
+      kh+='</div>';
+      h+=_disc('bf-kids', 'Quick add · subordinates', kh, {count:kidsAll.length, def:kidsAll.length<=8});
     }
   }
   // v0.23.0 — SEARCH is the primary way to add a real org (owner: "a search of
@@ -6578,7 +6658,7 @@ function _bfObjSheet(id){
   // adds any of the 1,399 real orgs (each mapped to a real location). The
   // free-text form below is now an explicit, clearly-labeled fallback for an org
   // that isn't in the app at all — collapsed by default so it's never in the way.
-  h+='<button class="rc-add" type="button" data-bfsearch="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg> Add another organization — search</button>';
+  h+='<button class="bf-act in" type="button" data-bfsearch="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="margin-right:7px"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.35-4.35"></path></svg>Search all organizations</button>';
   let customH='<div class="rc-note">Only for an organization that isn’t in the app. Everything already here is added by search above.</div>'
     +'<div class="rc-form">'
     +'<input class="rc-in" id="ogF1" type="text" maxlength="60" placeholder="Custom org name">'
@@ -6590,12 +6670,10 @@ function _bfObjSheet(id){
   h+=_disc('bf-custom','Add a custom org (advanced)', customH, {def:false});
   // v0.24.0: an org already IN the diagram gets the same selections
   if(sid && bfHas(sid)){ try{ const _ik=_bfOrgId(sid)||sid; h+=_bfSelections(_ik); h+=_bfInvHTML(_ik); }catch(_){} }   // v1.7.0: assets ride the org sheet too
-  // action rail: note · add/remove
+  // v1.9.0 danger rail: destructive only, always last, never beside the primary
   h+='<div class="rc-row rc-acts">';
-  if(sid && !BRIEF.ann[sid] && _bfAnnEdit!==sid) h+='<button class="bf-act in" type="button" data-bfannedit="'+escA(sid)+'">Add note</button>';
-  if(sid && bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfrm="'+escA(sid)+'">Remove from brief</button>';
-  if(sid && !bfHas(sid)) h+='<button class="bf-act in" type="button" data-bfadd="'+escA(sid)+'">Add to brief</button>';
-  if(o) h+='<button class="bf-act in" type="button" data-orgrm="'+escA(id)+'">Delete org</button>';
+  if(sid && bfHas(sid)) h+='<button class="bf-act rm" type="button" data-bfrm="'+escA(sid)+'">Remove from brief</button>';
+  if(o) h+='<button class="bf-act rm" type="button" data-orgrm="'+escA(id)+'">Delete org</button>';
   h+='</div>';
   const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
   host.innerHTML=h;
@@ -7541,7 +7619,8 @@ function _bfFrame(){
 }
 function _xpPulse(){
   try{
-    const b=document.querySelector('#briefStage [data-xpbtn]'); if(!b) return;
+    let b=document.querySelector('#briefStage [data-xpbtn]'); if(!b) return;
+    b=(b.querySelector && b.querySelector('.od-ico'))||b;   // v1.9.0: pulse the circle, not the labeled wrapper
     b.classList.remove('xp-pulse'); void b.offsetWidth;   // restart the beat
     b.classList.add('xp-pulse');
     setTimeout(function(){ try{ b.classList.remove('xp-pulse'); }catch(_){} }, 2900);

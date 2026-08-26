@@ -1014,3 +1014,31 @@ closeouts. The stepping label POLICY is now load-bearing:
   _ldSel closure var (the _rcForm lesson again). window.Ledger is gone.
 - Repository refresh moved into _dbApply's `took` block — ANY merge
   (records included) re-renders an open panel, not just the briefs blob.
+
+## v1.9.0 — groups off the globe + the control clean-up (owner, two asks)
+- GROUPS ARE CHART-ONLY: drawBriefNodes skips kind 'custom' && !pinned in
+  BOTH the fan pre-pass and the draw loop (symmetric, like states) — no
+  star/dot/label/_screen entry. Inherited coords STAY on the chain node so
+  arcs route parent → group spot → children. Pinned places (la!=null) keep
+  their stars.
+- UI GRAMMAR LAWS (born from a 3-agent design panel + 3-lens adversarial
+  review, both clean):
+  · Bar segments wear caption chips (.bf-vlab): LEVELS · STACK · ZOOM;
+    .bf-zseg{margin-left:auto} keeps structure left, view right.
+  · Head tools = .ch-tool wrapper (carries the data- attribute; inner
+    .od-ico/.ch-lbl are pointer-events:none) + .ch-lbl caption; clusters
+    VIEW │ FILE split by .ch-div; captions hide under body.chart-min.
+    Handler branches MUST stay above data-chmin (v0.26.0 trap).
+  · Sheets read: identity (rename/note = .bf-qt quiet text WITH the name)
+    → ONE filled primary (.bf-act bf-addsub via _bfAddUnderBtn, or
+    ★ Add to brief for non-members) → Quick add disc (counted, folded >8)
+    → Search all → Custom disc → Appearance disc → Arrange disc (reports-to,
+    order, AND the root hide toggle) → Assets disc → danger rail (.bf-act.rm,
+    Remove/Delete ONLY, always last). One primary per sheet, ever.
+  · .disc-h is a category header (uppercase mono + gold tick on hairline),
+    NOT a gray slab — the restyle covers all nine _disc call sites.
+- Review find fixed (pre-existing): Add-note is MEMBER-gated — bfNote
+  writes to the brief node, so a non-member sheet offering it silently ate
+  the text. Smoke enforces: non-member sheet = no data-bfannedit, leads
+  with data-bfadd. _xpPulse pulses the inner .od-ico circle, not the
+  labeled wrapper.
