@@ -1214,6 +1214,17 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.4.2 • THE FAN (owner: "some selections get stuck over others").
+//            Brief objects sharing one location — JBLM RSN + JBLM ECCSP,
+//            the Fort Bragg pair, anything else stacked on a base — piled
+//            their dots on a single point: the one underneath was invisible
+//            and untappable, and its label could drop. Co-located objects
+//            now spread on a small ring around the true spot (deterministic
+//            by chain order): every dot visible, every dot tappable, every
+//            label anchored to its own dot. Solo objects sit exactly on
+//            their spot, as before. Chart and selections sheet were probed
+//            for the same complaint and measured clean (zero overlapping
+//            controls) — the pile-up was the globe's.
 //   v1.4.1 • NAMES VERBATIM (owner: "All RSNs and ECCSPs should be labeled
 //            'name RSN' or 'name ECCSP'"). The abbreviator was squeezing
 //            owner-named objects to their all-caps token — "California RSN"
@@ -2058,7 +2069,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.4.1';
+const APP_VERSION = 'v1.4.2';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3912,12 +3923,31 @@ function drawBriefNodes(ctx, m){
   const zb=Math.min(2.4, 1 + (GlobeState.zoom-1)*0.14);
   const zb2=Math.min(2.1, 0.85+zb*0.16);
   const dotsOff=!!GlobeState._dotsOff, namesOff=!!GlobeState._namesOff;
+  // v1.4.2 THE FAN (owner: "some selections get stuck over others") — objects
+  // sharing one spot (JBLM RSN + JBLM ECCSP…) no longer pile on a single dot:
+  // co-located nodes spread on a small screen-space ring around the true
+  // point, deterministic by chain order, so every dot is visible, tappable,
+  // and anchors its own label. Solo nodes sit exactly on their spot.
+  const _fanN={}, _fanI={};
+  for(const key of C.order){
+    const n0=C.nodes[key];
+    if(n0.lat==null||n0.lon==null) continue;
+    const fk=n0.lat.toFixed(4)+','+n0.lon.toFixed(4);
+    _fanN[fk]=(_fanN[fk]||0)+1;
+  }
   for(const key of C.order){
     const n=C.nodes[key];
     if(n.lat==null||n.lon==null) continue;
     const p=_projectLonLat(n.lon, n.lat, m);
     if(p[2]<0) continue;
-    const sx=p[0], sy=p[1], fade=Math.max(0.3, p[2]);
+    let sx=p[0], sy=p[1];
+    const fade=Math.max(0.3, p[2]);
+    const _fk=n.lat.toFixed(4)+','+n.lon.toFixed(4);
+    if(_fanN[_fk]>1){
+      const _i=(_fanI[_fk]=(_fanI[_fk]||0)+1)-1, _c=_fanN[_fk];
+      const _r=(_c===2?9:13), _a=-Math.PI/2 + _i*(Math.PI*2/_c);
+      sx+=Math.cos(_a)*_r; sy+=Math.sin(_a)*_r;
+    }
     const dotR=(n.tier===1?3.4:(n.tier===2?3.0:2.7))*zb2;
     if(!dotsOff){
       ctx.globalAlpha=fade;
