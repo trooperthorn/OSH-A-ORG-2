@@ -1113,3 +1113,10 @@ closeouts. The stepping label POLICY is now load-bearing:
   brings back last-drawn-wins overwriting on shared borders.
 - Canvas proof pattern: pixel-scan getImageData for both hex colors and
   assert a cross-color pair within a few px along the border.
+
+## v1.11.2 — uniform objects (owner reference chart)
+- LAW: every .bf-box is EXACTLY 124×48 (fixed width AND height,
+  box-sizing:border-box), content centered, .bf-nm/.bf-st truncate at
+  102px. Never let content stretch a card — the diagram sits on one grid.
+  Verified by measuring offsetWidth×offsetHeight across mixed kinds
+  (org/group/place/state) and asserting ONE unique size.

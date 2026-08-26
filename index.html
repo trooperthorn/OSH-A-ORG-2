@@ -645,8 +645,12 @@ body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
    or the owner's picked swatch, name in heavy ink computed for contrast
    (_bfInk). No washes, no rings, no gloss — fill + ink + one soft drop. */
 .bf-box{position:relative; cursor:pointer; -webkit-tap-highlight-color:transparent;
-  min-width:66px; max-width:132px; padding:8px 13px 7px; border-radius:13px;
-  display:flex; flex-direction:column; align-items:center; gap:2px;
+  /* v1.11.2 (owner reference chart: "objects should be uniform in shape and
+     size"): ONE card size for every object — fixed width, fixed height,
+     content centered; names/stations truncate instead of stretching. */
+  width:124px; min-width:124px; max-width:124px; height:48px; box-sizing:border-box;
+  padding:6px 11px; border-radius:13px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
   background:var(--bfc,var(--t1)); color:var(--bfink,#FDF8E7);
   /* v1.9.1 CRISP PASS (owner: "sleek/modern, crisp/clean, iOS fluidity"):
      layered shadow (contact line + soft ambient) and springy transform
@@ -662,9 +666,9 @@ body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
 /* v1.10.0 — a box that just joined the diagram springs in (FLIP enter state) */
 .bf-box.bf-enter{opacity:0; transform:scale(.85)}
 .bf-nm{font:900 10.5px/1.25 var(--body); color:var(--bfink,#FDF8E7); letter-spacing:.01em;
-  max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  max-width:102px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bf-st{font:600 8.5px/1.2 var(--mono); letter-spacing:.03em; color:var(--bfink,#FDF8E7); opacity:.7;
-  max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  max-width:102px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bf-t1{--bfc:var(--t1)} .bf-t2{--bfc:var(--t2)} .bf-t3{--bfc:var(--t3)} .bf-t4{--bfc:var(--t4)}
 .bf-box.bf-dim{opacity:.28}
 .bf-box.bf-foc{box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(var(--accent-rgb),.35)}
@@ -1339,6 +1343,12 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.11.2 • UNIFORM OBJECTS (owner reference chart: "objects on chart
+//            should be uniform in terms of shape and size"). One card size
+//            for every chart object — 124×48, content centered, names and
+//            station lines truncate with an ellipsis instead of stretching
+//            the card. Columns align, rows read level, the whole diagram
+//            sits on one grid like the reference.
 //   v1.11.1 • THE DOUBLE BORDER (owner: "when bordering states have
 //            different color outlines, do a double line on the shared
 //            border so each state is fully outlined by the selected
@@ -2323,7 +2333,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.11.1';
+const APP_VERSION = 'v1.11.2';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
