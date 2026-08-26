@@ -645,11 +645,20 @@ body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
    or the owner's picked swatch, name in heavy ink computed for contrast
    (_bfInk). No washes, no rings, no gloss — fill + ink + one soft drop. */
 .bf-box{position:relative; cursor:pointer; -webkit-tap-highlight-color:transparent;
-  min-width:66px; max-width:132px; padding:7px 11px; border-radius:11px;
-  display:flex; flex-direction:column; align-items:center; gap:1px;
-  background:var(--bfc,var(--t1)); color:var(--bfink,#FDF8E7); box-shadow:var(--drop);
-  transition:box-shadow .16s ease, opacity .16s ease, filter .16s ease}
-.bf-box:active{filter:brightness(1.12)}
+  min-width:66px; max-width:132px; padding:8px 13px 7px; border-radius:13px;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  background:var(--bfc,var(--t1)); color:var(--bfink,#FDF8E7);
+  /* v1.9.1 CRISP PASS (owner: "sleek/modern, crisp/clean, iOS fluidity"):
+     layered shadow (contact line + soft ambient) and springy transform
+     feedback instead of the flat brightness blink */
+  box-shadow:0 1px 1.5px rgba(20,14,4,.20), 0 6px 18px rgba(20,14,4,.15);
+  transition:transform .22s cubic-bezier(.32,1.4,.45,1), box-shadow .22s ease, opacity .18s ease;
+  will-change:transform}
+.bf-box:active{transform:scale(.96)}
+@media(hover:hover){
+  .bf-box:hover{transform:translateY(-1.5px);
+    box-shadow:0 2px 3px rgba(20,14,4,.18), 0 10px 26px rgba(20,14,4,.22)}
+}
 .bf-nm{font:900 10.5px/1.25 var(--body); color:var(--bfink,#FDF8E7); letter-spacing:.01em;
   max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .bf-st{font:600 8.5px/1.2 var(--mono); letter-spacing:.03em; color:var(--bfink,#FDF8E7); opacity:.7;
@@ -658,25 +667,34 @@ body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
 .bf-box.bf-dim{opacity:.28}
 .bf-box.bf-foc{box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(var(--accent-rgb),.35)}
 /* v1.0.3 GROUPS — an owner-named filler element that shapes the hierarchy.
-   v1.3.0: the matte fill stays; the dash moves to INK so filler still reads
-   as structure on any color. */
-.bf-box.bf-grp{outline:1.4px dashed color-mix(in srgb, var(--bfink,#FDF8E7) 60%, transparent);
-  outline-offset:-3px}
-.bf-grptag{font:700 7px/1 var(--mono); letter-spacing:.16em; color:var(--bfink,#FDF8E7); opacity:.6}
+   v1.9.1 (owner: "looks like edit mode in Word"): the dashed ring is RETIRED —
+   the engraved GROUP kicker alone marks filler. Same crisp box as everything. */
+.bf-grptag{font:700 7px/1 var(--mono); letter-spacing:.18em; color:var(--bfink,#FDF8E7); opacity:.55; margin-top:1px}
 /* the fold caret sits under its box and carries the hidden count */
 /* v0.26.0 — the per-object ops: ＋ add subordinates · ✎ edit. Small and quiet so
    the box stays minimal, but always reachable without opening anything first. */
-.bf-ops{display:flex; gap:4px; margin-top:4px}
+.bf-ops{display:flex; gap:7px; margin-top:5px; width:100%; justify-content:center}
 .bf-op{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:0;
-  width:20px; height:20px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;
-  background:color-mix(in srgb, var(--bfink,#FDF8E7) 14%, transparent); color:var(--bfink,#FDF8E7);
-  font:800 12px/1 var(--body)}
-.bf-op:active{filter:brightness(1.3)}
+  width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  background:color-mix(in srgb, var(--bfink,#FDF8E7) 12%, transparent); color:var(--bfink,#FDF8E7);
+  font:700 13px/1 var(--body);
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1), background .16s ease}
+.bf-op:active{transform:scale(.86); background:color-mix(in srgb, var(--bfink,#FDF8E7) 22%, transparent)}
+@media(hover:hover){ .bf-op:hover{background:color-mix(in srgb, var(--bfink,#FDF8E7) 20%, transparent)} }
 .bf-box.bf-dim .bf-ops{opacity:.5}
 .bf-caret{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:3px 0 0;
-  padding:1px 7px; border-radius:7px; background:var(--panel-2); color:var(--dim);
-  box-shadow:0 0 0 1px var(--line); font:800 8.5px/1.5 var(--mono); letter-spacing:.04em}
+  padding:2px 9px; border-radius:999px; background:var(--panel-2); color:var(--dim);
+  box-shadow:0 0 0 1px var(--line); font:800 8.5px/1.5 var(--mono); letter-spacing:.04em;
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1), color .16s ease, box-shadow .16s ease}
+.bf-caret:active{transform:scale(.9)}
 .bf-caret.on{color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+/* v1.9.1 micro-motion — every chart control answers the finger (iOS grammar) */
+.bf-dep,.bf-zb,.bf-zpct{transition:transform .15s cubic-bezier(.34,1.56,.64,1), background .15s ease, color .15s ease}
+.bf-dep:active,.bf-zb:active,.bf-zpct:active{transform:scale(.9)}
+.bf-act{transition:transform .16s cubic-bezier(.32,1.4,.45,1), filter .16s ease}
+.bf-act:active{transform:scale(.98)}
+.ch-tool .od-ico{transition:transform .16s cubic-bezier(.34,1.56,.64,1)}
+.ch-tool:active .od-ico{transform:scale(.86)}
 /* the control bar — depth dial + zoom, one quiet row */
 /* the armed "adding under X" bar — says where the next pick will land */
 /* v0.26.0 — the ＋ multi-select picker */
@@ -1303,6 +1321,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.9.1 • THE CRISP PASS (owner: "still looks like edit mode in Word —
+//            dotted outlines, buttons off, fill off. I want iOS/Twitter
+//            fluidity and a sleek, crisp, clean look"). The dashed group
+//            ring is RETIRED — the engraved GROUP kicker alone marks
+//            filler, so groups wear the same clean matte box as every
+//            object. Boxes: layered contact+ambient shadows, 13px radius,
+//            springy press (scale .96) and desktop hover lift instead of
+//            the flat brightness blink. The ＋/✎ ops are perfect circles,
+//            truly centered, translucent-ink fills with a spring press.
+//            Fold carets are round pills that answer the finger; every bar
+//            segment, head tool and sheet button gained the same
+//            spring-curve micro-motion. CSS only — zero behavior change.
 //   v1.9.0 • GROUPS OFF THE GLOBE + THE CONTROL CLEAN-UP (owner, two asks).
 //            ONE: groups are chart-only — an unpinned custom draws NOTHING
 //            on the globe (no star, no dot, no label, no tap target); its
@@ -2241,7 +2271,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.9.0';
+const APP_VERSION = 'v1.9.1';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first

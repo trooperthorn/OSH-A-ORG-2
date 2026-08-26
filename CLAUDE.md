@@ -1042,3 +1042,16 @@ closeouts. The stepping label POLICY is now load-bearing:
   the text. Smoke enforces: non-member sheet = no data-bfannedit, leads
   with data-bfadd. _xpPulse pulses the inner .od-ico circle, not the
   labeled wrapper.
+
+## v1.9.1 — the crisp pass (owner: "Word edit mode" → "iOS/Twitter fluidity, sleek/crisp/clean")
+- DASHED RING RETIRED for groups — the engraved GROUP kicker is the ONLY
+  filler marker. Never bring back dotted/dashed outlines on chart objects.
+- Box law: matte fill + layered shadow (1px contact + soft ambient), 13px
+  radius, springy press (scale .96, cubic-bezier(.32,1.4,.45,1)) and
+  desktop hover lift. No brightness blinks.
+- Ops law: ＋/✎ are 22px CIRCLES, ink at 12% fill, centered via
+  .bf-ops{width:100%; justify-content:center}, spring press to .86.
+- Micro-motion grammar: every chart control (segments, zoom, carets, head
+  tools, sheet buttons) answers the finger with a spring-curve transform —
+  cubic-bezier(.34,1.56,.64,1) for small chips, (.32,1.4,.45,1) for cards.
+  New interactive chrome must ship with this feedback.
