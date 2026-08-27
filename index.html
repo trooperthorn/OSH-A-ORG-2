@@ -532,17 +532,19 @@ body.chart-min #briefStage > :not(.ch-head){display:none}
 body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
-.ch-head{display:flex; align-items:center; gap:8px; width:100%; border:none; background:none;
+.ch-head{display:flex; align-items:center; flex-wrap:wrap; gap:6px 8px; width:100%; border:none; background:none;
   margin:0 0 4px; padding:2px 0; cursor:pointer; -webkit-tap-highlight-color:transparent;
   font:800 10.5px/1 var(--body); letter-spacing:.22em; color:var(--faint); text-align:left}
-.ch-head .ch-n{margin-left:auto; letter-spacing:.06em; color:var(--dim)}
+/* v1.13.0 — the title text is gone; ⌗ alone marks the fold handle */
+.ch-mk{flex:none; font-size:13px; color:var(--dim); padding:0 2px}
+body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc{display:none}
 /* v1.5.1 — brief-only view toggles on the chart head: names + connecting
    lines. ON = accent; OFF = dimmed hollow. Map room never sees these. */
 .ch-head .bf-vw{color:var(--accent)}
 /* v1.9.0 — LABELED HEAD TOOLS · v1.12.1 THE DOCK: the four tools live in one
    dark pill (owner reference: iOS toolbar, amber active slot). Uniform 40px
    slots, gold circle = toggle ON, hairline divider between VIEW and FILE. */
-.ch-dock{display:inline-flex; align-items:flex-start; gap:1px; margin-left:8px;
+.ch-dock{display:inline-flex; align-items:flex-start; gap:1px; margin-left:auto;
   background:#141006; border-radius:22px; padding:5px 7px 3px;
   box-shadow:0 1px 2px rgba(20,14,4,.28)}
 .ch-tool{display:inline-flex; flex-direction:column; align-items:center; gap:1px; min-width:40px;
@@ -781,21 +783,28 @@ body.chart-min .ch-dock{padding:3px 6px; border-radius:999px; align-items:center
 #briefStage .bf-foot{display:flex; padding-top:8px}
 #briefStage .bf-foot .bf-act{margin:0 auto; min-height:34px; padding:0 14px;
   border-radius:17px; font:700 11px/1 var(--body)}
-.bf-bar{display:flex; align-items:center; gap:6px; padding:5px 0 6px; flex-wrap:wrap}
-/* v1.11.0 (owner: "fit highlight and buttons look off") — iOS segmented
-   control: one quiet track, transparent cells, the ON cell is a filled gold
-   pill. Rules scoped under .bf-seg so the legacy .bf-depth block can't win. */
+/* v1.11.0 iOS segments · v1.13.0 (owner: "same black and gold color scheme"):
+   the tracks wear the DOCK's material now — dark pill, cream cells, gold ON.
+   The separate .bf-bar row is retired; tracks live in the head. */
 .bf-seg{display:inline-flex; align-items:center; gap:2px; padding:3px;
-  border-radius:999px; background:rgba(0,0,0,.07); box-shadow:inset 0 0 0 1px var(--line)}
+  border-radius:999px; background:#141006; box-shadow:0 1px 2px rgba(20,14,4,.28)}
 .bf-seg .bf-dep,.bf-seg .bf-zb,.bf-seg .bf-zpct{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
-  background:none; box-shadow:none; color:var(--dim); font:700 9.5px/1 var(--mono); letter-spacing:.05em;
-  padding:5px 9px; border-radius:999px}
+  background:none; box-shadow:none; color:rgba(242,228,188,.72); font:700 9.5px/1 var(--mono); letter-spacing:.05em;
+  padding:5px 9px; border-radius:999px; -webkit-touch-callout:none; user-select:none}
 .bf-seg .bf-dep.on{color:#141006; background:var(--accent); box-shadow:0 1px 2px rgba(20,14,4,.25)}
 .bf-seg .bf-zpct{min-width:46px; text-align:center}
 .bf-seg .bf-zb{font-size:12px; color:var(--accent); padding:5px 8px}
-.bf-clearfoc{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin-left:auto;
-  padding:6px 10px; border-radius:9px; background:rgba(0,0,0,.28); box-shadow:0 0 0 1px var(--line);
+.bf-seg .bf-vlab{color:rgba(242,228,188,.5)}
+.bf-clearfoc{appearance:none;-webkit-appearance:none; border:0; cursor:pointer;
+  padding:6px 10px; border-radius:999px; background:#141006; box-shadow:0 1px 2px rgba(20,14,4,.28);
   color:var(--accent); font:700 9.5px/1 var(--mono); letter-spacing:.04em}
+/* v1.13.0 — the hold-a-level STACK popover */
+#bfStackPop{position:absolute; z-index:6}
+#bfStackPop .bf-sp{appearance:none;-webkit-appearance:none; border:0; cursor:pointer;
+  background:#141006; color:#F2E4BC; font:700 10px/1 var(--mono); letter-spacing:.08em;
+  padding:10px 14px; border-radius:999px;
+  box-shadow:0 6px 18px rgba(20,14,4,.4), 0 0 0 1px rgba(242,228,188,.22)}
+#bfStackPop .bf-sp.on{background:var(--accent); color:#141006}
 /* v0.13.0 THE HAND-BUILT BRIEF: echelon depth control · per-HQ group eyes */
 .bf-depth{display:flex; gap:4px; padding:5px 0 7px}
 .bf-dep{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin:0;
@@ -1362,6 +1371,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.13.0 • THE CONSOLE (owner: "create a lot of space — black and gold
+//            everywhere, drop the crossed-out text, L1-L4 at the top, no
+//            duplicate STACK bar; hold a level for a stack pop-up"). The
+//            chart chrome collapsed into ONE head row: ⌗ fold handle, the
+//            L1-L4 track, the ZOOM track and the tool dock — every control
+//            in the dock's black-and-gold material. "⌗ CHART" and the org
+//            count are gone; the whole freed band belongs to the diagram.
+//            STACK's track is retired: HOLD L2/L3/L4 (~half a second) and
+//            a dark popover appears under the cell — tap it to stack that
+//            level vertically, tap again to lay it flat. Same data
+//            contract underneath; the head is a div now (real buttons ride
+//            inside it), and track taps are excluded from the minimize.
 //   v1.12.1 • THE DOCK (owner: "controls look a bit junior — uneven, not
 //            centered, not uniform; expert-level, like the references").
 //            The four head tools live in ONE dark pill dock now — uniform
@@ -2386,7 +2407,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.12.1';
+const APP_VERSION = 'v1.13.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -5468,8 +5489,40 @@ function renderBrief(){
   const _flip=_bfFlipCapture(el);                  // v1.10.0 FLUID CHART: remember where every box IS
   const esc=_odEsc, escA=_odEscA;
   const memN=(BRIEF.nodes||[]).length;
-  let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
-    +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
+  // v1.13.0 (owner: "create a lot of space — drop the crossed-out text, move
+  // the controls up"): the chart/orgs title text is GONE; the chain map and
+  // view state compute FIRST so the L1-L4 and ZOOM tracks live IN the head
+  // row, dark like the dock. STACK's track is gone too — hold a level cell
+  // for the stack popover (_bfStackPop).
+  let C=null, dep=4, hid=null, fold=null, foc=null, branch=null, lineage={}, zpc='Fit', _deep=false;
+  if(memN){
+    C=_briefChainMap({all:true});
+    dep=GlobeState._bfDepth||4;
+    hid=new Set(BRIEF.hide||[]);
+    fold=GlobeState._bfFold||(GlobeState._bfFold={});
+    foc=(GlobeState._bfFocus && C.nodes[GlobeState._bfFocus])?GlobeState._bfFocus:null;
+    if(GlobeState._bfFocus && !foc) GlobeState._bfFocus=null;
+    if(foc){
+      branch=new Set(); let c=foc,g=0;
+      while(c!=null && g++<60){ branch.add(c); const pn=C.nodes[c]; c=pn?pn.parent:null; if(c) lineage[c]=1; }
+      const q=[foc]; while(q.length){ const cur=q.shift(); C.order.forEach(function(k){ if(C.nodes[k].parent===cur && !branch.has(k)){ branch.add(k); q.push(k); } }); }
+    }
+    zpc=GlobeState._bfZoom?(Math.round(GlobeState._bfZoom*100)+'%'):'Fit';
+    _deep=C.order.some(function(k){ return C.nodes[k].lvl>1; });   // v0.29.0 audit #24
+  }
+  // the head is a DIV (real <button> tracks live inside it now — buttons
+  // cannot nest); data-chmin + role button keep the tap contract.
+  let h='<div class="ch-head" data-chmin="1" role="button" tabindex="0" aria-label="Minimize or expand the chart">'
+    +'<span class="ch-mk">⌗</span>'
+    +((memN&&_deep)?('<span class="bf-seg bf-vseg">'+[1,2,3,4].map(function(n){
+        return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+' — hold to stack">L'+n+'</button>';
+      }).join('')+'</span>'):'')
+    +(memN?('<span class="bf-seg bf-zseg"><span class="bf-vlab">ZOOM</span>'
+      +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">−</button>'
+      +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
+      +'<button type="button" class="bf-zb" data-bfzoom="+" aria-label="Bigger">+</button>'
+    +'</span>'):'')
+    +((memN&&foc)?'<button type="button" class="bf-clearfoc" data-bffocusclear="1">Show all ✕</button>':'')
     // v1.9.0 (owner: label the tools) · v1.12.1 THE DOCK (owner reference:
     // the dark iOS pill toolbar, one amber active slot): the four tools live
     // in ONE dark pill — uniform slots, gold circle = toggle ON. The data-
@@ -5485,7 +5538,7 @@ function renderBrief(){
     +'<span class="ch-tool" data-xpbtn="1" role="button" aria-label="Export" title="Export">'
       +'<span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span><span class="ch-lbl">Export</span></span>'
     +'</span>'
-    +'</button>';
+    +'</div>';
   if(!memN){
     h+='<div class="bf-empty"><b>The brief is empty</b>'
       +'<span>Search an organization or a US state below to place it on the diagram.</span>'
@@ -5496,40 +5549,8 @@ function renderBrief(){
       +'</div>';
     el.innerHTML=h; return;
   }
-  const C=_briefChainMap({all:true});
-  const dep=GlobeState._bfDepth||4;
-  const hid=new Set(BRIEF.hide||[]);
-  const fold=GlobeState._bfFold||(GlobeState._bfFold={});
-  // v0.20.0 FOCUS — one branch at a time; the rest dims
-  const foc=(GlobeState._bfFocus && C.nodes[GlobeState._bfFocus])?GlobeState._bfFocus:null;
-  if(GlobeState._bfFocus && !foc) GlobeState._bfFocus=null;
-  let branch=null, lineage={};
-  if(foc){
-    branch=new Set(); let c=foc,g=0;
-    while(c!=null && g++<60){ branch.add(c); const pn=C.nodes[c]; c=pn?pn.parent:null; if(c) lineage[c]=1; }
-    const q=[foc]; while(q.length){ const cur=q.shift(); C.order.forEach(function(k){ if(C.nodes[k].parent===cur && !branch.has(k)){ branch.add(k); q.push(k); } }); }
-  }
-  // ── the CONTROL BAR: fit/zoom + the depth dial. Minimal, one row.
-  const zpc=GlobeState._bfZoom?(Math.round(GlobeState._bfZoom*100)+'%'):'Fit';
-  const _deep=C.order.some(function(k){ return C.nodes[k].lvl>1; });   // v0.29.0 audit #24
-  // v1.9.0 (owner: "easily understand what each button does"): every segment
-  // wears its category caption — the bar reads LEVELS · STACK · ZOOM.
-  h+='<div class="bf-bar">'
-    +(_deep?('<span class="bf-seg bf-vseg"><span class="bf-vlab">LEVELS</span>'+[1,2,3,4].map(function(n){
-        return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+'">L'+n+'</button>';
-      }).join('')+'</span>'):'')
-    // v1.5.0 — STACK: pick levels that lay out vertically (horizontal default)
-    +(_deep?('<span class="bf-seg bf-vseg"><span class="bf-vlab">STACK</span>'+[2,3,4].map(function(n){
-        const on=(BRIEF.vert||[]).indexOf(n)>=0;
-        return '<button type="button" class="bf-dep'+(on?' on':'')+'" data-bfvert="'+n+'" aria-pressed="'+(on?'true':'false')+'" title="'+(on?'Lay L'+n+' out horizontally':'Stack L'+n+' vertically')+'">L'+n+'</button>';
-      }).join('')+'</span>'):'')
-    +'<span class="bf-seg bf-zseg"><span class="bf-vlab">ZOOM</span>'
-      +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">\u2212</button>'
-      +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
-      +'<button type="button" class="bf-zb" data-bfzoom="+" aria-label="Bigger">+</button>'
-    +'</span>';
-  if(foc) h+='<button type="button" class="bf-clearfoc" data-bffocusclear="1">Show all \u2715</button>';
-  h+='</div>';
+  // (v1.13.0: the chain map, focus walk and the LEVELS/ZOOM tracks moved UP
+  // into the head build — the separate control bar is retired.)
   // ── ONE BOX. Minimal by design: the name, a station line only when it adds
   // something, and a fold caret carrying the hidden-descendant count.
   const kidsOf=function(k){ return C.order.filter(function(x){ return C.nodes[x].parent===k; }); };
@@ -7127,8 +7148,15 @@ if(!window._odWired){
       return; }
     const bey=e.target.closest('[data-bfeye]');
     if(bey){ const k=bey.getAttribute('data-bfeye'); bfEye(k); try{ _bfObjSheet(k); }catch(_){} return; }
+    // v1.13.0: a tap anywhere outside the stack popover dismisses it — EXCEPT
+    // the click that ends the long-press which just opened it (that click
+    // arrives here with _bfLpFired still up; eating the pop then would make
+    // it flash and vanish before the finger ever left the glass)
+    try{ const _sp0=document.getElementById('bfStackPop'); if(_sp0 && !_bfLpFired && !e.target.closest('#bfStackPop')) _sp0.remove(); }catch(_){}
     const bdp=e.target.closest('[data-bfdepth]');
-    if(bdp){ bfDepth(bdp.getAttribute('data-bfdepth')); return; }
+    if(bdp){
+      if(_bfLpFired){ _bfLpFired=false; return; }   // the long-press already opened the stack popover — swallow this click
+      bfDepth(bdp.getAttribute('data-bfdepth')); return; }
     const bvt=e.target.closest('[data-bfvert]');
     if(bvt){ bfStack(bvt.getAttribute('data-bfvert')); return; }
     const br=e.target.closest('[data-bfrm]');
@@ -7317,7 +7345,7 @@ if(!window._odWired){
     if(bln){ GlobeState._bfLinesOff=!GlobeState._bfLinesOff;
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
     const cm=e.target.closest('[data-chmin]');
-    if(cm){ if(!e.target.closest('[data-xpbtn]')){
+    if(cm){ if(!e.target.closest('[data-xpbtn],[data-bfzoom],[data-bfdepth],[data-bffocusclear]')){   // v1.13.0: tracks live IN the head — their taps never minimize
         document.body.classList.toggle('chart-min');
         try{ if(_coAt) calloutHide(); }catch(_){}          // chip anchors die with their chips
       } return; }
@@ -7936,6 +7964,49 @@ function bfNote(id, text){
 // v1.5.0 — STACK A LEVEL (owner: "pick a level L2, L3, L4 to stack
 // vertically; keep horizontal by default"). Toggles ride the diagram: kv,
 // the board, every device.
+// v1.13.0 THE STACK POPOVER (owner: "no duplicate bar for stack — hold the
+// level and a stack pop-up is clicked"). Hold L2/L3/L4 in the head track for
+// ~half a second and a small dark chip appears under the cell; tapping it
+// fires the SAME data-bfvert contract the old track used. Tap-away or any
+// re-render dismisses it. L1 never stacks (columns start at L2).
+let _bfLpT=null, _bfLpFired=false, _bfLpX=0, _bfLpY=0;
+function _bfStackPopHide(){ try{ const p=document.getElementById('bfStackPop'); p&&p.remove(); }catch(_){} }
+function _bfStackPop(lvl){
+  const el=document.getElementById('briefStage'); if(!el) return;
+  _bfStackPopHide();
+  lvl=+lvl; if(!(lvl>=2&&lvl<=4)) return;
+  const on=(BRIEF.vert||[]).indexOf(lvl)>=0;
+  const pop=document.createElement('div');
+  pop.id='bfStackPop';
+  pop.innerHTML='<button type="button" class="bf-sp'+(on?' on':'')+'" data-bfvert="'+lvl+'">⇅ '
+    +(on?('L'+lvl+' stacked — tap to lay flat'):('Stack L'+lvl+' vertically'))+'</button>';
+  el.appendChild(pop);
+  try{
+    const cell=el.querySelector('[data-bfdepth="'+lvl+'"]');
+    if(cell){ const r=cell.getBoundingClientRect(), er=el.getBoundingClientRect();
+      pop.style.left=Math.max(6, r.left-er.left+r.width/2-92)+'px';
+      pop.style.top=(r.bottom-er.top+8)+'px'; }
+  }catch(_){}
+}
+if(!window.__bfLpWired){ window.__bfLpWired=true;
+  document.addEventListener('pointerdown', function(e){
+    clearTimeout(_bfLpT); _bfLpT=null; _bfLpFired=false;
+    const c=e.target&&e.target.closest&&e.target.closest('#briefStage [data-bfdepth]');
+    if(!c) return;
+    const lvl=+c.getAttribute('data-bfdepth'); if(!(lvl>=2)) return;
+    _bfLpX=e.clientX; _bfLpY=e.clientY;
+    _bfLpT=setTimeout(function(){ _bfLpT=null; _bfLpFired=true; try{ _bfStackPop(lvl); }catch(_){} }, 480);
+  });
+  document.addEventListener('pointermove', function(e){
+    if(_bfLpT && Math.hypot(e.clientX-_bfLpX, e.clientY-_bfLpY)>12){ clearTimeout(_bfLpT); _bfLpT=null; }
+  });
+  ['pointerup','pointercancel'].forEach(function(ev){
+    document.addEventListener(ev, function(){ clearTimeout(_bfLpT); _bfLpT=null; });
+  });
+  document.addEventListener('contextmenu', function(e){   // a long touch must open OUR popover, not the browser menu
+    try{ if(e.target.closest && e.target.closest('#briefStage [data-bfdepth]')) e.preventDefault(); }catch(_){}
+  });
+}
 function bfStack(n){
   n=parseInt(n,10); if(!(n>=2&&n<=4)) return;
   BRIEF.vert=BRIEF.vert||[];

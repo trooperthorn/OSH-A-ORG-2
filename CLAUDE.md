@@ -1163,3 +1163,31 @@ closeouts. The stepping label POLICY is now load-bearing:
   margin-left:auto float (that was the ragged-right zoom pill).
 - Geometry proof: assert one unique .bf-seg height and the dock height at
   both 414 and 1280.
+
+## v1.13.0 — the console (owner's red-circle annotations) — AMENDS v1.12.1
+- ONE HEAD ROW: ⌗ mark + L1-L4 track + ZOOM track + focus chip + the dock
+  all live INSIDE .ch-head (a div[role=button][data-chmin] — a real
+  <button> head would nest buttons, which is invalid HTML). The separate
+  control bar (.bf-bar) is RETIRED; so are the "⌗ CHART" title text, the
+  .ch-n org count, and the LEVELS/STACK captions ("Level" word gone —
+  cells read L1-L4 bare). The v1.12.1 DECK LAW now governs the tracks
+  inside the head (whole-unit wrap, equal heights); .ch-dock floats right
+  via margin-left:auto.
+- CHMIN EXCLUSION LIST: the head IS the minimize toggle, so its branch
+  must exclude every interactive child:
+  [data-xpbtn],[data-bfzoom],[data-bfdepth],[data-bffocusclear]. The
+  data-bfzoom handler sits AFTER the chmin branch in the delegate — any
+  new head control MUST join this list or taps on it minimize the chart.
+- HOLD-TO-STACK: the STACK track is retired; long-press (480ms, >12px move
+  cancels, contextmenu suppressed on the cells) on an L2-L4 depth cell
+  opens #bfStackPop, whose .bf-sp button carries the SAME data-bfvert
+  contract the old track used. Two delegate traps, learned live:
+  (1) the click that ENDS the long-press hits the tap-away dismiss line
+  first — it must skip while _bfLpFired is up, or the pop flashes and
+  dies before the finger lifts; (2) the same flag makes the bdp branch
+  swallow that click so the level doesn't switch. Tap-away (guarded) and
+  any re-render dismiss the pop. L1 never stacks.
+- chart-min hides .bf-seg tracks + .bf-clearfoc (CSS, body.chart-min),
+  keeping the ⌗ + dock pill only.
+- Track material follows the dock: #141006 pill, cream .72 cells, gold
+  .on — never the old cream-outline segments.

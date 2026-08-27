@@ -563,7 +563,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.renderBrief();
       let ch3=IDS['briefStage'].innerHTML;
       if(ch3.indexOf('bf-vert')>=0){ sok=false; fails++; console.log('✗ STACK: vertical class present before any toggle'); }
-      if(ch3.indexOf('data-bfvert')<0){ sok=false; fails++; console.log('✗ STACK: bar toggles missing'); }
+      // v1.13.0: the STACK track is gone — holding a level cell opens the
+      // popover, whose button carries the same data-bfvert contract
+      if(ch3.indexOf('data-bfvert')>=0){ sok=false; fails++; console.log('✗ STACK: the duplicate track must be gone (hold-popover only)'); }
+      global._bfStackPop(2);
+      const _pp=global.document.getElementById('bfStackPop');
+      if(!_pp || String(_pp.innerHTML).indexOf('data-bfvert="2"')<0){ sok=false; fails++; console.log('✗ STACK: hold-popover missing its toggle'); }
+      global._bfStackPopHide();
       global.Brief.stack(2);
       ch3=IDS['briefStage'].innerHTML;
       if(ch3.indexOf('bf-vert')<0){ sok=false; fails++; console.log('✗ STACK: L2 vertical did not apply'); }
@@ -683,11 +689,15 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       let gok=true;
       global.Brief.addGroup('Grammar Group');
       const gg=global.Brief.list().map(k=>global.Brief.node(k)).find(n=>n&&n.t==='custom'&&n.n==='Grammar Group');
-      global.Brief.addPlace('px:utah-rsn', gg.k);            // depth 2 → the bar shows LEVELS/STACK
+      global.Brief.addPlace('px:utah-rsn', gg.k);            // depth 2 → the head grows the L1-L4 track
       global.renderBrief();
       const st2=IDS['briefStage']?IDS['briefStage'].innerHTML:'';
-      ['>LEVELS<','>STACK<','>ZOOM<'].forEach(function(cap){
-        if(st2.indexOf(cap)<0){ gok=false; fails++; console.log('✗ BAR caption missing: '+cap); } });
+      // v1.13.0: LEVELS/STACK captions and the chart title text are GONE;
+      // the L1-L4 and ZOOM tracks live in the head row
+      if(st2.indexOf('>ZOOM<')<0){ gok=false; fails++; console.log('✗ ZOOM caption missing'); }
+      if(st2.indexOf('>LEVELS<')>=0 || st2.indexOf('>STACK<')>=0){ gok=false; fails++; console.log('✗ LEVELS/STACK captions must be gone (v1.13.0)'); }
+      if(st2.indexOf('CHART')>=0){ gok=false; fails++; console.log('✗ the chart title text must be gone (v1.13.0)'); }
+      if(!(st2.indexOf('data-bfdepth')>=0 && st2.indexOf('data-bfdepth')<st2.indexOf('bf-tree'))){ gok=false; fails++; console.log('✗ the L1-L4 track must sit in the head row'); }
       ['>Names<','>Lines<','>Briefs<','>Export<'].forEach(function(lb){
         if(st2.indexOf('<span class="ch-lbl">'+lb.slice(1,-1)+'<')<0){ gok=false; fails++; console.log('✗ HEAD tool label missing: '+lb); } });
       if(st2.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ HEAD cluster divider missing'); }
@@ -708,7 +718,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       const nh=IDS['dossier']?IDS['dossier'].innerHTML:'';
       if(nh.indexOf('data-bfannedit')>=0){ gok=false; fails++; console.log('✗ NON-member sheet must not offer Add note (bfNote would eat it)'); }
       if(nh.indexOf('data-bfadd')<0){ gok=false; fails++; console.log('✗ NON-member sheet must lead with Add to brief'); }
-      if(gok) console.log('  ✓ ui grammar: bar captions LEVELS/STACK/ZOOM · labeled head tools + divider · filled primary · quiet edits · hide in Arrange · danger rail last · non-member note gated');
+      if(gok) console.log('  ✓ ui grammar: console head carries L1-L4 + ZOOM (LEVELS/STACK/CHART text gone) · labeled head tools + divider · filled primary · quiet edits · hide in Arrange · danger rail last · non-member note gated');
     }
     // v1.11.0 — AUTO-RECONNECT: no config → inert; auto:0 → inert (chip
     // path); auto:1 → dbConnect engages; the Database sheet carries the toggle
