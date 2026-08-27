@@ -630,6 +630,46 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(gk) global.Brief.remove(gk);
       if(tok) console.log('  ✓ territories + stars: DC/PR/Guam/VI on roster · outline rings decode (VI aliased) · star classifier rsn/eccsp/null · Guam anchors');
     }
+    // v1.13.1 — THE SEAM ORDER LAW (owner: "shared lines need the borders on
+    // both to be more distinct — bolden"): every state paints a BOLD 8.4
+    // clipped band first, then ONE dark seam pass re-traces every outline.
+    // The order is the invariant: a seam drawn inside the band loop gets its
+    // neighbor-half repainted by the NEXT state's clipped band and the two
+    // colors bleed together again.
+    {
+      let smk=true;
+      const wasBrief=document.body.classList.contains('brief-mode');
+      document.body.classList.add('brief-mode');
+      global.Brief.addState('California'); global.Brief.addState('Nevada');
+      const c0=global.GlobeState.__bfC, q0=global.GlobeState.q;
+      global.GlobeState.__bfC=global._briefChainMap({all:true});
+      try{
+        // face California so both rings sit on the visible disc
+        const v=global.lonLatToVec(-119.4,36.7);
+        const dz=Math.max(-1,Math.min(1,v[2])), ax=v[1], ay=-v[0], nn=Math.hypot(ax,ay);
+        global.GlobeState.q=(nn<1e-9)?[0,0,0,1]:global._qNorm(global._qFromAxisAngle(ax/nn,ay/nn,0,Math.acos(dz)));
+        global._setGlobeRot(global.GlobeState.rotLon, global.GlobeState.rotLat);
+        const strokes=[];
+        const rec={ lineWidth:0, strokeStyle:'',
+          save(){}, restore(){}, clip(){}, beginPath(){}, closePath(){}, moveTo(){}, lineTo(){},
+          stroke(){ strokes.push({lw:this.lineWidth, ss:String(this.strokeStyle)}); } };
+        global.drawBriefStates(rec, global.globeMetrics(IDS['globeCanvas']), false);
+        const bands=[], seams=[];
+        strokes.forEach(function(s,i){
+          if(s.lw===8.4) bands.push(i);
+          if(s.ss.indexOf('rgba(12,9,3')===0) seams.push(i);
+        });
+        if(bands.length<2){ smk=false; fails++; console.log('✗ SEAM: expected a bold 8.4 band per state, saw '+bands.length); }
+        if(seams.length<2){ smk=false; fails++; console.log('✗ SEAM: expected a dark seam per state outline, saw '+seams.length); }
+        if(bands.length && seams.length && Math.max.apply(null,bands)>Math.min.apply(null,seams)){
+          smk=false; fails++; console.log('✗ SEAM ORDER: every band must paint BEFORE the first seam (later bands repaint earlier seams)'); }
+      }catch(e){ smk=false; fails++; console.log('✗ SEAM probe threw: '+e.message); }
+      global.Brief.remove('st:California'); global.Brief.remove('st:Nevada');
+      global.GlobeState.__bfC=c0; global.GlobeState.q=q0;
+      try{ global._setGlobeRot(global.GlobeState.rotLon, global.GlobeState.rotLat); }catch(_){}
+      if(!wasBrief) document.body.classList.remove('brief-mode');
+      if(smk) console.log('  ✓ seam order: bold 8.4 bands clipped per state, one dark seam pass AFTER all bands');
+    }
     // v1.7.0 — SAVED BRIEFS + LEDGER + ASSET INVENTORY: inventory sanitizes and
     // rides node/snapshot/saved-brief; the shelf captures, loads back, merges
     // newest-wins from the board; the ledger HTML carries briefs + ID registry

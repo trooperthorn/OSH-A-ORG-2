@@ -1191,3 +1191,21 @@ closeouts. The stepping label POLICY is now load-bearing:
   keeping the ⌗ + dock pill only.
 - Track material follows the dock: #141006 pill, cream .72 cells, gold
   .on — never the old cream-outline segments.
+
+## v1.13.1 — the seam (owner: "shared lines… more distinct, bolden") — AMENDS v1.11.1
+- BAND LAW: the state outline is an 8.4 stroke clipped to its own polygon
+  (4.2 visible inside every border, up from 1.8). Alpha 1.
+- SEAM LAW: after ALL bands, one pass re-traces every selected outline
+  with a 2px rgba(12,9,3,.9) line ON the border itself — touching
+  selections read color · seam · color. ORDER IS THE INVARIANT: a seam
+  drawn inside the band loop gets its neighbor-half repainted by the next
+  state's clipped band and the colors bleed again. drawBriefStates is now
+  two passes over a pre-gathered sel[] list with a shared trace() helper;
+  the label phase is untouched.
+- Smoke asserts band count, seam count, and max(band idx) < min(seam idx)
+  on a recording ctx (California+Nevada, camera faced via the harness
+  quaternion pattern — GLOBE_STATE_SHAPES does load in the smoke boot).
+- Live proof pattern: pixel-scan a screen segment crossing a straight
+  border stretch (WA/OR at 46°N, lon -118.5) and assert the run sequence.
+  Classify pixels by NEAREST palette target under distance 60 — first-hit
+  under a loose 90 misread pink as purple (they sit 85 apart).

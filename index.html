@@ -1371,6 +1371,13 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.13.1 • THE SEAM (owner: "for shared lines need the borders on both to
+//            be more distinct — bolden"). Brief state outlines bolden from a
+//            3.6 to an 8.4 clipped band (4.2 visible inside every border) and
+//            a second pass re-traces each outline with a thin dark seam ON
+//            the border line itself, so two touching selections read as
+//            color · seam · color — two unmistakable bands instead of a
+//            blended glow. The seam pass runs AFTER all bands (order law).
 //   v1.13.0 • THE CONSOLE (owner: "create a lot of space — black and gold
 //            everywhere, drop the crossed-out text, L1-L4 at the top, no
 //            duplicate STACK bar; hold a level for a stack pop-up"). The
@@ -2407,8 +2414,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.13.0';
-const APP_UPDATED = '25 August 2026';
+const APP_VERSION = 'v1.13.1';
+const APP_UPDATED = '27 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
 // boots, so the reviewer always knows which build they are looking at. The
@@ -4218,6 +4225,68 @@ function drawBriefStates(ctx, m, labels){
   const C=GlobeState.__bfC; if(!C || !C.order || !C.order.length) return;
   if(labels && (GlobeState._namesOff || GlobeState._bfNamesOff)) return;   // Names toggles (map + v1.5.1 brief Aa) silence state labels too
   const T=_mTok();
+  if(!labels){
+    // v1.6.0: no wash, no dot — the border alone. v1.11.1: each stroke is
+    // CLIPPED to its own polygon at double width so only the INNER half
+    // paints — neighbors sit side by side instead of overwriting.
+    // v1.13.1 (owner: "for shared lines need the borders on both to be
+    // more distinct — bolden"): the band doubles to an 8.4 stroke (4.2
+    // visible) and a second pass re-traces every outline with a thin DARK
+    // seam ON the border itself, so touching selections read
+    // colorA | seam | colorB instead of two glows bleeding together. The
+    // seam pass must run AFTER every band — inside one loop, a later
+    // state's clipped band repaints its half of an earlier state's seam.
+    const sel=[];
+    for(const k of C.order){
+      const n=C.nodes[k];
+      if(!n || n.kind!=='state') continue;
+      // color: the node's own pick, else its tier stream shade
+      let trip=n.color?_hexTrip(n.color):null;
+      if(!trip) trip=String(n.shade||'245,215,110').split(',');
+      const shapes=GLOBE_STATE_SHAPES[n.ref];
+      if(!shapes) continue;                            // geometry not in yet — label still shows
+      sel.push({n:n, shapes:shapes, R:+trip[0]||245, G:+trip[1]||215, B:+trip[2]||110});
+    }
+    const trace=function(ring){    // ring path onto ctx; null if it crosses the limb
+      let bx0=1e9, by0=1e9, bx1=-1e9, by1=-1e9;
+      ctx.beginPath();
+      for(let i=0;i<ring.length;i++){
+        const pt=_projectLonLat(ring[i][0], ring[i][1], m);
+        if(pt[2] < -0.02) return null;
+        if(pt[0]<bx0)bx0=pt[0]; if(pt[0]>bx1)bx1=pt[0];
+        if(pt[1]<by0)by0=pt[1]; if(pt[1]>by1)by1=pt[1];
+        if(i===0) ctx.moveTo(pt[0],pt[1]); else ctx.lineTo(pt[0],pt[1]);
+      }
+      ctx.closePath();
+      return [bx0,by0,bx1,by1];
+    };
+    for(const s of sel){
+      ctx.save();
+      for(const ring of s.shapes){
+        if(!ring || ring.length<3) continue;
+        const bb=trace(ring); if(!bb) continue;
+        ctx.save(); ctx.clip();
+        ctx.lineWidth=8.4; ctx.strokeStyle='rgba('+s.R+','+s.G+','+s.B+',1)'; ctx.stroke();
+        if(s.n.stripe){
+          ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+s.R+','+s.G+','+s.B+',0.8)';
+          const hh=bb[3]-bb[1];
+          ctx.beginPath();
+          for(let hx=bb[0]-hh; hx<bb[2]; hx+=7){ ctx.moveTo(hx,bb[3]+1); ctx.lineTo(hx+hh+2,bb[1]-1); }
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+    for(const s of sel){                               // the seam pass
+      for(const ring of s.shapes){
+        if(!ring || ring.length<3) continue;
+        if(!trace(ring)) continue;
+        ctx.lineWidth=2; ctx.strokeStyle='rgba(12,9,3,0.9)'; ctx.stroke();
+      }
+    }
+    return;
+  }
   for(const k of C.order){
     const n=C.nodes[k];
     if(!n || n.kind!=='state') continue;
@@ -4225,44 +4294,7 @@ function drawBriefStates(ctx, m, labels){
     let trip=n.color?_hexTrip(n.color):null;
     if(!trip) trip=String(n.shade||'245,215,110').split(',');
     const R=+trip[0]||245, G=+trip[1]||215, B=+trip[2]||110;
-    if(!labels){
-      const shapes=GLOBE_STATE_SHAPES[n.ref];
-      if(!shapes) continue;                            // geometry not in yet — label still shows
-      ctx.save();
-      for(const ring of shapes){
-        if(!ring || ring.length<3) continue;
-        let behind=false, bx0=1e9, by0=1e9, bx1=-1e9, by1=-1e9;
-        ctx.beginPath();
-        for(let i=0;i<ring.length;i++){
-          const pt=_projectLonLat(ring[i][0], ring[i][1], m);
-          if(pt[2] < -0.02){ behind=true; break; }     // ring crosses the limb — skip it
-          if(pt[0]<bx0)bx0=pt[0]; if(pt[0]>bx1)bx1=pt[0];
-          if(pt[1]<by0)by0=pt[1]; if(pt[1]>by1)by1=pt[1];
-          if(i===0) ctx.moveTo(pt[0],pt[1]); else ctx.lineTo(pt[0],pt[1]);
-        }
-        if(behind) continue;
-        ctx.closePath();
-        // v1.6.0: no wash, no dot — the border alone. v1.11.1 (owner: "when
-        // bordering states have different colors, do a double line on the
-        // shared border so each state is fully outlined in its own color"):
-        // the stroke is CLIPPED to the state's own polygon and drawn at
-        // double width, so only the INNER half paints. Every outline hugs
-        // the inside of its border — neighbors sit side by side instead of
-        // overwriting, a double line exactly where selections touch, with
-        // no adjacency math at all. Stripes stay an explicit owner toggle.
-        ctx.save(); ctx.clip();
-        ctx.lineWidth=3.6; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.95)'; ctx.stroke();
-        if(n.stripe){
-          ctx.lineWidth=1.2; ctx.strokeStyle='rgba('+R+','+G+','+B+',0.8)';
-          const hh=by1-by0;
-          ctx.beginPath();
-          for(let hx=bx0-hh; hx<bx1; hx+=7){ ctx.moveTo(hx,by1+1); ctx.lineTo(hx+hh+2,by0-1); }
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
-      ctx.restore();
-    } else {
+    {
       if(n.lat==null) continue;
       const pt=_projectLonLat(n.lon, n.lat, m); if(pt[2]<0) continue;
       const fs=(m.w<560?12:11);
