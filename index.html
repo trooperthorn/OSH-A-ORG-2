@@ -539,16 +539,28 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 /* v1.5.1 — brief-only view toggles on the chart head: names + connecting
    lines. ON = accent; OFF = dimmed hollow. Map room never sees these. */
 .ch-head .bf-vw{color:var(--accent)}
-/* v1.9.0 — LABELED HEAD TOOLS: icon chip + caption, VIEW │ FILE clusters */
-.ch-tool{display:inline-flex; flex-direction:column; align-items:center; gap:1px; min-width:38px;
+/* v1.9.0 — LABELED HEAD TOOLS · v1.12.1 THE DOCK: the four tools live in one
+   dark pill (owner reference: iOS toolbar, amber active slot). Uniform 40px
+   slots, gold circle = toggle ON, hairline divider between VIEW and FILE. */
+.ch-dock{display:inline-flex; align-items:flex-start; gap:1px; margin-left:8px;
+  background:#141006; border-radius:22px; padding:5px 7px 3px;
+  box-shadow:0 1px 2px rgba(20,14,4,.28)}
+.ch-tool{display:inline-flex; flex-direction:column; align-items:center; gap:1px; min-width:40px;
   -webkit-tap-highlight-color:transparent}
 .ch-tool .od-ico, .ch-tool .ch-lbl{pointer-events:none}
-.ch-lbl{font:700 7px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+.ch-dock .od-ico{background:none; box-shadow:none; color:#F2E4BC; width:28px; height:28px}
+.ch-dock .bf-vw{color:#F2E4BC}
+.ch-dock .bf-vw:not(.off){background:var(--accent); color:#141006; border-radius:50%}
+.ch-dock .bf-vw.off{background:none; opacity:.5}
+.ch-lbl{font:700 6.5px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:rgba(242,228,188,.6)}
 .ch-tool.off .ch-lbl{opacity:.55}
-.ch-div{flex:none; width:1px; height:22px; background:var(--line); margin:0 3px; align-self:center}
+.ch-div{flex:none; width:1px; height:20px; background:rgba(242,228,188,.28); margin:4px 4px 0; align-self:flex-start}
 body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
-/* v1.9.0 — the zoom segment rides the bar's right edge (structure left, view right) */
-.bf-zseg{margin-left:auto; align-items:center}
+body.chart-min .ch-dock{padding:3px 6px; border-radius:999px; align-items:center}
+/* v1.12.1 — the deck: LEVELS · STACK · ZOOM as ONE aligned row of equal-height
+   tracks; groups wrap as whole units, nothing floats to the ragged right */
+.bf-zseg{align-items:center}
+.bf-seg{min-height:32px}
 /* v1.7.0 — THE LEDGER: right-side drawer (IDs · records · saved briefs) */
 #ledger{position:fixed; inset:0; z-index:58; pointer-events:none}
 #ledger .ld-scrim{position:absolute; inset:0; background:rgba(12,9,3,.42); opacity:0; transition:opacity .24s ease}
@@ -1350,6 +1362,15 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.12.1 • THE DOCK (owner: "controls look a bit junior — uneven, not
+//            centered, not uniform; expert-level, like the references").
+//            The four head tools live in ONE dark pill dock now — uniform
+//            40px slots, cream glyphs, a gold circle behind an ON toggle
+//            (the reference's amber slot), hairline divider between the
+//            view and file clusters. The deck below is one aligned row of
+//            equal-height tracks — LEVELS · STACK · ZOOM — that wraps as
+//            whole units; the zoom pill no longer floats to the ragged
+//            right. Uniform shapes, uniform heights, one grid.
 //   v1.12.0 • THE WORKING COPY (owner: "save a brief and continue to work
 //            off the same brief — ONE saved record you save progress to,
 //            not a new record each time; the app should open with a blank
@@ -2365,7 +2386,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.12.0';
+const APP_VERSION = 'v1.12.1';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -5449,9 +5470,11 @@ function renderBrief(){
   const memN=(BRIEF.nodes||[]).length;
   let h='<button type="button" class="ch-head" data-chmin="1" aria-label="Minimize or expand the chart">⌗ CHART'
     +'<span class="ch-n">'+(memN?(memN+' org'+(memN===1?'':'s')):'')+'</span>'
-    // v1.9.0 (owner: label the tools): each head tool = icon chip + caption,
-    // clustered VIEW (Names · Lines) │ FILE (Briefs · Export). The data-
+    // v1.9.0 (owner: label the tools) · v1.12.1 THE DOCK (owner reference:
+    // the dark iOS pill toolbar, one amber active slot): the four tools live
+    // in ONE dark pill — uniform slots, gold circle = toggle ON. The data-
     // attribute rides the wrapper — closest() delegation absorbs the move.
+    +'<span class="ch-dock">'
     +'<span class="ch-tool'+(GlobeState._bfNamesOff?' off':'')+'" data-bfnm="1" role="button" aria-label="'+(GlobeState._bfNamesOff?'Show names on the globe':'Hide names on the globe')+'" title="Names on the globe">'
       +'<span class="od-ico bf-vw'+(GlobeState._bfNamesOff?' off':'')+'">Aa</span><span class="ch-lbl">Names</span></span>'
     +'<span class="ch-tool'+(GlobeState._bfLinesOff?' off':'')+'" data-bfln="1" role="button" aria-label="'+(GlobeState._bfLinesOff?'Show connecting lines':'Hide connecting lines')+'" title="Connecting lines">'
@@ -5461,6 +5484,7 @@ function renderBrief(){
       +'<span class="od-ico">▤</span><span class="ch-lbl">Briefs</span></span>'
     +'<span class="ch-tool" data-xpbtn="1" role="button" aria-label="Export" title="Export">'
       +'<span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span><span class="ch-lbl">Export</span></span>'
+    +'</span>'
     +'</button>';
   if(!memN){
     h+='<div class="bf-empty"><b>The brief is empty</b>'

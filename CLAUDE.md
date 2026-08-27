@@ -1152,3 +1152,14 @@ closeouts. The stepping label POLICY is now load-bearing:
 - Smoke enforces: snapshot has NO brief key; a remote working-brief blob
   never applies; stacking + inventory persistence assert on the SAVED
   record; the working-copy lifecycle (activate/update/fork/clear).
+
+## v1.12.1 — the dock (owner: "expert-level, like the references")
+- HEAD LAW: the four chart tools live in ONE dark pill (.ch-dock, #141006,
+  radius 22): uniform 40px slots, cream glyphs (#F2E4BC), gold CIRCLE
+  behind an ON toggle (the reference's amber slot), hairline cream divider
+  between VIEW and FILE clusters. chart-min keeps the pill, drops captions.
+- DECK LAW: LEVELS · STACK · ZOOM are one row of equal-height (32px)
+  tracks, gap-separated, wrapping as WHOLE units, left-aligned — never a
+  margin-left:auto float (that was the ragged-right zoom pill).
+- Geometry proof: assert one unique .bf-seg height and the dock height at
+  both 414 and 1280.
