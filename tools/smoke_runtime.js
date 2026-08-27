@@ -389,21 +389,23 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         ok=false; fails++; console.log('✗ database sheet missing url/status/setup'); }
     } else { ok=false; fails++; console.log('✗ _dbSheet missing'); }
     try{ global.hideDossier(); }catch(_){}
-    // v1.2.0 — the board carries brief + views; merges are newest-wins; the
-    // reconnect chip exists, and stays silent without stored settings
+    // v1.2.0 board / v1.12.0 BLANK-SLATE AMENDMENT: the board carries
+    // records + views + saved briefs; the WORKING diagram left the board —
+    // an incoming brief blob (older app) must be IGNORED, and the snapshot
+    // must not carry one. Views stay newest-wins. Chip gating unchanged.
     const snap=global._dbSnapshot();
-    if(!snap.brief || !Array.isArray(snap.brief.nodes) || !snap.views || !Array.isArray(snap.views.list)){
-      ok=false; fails++; console.log('✗ board snapshot missing brief/views'); }
+    if(snap.brief){ ok=false; fails++; console.log('✗ snapshot must NOT carry the working brief (blank-slate law)'); }
+    if(!snap.views || !Array.isArray(snap.views.list) || !snap.briefs || !Array.isArray(snap.briefs.list)){
+      ok=false; fails++; console.log('✗ board snapshot missing views/briefs'); }
     const far=Date.now()+9e9;
     global._dbApply({brief:{nodes:[{k:'cx:remote1',n:'Remote Group',p:null,t:'custom',r:null,c:'',sh:0,tx:''}],hide:[],mod:far},
                      views:{list:[{n:'Remote view'}],mod:far}});
-    if(!global.Brief.node('cx:remote1')){ ok=false; fails++; console.log('✗ newer remote brief did not apply'); }
+    if(global.Brief.node('cx:remote1')){ ok=false; fails++; console.log('✗ remote WORKING-brief blob must be ignored (blank-slate law)'); }
     const s2=global._dbSnapshot();
     if(!s2.views.list.length || s2.views.list[0].n!=='Remote view'){ ok=false; fails++; console.log('✗ newer remote views did not apply'); }
-    global._dbApply({brief:{nodes:[],hide:[],mod:1}, views:{list:[],mod:1}});   // OLDER — must be ignored
-    if(!global.Brief.node('cx:remote1') || !global._dbSnapshot().views.list.length){
-      ok=false; fails++; console.log('✗ older remote blob clobbered newer local state'); }
-    global.Brief.remove('cx:remote1');
+    global._dbApply({views:{list:[],mod:1}});                                   // OLDER — must be ignored
+    if(!global._dbSnapshot().views.list.length){
+      ok=false; fails++; console.log('✗ older remote views clobbered newer local state'); }
     global._dbApply({views:{list:[],mod:far+1}});                               // clean the test view (newest wins)
     if(typeof global.DB.chip!=='function'){ ok=false; fails++; console.log('✗ reconnect chip missing'); }
     global.DB.chip();                                                            // no cfg → must not render
@@ -414,7 +416,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(!chipEl){ ok=false; fails++; console.log('✗ chip did not render with stored settings'); }
     else { try{ chipEl.remove(); }catch(_){} }
     global.DB._setCfg(null);
-    if(ok) console.log('  ✓ board carries brief+views (newest-wins both ways) · reconnect chip gated on stored settings');
+    if(ok) console.log('  ✓ board carries views+briefs (working brief OFF the board — blank-slate law) · reconnect chip gated on stored settings');
   }catch(e){ fails++; console.log('✗ ID/DB probe: '+e.message); }
 
   // ── PROBE: v0.13.0 the HAND-BUILT brief — members only, derived L1-L4,
@@ -565,8 +567,11 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Brief.stack(2);
       ch3=IDS['briefStage'].innerHTML;
       if(ch3.indexOf('bf-vert')<0){ sok=false; fails++; console.log('✗ STACK: L2 vertical did not apply'); }
-      const snapV=global._dbSnapshot();
-      if(!snapV.brief.vert || snapV.brief.vert.indexOf(2)<0){ sok=false; fails++; console.log('✗ STACK: vert not on the board snapshot'); }
+      // v1.12.0: stacking persists on the SAVED brief record now
+      global.Briefs.save('Stack Persist Probe');
+      const _sp=global.Briefs.list()[0];
+      if(!_sp || !_sp.vert || _sp.vert.indexOf(2)<0){ sok=false; fails++; console.log('✗ STACK: vert not on the saved brief record'); }
+      global.Briefs.remove(0);
       global.Brief.stack(2);
       ch3=IDS['briefStage'].innerHTML;
       if(ch3.indexOf('bf-vert')>=0){ sok=false; fails++; console.log('✗ STACK: toggle-off did not restore horizontal'); }
@@ -630,11 +635,11 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       ndI.inv=global._bfInvClean([{q:'12',d:'JLTV'},{q:'',d:'Generators'},{q:'3',d:''}]);
       if(!ndI.inv || ndI.inv.length!==2){ wok=false; fails++; console.log('✗ INV sanitizer: blank description must drop, blank qty must keep — got '+JSON.stringify(ndI.inv)); }
       global._bfSave();
-      const snI=global._dbSnapshot();
-      const snNode=(snI.brief.nodes||[]).find(function(n){ return n.k===ih.k; });
-      if(!snNode || !snNode.inv || snNode.inv.length!==2){ wok=false; fails++; console.log('✗ INV must ride the board snapshot on its node'); }
-      // saved briefs: capture → shelf + snapshot; load restores nodes with inv
+      // saved briefs: capture → shelf + snapshot; the record carries inv;
+      // load restores nodes with inv (v1.12.0: the record IS the persistence)
       const nm=global.Briefs.save('Test Shelf Brief');
+      const recNode=(global.Briefs.list()[0].nodes||[]).find(function(n){ return n.k===ih.k; });
+      if(!recNode || !recNode.inv || recNode.inv.length!==2){ wok=false; fails++; console.log('✗ INV must ride the saved brief record on its node'); }
       if(nm!=='Test Shelf Brief' || global.Briefs.list().length<1 || global.Briefs.list()[0].n!=='Test Shelf Brief'){ wok=false; fails++; console.log('✗ SAVED BRIEF capture failed'); }
       if(!(global._dbSnapshot().briefs && global._dbSnapshot().briefs.list.length>=1)){ wok=false; fails++; console.log('✗ SAVED BRIEFS must ride the board snapshot'); }
       global.Brief.remove(ih.k);
@@ -719,6 +724,33 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global._dbSheet();
       if((IDS['dossier']?IDS['dossier'].innerHTML:'').indexOf('data-dbauto')<0){ auk=false; fails++; console.log('✗ AUTO toggle missing from the Database sheet'); }
       if(auk) console.log('  ✓ auto-reconnect: inert without config · respects OFF · fires with ON · sheet toggle present');
+    }
+    // v1.12.0 — THE WORKING COPY: save once → record is active; later saves
+    // update IN PLACE (no new record); save-as-new mints a sibling and takes
+    // over; removing the active record clears the pointer; the sheet leads
+    // with Save-changes and marks the working copy
+    {
+      let wck=true;
+      const base=global.Briefs.list().length;
+      global.Brief.addGroup('WC Alpha');
+      global.Briefs.save('Working Copy Probe');
+      if(global.Briefs.list().length!==base+1){ wck=false; fails++; console.log('✗ WC: first save must mint exactly one record'); }
+      const id0=global.Briefs.list()[0].id;
+      if(!id0 || global.GlobeState._sbActive!==id0){ wck=false; fails++; console.log('✗ WC: saving must make the record ACTIVE'); }
+      global.Brief.addGroup('WC Beta');
+      if(global.Briefs.update()!=='Working Copy Probe'){ wck=false; fails++; console.log('✗ WC: update must save into the active record'); }
+      if(global.Briefs.list().length!==base+1){ wck=false; fails++; console.log('✗ WC: update must NOT mint a new record'); }
+      if(!(global.Briefs.list()[0].nodes||[]).some(function(n){ return n.n==='WC Beta'; })){ wck=false; fails++; console.log('✗ WC: update did not capture the new state'); }
+      global._sbOpenSheet();
+      const wsh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      if(wsh.indexOf('data-sbupdate')<0 || wsh.indexOf('WORKING COPY')<0){ wck=false; fails++; console.log('✗ WC: sheet must lead with Save-changes and mark the working copy'); }
+      global.Briefs.save('WC Fork');
+      if(global.Briefs.list().length!==base+2 || global.GlobeState._sbActive===id0){ wck=false; fails++; console.log('✗ WC: save-as-new must mint a sibling and take over as active'); }
+      global.Briefs.remove(0); global.Briefs.remove(0);
+      if(global.GlobeState._sbActive){ wck=false; fails++; console.log('✗ WC: removing the active record must clear the pointer'); }
+      global.Brief.list().slice().forEach(function(k){ const nd2=global.Brief.node(k);
+        if(nd2&&nd2.t==='custom'&&(nd2.n==='WC Alpha'||nd2.n==='WC Beta')) global.Brief.remove(k); });
+      if(wck) console.log('  ✓ working copy: save activates · update in place · sheet leads with save-changes · fork takes over · remove clears');
     }
     global.Orgs.remove(org.id);
     global.Brief.remove('amc'); global.Brief.remove('fort-bragg'); global.Brief.remove(org.id);

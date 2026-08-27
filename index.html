@@ -1350,6 +1350,23 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.12.0 • THE WORKING COPY (owner: "save a brief and continue to work
+//            off the same brief — ONE saved record you save progress to,
+//            not a new record each time; the app should open with a blank
+//            slate on map and brief; pull up the same version to work
+//            off"). The whole brief workflow changed. The brief room is a
+//            scratch canvas now: every open starts EMPTY (map too — no
+//            restored selection, no restored room; the camera angle alone
+//            survives). Your work lives in the saved brief: the first save
+//            names the record and makes it the WORKING COPY; from then on
+//            the Briefs sheet leads with “Save changes to <name>” — one
+//            record, updated in place — with save-as-new as the quiet
+//            fork. Loading a brief makes IT the working copy. The old
+//            auto-persisted working diagram is retired everywhere (kv,
+//            board blob, boot restore); a pre-v1.12 working brief is
+//            rescued ONCE onto the shelf as “Recovered brief” so nothing
+//            already built is lost. Saved records carry everything —
+//            structure, colors, stacking, inventories — across devices.
 //   v1.11.3 • THE STRAIGHT RAIL (owner: "stack the L4s directly under the
 //            L3, compact, and fix the alignment of the connecting lines on
 //            the left of each L4"). Stacked columns rebuilt: the litter
@@ -2348,7 +2365,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.11.3';
+const APP_VERSION = 'v1.12.0';
 const APP_UPDATED = '25 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -7040,6 +7057,12 @@ if(!window._odWired){
     const sx=e.target.closest('[data-svclose]');
     if(sx){ if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
     // ---- v1.8.0 BRIEFS SHEET (save/load whole diagrams; the shelf rides the board) ----
+    // v1.12.0 — the working copy: save PROGRESS into the active record
+    const bsu=e.target.closest('[data-sbupdate]');
+    if(bsu){ const nm=sbUpdate();
+      if(nm){ _sbOpenSheet(); try{ _bfToast('Progress saved to “'+nm+'”'+(((typeof _dbState!=='undefined')&&_dbState==='live')?' — mirrored to your devices':'')); }catch(_){} }
+      else { _sbArm=true; _sbOpenSheet(); }         // active record vanished → fall back to save-as-new
+      return; }
     const bsv=e.target.closest('[data-sbsave]');
     if(bsv){ _sbArm=true; _sbLoadArm=-1; _sbOpenSheet();
       try{ const f=document.getElementById('sbBriefName'); f&&f.focus(); }catch(_){} return; }
@@ -7597,13 +7620,13 @@ function _rdbOpen(){
             // with NO saved selection returns to the calm cluster world — restoring a
             // deep zoom is what dropped the owner back into a wall of labels. A saved
             // selection keeps its camera (the zoom is justified by the pick).
-            const _hasSel=v.sel && siteById(v.sel);
+            // v1.12.0 BLANK SLATE (owner): every open starts clean — the
+            // camera angle survives (it's a view, not content), but the
+            // saved selection and the brief-room flag no longer restore.
             if(typeof v.yaw==='number'){ GlobeState.yaw=v.yaw; GlobeState.pitch=v.pitch||0;
-              GlobeState.zoom=_hasSel?Math.max(1, Math.min(28, v.zoom||1.5)):Math.min(v.zoom||1.5, 1.5);
+              GlobeState.zoom=Math.min(v.zoom||1.5, 1.5);   // the calm cluster world, always
               if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ();
               globeMark(); }
-            if(_hasSel) selectSite(v.sel, {keepCam:true, noUndo:true});
-            if(v.brief) setMode('brief');
             _ssLast=JSON.stringify(v);
           }catch(_){}
         };
@@ -7656,54 +7679,27 @@ function _rdbOpen(){
         const gb=tk.objectStore('kv').get('brief');
         gb.onsuccess=function(){
           const v=gb.result&&gb.result.v;
-          if(v){
-            _bfMod=v.mod||0;                       // v1.2.0: board merge baseline
-            BRIEF.hide=Array.isArray(v.hide)?v.hide.slice():[];
-            BRIEF.vert=Array.isArray(v.vert)?v.vert.slice():[];   // v1.5.0: per-level stacking
-            if(Array.isArray(v.nodes)){
-              // v2 — the stored diagram, exactly as the owner arranged it
-              const seen={};
-              BRIEF.nodes=v.nodes.filter(function(n){
-                if(!n || typeof n.k!=='string' || seen[n.k]) return false;
-                if(n.t==='org' && !((typeof orgOf==='function'&&orgOf(n.r))||(typeof orgById==='function'&&orgById(n.r)))) return false;
-                seen[n.k]=1; return true;
-              }).map(function(n){
-                const m2={k:n.k, n:String(n.n||n.k).slice(0,80), p:(typeof n.p==='string'?n.p:null),
-                  t:(n.t==='state'||n.t==='custom')?n.t:'org', r:(n.r==null?null:n.r),
-                  c:(/^#[0-9a-fA-F]{6}$/.test(String(n.c||''))?String(n.c).toLowerCase():''),
-                  sh:n.sh?1:0, tx:String(n.tx||'').slice(0,80)};
-                // v1.4.0 — a PLACE keeps its pinned spot + host-base label
-                if(typeof n.la==='number' && typeof n.lo==='number'){ m2.la=n.la; m2.lo=n.lo; m2.bs=String(n.bs||'').slice(0,60); }
-                // v1.7.0 — the asset inventory rides the node
-                if(Array.isArray(n.inv) && n.inv.length){ const iv=_bfInvClean(n.inv); if(iv.length) m2.inv=iv; }
-                return m2;
-              });
-              BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
-              _bfSync();
-            } else {
-              // v1 → v2 MIGRATION: a flat {mem, ann} list becomes real nodes. The
-              // structure it USED to derive is frozen in as each node's own parent,
-              // so an existing brief reopens looking identical — and is now movable.
-              const srcIds=Array.isArray(v.mem)?v.mem:(Array.isArray(v.hqs)?v.hqs:[]);
-              const mapped=[]; const seenM={};
-              srcIds.forEach(function(id){
-                const k=(typeof _bfOrgId==='function')?_bfOrgId(id):id;
-                if(k && !seenM[k]){ seenM[k]=1; mapped.push(k); }
-              });
-              const oldAnn=v.ann||{}; const annN={};
-              for(const k in oldAnn){ const nk=(typeof _bfOrgId==='function')?(_bfOrgId(k)||k):k; if(!annN[nk]) annN[nk]=oldAnn[k]; }
-              const inSet={}; mapped.forEach(function(k){ inSet[k]=1; });
-              BRIEF.nodes=mapped.map(function(k){
-                let par=null, up=(typeof _bfParentOf==='function')?_bfParentOf(k):null, hops=0;
-                while(up && ++hops<40){ if(inSet[up]){ par=up; break; } up=_bfParentOf(up); }
-                const o=(typeof orgOf==='function'&&orgOf(k))||(typeof orgById==='function'?orgById(k):null);
-                return {k:k, n:o?o.name:k, p:par, t:'org', r:k, c:'', sh:0, tx:String(annN[k]||'').slice(0,80)};
-              });
-              _bfSave();
-            }
-          }
-          try{ if(document.body.classList.contains('brief-mode')) renderBrief(); }catch(_){}
-          try{ globeMark(); }catch(_){}
+          // v1.12.0 BLANK SLATE (owner): the working diagram no longer
+          // restores at boot — the brief room opens empty every time, and
+          // persistence is the saved-brief record. ONE-TIME RESCUE: a
+          // pre-v1.12 working brief left in this kv slot is captured onto
+          // the saved shelf as "Recovered brief" (so nothing already built
+          // is lost), then the slot is emptied for good.
+          if(!(v && Array.isArray(v.nodes) && v.nodes.length)) return;
+          setTimeout(function(){                   // let the parallel 'briefs' read land first
+            try{
+              const dupe=SAVEDB.some(function(b){ return b && b.rts && b.rts===(v.mod||1); });
+              if(!dupe){
+                SAVEDB.unshift({ id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+                  n:'Recovered brief', ts:Date.now(), rts:(v.mod||1),
+                  nodes:v.nodes, hide:Array.isArray(v.hide)?v.hide:[], vert:Array.isArray(v.vert)?v.vert:[] });
+                if(SAVEDB.length>24) SAVEDB.pop();
+                _sbSave();
+              }
+              if(_rdb){ const tx2=_rdb.transaction('kv','readwrite');
+                tx2.objectStore('kv').put({k:'brief', v:{v:2, nodes:[], hide:[], vert:[], mod:(v.mod||1)}}); }
+            }catch(_){}
+          }, 1500);
         };
       }catch(_){}
     };
@@ -7732,10 +7728,11 @@ function _bfSync(){
 }
 function _bfSave(){
   _bfSync();
-  _bfMod=Date.now();                              // v1.2.0: the board merges newest-wins
-  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
-    tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod}}); } }catch(_){}
-  try{ dbPush(); }catch(_){}                      // the diagram rides the database board too
+  _bfMod=Date.now();
+  // v1.12.0 (owner: "the app should open with a blank slate on map and
+  // brief") — the WORKING diagram is session-scoped now: no kv write, no
+  // board ride. Persistence is the saved-brief record (Briefs sheet), which
+  // the owner updates in place and loads to continue.
 }
 // v1.7.0 ASSET INVENTORY (owner: "in brief object pop out need an asset
 // inventory list to add QTYs and descriptions for specific sites"). Rows of
@@ -8080,12 +8077,30 @@ function sbCapture(name){
   const roots=BRIEF.nodes.filter(function(n){ return !n.p; });
   const nm=String(name||'').trim().slice(0,60)
     || ((roots[0]?(roots[0].n+' · '):'')+new Date().toLocaleDateString());
-  SAVEDB.unshift({ n:nm, ts:Date.now(),
+  // v1.12.0 — every record carries a stable id; saving makes it the WORKING
+  // COPY, so later saves update THIS record instead of minting siblings.
+  const rec={ id:Date.now().toString(36)+Math.random().toString(36).slice(2,7), n:nm, ts:Date.now(),
     nodes:JSON.parse(JSON.stringify(BRIEF.nodes)),
-    hide:(BRIEF.hide||[]).slice(), vert:(BRIEF.vert||[]).slice() });
+    hide:(BRIEF.hide||[]).slice(), vert:(BRIEF.vert||[]).slice() };
+  SAVEDB.unshift(rec);
   if(SAVEDB.length>24) SAVEDB.pop();              // same shelf depth as views
+  GlobeState._sbActive=rec.id;
   _sbSave();
   return nm;
+}
+// v1.12.0 (owner: "1 saved brief record that you save the progress to, not a
+// new record each time") — update the working copy IN PLACE. Returns its
+// name, or false when no working copy is active (caller falls back to
+// save-as-new).
+function sbUpdate(){
+  const id=GlobeState._sbActive; if(!id) return false;
+  const rec=SAVEDB.find(function(b){ return b && b.id===id; });
+  if(!rec) { GlobeState._sbActive=null; return false; }
+  rec.nodes=JSON.parse(JSON.stringify(BRIEF.nodes));
+  rec.hide=(BRIEF.hide||[]).slice(); rec.vert=(BRIEF.vert||[]).slice();
+  rec.ts=Date.now();
+  _sbSave();
+  return rec.n;
 }
 function sbLoad(i){
   const b=SAVEDB[i]; if(!b || !Array.isArray(b.nodes)) return false;
@@ -8097,11 +8112,17 @@ function sbLoad(i){
   }).map(function(n){ if(n.inv) n.inv=_bfInvClean(n.inv); return n; });
   BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
   BRIEF.hide=(b.hide||[]).slice(); BRIEF.vert=(b.vert||[]).slice();
+  if(!b.id){ b.id=Date.now().toString(36)+Math.random().toString(36).slice(2,7); _sbSave(); }   // legacy records earn an id on first load
+  GlobeState._sbActive=b.id;                       // v1.12.0: loading makes it the working copy
   _bfSave();
   try{ setMode('brief'); renderBrief(); globeMark(); _bfFrame(); }catch(_){}
   return true;
 }
-function sbRemove(i){ SAVEDB.splice(i,1); _sbSave(); }
+function sbRemove(i){
+  const rec=SAVEDB[i];
+  if(rec && rec.id && GlobeState._sbActive===rec.id) GlobeState._sbActive=null;
+  SAVEDB.splice(i,1); _sbSave();
+}
 // v1.8.0 (owner: "don't need a brief ledger — need to be able to save briefs
 // as a whole"): the shelf lives in the BRIEF ROOM as its own sheet, off the
 // chart-head ▤ — save the whole diagram under a name, load one back (two-tap
@@ -8116,24 +8137,32 @@ function _sbOpenSheet(){
   h+='<div class="od-head od-head-slim"><div class="od-name">Briefs</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-sbclose="1" aria-label="Close">✕</button></div>';
   const bn=BRIEF.nodes.length;
+  // v1.12.0 THE WORKING COPY: with an active record, the primary saves
+  // PROGRESS INTO IT — one record, updated in place. Save-as-new is the
+  // quiet alternative. Without one, the first save names a new record.
+  const act=SAVEDB.find(function(b){ return b && b.id && b.id===GlobeState._sbActive; });
   if(_sbArm){
     h+='<div class="rc-form"><input class="rc-in" id="sbBriefName" type="text" maxlength="60" placeholder="Name this brief">'
       +'<div class="rc-btns"><span class="od-sp"></span>'
       +'<button class="rc-cancel" type="button" data-sbsavecancel="1">Cancel</button>'
       +'<button class="rc-save" type="button" data-sbsavego="1">Save</button></div></div>';
+  } else if(act){
+    h+='<button class="rc-add" type="button" data-sbupdate="1"'+(bn?'':' disabled')+'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save changes to “'+esc(act.n)+'”</button>'
+      +'<button class="bf-qt" type="button" data-sbsave="1"'+(bn?'':' disabled')+'>＋ Save as a new brief…</button>';
   } else {
     h+='<button class="rc-add" type="button" data-sbsave="1"'+(bn?'':' disabled')+'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save current brief ('+bn+' object'+(bn===1?'':'s')+')</button>';
   }
   if(SAVEDB.length){
     SAVEDB.forEach(function(b,i){
       const armed=(_sbLoadArm===i);
+      const isAct=!!(b.id && b.id===GlobeState._sbActive);
       h+='<div class="rc-row">'
         +'<button class="rc-top sv-go'+(armed?' sb-arm':'')+'" type="button" data-sbload="'+i+'">'+esc(b.n)+(armed?' — replace current?':'')+'</button>'
-        +'<span class="rc-sub">'+(Array.isArray(b.nodes)?b.nodes.length:0)+' objects · '+new Date(b.ts||0).toLocaleDateString()+'</span>'
+        +'<span class="rc-sub">'+(isAct?'WORKING COPY · ':'')+(Array.isArray(b.nodes)?b.nodes.length:0)+' objects · '+new Date(b.ts||0).toLocaleDateString()+'</span>'
         +'<button class="od-ico rc-dots" type="button" data-sbrm="'+i+'" aria-label="Delete saved brief"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>'
         +'</div>';
     });
-  } else h+='<div class="rc-note">No saved briefs yet — save the current diagram and open it on any connected device.</div>';
+  } else h+='<div class="rc-note">No saved briefs yet — save the current diagram and open it on any connected device. The brief room opens blank; your work lives in the brief you save here.</div>';
   h+='<div class="rc-note">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
     ?'Database LIVE — saved briefs mirror your other devices.'
     :'Connect the database (hold the A-ORG-2 mark → Database) to open saved briefs on other devices.')+'</div>';
@@ -8144,7 +8173,7 @@ function _sbOpenSheet(){
   host.hidden=false; host.scrollTop=0;
   _sheetFlag();
 }
-try{ window.Briefs={ save:sbCapture, load:sbLoad, remove:sbRemove, list:function(){ return SAVEDB.slice(); }, open:_sbOpenSheet }; }catch(_){}
+try{ window.Briefs={ save:sbCapture, update:sbUpdate, load:sbLoad, remove:sbRemove, list:function(){ return SAVEDB.slice(); }, open:_sbOpenSheet }; }catch(_){}
 
 // ── v1.8.0 THE REPOSITORY (owner v1.7.0 correction: "don't need a brief
 // ledger … as information is input on the map — IDs, people, etc — need an
@@ -8315,10 +8344,11 @@ function ensureSupabase(){
 function _dbSnapshot(){
   // v1.2.0 — the board carries the whole working set: records, the brief
   // diagram (groups included) and saved views. Each part merges newest-wins.
-  return {v:2, records:RECORDS,
-    brief:{nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod},
+  // v1.12.0 — the WORKING diagram left the board (blank-slate law); the
+  // saved-brief records are the cross-device carrier now.
+  return {v:3, records:RECORDS,
     views:{list:SAVEDV, mod:_svMod},
-    briefs:{list:SAVEDB, mod:_sbMod}};             // v1.7.0: the saved-brief shelf rides too
+    briefs:{list:SAVEDB, mod:_sbMod}};
 }
 function _dbApply(data){
   if(!data) return;
@@ -8332,24 +8362,9 @@ function _dbApply(data){
       try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite'); tx.objectStore('records').put(r2); } }catch(_){}
     }
   });
-  // v1.2.0 — the brief diagram: one blob, newest edit wins. Write kv DIRECTLY
-  // (never through _bfSave — that would dbPush the merge back out, an echo).
-  if(data.brief && Array.isArray(data.brief.nodes) && (data.brief.mod||0)>(_bfMod||0)){
-    const seen={};
-    BRIEF.nodes=data.brief.nodes.filter(function(n){
-      if(!n || typeof n.k!=='string' || seen[n.k]) return false;
-      if(n.t==='org' && !((typeof orgOf==='function'&&orgOf(n.r))||(typeof orgById==='function'&&orgById(n.r)))) return false;
-      seen[n.k]=1; return true;
-    });
-    BRIEF.nodes.forEach(function(n){ if(n.p && !BRIEF.nodes.some(function(x){ return x.k===n.p; })) n.p=null; });
-    BRIEF.hide=Array.isArray(data.brief.hide)?data.brief.hide.slice():[];
-    BRIEF.vert=Array.isArray(data.brief.vert)?data.brief.vert.slice():[];
-    _bfMod=data.brief.mod; _bfSync();
-    try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
-      tx.objectStore('kv').put({k:'brief', v:{v:2, nodes:BRIEF.nodes, hide:BRIEF.hide, vert:BRIEF.vert, mod:_bfMod}}); } }catch(_){}
-    took++;
-    try{ if(document.body.classList.contains('brief-mode')){ renderBrief(); globeMark(); } }catch(_){}
-  }
+  // v1.12.0 — an incoming WORKING-brief blob (older app versions still send
+  // one) is deliberately IGNORED: the working diagram is session-scoped, and
+  // only the saved-brief records travel.
   // v1.2.0 — saved views: same law
   if(data.views && Array.isArray(data.views.list) && (data.views.mod||0)>(_svMod||0)){
     SAVEDV=data.views.list.slice(); _svMod=data.views.mod;

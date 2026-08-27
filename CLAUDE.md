@@ -1131,3 +1131,24 @@ closeouts. The stepping label POLICY is now load-bearing:
   and the 6px gap — if either ever changes, re-derive 24/30/34 together.
 - Geometry proof: assert one unique card x per column, column center
   within 20px of the parent's center, and gaps === [6] via gBCR.
+
+## v1.12.0 — the working copy (owner: one record, blank-slate opens) — AMENDS v1.2.0
+- THE BRIEF WORKFLOW LAW: the working diagram is SESSION-SCOPED. Every open
+  starts blank (map too: no restored selection, no restored room; camera
+  angle only, zoom clamped to the calm world). Persistence = the saved
+  brief record: first save names it and makes it the WORKING COPY
+  (GlobeState._sbActive = record id); the Briefs sheet then leads with
+  “Save changes to <name>” (sbUpdate — in place, same record), with
+  save-as-new as the quiet fork. Loading a record makes IT the working
+  copy; legacy records earn an id on first load; removing the active
+  record clears the pointer.
+- RETIRED from v1.2.0: the working-brief blob — kv 'brief' is no longer
+  read (one-time rescue: pre-v1.12 nodes found there become a “Recovered
+  brief” shelf record, slot emptied), _bfSave writes nothing durable,
+  _dbSnapshot (v:3) carries no brief key, and _dbApply IGNORES incoming
+  brief blobs from older versions. Saved records (briefs blob) are the
+  ONLY cross-device carrier of diagram work — inventories, colors,
+  stacking all ride inside record nodes.
+- Smoke enforces: snapshot has NO brief key; a remote working-brief blob
+  never applies; stacking + inventory persistence assert on the SAVED
+  record; the working-copy lifecycle (activate/update/fork/clear).
