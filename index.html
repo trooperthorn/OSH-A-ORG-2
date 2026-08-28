@@ -199,7 +199,7 @@
      whisper above the ocean, bright gold linework carries the whole map. */
   --ocean-hi:#080706;
   --ocean-lo:#030302;
-  --land:17,14,9;
+  --land:11,9,6;         /* v1.17.3: backfill dimmed a step (was 17,14,9) */
   --coast:240,220,140;
   --world-glow:0;
   --line-tree:rgba(245,215,110,.34);
@@ -1461,6 +1461,12 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.17.3 • THE QUIET MAP (owner: "border state/country lines dimmer for
+//            contrast; backfill a little dimmer; increase zoom"). Linework
+//            recedes so the light owns the picture: coast/shore .92→.55,
+//            state borders .62→.38, country borders .36→.22; land backfill
+//            17,14,9 → 11,9,6. Resting camera moves in: default zoom
+//            1.5 → 1.8 (boot landing + session restore follow).
 //   v1.17.2 • THE ILLUMINATED NAME (owner: "use that illuminating font like
 //            the dots for the names as well"). Map names now GLOW like the
 //            markers: every zoomed-in label draws a gold aura (shadow
@@ -1742,7 +1748,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.17.2';
+const APP_VERSION = 'v1.17.3';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -1795,7 +1801,7 @@ try{
 const GlobeState = window.GlobeState = {
   yaw: 0, pitch: 0,
   q: [0,0,0,1],
-  rotLon: 60, rotLat: -10, zoom: 1.5,
+  rotLon: 60, rotLat: -10, zoom: 1.8,   // v1.17.3: closer resting camera (owner)
   dragging:false, lastX:0, lastY:0, moved:false,
   spin:false, raf:null,
   dirty:false, sel:null, baseK:0.72,
@@ -2174,7 +2180,7 @@ function drawGlobe(cv, ctx){
   for(let lon=-180; lon<180; lon+=30){ drawGlobePath(ctx,m, lonRing(lon)); }
   // land: flat print = near-solid paper/slab fill under a quiet coast stroke;
   // glow = the old translucent accent wash under a bright accent line.
-  ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.92')+')'; ctx.lineWidth=(wGlow?1.4:1.1);
+  ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.55')+')'; ctx.lineWidth=(wGlow?1.4:1.1);   // v1.17.3: quieter linework — the light owns the map
   ctx.fillStyle=(W&&W.land)?('rgba('+wLand+',.96)'):(wGlow?('rgba('+wAcc+',.30)'):('rgba('+wLand+',.96)'));
   for(const ring of GLOBE_RINGS){ drawGlobePath(ctx,m, ring, true); }
   // US INLAND EDGES (v0.33.0 one-source-per-edge law): states-10m single-use
@@ -2182,18 +2188,18 @@ function drawGlobe(cv, ctx){
   // US-Mexico + AK-Canada, drawn ONCE with the same ink as the ocean coast.
   // The countries mesh below has the USA's arcs REMOVED; nothing retraces.
   if(GLOBE_SHORE_RINGS && GLOBE_SHORE_RINGS.length){
-    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.92')+')'; ctx.lineWidth=(wGlow?1.4:1.1);
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'1':'.55')+')'; ctx.lineWidth=(wGlow?1.4:1.1);   // v1.17.3: quieter linework — the light owns the map
     for(const ring of GLOBE_SHORE_RINGS){ drawGlobePath(ctx,m, ring, false); }
   }
   // World COUNTRY borders — thin, dim, global context layer (USA arcs excluded).
   if(GLOBE_COUNTRY_RINGS && GLOBE_COUNTRY_RINGS.length){
-    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.38':'.36')+')'; ctx.lineWidth=0.65;
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.38':'.22')+')'; ctx.lineWidth=0.65;   // v1.17.3 dimmed
     for(const ring of GLOBE_COUNTRY_RINGS){ drawGlobePath(ctx,m, ring, false); }
   }
   // US state borders — over the land fill (no fill, no glow). v0.31.1 sharpened
   // (owner: "very dim"); v0.33.0 nudged with the rest of the linework.
   if(GLOBE_STATE_RINGS && GLOBE_STATE_RINGS.length){
-    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.66':'.62')+')'; ctx.lineWidth=(wGlow?0.9:0.95);
+    ctx.strokeStyle='rgba('+wCoast+','+(wGlow?'.66':'.38')+')'; ctx.lineWidth=(wGlow?0.9:0.95);   // v1.17.3 dimmed
     for(const ring of GLOBE_STATE_RINGS){ drawGlobePath(ctx,m, ring, false); }
   }
   // m5 owns every marker/label/link/brief overlay (A-ORG-1: drawGlobeMarkers et al).
@@ -7136,7 +7142,7 @@ function _rdbOpen(){
             // camera angle survives (it's a view, not content), but the
             // saved selection and the brief-room flag no longer restore.
             if(typeof v.yaw==='number'){ GlobeState.yaw=v.yaw; GlobeState.pitch=v.pitch||0;
-              GlobeState.zoom=Math.min(v.zoom||1.5, 1.5);   // the calm cluster world, always
+              GlobeState.zoom=Math.min(v.zoom||1.8, 1.8);   // the calm resting world, always (v1.17.3: 1.8)
               if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ();
               globeMark(); }
             _ssLast=JSON.stringify(v);
@@ -9057,7 +9063,7 @@ function _bootPaint(ctx, m){
     var GRPS=[ ['pi','gu'], ['kj'], ['swa'], ['eur'], null ];   // null = flood everything
     // camera waypoints at beat boundaries (lon, westward; Hawaii sits at 202°E)
     var CAM=[205, 150, 90, 25, -40, -78];
-    var startZoom=GlobeState.zoom||1.5;
+    var startZoom=GlobeState.zoom||1.8;
     GlobeState._bootMode=true;
     GlobeState._bootLit=new Set();
     GlobeState._boot={hops:HOPS, seg:0, segP:0, flash:[], t:t0};

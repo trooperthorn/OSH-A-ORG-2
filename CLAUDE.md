@@ -1436,3 +1436,18 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
   (wrong field names) and "passed" — a probe whose samples are all
   identical is broken, not lucky. The clipped 3× screenshot was the
   honest check; keep close-up crops in the visual proof kit.
+
+## v1.17.3 — the quiet map (owner: "border lines dimmer for contrast; backfill dimmer; increase zoom")
+- LINEWORK RECEDES, LIGHT LEADS: flat-print alphas — coast/US-shore
+  .92→.55 · state borders .62→.38 · country borders .36→.22 (glow-mode
+  values untouched). The constellation and its names are the brightest
+  thing on the sphere by design.
+- BACKFILL: --land 17,14,9 → 11,9,6 (ocean #080706/#030302 unchanged —
+  land must stay a step lighter than ocean or the continents dissolve).
+- RESTING CAMERA: default zoom 1.5 → 1.8 in THREE coupled places —
+  GlobeState init, the session-restore clamp (Math.min(v.zoom||1.8,1.8)),
+  and the boot fin() startZoom fallback. A future default-zoom change
+  moves all three together.
+- Live proof: boot must land at 1.8; pixel note — the UT/WY border sample
+  point sits next to Hill AFB's glow, so border-level pixel reads there
+  are contaminated; judge linework from the screenshot, not that sample.
