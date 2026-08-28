@@ -1325,3 +1325,20 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - A prune is a RELEASE like any other: version bump, cache, changelog
   entry, full suite, live boot sanity — "no user-facing change" never
   means "no proof".
+
+## v1.16.2 — the ignition (owner: "the dimming effect and the dots did not change")
+- During the tour the WORLD DIMS: drawMarkersHook opens with a full-canvas
+  rgba(4,3,2,.55) veil while _bootMode is up, fading to 0 across the finale
+  beat — the flood of light IS the landing.
+- IGNITED DOTS: while _bootMode is up the reticle NEVER draws — the marker
+  loop pushes the hit-cache entry and continues; _bootPaint paints every lit
+  site as three concentric light arcs (halo 6px @.14 · corona 3.2 @.34 ·
+  hot core 1.7 #FFE9AA), depth-faded. No gradients, no shadowBlur — cheap,
+  boot-only, so the resting map's no-glow reticle law stands untouched.
+- Proof pattern: pixel-sample on the page clock — the Humphreys pixel must
+  read warm gold mid-beat-1 and an interior-land pixel must sit well under
+  its resting luminance (measured 7.0 vs 12.7 here).
+- Root cause of the miss: v1.16.0 verified the tour's STATE (lit sets,
+  beats, teardown) but not its LOOK against the 4b frames. When a design
+  frame exists, the live proof must include a pixel/visual comparison to
+  it, not just state asserts.

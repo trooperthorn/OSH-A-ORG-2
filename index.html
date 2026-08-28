@@ -1451,6 +1451,13 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.16.2 • THE IGNITION (owner: "the dimming effect and the dots did
+//            not change"). The tour now matches the 4b frames: the WORLD
+//            goes dark while it runs (a .55 dim that floods away across
+//            the finale), and lit sites paint as GLOWING POINTS — halo,
+//            corona, hot core — instead of the map's sharp reticles
+//            (which never draw during the tour; the hit-cache still
+//            fills). The resting map is untouched: no-glow law holds.
 //   v1.16.1 • THE PRUNE. No user-facing change: the in-file changelog now
 //            keeps the current era only (v1.5.0+) — 66 KB of v0.x/early-v1
 //            history moved to git + CLAUDE.md. 97.4% of the byte budget
@@ -1681,7 +1688,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.16.1';
+const APP_VERSION = 'v1.16.2';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3151,9 +3158,14 @@ function drawGlobeMarkers(ctx, m){
     if(GlobeState.selOrg && !onChain) continue;
     // v1.16.0 BOOT TOUR: while the tour runs only LIT groups paint (the light
     // accumulates westward, design 4b); clusters and labels stand down.
+    // v1.16.2 THE IGNITION (owner: "the dots did not change"): during the tour
+    // the reticle never draws — _bootPaint owns the dots as GLOWING POINTS
+    // over the dimmed world. The hit-cache still fills (probe + tap law).
     if(GlobeState._bootMode){
       const bl=GlobeState._bootLit;
       if(!(bl && (bl.has('*') || bl.has(String(inst.grp||'').split('|')[0])))) continue;
+      GlobeState._screen.push({inst, sx, sy, depth:p[2]});
+      continue;
     }
     // class filter (legend): chain members stay — the picture outranks the layers
     if(!onChain && _famOffSet().has(cls)) continue;
@@ -3733,6 +3745,14 @@ function drawBriefNodes(ctx, m){
 // ---- m2 hook: links under, markers over (A-ORG-1 drawGlobe order, ~L16798) -----
 function drawMarkersHook(ctx, m){
   _selSyncCheck();
+  // v1.16.2 THE IGNITION: during the tour the WORLD goes dark ("the world
+  // barely there") so the igniting theaters read as light. The dim holds
+  // through the hops and floods away across the finale beat.
+  if(GlobeState._bootMode && GlobeState._boot){
+    const B=GlobeState._boot;
+    const a=(B.seg>=3)?0.55*(1-Math.min(1,B.segP*1.15)):0.55;
+    if(a>0.01){ ctx.save(); ctx.fillStyle='rgba(4,3,2,'+a.toFixed(3)+')'; ctx.fillRect(0,0,m.w,m.h); ctx.restore(); }
+  }
   drawGlobeLinks(ctx, m);
   drawGlobeMarkers(ctx, m);
   drawClusters(ctx, m);
@@ -8945,6 +8965,30 @@ function _bootPaint(ctx, m){
   var B=GlobeState._boot; if(!B) return;
   var now=B.t||0;
   ctx.save();
+  // v1.16.2 — the IGNITED DOTS (mock: soft glowing points, not reticles):
+  // every lit site paints as three concentric light arcs — halo, corona,
+  // hot core. Cheap (no gradients, no shadowBlur); boot-only, so the
+  // no-glow marker law for the resting map still stands.
+  try{
+    var bl=GlobeState._bootLit;
+    if(bl){
+      var all=bl.has('*');
+      for(var si=0; si<SITES.length; si++){
+        var st2=SITES[si];
+        if(st2.lat==null || st2.lon==null) continue;
+        if(!all && !bl.has(String(st2.grp||'').split('|')[0])) continue;
+        var pp2=_projectLonLat(st2.lon, st2.lat, m);
+        if(pp2[2]<0) continue;
+        var fd=Math.max(0.45, pp2[2]);
+        ctx.beginPath(); ctx.arc(pp2[0],pp2[1],6,0,Math.PI*2);
+        ctx.fillStyle='rgba(245,215,110,'+(0.14*fd).toFixed(3)+')'; ctx.fill();
+        ctx.beginPath(); ctx.arc(pp2[0],pp2[1],3.2,0,Math.PI*2);
+        ctx.fillStyle='rgba(245,215,110,'+(0.34*fd).toFixed(3)+')'; ctx.fill();
+        ctx.beginPath(); ctx.arc(pp2[0],pp2[1],1.7,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,233,170,'+(0.95*fd).toFixed(3)+')'; ctx.fill();
+      }
+    }
+  }catch(_){}
   // the lineage line — lifted great-circle segments, drawn up to the beat's
   // progress (slerp copied from drawSubtleArcs; partial-stroke is boot-only)
   var seg=B.seg;
