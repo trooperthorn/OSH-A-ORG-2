@@ -1315,3 +1315,13 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - PROOF PATTERN: sample the tour on the PAGE clock (injected setTimeout
   recorder), never the test's — a mid-run Playwright screenshot costs
   ~0.5s of wall time and slides every later sample into the wrong beat.
+
+## v1.16.1 — the prune (budget law) — AMENDS the ship ritual
+- THE CHANGELOG RETENTION LAW: the in-file changelog keeps the CURRENT ERA
+  only (today: v1.5.0+). Older entries live in `git log` and this file's
+  law sections — they are never lost, only moved. When the ledger's oldest
+  era no longer matches any live law, trim it in a prune release and move
+  the pointer comment. 66 KB freed here: 97.4% → 90.3% of the 900 KB gate.
+- A prune is a RELEASE like any other: version bump, cache, changelog
+  entry, full suite, live boot sanity — "no user-facing change" never
+  means "no proof".
