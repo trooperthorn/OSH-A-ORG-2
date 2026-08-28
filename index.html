@@ -1461,6 +1461,15 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.17.1 • THE CONSTELLATION AT EVERY ZOOM (owner: "keep the illuminated
+//            dots and use that color scheme for the names as you zoom
+//            closer — right now it still shows the white dots"). The glass
+//            reticle no longer paints ordinary sites at ANY zoom: every
+//            unselected site is an ignited gold dot (_glowDot, scaled by
+//            the zb2 growth law; HQs a touch larger, guard dimmer). The
+//            reticle survives only as the SELECTION language on chain
+//            members. Zoomed-in names now draw in the ignited gold, not
+//            ice-white.
 //   v1.17.0 • THE CONSTELLATION (owner: "do away with the big numbers on
 //            the map — illuminated dots instead; more bases in the area
 //            reflected by the illumination"). The numbered cluster badges
@@ -1727,7 +1736,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.17.0';
+const APP_VERSION = 'v1.17.1';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3208,20 +3217,6 @@ function drawGlobeMarkers(ctx, m){
     }
     // class filter (legend): chain members stay — the picture outranks the layers
     if(!onChain && _famOffSet().has(cls)) continue;
-    // THE CONSTELLATION (v1.17.0, owner: "do away with the big numbers —
-    // illuminated dots instead; more bases in the area reflected by the
-    // illumination"): at world zoom every ordinary site paints as an ignited
-    // glow dot (the boot tour's own recipe) and density reads as brightness —
-    // overlapping halos accumulate where installations crowd. The numbered
-    // cluster badges are RETIRED. Taps still land on individual sites via
-    // _screen. The no-glow reticle law now governs zoom ≥ 1.6 only.
-    if(GlobeState.zoom<1.6 && !onChain && !GlobeState._bootMode){
-      if(!dotsOff){
-        _glowDot(ctx, sx, sy, Math.max(0.45, p[2]));
-        GlobeState._screen.push({inst, sx, sy, depth:p[2]});
-      }
-      continue;
-    }
     const col=(isSel||isDown) ? T.accent : (isUp ? T.signal : (CLS_META[cls]||CLS_META.base).c);
     const zb2=Math.min(2.1, 0.85+zb*0.16);
     const dotR=((isSel?3.6:(onChain?3.0:(cls==='hq'?3.4:(isGuard?2.0:2.5)))))*zb2;
@@ -3240,21 +3235,25 @@ function drawGlobeMarkers(ctx, m){
       ctx.restore();
     }
 
-    // GLASS RETICLE, SHARP (A-ORG-1 recipe, halo deleted per owner: dark interior
-    // disc + one thin ring + bright core; HQ adds one concentric ring; no glow,
-    // no shadowBlur — ~270 markers must hold phone frames).
+    // THE CONSTELLATION AT EVERY ZOOM (v1.17.1, owner: "keep the illuminated
+    // dots… right now it still shows the white dots"): every ordinary site is
+    // an ignited gold dot at ANY zoom — _glowDot scaled by the old zb2 growth
+    // law (HQs a touch larger, guard a touch dimmer). Density reads as
+    // brightness everywhere. The GLASS RETICLE (dark disc + ring + core)
+    // survives only as the SELECTION language on chain members, in the
+    // accent/signal colors — never white.
     if(!dotsOff){
-      ctx.globalAlpha=fade*(isGuard&&!onChain?0.8:1);
-      ctx.beginPath(); ctx.arc(sx, sy, rr, 0, Math.PI*2);
-      ctx.fillStyle='rgba(8,7,4,.85)'; ctx.fill();
-      ctx.lineWidth=onChain?1.6:1.25; ctx.strokeStyle='rgb('+col+')'; ctx.stroke();
-      ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.9, rr*0.34), 0, Math.PI*2);
-      ctx.fillStyle='rgb('+col+')'; ctx.fill();
-      if(cls==='hq' && !isSel){
-        ctx.lineWidth=1.1; ctx.strokeStyle='rgb('+col+')'; ctx.globalAlpha=0.9*fade;
-        ctx.beginPath(); ctx.arc(sx, sy, rr+2.8, 0, Math.PI*2); ctx.stroke();
+      if(onChain){
+        ctx.globalAlpha=fade;
+        ctx.beginPath(); ctx.arc(sx, sy, rr, 0, Math.PI*2);
+        ctx.fillStyle='rgba(8,7,4,.85)'; ctx.fill();
+        ctx.lineWidth=1.6; ctx.strokeStyle='rgb('+col+')'; ctx.stroke();
+        ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.9, rr*0.34), 0, Math.PI*2);
+        ctx.fillStyle='rgb('+col+')'; ctx.fill();
+        ctx.globalAlpha=1;
+      } else {
+        _glowDot(ctx, sx, sy, Math.max(0.45, p[2])*(isGuard?0.85:1), zb2*(cls==='hq'?1.25:1));
       }
-      ctx.globalAlpha=1;
     }
 
     // chain-member labels draw at ANY zoom AND through the Names/USACE toggles —
@@ -3345,7 +3344,8 @@ function drawGlobeMarkers(ctx, m){
       ctx.shadowColor='rgba('+T.ground+',.9)'; ctx.shadowBlur=3; ctx.shadowOffsetY=1;
       ctx.lineWidth=2.2; ctx.strokeStyle='rgba('+T.ground+',.78)'; ctx.strokeText(name, _pl.x, _pl.y);
       ctx.shadowBlur=0; ctx.shadowOffsetY=0;
-      ctx.fillStyle='rgba('+(clsOf(inst.id)==='depot'?T.signal:T.text)+',.92)'; ctx.fillText(name, _pl.x, _pl.y);
+      // v1.17.1 (owner: "use that color scheme for the names"): the ignited gold
+      ctx.fillStyle='rgba(245,215,110,.92)'; ctx.fillText(name, _pl.x, _pl.y);
       _lblN++;
     }
     ctx.restore();
@@ -3359,12 +3359,13 @@ function drawGlobeMarkers(ctx, m){
 // count — overlapping halos brighten where installations crowd.
 // (The numbered cluster badges — A-ORG-1 §3.4 grid/merge/count — retired
 // v1.17.0 by owner directive; taps land on individual sites via _screen.)
-function _glowDot(ctx, x, y, fd){
-  ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2);
+function _glowDot(ctx, x, y, fd, k){
+  k=k||1;
+  ctx.beginPath(); ctx.arc(x,y,6*k,0,Math.PI*2);
   ctx.fillStyle='rgba(245,215,110,'+(0.14*fd).toFixed(3)+')'; ctx.fill();
-  ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2);
+  ctx.beginPath(); ctx.arc(x,y,3.2*k,0,Math.PI*2);
   ctx.fillStyle='rgba(245,215,110,'+(0.34*fd).toFixed(3)+')'; ctx.fill();
-  ctx.beginPath(); ctx.arc(x,y,1.7,0,Math.PI*2);
+  ctx.beginPath(); ctx.arc(x,y,1.7*k,0,Math.PI*2);
   ctx.fillStyle='rgba(255,233,170,'+(0.95*fd).toFixed(3)+')'; ctx.fill();
 }
 

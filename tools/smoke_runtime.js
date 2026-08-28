@@ -777,6 +777,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(html.indexOf('drawClusters')>=0 || html.indexOf('_cluHits')>=0){
         gok=false; fails++; console.log('✗ the cluster-badge system is back (retired v1.17.0 — the constellation owns world zoom)'); }
       if(typeof global._glowDot!=='function'){ gok=false; fails++; console.log('✗ _glowDot (the shared ignited-dot recipe) is missing'); }
+      // v1.17.1 (owner: "it still shows the white dots"): the glass reticle
+      // paints CHAIN MEMBERS ONLY — exactly one reticle fill in source — and
+      // the tiny labels ink in the ignited gold, never ice-white.
+      if(html.split('rgba(8,7,4,.85)').length!==2){
+        gok=false; fails++; console.log('✗ the glass reticle escaped the chain (must appear exactly once, selection language only)'); }
+      if(html.indexOf("ctx.fillStyle='rgba(245,215,110,.92)'; ctx.fillText(name")<0){
+        gok=false; fails++; console.log('✗ zoomed-in names lost the ignited-gold ink (v1.17.1 law)'); }
       global._bfObjSheet(gg.k);
       const gh=IDS['dossier']?IDS['dossier'].innerHTML:'';
       if(gh.indexOf('bf-act bf-addsub')<0 || gh.indexOf('data-bfunder')<0){ gok=false; fails++; console.log('✗ SHEET primary (filled ⊕ Add a subordinate) missing'); }

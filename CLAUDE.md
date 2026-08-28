@@ -1405,3 +1405,19 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - Proof: harness CONSTELLATION probe (266 dots · ≥2 arcs each · no badges);
   live pixel law — the CONUS patch must outshine an empty-ocean patch
   (measured 50.5 vs 8.9), and a world-zoom tap must select a site.
+
+## v1.17.1 — the constellation at every zoom (owner: "keep the illuminated dots… it still shows the white dots")
+- THE GLOW IS THE MARKER, PERIOD: _glowDot paints every unselected site at
+  ANY zoom — scaled by the old zb2 growth law (k), HQs ×1.25, guard ×0.85
+  brightness. The v1.17.0 world-zoom-only gate lasted one release; the
+  owner wanted the light everywhere.
+- The GLASS RETICLE is now purely the SELECTION language — it draws on
+  chain members only (accent/signal ink). Smoke pins this: the reticle
+  fill `rgba(8,7,4,.85)` must appear EXACTLY once in source.
+- NAMES IN THE SCHEME: the tiny-label pass inks rgba(245,215,110,.92) —
+  the ignited gold — never T.text ice-white (smoke source law). Chain
+  labels keep their accent/signal ink (selection language).
+- CLS_META colors survive in the legend UI only; on the canvas the class
+  distinction is size (HQ) and brightness (guard), not hue.
+- Proof pattern: pixel-sample 8 marker centers at zoom 2.6 — all must read
+  warm gold (b < r·0.78); ice-white cores fail at b/r ≈ .89.
