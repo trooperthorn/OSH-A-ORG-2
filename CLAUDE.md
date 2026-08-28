@@ -1386,3 +1386,22 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
   hands into the veil fade. Wordmark condenses from p>.55 over .31.
 - Coupled timers stand at T=3900: toast 5000 · coach 4800 · chip 5600 —
   any future T change moves all three (law since v1.16.0).
+
+## v1.17.0 — the constellation (owner: "do away with the big numbers — illuminated dots instead")
+- THE CLUSTER BADGES ARE RETIRED: the A-ORG-1 §3.4 grid/merge/count system
+  (drawClusters, GlobeState._clu/_cluHits, the badge tap pass, _flyFitPts)
+  is deleted. Smoke bans the identifiers in source — retired isn't retired
+  until a probe guards it.
+- WORLD VIEW = CONSTELLATION: below zoom 1.6 every ordinary site paints via
+  _glowDot — the boot tour's three-arc ignited dot (halo 6 @.14·fd · corona
+  3.2 @.34·fd · core 1.7 #FFE9AA @.95·fd), now a SHARED recipe (_bootPaint
+  uses it too). Density IS the count: overlapping halos brighten where
+  installations crowd. No gradients, no shadowBlur — ~270 must hold phone
+  frames.
+- The no-glow reticle law now governs the OPERATIONAL zoom (≥ 1.6) only;
+  reticles, chain labels, and the tiny-label ladder are untouched there.
+- TAP LAW: a constellation dot is a real door — every world-zoom site rides
+  GlobeState._screen and siteHitTest; there is no badge hit pass anymore.
+- Proof: harness CONSTELLATION probe (266 dots · ≥2 arcs each · no badges);
+  live pixel law — the CONUS patch must outshine an empty-ocean patch
+  (measured 50.5 vs 8.9), and a world-zoom tap must select a site.

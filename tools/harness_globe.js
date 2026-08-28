@@ -266,15 +266,20 @@ if(!fails){
         }
       }catch(e){ fails++; console.log('✗ TAP probe crashed: '+e.message); }
     }
-    // ── CLUSTER GATE (v0.6.0): below zoom 1.6 ordinary sites divert to badges ──
+    // ── THE CONSTELLATION (v1.17.0, replaces the CLUSTER GATE): below zoom 1.6
+    // the numbered badges are RETIRED — every ordinary site paints as an
+    // ignited glow dot (_glowDot, 3 arcs each) and stays individually tappable.
     {
-      GS.zoom=1.2; GS._clu=null; GS._cluHits=null;
+      GS.zoom=1.2;
       const cc={}, cctx=makeCtx(cc);
       G.drawMarkersHook(cctx,m);
-      const badges=(GS._cluHits||[]).length;
-      if(!(badges>0)){ fails++; console.log('✗ CLUSTERS: zoom 1.2 produced no badges'); }
-      else if((cc.fillText||0)<1){ fails++; console.log('✗ CLUSTERS: no count text drawn'); }
-      else console.log('✓ CLUSTERS: zoom 1.2 → '+badges+' badges with counts; singles return above the 1.6 gate');
+      const scrN=(GS._screen||[]).length;
+      if(typeof G.drawClusters!=='undefined'){ fails++; console.log('✗ CONSTELLATION: drawClusters still exists — the badges were retired v1.17.0'); }
+      else if(GS._cluHits!=null || GS._clu!=null){ fails++; console.log('✗ CONSTELLATION: cluster state survived the draw'); }
+      else if(typeof G._glowDot!=='function'){ fails++; console.log('✗ CONSTELLATION: _glowDot missing'); }
+      else if(!((cc.arc||0)>=scrN*2)){ fails++; console.log('✗ CONSTELLATION: zoom 1.2 drew only '+(cc.arc||0)+' arcs for '+scrN+' screen dots — glow recipe not painting'); }
+      else if(!(scrN>60)){ fails++; console.log('✗ CONSTELLATION: only '+scrN+' sites in _screen at world zoom — dots must stay tappable'); }
+      else console.log('✓ CONSTELLATION: zoom 1.2 → '+scrN+' glow dots ('+cc.arc+' arcs, no badges, no counts), each in the hit cache');
       GS.zoom=2.0;
     }
     GS.sel=null; G._syncSelArcs(null);

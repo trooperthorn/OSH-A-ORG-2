@@ -772,6 +772,11 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // v1.16.3 brief-space law: phone brief drops the search band to +74
       if(html.indexOf('body.brief-mode #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}')<0){
         gok=false; fails++; console.log('✗ phone brief must lower the search pill to +74 (space law)'); }
+      // v1.17.0 (owner: "do away with the big numbers"): the numbered cluster
+      // badges are RETIRED — retired isn't retired until a probe guards it.
+      if(html.indexOf('drawClusters')>=0 || html.indexOf('_cluHits')>=0){
+        gok=false; fails++; console.log('✗ the cluster-badge system is back (retired v1.17.0 — the constellation owns world zoom)'); }
+      if(typeof global._glowDot!=='function'){ gok=false; fails++; console.log('✗ _glowDot (the shared ignited-dot recipe) is missing'); }
       global._bfObjSheet(gg.k);
       const gh=IDS['dossier']?IDS['dossier'].innerHTML:'';
       if(gh.indexOf('bf-act bf-addsub')<0 || gh.indexOf('data-bfunder')<0){ gok=false; fails++; console.log('✗ SHEET primary (filled ⊕ Add a subordinate) missing'); }

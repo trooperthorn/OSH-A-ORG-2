@@ -1461,6 +1461,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.17.0 • THE CONSTELLATION (owner: "do away with the big numbers on
+//            the map — illuminated dots instead; more bases in the area
+//            reflected by the illumination"). The numbered cluster badges
+//            are retired. At world zoom (< 1.6) every site paints as the
+//            boot tour's ignited glow dot (_glowDot: halo · corona · hot
+//            core) — density itself is the count, overlapping halos
+//            brighten where installations crowd. Taps land on individual
+//            dots. Reticles unchanged at operational zoom (≥ 1.6).
 //   v1.16.5 • THE THEATER ORDER (owner: "go Pacific, Korea, SWA, Europe,
 //            US"). The tour now opens in the PACIFIC — Fort Shafter
 //            pulses while Hawaii/Guam ignite — then the line hops Korea →
@@ -1719,7 +1727,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.16.5';
+const APP_VERSION = 'v1.17.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3200,11 +3208,16 @@ function drawGlobeMarkers(ctx, m){
     }
     // class filter (legend): chain members stay — the picture outranks the layers
     if(!onChain && _famOffSet().has(cls)) continue;
-    // CLUSTERS (A-ORG-1 §3.4, gate 1.6 · 44px grid): at world zoom, ordinary
-    // sites divert into count badges; the badge pass draws after this loop.
+    // THE CONSTELLATION (v1.17.0, owner: "do away with the big numbers —
+    // illuminated dots instead; more bases in the area reflected by the
+    // illumination"): at world zoom every ordinary site paints as an ignited
+    // glow dot (the boot tour's own recipe) and density reads as brightness —
+    // overlapping halos accumulate where installations crowd. The numbered
+    // cluster badges are RETIRED. Taps still land on individual sites via
+    // _screen. The no-glow reticle law now governs zoom ≥ 1.6 only.
     if(GlobeState.zoom<1.6 && !onChain && !GlobeState._bootMode){
       if(!dotsOff){
-        (GlobeState._clu||(GlobeState._clu=[])).push({x:sx, y:sy, lat:inst.lat, lon:inst.lon, c:(CLS_META[cls]||CLS_META.base).c});
+        _glowDot(ctx, sx, sy, Math.max(0.45, p[2]));
         GlobeState._screen.push({inst, sx, sy, depth:p[2]});
       }
       continue;
@@ -3339,66 +3352,20 @@ function drawGlobeMarkers(ctx, m){
   }
 }
 
-// ---- CLUSTER BADGES (A-ORG-1 §3.4, single-pass port): 44px screen grid,
-// active below zoom 1.6; badge = glass disc + accent ring + halo ring + reticle
-// ticks + count. Tap eases past the gate at the badge's centroid. ------------
-function drawClusters(ctx, m){
-  const T=_mTok();
-  if(GlobeState.zoom>=1.6 || !GlobeState._clu || !GlobeState._clu.length){ GlobeState._cluHits=null; GlobeState._clu=null; return; }
-  const gm=new Map();
-  for(const c of GlobeState._clu){
-    const k=((c.x/44)|0)+':'+((c.y/44)|0);
-    let g=gm.get(k); if(!g){ g={x:0,y:0,la:0,lo:0,n:0,mem:[]}; gm.set(k,g); }
-    g.x+=c.x; g.y+=c.y; g.la+=c.lat; g.lo+=c.lon; g.n++; g.c=c.c;
-    g.mem.push({lat:c.lat, lon:c.lon});
-  }
-  // v0.30.0 (audit #19): grid cells whose badges would overlap MERGE — one badge,
-  // one honest count, instead of "2" printed over "21".
-  let cells=[]; gm.forEach(function(g){ cells.push(g); });
-  let merged=true, guard=0;
-  while(merged && ++guard<24){
-    merged=false;
-    outer: for(let a2=0;a2<cells.length;a2++){
-      for(let b2=a2+1;b2<cells.length;b2++){
-        const A=cells[a2], B=cells[b2];
-        const ra=(A.n>1)?Math.min(15,7+Math.log2(A.n)*2.6)+4:3, rb=(B.n>1)?Math.min(15,7+Math.log2(B.n)*2.6)+4:3;
-        const dx=A.x/A.n-B.x/B.n, dy=A.y/A.n-B.y/B.n;
-        if(dx*dx+dy*dy < (ra+rb)*(ra+rb)){
-          A.x+=B.x; A.y+=B.y; A.la+=B.la; A.lo+=B.lo; A.n+=B.n;
-          A.mem=(A.mem||[]).concat(B.mem||[]);
-          cells.splice(b2,1); merged=true; break outer;
-        }
-      }
-    }
-  }
-  GlobeState._cluHits=[];
-  ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
-  cells.forEach(function(g){
-    let cx=g.x/g.n, cy=g.y/g.n;
-    if(g.n===1){
-      ctx.beginPath(); ctx.arc(cx,cy,2.2,0,Math.PI*2);
-      ctx.fillStyle='rgb('+(g.c||T.accent)+')'; ctx.globalAlpha=.85; ctx.fill(); ctx.globalAlpha=1;
-      return;
-    }
-    const r=Math.min(15, 7+Math.log2(g.n)*2.6);
-    // v0.31.0 (re-verify): a limb badge half off the screen edge is unreadable and
-    // barely tappable — clamp the whole disc inside the frame (hits use it too)
-    const _bE=r+8; cx=Math.max(_bE, Math.min(m.w-_bE, cx)); cy=Math.max(_bE, Math.min(m.h-_bE, cy));
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.fillStyle='rgba(8,7,4,.66)'; ctx.fill();
-    ctx.strokeStyle='rgba('+T.accent+',.85)'; ctx.lineWidth=1.4; ctx.stroke();
-    ctx.beginPath(); ctx.arc(cx,cy,r+3.5,0,Math.PI*2);
-    ctx.strokeStyle='rgba('+T.accent+',.28)'; ctx.lineWidth=1; ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx-r-7,cy); ctx.lineTo(cx-r-2,cy); ctx.moveTo(cx+r+2,cy); ctx.lineTo(cx+r+7,cy);
-    ctx.moveTo(cx,cy-r-7); ctx.lineTo(cx,cy-r-2); ctx.moveTo(cx,cy+r+2); ctx.lineTo(cx,cy+r+7);
-    ctx.strokeStyle='rgba('+T.accent+',.5)'; ctx.lineWidth=1; ctx.stroke();
-    ctx.fillStyle='rgba('+T.text+',.95)';
-    ctx.font='700 9px '+T.body;
-    ctx.fillText(String(g.n), cx, cy+0.5);
-    GlobeState._cluHits.push({x:cx, y:cy, r:r+8, lat:g.la/g.n, lon:g.lo/g.n, mem:g.mem||null});
-  });
-  ctx.restore(); GlobeState._clu=null;
+// ---- THE IGNITED DOT (v1.17.0): the boot tour's three-arc light point,
+// promoted to a shared recipe — halo, corona, hot core; no gradients, no
+// shadowBlur (~270 of these must hold phone frames). The resting WORLD VIEW
+// (zoom < 1.6) and the boot tour both paint with it; density itself is the
+// count — overlapping halos brighten where installations crowd.
+// (The numbered cluster badges — A-ORG-1 §3.4 grid/merge/count — retired
+// v1.17.0 by owner directive; taps land on individual sites via _screen.)
+function _glowDot(ctx, x, y, fd){
+  ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2);
+  ctx.fillStyle='rgba(245,215,110,'+(0.14*fd).toFixed(3)+')'; ctx.fill();
+  ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2);
+  ctx.fillStyle='rgba(245,215,110,'+(0.34*fd).toFixed(3)+')'; ctx.fill();
+  ctx.beginPath(); ctx.arc(x,y,1.7,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,233,170,'+(0.95*fd).toFixed(3)+')'; ctx.fill();
 }
 
 // ═══ THE BRIEF ON THE GLOBE (v0.7.0 owner reversal) — the chain is BUILT on the
@@ -3790,7 +3757,6 @@ function drawMarkersHook(ctx, m){
   }
   drawGlobeLinks(ctx, m);
   drawGlobeMarkers(ctx, m);
-  drawClusters(ctx, m);
   try{ drawBriefStates(ctx, m, true); }catch(_){}    // v0.24.0: state names last — they share the label collision list
   try{ if(GlobeState._bootMode && typeof _bootPaint==='function') _bootPaint(ctx, m); }catch(_){}   // v1.16.0: the tour's own light
 }
@@ -5241,28 +5207,8 @@ function _flyFitChain(){
     flyToLatLon(cLat, cLon, zoom);
   }catch(_){}
 }
-// fit ANY point set: mean-vector center, zoom from spread (floor = the zoom that
-// dissolves clusters so the members resolve into dots)
-function _flyFitPts(pts, minZoom){
-  try{
-    if(!pts || !pts.length) return;
-    const d=Math.PI/180; let x=0,y=0,z=0;
-    const vs=pts.map(function(pt){ const v=[Math.cos(pt.lat*d)*Math.cos(pt.lon*d), Math.cos(pt.lat*d)*Math.sin(pt.lon*d), Math.sin(pt.lat*d)];
-      x+=v[0]; y+=v[1]; z+=v[2]; return v; });
-    const L=Math.hypot(x,y,z)||1;
-    const cLat=Math.asin(Math.max(-1,Math.min(1,z/L)))/d, cLon=Math.atan2(y,x)/d;
-    const cv2=[x/L,y/L,z/L];
-    let maxSep=0;
-    vs.forEach(function(v){ let dot=cv2[0]*v[0]+cv2[1]*v[1]+cv2[2]*v[2]; dot=Math.max(-1,Math.min(1,dot));
-      maxSep=Math.max(maxSep, Math.acos(dot)/d); });
-    // v0.32.1: same clear-window law as the pair/chain fits.
-    const aim=_bandAim(cLat, cLon, maxSep*2, minZoom||1.7, 4.8);
-    if(aim){ flyToLatLon(aim.lat, aim.lon, aim.zoom); return; }
-    const span=maxSep*2*1.2;
-    const zoom=Math.max(minZoom||1.7, span>60?1.7 : span>30?2.2 : span>14?2.9 : span>6?3.8 : 4.8);
-    flyToLatLon(cLat, cLon, zoom);
-  }catch(_){}
-}
+// (v1.17.0: _flyFitPts — the any-point-set camera fit — left with its only
+// caller, the cluster-badge tap. Rebuild from git if a future fit needs it.)
 // ── THE CLEAR WINDOW (v0.32.1, owner recording #3: "This again…") ─────────────
 // Every fit used to center on the CANVAS — but the docked card owns the top
 // ~45% of a phone (and a 400px left rail on desktop), so about half the stepped
@@ -5378,15 +5324,8 @@ function tapAtScreen(x, y){
     }
     return;
   }
-  const hits=GlobeState._cluHits;
-  if(hits){ for(const h of hits){ const dx=x-h.x, dy=y-h.y;
-    if(dx*dx+dy*dy<=h.r*h.r){
-      // v0.30.0 (audit #19): a cluster tap frames ITS members, not a blind hop
-      try{ _undoPush();
-        if(h.mem && h.mem.length>1) _flyFitPts(h.mem, 2.0);
-        else flyToLatLon(h.lat, h.lon, 2.4);
-      }catch(_){}
-      return; } } }
+  // (v1.17.0: the cluster-badge hit pass is gone with the badges — at world
+  // zoom a tap lands on the nearest constellation dot via siteHitTest below.)
   const s=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
   if(s && s.id!=null){
     // DRILL DOWN (v0.18.0): tapping a direct-subordinate dot focuses THAT org and
@@ -9001,9 +8940,10 @@ function _bootPaint(ctx, m){
   var now=B.t||0;
   ctx.save();
   // v1.16.2 — the IGNITED DOTS (mock: soft glowing points, not reticles):
-  // every lit site paints as three concentric light arcs — halo, corona,
-  // hot core. Cheap (no gradients, no shadowBlur); boot-only, so the
-  // no-glow marker law for the resting map still stands.
+  // every lit site paints via _glowDot (halo · corona · hot core). As of
+  // v1.17.0 the resting WORLD VIEW shares the same recipe — the boot's look
+  // persists below zoom 1.6; the no-glow reticle law now governs the
+  // operational zoom (≥ 1.6) only.
   try{
     var bl=GlobeState._bootLit;
     if(bl){
@@ -9014,13 +8954,7 @@ function _bootPaint(ctx, m){
         if(!all && !bl.has(String(st2.grp||'').split('|')[0])) continue;
         var pp2=_projectLonLat(st2.lon, st2.lat, m);
         if(pp2[2]<0) continue;
-        var fd=Math.max(0.45, pp2[2]);
-        ctx.beginPath(); ctx.arc(pp2[0],pp2[1],6,0,Math.PI*2);
-        ctx.fillStyle='rgba(245,215,110,'+(0.14*fd).toFixed(3)+')'; ctx.fill();
-        ctx.beginPath(); ctx.arc(pp2[0],pp2[1],3.2,0,Math.PI*2);
-        ctx.fillStyle='rgba(245,215,110,'+(0.34*fd).toFixed(3)+')'; ctx.fill();
-        ctx.beginPath(); ctx.arc(pp2[0],pp2[1],1.7,0,Math.PI*2);
-        ctx.fillStyle='rgba(255,233,170,'+(0.95*fd).toFixed(3)+')'; ctx.fill();
+        _glowDot(ctx, pp2[0], pp2[1], Math.max(0.45, pp2[2]));   // v1.17.0: shared recipe
       }
     }
   }catch(_){}
