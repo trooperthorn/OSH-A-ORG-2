@@ -766,6 +766,12 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(dk.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ DOCK cluster divider missing'); }
       if(dk.indexOf('data-bfledger')<0 || dk.indexOf('data-bfsearch')<0){ gok=false; fails++; console.log('✗ DOCK Add/Ledger doors missing'); }
       if(st2.indexOf('ch-dock')>=0){ gok=false; fails++; console.log('✗ the dock must be OUT of the chart head (v1.15.0 split)'); }
+      // v1.16.3 (owner, twice now): NO dashed rings on chart objects — ever
+      if(html.indexOf('dashed var(--bfrg')>=0){ gok=false; fails++; console.log('✗ the group ring is dashed again (v1.9.1/v1.16.3 law: solid only)'); }
+      if(html.indexOf('border:1.4px solid var(--bfrg')<0){ gok=false; fails++; console.log('✗ the group ring lost its solid border'); }
+      // v1.16.3 brief-space law: phone brief drops the search band to +74
+      if(html.indexOf('body.brief-mode #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}')<0){
+        gok=false; fails++; console.log('✗ phone brief must lower the search pill to +74 (space law)'); }
       global._bfObjSheet(gg.k);
       const gh=IDS['dossier']?IDS['dossier'].innerHTML:'';
       if(gh.indexOf('bf-act bf-addsub')<0 || gh.indexOf('data-bfunder')<0){ gok=false; fails++; console.log('✗ SHEET primary (filled ⊕ Add a subordinate) missing'); }

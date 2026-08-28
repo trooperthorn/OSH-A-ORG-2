@@ -309,7 +309,7 @@ body{
    CSS off body.brief-mode. Literal gold/ink pair (dock-material law) so the
    pill reads the same in both rooms. */
 #modeSeg{position:absolute; z-index:22; left:50%; transform:translateX(-50%);
-  top:calc(env(safe-area-inset-top,0px) + 52px);
+  top:calc(env(safe-area-inset-top,0px) + 48px);   /* v1.16.3: 4px up — brief space */
   display:flex; gap:2px; padding:3px; border-radius:var(--r-pill)}
 .ms-cell{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
   padding:6px 14px; border-radius:999px; background:none; color:var(--dim);
@@ -559,10 +559,14 @@ body.brief-mode #briefStage{
      Full pane minus 6px gutters on phone; centered 880px on desktop. */
   display:block; position:absolute; z-index:16;
   left:6px; right:6px;
-  top:calc(env(safe-area-inset-top,0px) + 92px);
-  width:auto; max-height:60vh; max-height:60dvh;
+  /* v1.16.3 (owner: "maximize space — push top up and bottom down"): the
+     console hugs the seg (+84) and may run down to the lowered search pill */
+  top:calc(env(safe-area-inset-top,0px) + 84px);
+  width:auto;
+  max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 218px);
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 218px);
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  padding:8px 8px 12px; border-radius:18px;
+  padding:6px 6px 10px; border-radius:18px;
   background:radial-gradient(ellipse 95% 100% at 50% 30%, rgba(6,5,4,.85) 60%, rgba(6,5,4,0) 100%);
 }
 @media(min-width:1100px){ body.brief-mode #briefStage{
@@ -615,6 +619,10 @@ body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .1
 @media(max-width:1099px){
   body.brief-mode #briefDock{left:10px; right:10px; justify-content:space-between; padding:6px 8px 5px}
   #briefDock .bd-gap{flex:none; width:70px}
+  /* v1.16.3: the bottom band drops — the search pill sits just above the dock
+     (74) instead of the map room's 96, and the results shelf follows */
+  body.brief-mode #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
+  body.brief-mode #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 126px)}
 }
 @media(min-width:1100px){ #briefDock .bd-gap{display:none} }
 /* v1.15.0 — the chart-to-globe leader */
@@ -709,8 +717,10 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
 .bf-box.bf-dim{opacity:.35}
 .bf-box.bf-foc{box-shadow:0 0 0 1.5px var(--bfrg,#FFFFFF), 0 0 0 3.5px rgba(245,215,110,.4),
   0 0 16px var(--bfgl,rgba(255,255,255,.3))}
-/* a GROUP is filler — same light, dashed ring says "scaffold" */
-.bf-box.bf-grp{box-shadow:0 0 9px var(--bfgl,rgba(255,255,255,.3)); border:1.4px dashed var(--bfrg,#FFFFFF)}
+/* a GROUP is filler — SAME solid light as every other box (v1.16.3, owner:
+   "groups have the dotted line again which we got rid of — make it solid".
+   The v1.9.1 law stands: dashed reads as edit-mode chrome; never again.) */
+.bf-box.bf-grp{box-shadow:0 0 9px var(--bfgl,rgba(255,255,255,.3)); border:1.4px solid var(--bfrg,#FFFFFF)}
 /* the fold caret sits under its box and carries the hidden count */
 /* v0.26.0 — the per-object ops: ＋ add subordinates · ✎ edit. Small and quiet so
    the box stays minimal, but always reachable without opening anything first. */
@@ -1451,6 +1461,13 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.16.3 • BRIEF BREATHING ROOM (owner's phone review). Phone brief
+//            maximizes the chart: the seg rides 4px higher, the console
+//            hugs it at +84 with tighter padding and may run down to the
+//            search band, which DROPS to +74 (just above the dock; the
+//            results shelf follows). And the GROUP ring is SOLID again —
+//            the dashed scaffold crept back in v1.15.0; the v1.9.1 law
+//            (dashed reads as edit-mode chrome) is re-affirmed for good.
 //   v1.16.2 • THE IGNITION (owner: "the dimming effect and the dots did
 //            not change"). The tour now matches the 4b frames: the WORLD
 //            goes dark while it runs (a .55 dim that floods away across
@@ -1688,7 +1705,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.16.2';
+const APP_VERSION = 'v1.16.3';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first

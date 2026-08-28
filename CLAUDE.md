@@ -1342,3 +1342,13 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
   beats, teardown) but not its LOOK against the 4b frames. When a design
   frame exists, the live proof must include a pixel/visual comparison to
   it, not just state asserts.
+
+## v1.16.3 — brief breathing room + the solid group ring (owner's phone review)
+- BRIEF SPACE LAW (phone): seg top +48; console top +84 with 6px padding;
+  console max-height = 100dvh − both safe insets − 218px; the search pill
+  DROPS to bottom +74 in brief (results shelf +126) so it sits just above
+  the dock. The chart owns everything between the seg and the search band.
+- THE DASHED RING DIED TWICE: v1.9.1 retired it ("edit mode in Word");
+  v1.15.0 quietly brought it back on groups; the owner caught it. It is now
+  a smoke assert (no `dashed var(--bfrg` anywhere) — a retired style is not
+  retired until a probe guards it.
