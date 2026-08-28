@@ -1367,3 +1367,22 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - Coupled timers moved again with T: toast 5000 · coach 4800 · chip 5600.
 - PROBE LESSON: style readbacks NORMALIZE colors — 'rgba(245,215,110'
   never matches; assert on '245, 215, 110' (spaced) or the function name.
+
+## v1.16.5 — the theater order (owner recording: "Go pacific Korea SWA Europe US")
+- HOP ORDER LAW: the intro reads west-to-east into home — Fort Shafter
+  (Pacific, with Guam/Philippines igniting alongside) → Camp Humphreys
+  (Korea) → Camp Arifjan (SWA) → Wiesbaden (Europe) → the Pentagon (US,
+  lit '*'). GRPS = [['pi','gu'],['kj'],['swa'],['eur'],null].
+- CAMERA WAYPOINTS: piecewise lon CAM=[205,150,90,25,-40,-78] lerped per
+  beat (seg → seg+1 across segP), pitch 28° with a +5° ease on the final
+  beat, zoom 1.05→1.30 on eased total progress. Changing hop order means
+  re-deriving CAM — the camera must lead each landing, never chase it.
+- ARRIVAL-FLASH LAW: a target flashes when the line LANDS, not when the
+  beat starts — fire at segP>0.94 with a flash.some(f=>f.i===seg) dedupe.
+  (v1.16.5's first cut ringed Arifjan while the line was still mid-ocean;
+  the beat frame caught it. Mid-flight sample must show fl=[].)
+- Dim veil holds through the four away beats and floods off across
+  p .78→.97; the CONUS bloom is seg===4 only (bp=min(1,segP·1.3)) and
+  hands into the veil fade. Wordmark condenses from p>.55 over .31.
+- Coupled timers stand at T=3900: toast 5000 · coach 4800 · chip 5600 —
+  any future T change moves all three (law since v1.16.0).

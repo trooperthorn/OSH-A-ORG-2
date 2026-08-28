@@ -1461,6 +1461,12 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.16.5 • THE THEATER ORDER (owner: "go Pacific, Korea, SWA, Europe,
+//            US"). The tour now opens in the PACIFIC — Fort Shafter
+//            pulses while Hawaii/Guam ignite — then the line hops Korea →
+//            SW Asia → Europe and lands on the Pentagon for the US finale
+//            (full flood + CONUS bloom + the A-ORG-2 flash). One hop per
+//            theater, camera on piecewise waypoints 205→150→90→25→−40→−78.
 //   v1.16.4 • THE CLOSER (owner: "the ending abruptly stops — a second
 //            longer, one more hop, flash A-ORG-2 at the end"). The tour
 //            grows to FIVE beats over ~3.9s: after the CONUS flood the
@@ -1713,7 +1719,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.16.4';
+const APP_VERSION = 'v1.16.5';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3775,10 +3781,11 @@ function drawMarkersHook(ctx, m){
   // through the hops and floods away across the finale beat.
   if(GlobeState._bootMode && GlobeState._boot){
     const B=GlobeState._boot;
-    // v1.16.4: five beats — the dim floods away across the flood beat and is
-    // fully gone before the closing flash (p .6 → .95)
+    // v1.16.5: the flood is the FINAL beat now (Pacific→Korea→SWA→Europe→US),
+    // so the dim holds through all four hops and floods away across the US
+    // finale (p .78 → .97)
     const pr=(B.p!=null)?B.p:((B.seg+B.segP)/5);
-    const a=0.55*(1-Math.max(0,Math.min(1,(pr-0.6)/0.35)));
+    const a=0.55*(1-Math.max(0,Math.min(1,(pr-0.78)/0.19)));
     if(a>0.01){ ctx.save(); ctx.fillStyle='rgba(4,3,2,'+a.toFixed(3)+')'; ctx.fillRect(0,0,m.w,m.h); ctx.restore(); }
   }
   drawGlobeLinks(ctx, m);
@@ -9036,7 +9043,8 @@ function _bootPaint(ctx, m){
     ctx.strokeStyle='rgba(255,179,92,.9)'; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.stroke();
   };
   for(var k=1;k<=seg && k<B.hops.length;k++) drawHop(B.hops[k-1], B.hops[k], (k===seg)?B.segP:1);
-  // Camp Humphreys pulse (beat 1): bright dot + two expanding rings
+  // the opening pulse at hops[0] (v1.16.5: Fort Shafter — the Pacific start):
+  // bright dot + two expanding rings
   if(seg===0){
     var hp=B.hops[0], p0=_projectLonLat(hp.lon,hp.lat,m);
     if(p0[2]>=0){
@@ -9057,15 +9065,14 @@ function _bootPaint(ctx, m){
     ctx.strokeStyle='rgba(255,217,140,'+(1-age).toFixed(3)+')'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(pp[0],pp[1],4+age*12,0,Math.PI*2); ctx.stroke();
   });
-  // the finale bloom over CONUS — swells through the flood beat, breathes out
-  // under the closing flash (v1.16.4: seg 3 in, seg 4 out)
-  if(seg>=3){
+  // the finale bloom over CONUS — swells through the US beat and hands into
+  // the veil's own fade (v1.16.5: the flood beat is seg 4)
+  if(seg===4){
     var c0=_projectLonLat(-98,39,m);
     if(c0[2]>=0){
-      var bp=(seg===3)?Math.min(1,B.segP*1.4):1;
-      var fadeOut=(seg===4)?(1-B.segP):1;
+      var bp=Math.min(1,B.segP*1.3);
       var R2=Math.max(1,(m.R||200)*0.55*bp);
-      var al=0.26*(1-0.4*bp)*fadeOut;
+      var al=0.26*(1-0.4*bp);
       if(al>0.008){
         var gr=ctx.createRadialGradient(c0[0],c0[1],0,c0[0],c0[1],R2);
         gr.addColorStop(0,'rgba(245,215,110,'+al.toFixed(3)+')');
@@ -9086,17 +9093,20 @@ function _bootPaint(ctx, m){
     var mark=veil.querySelector('.in-mark');
     document.body.classList.add('intro');
     veil.hidden=false;
-    // v1.16.4 (owner: "the ending abruptly stops — a second longer, one more
-    // hop, flash A-ORG-2 at the end"): FIVE beats over ~3.9s. The fifth beat
-    // is the closer — Pentagon → Fort Bragg while the camera settles onto
-    // CONUS, and the mark FLASHES before the chrome fades up.
+    // v1.16.5 (owner: "for the intro hops, go Pacific → Korea → SWA → Europe →
+    // US"): FIVE beats over ~3.9s, one hop per theater. The run opens in the
+    // PACIFIC (Fort Shafter pulses, Hawaii/Guam ignite), the line leaps to
+    // Korea, SW Asia, Europe, and lands on the Pentagon for the US finale —
+    // full flood, CONUS bloom, and the A-ORG-2 flash (v1.16.4's closer).
     var T=3900, t0=performance.now(), n=0, done=false;
-    var HOPS=[ {lat:36.97, lon:127.03},   // Camp Humphreys
-               {lat:28.86, lon:48.15},    // Camp Arifjan
-               {lat:50.08, lon:8.24},     // Wiesbaden
-               {lat:38.87, lon:-77.06},   // The Pentagon
-               {lat:35.14, lon:-79.01} ]; // Fort Bragg — the closing hop
-    var GRPS=[ ['kj','pi','gu'], ['swa'], ['eur'], null, null ];   // null = flood everything
+    var HOPS=[ {lat:21.35, lon:-157.9},   // Fort Shafter / Schofield — PACIFIC
+               {lat:36.97, lon:127.03},   // Camp Humphreys — KOREA
+               {lat:28.86, lon:48.15},    // Camp Arifjan — SW ASIA
+               {lat:50.08, lon:8.24},     // Wiesbaden — EUROPE
+               {lat:38.87, lon:-77.06} ]; // The Pentagon — US
+    var GRPS=[ ['pi','gu'], ['kj'], ['swa'], ['eur'], null ];   // null = flood everything
+    // camera waypoints at beat boundaries (lon, westward; Hawaii sits at 202°E)
+    var CAM=[205, 150, 90, 25, -40, -78];
     var startZoom=GlobeState.zoom||1.5;
     GlobeState._bootMode=true;
     GlobeState._bootLit=new Set();
@@ -9123,12 +9133,11 @@ function _bootPaint(ctx, m){
       var p=Math.min(1,(now-t0)/T);
       var seg=Math.min(4, Math.floor(p*5)), segP=p*5-seg;
       try{
-        // one continuous westward pan (130°E → 89°W on the 28°N track across
-        // beats 1-4), then the closer eases the last 11° onto the resting
-        // CONUS frame so fin()'s landing fly is a settle, not a jump.
-        var lon, pit;
-        if(p<=0.8){ lon=130-219*(p/0.8); pit=28; }
-        else { var t5=(p-0.8)/0.2; lon=-89+11*t5; pit=28+5*t5; }
+        // one continuous westward pan through the theater waypoints (Hawaii →
+        // Korea → SWA → Europe → CONUS); the final beat also eases the pitch
+        // onto the resting frame so fin()'s landing fly is a settle.
+        var lon=CAM[seg]+(CAM[seg+1]-CAM[seg])*segP;
+        var pit=(seg===4)?(28+5*segP):28;
         GlobeState.yaw=(lon-90)*Math.PI/180;
         GlobeState.pitch=pit*Math.PI/180;
         GlobeState.zoom=1.05+0.25*ease(p);
@@ -9138,13 +9147,18 @@ function _bootPaint(ctx, m){
           var g=GRPS[seg];
           if(g) g.forEach(function(x){ GlobeState._bootLit.add(x); });
           else GlobeState._bootLit.add('*');
-          if(seg>0) GlobeState._boot.flash.push({i:seg, t:now});   // the line just landed
+        }
+        // v1.16.5: the arrival flash fires when the line actually LANDS (the
+        // tail of each hop beat) — not at departure, which ringed the target
+        // before the line reached it.
+        if(seg>0 && segP>0.94 && !GlobeState._boot.flash.some(function(f){ return f.i===seg; })){
+          GlobeState._boot.flash.push({i:seg, t:now});
         }
         GlobeState._boot.seg=seg; GlobeState._boot.segP=segP; GlobeState._boot.p=p; GlobeState._boot.t=now;
-        // the wordmark condenses in through beats 3-4, then FLASHES in the closer
+        // the wordmark condenses in from the Europe beat, then FLASHES in the finale
         if(mark){
-          if(p>0.45){
-            var wp=Math.min(1,(p-0.45)/0.33);
+          if(p>0.55){
+            var wp=Math.min(1,(p-0.55)/0.31);
             mark.style.letterSpacing=(0.5-0.16*wp)+'em';
             mark.style.textIndent=(0.5-0.16*wp)+'em';
             mark.style.opacity=String(0.22+0.78*wp);
