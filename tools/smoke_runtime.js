@@ -784,6 +784,11 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         gok=false; fails++; console.log('✗ the glass reticle escaped the chain (must appear exactly once, selection language only)'); }
       if(html.indexOf("ctx.fillStyle='rgba(245,215,110,.92)'; ctx.fillText(name")<0){
         gok=false; fails++; console.log('✗ zoomed-in names lost the ignited-gold ink (v1.17.1 law)'); }
+      // v1.17.2 (owner: "that illuminating font like the dots"): names GLOW —
+      // gold aura (shadow bloom) + hot cream core, the dot recipe in type.
+      if(html.indexOf("ctx.shadowColor='rgba(245,215,110,.85)'; ctx.shadowBlur=8;")<0
+        || html.indexOf("ctx.fillStyle='rgba(255,233,170,.95)'; ctx.fillText(name")<0){
+        gok=false; fails++; console.log('✗ the illuminated-name recipe (aura + cream core) is gone (v1.17.2 law)'); }
       global._bfObjSheet(gg.k);
       const gh=IDS['dossier']?IDS['dossier'].innerHTML:'';
       if(gh.indexOf('bf-act bf-addsub')<0 || gh.indexOf('data-bfunder')<0){ gok=false; fails++; console.log('✗ SHEET primary (filled ⊕ Add a subordinate) missing'); }

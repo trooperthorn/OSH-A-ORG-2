@@ -1421,3 +1421,18 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
   distinction is size (HQ) and brightness (guard), not hue.
 - Proof pattern: pixel-sample 8 marker centers at zoom 2.6 — all must read
   warm gold (b < r·0.78); ice-white cores fail at b/r ≈ .89.
+
+## v1.17.2 — the illuminated name (owner: "that illuminating font like the dots for the names as well")
+- NAMES GLOW LIKE MARKERS: the tiny-label pass draws _glowDot's recipe in
+  type — dark ground stroke (legibility on coastlines), then a gold AURA
+  (shadowColor rgba(245,215,110,.85), shadowBlur 8) under a hot CREAM core
+  (rgba(255,233,170,.95) second fill). Chain labels illuminate the same
+  way in their own selection ink (aura pass + crisp pass, hue preserved).
+- shadowBlur on TEXT is allowed because the label cap (13–30) bounds it;
+  the no-shadowBlur law still binds the DOTS (~270 per frame).
+- Smoke pins the recipe: the aura line and the cream-core fill must both
+  survive in source.
+- PROOF LESSON: my __gLbl rect sampler read the same patch six times
+  (wrong field names) and "passed" — a probe whose samples are all
+  identical is broken, not lucky. The clipped 3× screenshot was the
+  honest check; keep close-up crops in the visual proof kit.

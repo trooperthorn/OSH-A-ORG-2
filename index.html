@@ -1461,6 +1461,12 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.17.2 • THE ILLUMINATED NAME (owner: "use that illuminating font like
+//            the dots for the names as well"). Map names now GLOW like the
+//            markers: every zoomed-in label draws a gold aura (shadow
+//            bloom) under a hot cream core — _glowDot's recipe in type.
+//            Chain labels illuminate in their own selection ink. The dark
+//            contrast stroke stays underneath for legibility on coastlines.
 //   v1.17.1 • THE CONSTELLATION AT EVERY ZOOM (owner: "keep the illuminated
 //            dots and use that color scheme for the names as you zoom
 //            closer — right now it still shows the white dots"). The glass
@@ -1736,7 +1742,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.17.1';
+const APP_VERSION = 'v1.17.2';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3292,6 +3298,10 @@ function drawGlobeMarkers(ctx, m){
       }
       if(_pos){
         ctx.lineWidth=(_fs>11?3.6:3.2); ctx.strokeStyle='rgba('+T.ground+',.9)'; ctx.strokeText(_nm, _pos.x, _pos.y);
+        // v1.17.2: chain names illuminate too — aura in their own selection ink
+        ctx.shadowColor='rgba('+col+',.8)'; ctx.shadowBlur=8;
+        ctx.fillStyle='rgba('+col+',1)'; ctx.fillText(_nm, _pos.x, _pos.y);
+        ctx.shadowBlur=0;
         ctx.fillStyle='rgba('+col+',1)'; ctx.fillText(_nm, _pos.x, _pos.y);
       }
       ctx.restore();
@@ -3343,9 +3353,14 @@ function drawGlobeMarkers(ctx, m){
       if(!_pl) continue;
       ctx.shadowColor='rgba('+T.ground+',.9)'; ctx.shadowBlur=3; ctx.shadowOffsetY=1;
       ctx.lineWidth=2.2; ctx.strokeStyle='rgba('+T.ground+',.78)'; ctx.strokeText(name, _pl.x, _pl.y);
-      ctx.shadowBlur=0; ctx.shadowOffsetY=0;
-      // v1.17.1 (owner: "use that color scheme for the names"): the ignited gold
+      ctx.shadowOffsetY=0;
+      // v1.17.2 THE ILLUMINATED NAME (owner: "that illuminating font like the
+      // dots"): _glowDot's recipe in type — gold AURA (shadow bloom) under a
+      // hot CREAM core. Label cap (13–30) keeps the blur affordable.
+      ctx.shadowColor='rgba(245,215,110,.85)'; ctx.shadowBlur=8;
       ctx.fillStyle='rgba(245,215,110,.92)'; ctx.fillText(name, _pl.x, _pl.y);
+      ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(255,233,170,.95)'; ctx.fillText(name, _pl.x, _pl.y);
       _lblN++;
     }
     ctx.restore();
