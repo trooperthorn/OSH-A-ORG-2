@@ -1352,3 +1352,18 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
   v1.15.0 quietly brought it back on groups; the owner caught it. It is now
   a smoke assert (no `dashed var(--bfrg` anywhere) — a retired style is not
   retired until a probe guards it.
+
+## v1.16.4 — the closer (owner: "ending abruptly stops — one more hop, flash A-ORG-2")
+- FIVE beats over T=3900 (seg=floor(p·5)): the 5th is the CLOSER — the line
+  hops the Pentagon → Fort Bragg while the camera eases its last 11°
+  (-89 → -78, pitch 28°→33°) onto the resting CONUS frame, so fin()'s
+  landing fly is a settle, not a jump. The dim now fades on total progress
+  (p .6→.95) and the bloom breathes out under the closer (seg 4).
+- THE FLASH: from p>.86 the veil mark swells 6% and glows (drop-shadow up
+  to 48px at .9 alpha), peaking on a sine and handing off into the veil's
+  own .45s fade — the A-ORG-2 mark is the last thing the boot says.
+- fin() must clear EVERY inline mark style it set (letter-spacing,
+  text-indent, opacity, transform, filter).
+- Coupled timers moved again with T: toast 5000 · coach 4800 · chip 5600.
+- PROBE LESSON: style readbacks NORMALIZE colors — 'rgba(245,215,110'
+  never matches; assert on '245, 215, 110' (spaced) or the function name.

@@ -1461,6 +1461,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.16.4 • THE CLOSER (owner: "the ending abruptly stops — a second
+//            longer, one more hop, flash A-ORG-2 at the end"). The tour
+//            grows to FIVE beats over ~3.9s: after the CONUS flood the
+//            lineage line makes one last hop, the Pentagon → Fort Bragg,
+//            while the camera eases its final 11° onto the resting CONUS
+//            frame — and the A-ORG-2 mark FLASHES (glow + 6% swell) as
+//            the dim and bloom breathe out. Coupled timers move again:
+//            toast 5000 · coach 4800 · db chip floor 5600.
 //   v1.16.3 • BRIEF BREATHING ROOM (owner's phone review). Phone brief
 //            maximizes the chart: the seg rides 4px higher, the console
 //            hugs it at +84 with tighter padding and may run down to the
@@ -1705,7 +1713,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.16.3';
+const APP_VERSION = 'v1.16.4';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -1724,7 +1732,7 @@ try{
         if(localStorage.getItem('a2Coached') && typeof _bfToast==='function') _bfToast('A-ORG-2 '+APP_VERSION);
       }
     }catch(_){}
-  }, 4000);   // v1.16.0: after the ~2.9s world tour — the toast may not crash the intro
+  }, 5000);   // v1.16.4: after the ~3.9s five-beat tour — the toast may not crash the intro
   // v1.0.0 — FIRST-RUN COACH: for users who are not the owner. Three hints,
   // once ever (a2Coached), pointer-transparent, gone at the first touch or 14s.
   setTimeout(function(){
@@ -1745,7 +1753,7 @@ try{
         document.removeEventListener('pointerdown', h, true); setTimeout(go, 150);
       }, true);
     }catch(_){}
-  }, 3800);   // v1.16.0: after the ~2.9s world tour — chips must never sit under the veil
+  }, 4800);   // v1.16.4: after the ~3.9s five-beat tour — chips must never sit under the veil
 }catch(_){}
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -3767,7 +3775,10 @@ function drawMarkersHook(ctx, m){
   // through the hops and floods away across the finale beat.
   if(GlobeState._bootMode && GlobeState._boot){
     const B=GlobeState._boot;
-    const a=(B.seg>=3)?0.55*(1-Math.min(1,B.segP*1.15)):0.55;
+    // v1.16.4: five beats — the dim floods away across the flood beat and is
+    // fully gone before the closing flash (p .6 → .95)
+    const pr=(B.p!=null)?B.p:((B.seg+B.segP)/5);
+    const a=0.55*(1-Math.max(0,Math.min(1,(pr-0.6)/0.35)));
     if(a>0.01){ ctx.save(); ctx.fillStyle='rgba(4,3,2,'+a.toFixed(3)+')'; ctx.fillRect(0,0,m.w,m.h); ctx.restore(); }
   }
   drawGlobeLinks(ctx, m);
@@ -7198,7 +7209,7 @@ function _rdbOpen(){
         gdb.onsuccess=function(){ const v=gdb.result&&gdb.result.v; if(v&&v.url){ _dbCfg=v;
           // v1.2.0 chip waits out the boot title; v1.11.0 — with auto on it
           // CONNECTS instead of asking (chip only as the failure fallback)
-          try{ setTimeout(function(){ if(!_dbAutoBoot()) _dbChipShow(); }, Math.max(600, 4600-performance.now())); }catch(_){}
+          try{ setTimeout(function(){ if(!_dbAutoBoot()) _dbChipShow(); }, Math.max(600, 5600-performance.now())); }catch(_){}
         } };
       }catch(_){}
       try{
@@ -9046,15 +9057,21 @@ function _bootPaint(ctx, m){
     ctx.strokeStyle='rgba(255,217,140,'+(1-age).toFixed(3)+')'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(pp[0],pp[1],4+age*12,0,Math.PI*2); ctx.stroke();
   });
-  // the finale bloom over CONUS — the run's biggest illumination
-  if(seg===3){
+  // the finale bloom over CONUS — swells through the flood beat, breathes out
+  // under the closing flash (v1.16.4: seg 3 in, seg 4 out)
+  if(seg>=3){
     var c0=_projectLonLat(-98,39,m);
     if(c0[2]>=0){
-      var bp=Math.min(1,B.segP*1.4), R2=Math.max(1,(m.R||200)*0.55*bp);
-      var gr=ctx.createRadialGradient(c0[0],c0[1],0,c0[0],c0[1],R2);
-      gr.addColorStop(0,'rgba(245,215,110,'+(0.26*(1-0.4*bp)).toFixed(3)+')');
-      gr.addColorStop(1,'rgba(245,215,110,0)');
-      ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(c0[0],c0[1],R2,0,Math.PI*2); ctx.fill();
+      var bp=(seg===3)?Math.min(1,B.segP*1.4):1;
+      var fadeOut=(seg===4)?(1-B.segP):1;
+      var R2=Math.max(1,(m.R||200)*0.55*bp);
+      var al=0.26*(1-0.4*bp)*fadeOut;
+      if(al>0.008){
+        var gr=ctx.createRadialGradient(c0[0],c0[1],0,c0[0],c0[1],R2);
+        gr.addColorStop(0,'rgba(245,215,110,'+al.toFixed(3)+')');
+        gr.addColorStop(1,'rgba(245,215,110,0)');
+        ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(c0[0],c0[1],R2,0,Math.PI*2); ctx.fill();
+      }
     }
   }
   ctx.restore();
@@ -9069,12 +9086,17 @@ function _bootPaint(ctx, m){
     var mark=veil.querySelector('.in-mark');
     document.body.classList.add('intro');
     veil.hidden=false;
-    var T=2900, t0=performance.now(), n=0, done=false;
+    // v1.16.4 (owner: "the ending abruptly stops — a second longer, one more
+    // hop, flash A-ORG-2 at the end"): FIVE beats over ~3.9s. The fifth beat
+    // is the closer — Pentagon → Fort Bragg while the camera settles onto
+    // CONUS, and the mark FLASHES before the chrome fades up.
+    var T=3900, t0=performance.now(), n=0, done=false;
     var HOPS=[ {lat:36.97, lon:127.03},   // Camp Humphreys
                {lat:28.86, lon:48.15},    // Camp Arifjan
                {lat:50.08, lon:8.24},     // Wiesbaden
-               {lat:38.87, lon:-77.06} ]; // The Pentagon
-    var GRPS=[ ['kj','pi','gu'], ['swa'], ['eur'], null ];   // null = flood everything
+               {lat:38.87, lon:-77.06},   // The Pentagon
+               {lat:35.14, lon:-79.01} ]; // Fort Bragg — the closing hop
+    var GRPS=[ ['kj','pi','gu'], ['swa'], ['eur'], null, null ];   // null = flood everything
     var startZoom=GlobeState.zoom||1.5;
     GlobeState._bootMode=true;
     GlobeState._bootLit=new Set();
@@ -9083,7 +9105,8 @@ function _bootPaint(ctx, m){
     var fin=function(){
       if(done) return; done=true;
       GlobeState._bootMode=false; GlobeState._bootLit=null; GlobeState._boot=null;
-      try{ if(mark){ mark.style.letterSpacing=''; mark.style.textIndent=''; mark.style.opacity=''; } }catch(_){}
+      try{ if(mark){ mark.style.letterSpacing=''; mark.style.textIndent=''; mark.style.opacity='';
+        mark.style.transform=''; mark.style.filter=''; } }catch(_){}
       document.body.classList.remove('intro');
       veil.style.opacity='0'; veil.style.pointerEvents='none';
       setTimeout(function(){ try{ veil.remove(); }catch(_){} }, 500);
@@ -9098,12 +9121,16 @@ function _bootPaint(ctx, m){
       if(done) return;
       if(++n>900){ fin(); return; }                       // hard cap — no environment may loop this
       var p=Math.min(1,(now-t0)/T);
-      var seg=Math.min(3, Math.floor(p*4)), segP=p*4-seg;
+      var seg=Math.min(4, Math.floor(p*5)), segP=p*5-seg;
       try{
-        // one continuous westward pan: 130°E → 89°W on the 28°N track
-        var lon=130-219*p;
+        // one continuous westward pan (130°E → 89°W on the 28°N track across
+        // beats 1-4), then the closer eases the last 11° onto the resting
+        // CONUS frame so fin()'s landing fly is a settle, not a jump.
+        var lon, pit;
+        if(p<=0.8){ lon=130-219*(p/0.8); pit=28; }
+        else { var t5=(p-0.8)/0.2; lon=-89+11*t5; pit=28+5*t5; }
         GlobeState.yaw=(lon-90)*Math.PI/180;
-        GlobeState.pitch=28*Math.PI/180;
+        GlobeState.pitch=pit*Math.PI/180;
         GlobeState.zoom=1.05+0.25*ease(p);
         _rebuildGlobeQ();
         if(seg!==litSeg){
@@ -9113,16 +9140,21 @@ function _bootPaint(ctx, m){
           else GlobeState._bootLit.add('*');
           if(seg>0) GlobeState._boot.flash.push({i:seg, t:now});   // the line just landed
         }
-        GlobeState._boot.seg=seg; GlobeState._boot.segP=segP; GlobeState._boot.t=now;
-        // the wordmark condenses in from wide tracking through beats 3-4
+        GlobeState._boot.seg=seg; GlobeState._boot.segP=segP; GlobeState._boot.p=p; GlobeState._boot.t=now;
+        // the wordmark condenses in through beats 3-4, then FLASHES in the closer
         if(mark){
-          if(p>0.48){
-            var wp=Math.min(1,(p-0.48)/0.44);
+          if(p>0.45){
+            var wp=Math.min(1,(p-0.45)/0.33);
             mark.style.letterSpacing=(0.5-0.16*wp)+'em';
             mark.style.textIndent=(0.5-0.16*wp)+'em';
             mark.style.opacity=String(0.22+0.78*wp);
           } else {
             mark.style.letterSpacing='0.5em'; mark.style.textIndent='0.5em'; mark.style.opacity='0.12';
+          }
+          if(p>0.86){
+            var fl=Math.sin(Math.min(1,(p-0.86)/0.14)*Math.PI);
+            mark.style.transform='translateY(-16vh) scale('+(1+fl*0.06).toFixed(4)+')';
+            mark.style.filter='drop-shadow(0 1px 0 rgba(0,0,0,.65)) drop-shadow(0 0 '+(18+fl*30).toFixed(1)+'px rgba(245,215,110,'+(0.35+fl*0.55).toFixed(3)+'))';
           }
         }
         GlobeState.dirty=true; globeMark();
