@@ -455,11 +455,12 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     // chart: group headers with eyes, depth control, the custom chip
     global.renderBrief();
     const bs2=IDS['briefStage'];
-    // v0.25.0: the chart is A-ORG-1's TOP-DOWN org chart — nested ul/li with CSS
-    // connector risers and MINIMAL boxes; options (eye, add-subordinate, colour,
-    // move) live in each node's sheet, not as chips on the diagram.
+    // v1.15.0: the chart is the ILLUMINATED CONSOLE — an absolute plot
+    // (.bf-tree) with content-hugging boxes and one SVG net (.bf-net) of
+    // hairlines + elbow connectors. The ul/li rail tree is retired.
     if(bs2.innerHTML.indexOf('bf-tree')<0 || bs2.innerHTML.indexOf('bf-box')<0
-       || bs2.innerHTML.indexOf('bf-kids')<0){ fails++; console.log('✗ CHART is not the top-down org chart (want bf-tree/bf-li/bf-box/bf-kids)'); }
+       || bs2.innerHTML.indexOf('bf-net')<0){ fails++; console.log('✗ CHART is not the illuminated console (want bf-tree/bf-box/bf-net)'); }
+    if(bs2.innerHTML.indexOf('bf-kids')>=0 || bs2.innerHTML.indexOf('bf-li')>=0){ fails++; console.log('✗ the retired ul/li rail tree still renders'); }
     if(bs2.innerHTML.indexOf('ch-node')>=0){ fails++; console.log('✗ the retired indented-list chart still renders'); }
     if(bs2.innerHTML.indexOf('data-bfdepth')<0){ fails++; console.log('✗ CHART depth control missing'); }
     if(bs2.innerHTML.indexOf('data-bfobj="'+org.id+'"')<0){ fails++; console.log('✗ custom org missing from chart'); }
@@ -511,8 +512,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Brief.rename('amc', 'Hacked');   // real orgs must refuse rename
       if(global.Brief.node('amc').n==='Hacked'){ fails++; console.log('✗ RENAME must be group-only'); }
       const chart=global.renderBrief && (function(){ global.renderBrief(); return IDS['briefStage']?IDS['briefStage'].innerHTML:''; })();
-      if(chart && (chart.indexOf('bf-grp')<0 || chart.indexOf('GROUP')<0)){
-        fails++; console.log('✗ GROUP box missing its dashed class / engraved tag in the chart'); }
+      // v1.15.0: the engraved GROUP tag retired with the name-only box —
+      // the dashed bf-grp ring alone says filler
+      if(chart && chart.indexOf('bf-grp')<0){
+        fails++; console.log('✗ GROUP box missing its dashed bf-grp class in the chart'); }
       // v1.0.4 — the name form is a SHEET, never inline chart chrome (the owner's
       // recording: the inline foot form collapsed under the phone keyboard)
       if(chart && chart.indexOf('bf-grprow')>=0){ fails++; console.log('✗ inline group form back in the chart — v1.0.4 banned it'); }
@@ -548,7 +551,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!cn || cn.lat!==ca.lat || cn.lon!==ca.lon || !cn.pinned){ pok=false; fails++; console.log('✗ chain map must use the place own spot'); }
       global.renderBrief();
       const ch2=IDS['briefStage']?IDS['briefStage'].innerHTML:'';
-      if(ch2 && (ch2.indexOf('California National Guard')<0)){ pok=false; fails++; console.log('✗ PLACE box missing its host-base line'); }
+      // v1.15.0 name-only law: the place box renders (host-base sublines retired)
+      if(ch2 && (ch2.indexOf('California RSN')<0)){ pok=false; fails++; console.log('✗ PLACE box missing from the chart'); }
+      if(ch2 && ch2.indexOf('class="bf-st"')>=0){ pok=false; fails++; console.log('✗ station sublines must be retired (v1.15.0 name-only law)'); }
       if(ch2 && />GROUP<[\s\S]*California RSN|California RSN[\s\S]{0,200}>GROUP</.test(ch2)){ pok=false; fails++; console.log('✗ PLACE must not wear the GROUP tag'); }
       global.Brief.remove('px:california-rsn'); global.Brief.remove('fort-bragg');
       if(pok) console.log('  ✓ places: roster of 12 · anchors real · pinned coords in node+chain · host-base line · no GROUP tag');
@@ -562,7 +567,15 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Brief.addPlace('px:utah-rsn', sr.k); global.Brief.addPlace('px:texas-rsn', sr.k);
       global.renderBrief();
       let ch3=IDS['briefStage'].innerHTML;
-      if(ch3.indexOf('bf-vert')>=0){ sok=false; fails++; console.log('✗ STACK: vertical class present before any toggle'); }
+      // v1.15.0: stacking is GEOMETRY now — the layout carries positions in the
+      // markup, so the probe reads box lefts straight from the HTML string.
+      const lx=function(html2,k){
+        const m2=String(html2).match(new RegExp('left:([0-9.]+)px[^"]*" data-bfobj="'+String(k).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'"'));
+        return m2?+m2[1]:null; };
+      const ty=function(html2,k){
+        const m2=String(html2).match(new RegExp('top:([0-9.]+)px[^"]*" data-bfobj="'+String(k).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'"'));
+        return m2?+m2[1]:null; };
+      if(lx(ch3,'px:utah-rsn')===lx(ch3,'px:texas-rsn')){ sok=false; fails++; console.log('✗ STACK: siblings share a column before any toggle'); }
       // v1.13.0: the STACK track is gone — holding a level cell opens the
       // popover, whose button carries the same data-bfvert contract
       if(ch3.indexOf('data-bfvert')>=0){ sok=false; fails++; console.log('✗ STACK: the duplicate track must be gone (hold-popover only)'); }
@@ -572,7 +585,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global._bfStackPopHide();
       global.Brief.stack(2);
       ch3=IDS['briefStage'].innerHTML;
-      if(ch3.indexOf('bf-vert')<0){ sok=false; fails++; console.log('✗ STACK: L2 vertical did not apply'); }
+      if(!(lx(ch3,'px:utah-rsn')!=null && lx(ch3,'px:utah-rsn')===lx(ch3,'px:texas-rsn') && lx(ch3,'px:utah-rsn')===lx(ch3,sr.k))){
+        sok=false; fails++; console.log('✗ STACK: L2 column must sit on the parent center (shared left)'); }
+      if(!(ty(ch3,'px:texas-rsn')>ty(ch3,'px:utah-rsn'))){ sok=false; fails++; console.log('✗ STACK: column rows must descend'); }
       // v1.12.0: stacking persists on the SAVED brief record now
       global.Briefs.save('Stack Persist Probe');
       const _sp=global.Briefs.list()[0];
@@ -580,7 +595,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.Briefs.remove(0);
       global.Brief.stack(2);
       ch3=IDS['briefStage'].innerHTML;
-      if(ch3.indexOf('bf-vert')>=0){ sok=false; fails++; console.log('✗ STACK: toggle-off did not restore horizontal'); }
+      if(lx(ch3,'px:utah-rsn')===lx(ch3,'px:texas-rsn')){ sok=false; fails++; console.log('✗ STACK: toggle-off did not restore horizontal'); }
       global.Brief.remove(sr.k);
       if(sok) console.log('  ✓ stacking: horizontal default · L2 toggles vertical · rides the board · toggles back');
     }
@@ -713,9 +728,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       rh=global.Repo.html();
       if(rh.indexOf('Ledger Probe')<0 || rh.indexOf('S3')<0){ wok=false; fails++; console.log('✗ REPOSITORY expanded ID must show the saved item text'); }
       global.Repo.sel(null);
-      // head door present on the chart — and it is the BRIEFS door now
+      // v1.15.0: the BRIEFS door lives on the bottom brief dock (static markup)
       global.renderBrief();
-      if((IDS['briefStage']?IDS['briefStage'].innerHTML:'').indexOf('data-bfbriefs')<0){ wok=false; fails++; console.log('✗ BRIEFS door missing from the chart head'); }
+      const _bd=(html.split('id="briefDock"')[1]||'').split('</div>')[0];
+      if(_bd.indexOf('data-bfbriefs')<0){ wok=false; fails++; console.log('✗ BRIEFS door missing from the brief dock'); }
       // cleanup
       try{ (global.RECORDS['fort-bragg'].people||[]).pop(); global.recDelId('fort-bragg','ID-900'); }catch(_){}
       global.Briefs.remove(0);
@@ -738,9 +754,18 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(st2.indexOf('>LEVELS<')>=0 || st2.indexOf('>STACK<')>=0){ gok=false; fails++; console.log('✗ LEVELS/STACK captions must be gone (v1.13.0)'); }
       if(st2.indexOf('CHART')>=0){ gok=false; fails++; console.log('✗ the chart title text must be gone (v1.13.0)'); }
       if(!(st2.indexOf('data-bfdepth')>=0 && st2.indexOf('data-bfdepth')<st2.indexOf('bf-tree'))){ gok=false; fails++; console.log('✗ the L1-L4 track must sit in the head row'); }
-      ['>Names<','>Lines<','>Briefs<','>Export<'].forEach(function(lb){
-        if(st2.indexOf('<span class="ch-lbl">'+lb.slice(1,-1)+'<')<0){ gok=false; fails++; console.log('✗ HEAD tool label missing: '+lb); } });
-      if(st2.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ HEAD cluster divider missing'); }
+      // v1.15.0 (design 2b): the head is CHART-SCOPED — count + hint + ⌄ on the
+      // active level; the file tools live on the bottom #briefDock (static
+      // markup, so those labels are asserted against the SOURCE).
+      if(!/\d+ ORGS?</.test(st2)){ gok=false; fails++; console.log('✗ HEAD org count (.ch-n) missing'); }
+      if(st2.indexOf('ch-hint')<0 || st2.indexOf('HOLD A LEVEL')<0){ gok=false; fails++; console.log('✗ HEAD hold-to-stack hint missing'); }
+      if(!/bf-dep on[^>]*>L\d ⌄</.test(st2)){ gok=false; fails++; console.log('✗ active level cell missing its ⌄ stack affordance'); }
+      const dk=(html.split('id="briefDock"')[1]||'').split('\n</div>')[0];
+      ['>Add<','>Names<','>Lines<','>Briefs<','>Export<','>Ledger<'].forEach(function(lb){
+        if(dk.indexOf('<span class="ch-lbl">'+lb.slice(1,-1)+'<')<0){ gok=false; fails++; console.log('✗ DOCK tool label missing: '+lb); } });
+      if(dk.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ DOCK cluster divider missing'); }
+      if(dk.indexOf('data-bfledger')<0 || dk.indexOf('data-bfsearch')<0){ gok=false; fails++; console.log('✗ DOCK Add/Ledger doors missing'); }
+      if(st2.indexOf('ch-dock')>=0){ gok=false; fails++; console.log('✗ the dock must be OUT of the chart head (v1.15.0 split)'); }
       global._bfObjSheet(gg.k);
       const gh=IDS['dossier']?IDS['dossier'].innerHTML:'';
       if(gh.indexOf('bf-act bf-addsub')<0 || gh.indexOf('data-bfunder')<0){ gok=false; fails++; console.log('✗ SHEET primary (filled ⊕ Add a subordinate) missing'); }

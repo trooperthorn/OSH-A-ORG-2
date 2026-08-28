@@ -554,20 +554,23 @@ body.brief-mode .nv-fablbl::after{content:'TO MAP'}
    full-screen chain globe. Minimize (–) collapses it to a "⌗ CHART" tab. */
 #briefStage{display:none}
 body.brief-mode #briefStage{
-  /* v0.25.0 — the chart is the WORK SURFACE in brief, not a corner tile: a
-     hierarchy needs width. Full pane minus the safe gutters; the globe still
-     shows through above and below, and ⌗ CHART collapses it to a pill. */
+  /* v1.15.0 (design 5a) — THE FRAMELESS CONSOLE: not a card. A radial pool of
+     near-black that the world glows through at the edges; no ring, no drop.
+     Full pane minus 6px gutters on phone; centered 880px on desktop. */
   display:block; position:absolute; z-index:16;
-  left:var(--safe-l); right:var(--safe-r);
-  /* v1.14.0: top clears the mode seg (the seg sits at +52 and is ~29px tall) */
+  left:6px; right:6px;
   top:calc(env(safe-area-inset-top,0px) + 92px);
-  width:auto; max-height:56vh; max-height:56dvh;
+  width:auto; max-height:60vh; max-height:60dvh;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  padding:10px 12px 12px; border-radius:var(--r-card);
-  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
-  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
+  padding:8px 8px 12px; border-radius:18px;
+  background:radial-gradient(ellipse 95% 100% at 50% 30%, rgba(6,5,4,.85) 60%, rgba(6,5,4,0) 100%);
 }
-@media(min-width:1100px){ body.brief-mode #briefStage{ right:auto; width:min(880px,72vw); max-height:76vh } }
+@media(min-width:1100px){ body.brief-mode #briefStage{
+  left:0; right:0; margin:0 auto;   /* centered WITHOUT a transform — the stage scrolls */
+  top:calc(env(safe-area-inset-top,0px) + 84px);
+  width:min(880px,72vw); max-height:72vh; padding:8px 14px 14px; border-radius:24px;
+  background:radial-gradient(ellipse 90% 100% at 50% 30%, rgba(6,5,4,.82) 55%, rgba(6,5,4,0) 100%);
+} }
 body.brief-mode.chart-min #briefStage{
   width:auto; max-height:none; overflow:visible; padding:0; background:none; box-shadow:none;
 }
@@ -578,20 +581,25 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
 .ch-head{display:flex; align-items:center; flex-wrap:wrap; gap:6px 8px; width:100%; border:none; background:none;
   margin:0 0 4px; padding:2px 0; cursor:pointer; -webkit-tap-highlight-color:transparent;
   font:800 10.5px/1 var(--body); letter-spacing:.22em; color:var(--faint); text-align:left}
-/* v1.13.0 — the title text is gone; ⌗ alone marks the fold handle */
+/* v1.13.0 — the title text is gone; ⌗ alone marks the fold handle.
+   v1.15.0 (design 5a): the org count returns as a quiet mono kicker, and the
+   head is CHART-SCOPED only — the file tools moved to the bottom brief dock. */
 .ch-mk{flex:none; font-size:13px; color:var(--dim); padding:0 2px}
-body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc{display:none}
-/* v1.5.1 — brief-only view toggles on the chart head: names + connecting
-   lines. ON = accent; OFF = dimmed hollow. Map room never sees these. */
+.ch-n{flex:none; font:700 9px/1 var(--mono); letter-spacing:.1em; color:var(--faint)}
+.ch-hint{flex:none; font:700 6.5px/1.4 var(--mono); letter-spacing:.08em; color:#6E6650;
+  display:none; text-transform:uppercase}
+@media(min-width:1100px){ .ch-hint{display:inline-block} }
+body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch-hint{display:none}
+/* v1.5.1 — brief-only view toggles: ON = accent; OFF = dimmed hollow. */
 .ch-head .bf-vw{color:var(--accent)}
-/* v1.9.0 — LABELED HEAD TOOLS · v1.12.1 THE DOCK: the four tools live in one
-   dark pill (owner reference: iOS toolbar, amber active slot). Uniform 40px
-   slots, gold circle = toggle ON, hairline divider between VIEW and FILE. */
-.ch-dock{display:inline-flex; align-items:flex-start; gap:1px; margin-left:auto;
+/* v1.12.1 THE DOCK MATERIAL · v1.15.0 (design 2b): the dock is its own bottom
+   element now (#briefDock) — same grammar: dark pill, uniform labeled slots,
+   gold circle = toggle ON, hairline divider between VIEW and FILE clusters. */
+.ch-dock{display:inline-flex; align-items:flex-start; gap:1px;
   background:#141006; border-radius:22px; padding:5px 7px 3px;
-  box-shadow:0 1px 2px rgba(20,14,4,.28)}
-.ch-tool{display:inline-flex; flex-direction:column; align-items:center; gap:1px; min-width:40px;
-  -webkit-tap-highlight-color:transparent}
+  box-shadow:0 0 0 1px rgba(240,220,140,.22), 0 1px 2px rgba(20,14,4,.28)}
+.ch-tool{display:inline-flex; flex-direction:column; align-items:center; gap:1px; min-width:44px;
+  cursor:pointer; -webkit-tap-highlight-color:transparent}
 .ch-tool .od-ico, .ch-tool .ch-lbl{pointer-events:none}
 .ch-dock .od-ico{background:none; box-shadow:none; color:#F2E4BC; width:28px; height:28px}
 .ch-dock .bf-vw{color:#F2E4BC}
@@ -600,8 +608,25 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc{display:none}
 .ch-lbl{font:700 6.5px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:rgba(242,228,188,.6)}
 .ch-tool.off .ch-lbl{opacity:.55}
 .ch-div{flex:none; width:1px; height:20px; background:rgba(242,228,188,.28); margin:4px 4px 0; align-self:flex-start}
-body.chart-min .ch-lbl, body.chart-min .ch-div{display:none}
-body.chart-min .ch-dock{padding:3px 6px; border-radius:999px; align-items:center}
+#briefDock{display:none}
+body.brief-mode #briefDock{display:inline-flex; position:absolute; z-index:43;
+  right:calc(50% + 52px); bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
+body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .15s ease}
+@media(max-width:1099px){
+  body.brief-mode #briefDock{left:10px; right:10px; justify-content:space-between; padding:6px 8px 5px}
+  #briefDock .bd-gap{flex:none; width:70px}
+}
+@media(min-width:1100px){ #briefDock .bd-gap{display:none} }
+/* v1.15.0 — the chart-to-globe leader */
+#bfLeader{position:absolute; inset:0; z-index:15; pointer-events:none}
+#bfLeader[hidden]{display:none}
+body.chart-min #bfLeader, body:not(.brief-mode) #bfLeader{display:none}
+.bl-svg{position:absolute; inset:0; width:100%; height:100%}
+.bl-path{fill:none; stroke:rgba(245,215,110,.5); stroke-width:1.4; stroke-dasharray:1 5; stroke-linecap:round}
+.bl-dia{fill:none; stroke:#F5D76E; stroke-width:2}
+.bl-lbl{position:absolute; font:700 8.5px/1 var(--mono); letter-spacing:.1em; color:var(--accent);
+  text-shadow:0 0 8px rgba(0,0,0,.9); white-space:nowrap}
+body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opacity .2s ease}
 /* v1.12.1 — the deck: LEVELS · STACK · ZOOM as ONE aligned row of equal-height
    tracks; groups wrap as whole units, nothing floats to the ragged right */
 .bf-zseg{align-items:center}
@@ -647,99 +672,45 @@ body.chart-min .ch-dock{padding:3px 6px; border-radius:999px; align-items:center
 .bf-invin .bf-invqin{flex:0 0 72px}
 .bf-invin .rc-in{min-width:0}
 .ch-head .bf-vw.off{color:var(--faint); background:transparent; opacity:.6}
-/* ═══ v0.25.0 THE HIERARCHY CHART (A-ORG-1's technique, sleek Lumen build) ═══
-   A real TOP-DOWN org chart: nested ul/li, boxes centred under their parent, and
-   connector risers drawn with ::before/::after so there is no SVG to keep in sync.
-   Boxes are MINIMAL — a name; options live in the sheet a tap away. */
+/* ═══ v1.15.0 THE ILLUMINATED CHART (design 5a — replaces the ul/li rail tree
+   and the matte 124×48 card). The plot is one absolutely-positioned surface:
+   boxes hug their content on a 24px grid (48px level pitch · 32px stack
+   pitch), every box lit from within — tier-tint fill, glowing tier-color
+   ring, pale tier text — and one SVG net carries echelon hairlines, rounded-
+   elbow connectors, the focused chain's glow pass and its junction beads. */
 .bf-wrap{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   max-height:52vh; padding:4px 2px 8px}
-.bf-tree,.bf-kids{display:flex; justify-content:center; align-items:flex-start;
-  list-style:none; margin:0; padding:0; position:relative}
-.bf-tree{min-width:max-content; margin:0 auto}
-.bf-kids{padding-top:15px}
-.bf-kids::before{content:''; position:absolute; top:0; left:50%; width:0; height:15px;
-  border-left:1.4px solid var(--line-tree)}
-.bf-li{display:flex; flex-direction:column; align-items:center; position:relative; padding:15px 4px 0}
-.bf-li::before,.bf-li::after{content:''; position:absolute; top:0; right:50%; width:50%; height:15px;
-  border-top:1.4px solid var(--line-tree)}
-.bf-li::after{right:auto; left:50%; border-left:1.4px solid var(--line-tree)}
-.bf-li:first-child::before{border:0 none}
-.bf-li:last-child::after{border-left:0 none; border-top:0 none}
-.bf-li:last-child::before{border-right:1.4px solid var(--line-tree); border-radius:0 8px 0 0}
-.bf-li:first-child::after{border-radius:8px 0 0 0}
-.bf-li:only-child::before{display:none}
-.bf-li:only-child::after{border-top:0; border-radius:0}
-.bf-tree>.bf-li{padding-top:0}
-.bf-tree>.bf-li::before,.bf-tree>.bf-li::after{display:none}
-/* a wide litter wraps into banded rows — never one endless ribbon */
-.bf-kgroup{position:relative; display:flex; flex-direction:column; align-items:center;
-  padding:0 4px 3px; border-radius:12px; box-shadow:inset 0 0 0 1px var(--line-tree)}
-.bf-kids.bf-krow2{padding-top:7px}
-.bf-kids.bf-krow2::before{display:none}
-/* v1.5.0 — a STACKED level. v1.11.3 (owner: "stack the L4s directly under
-   the L3, compact, and fix the connector alignment"): the column sits tight
-   under its parent with 6px gaps, and the connectors are ONE straight rail —
-   a drop from the parent into the first card, per-card rails bridging card
-   center to card center (they pass cleanly left of any nested subtree), and
-   a short stub into each card's left edge at exactly half the uniform 48px
-   card height. No more floating elbows. Horizontal stays the default. */
-.bf-kids.bf-vert{flex-direction:column; align-items:flex-start; gap:6px;
-  padding:10px 0 0 30px}
-.bf-kids.bf-vert::before{content:''; display:block; position:absolute;
-  left:16px; top:0; width:0; height:34px; border:0 none;
-  border-left:1.4px solid var(--line-tree)}
-.bf-vert>.bf-li{padding:0; align-items:flex-start}
-.bf-vert>.bf-li::before,
-.bf-vert>.bf-li:first-child::before,
-.bf-vert>.bf-li:last-child::before,
-.bf-vert>.bf-li:only-child::before{content:''; display:block; position:absolute;
-  left:-14px; right:auto; top:24px; width:14px; height:0;
-  border:0 none; border-top:1.4px solid var(--line-tree); border-radius:0}
-.bf-vert>.bf-li::after,
-.bf-vert>.bf-li:first-child::after,
-.bf-vert>.bf-li:last-child::after,
-.bf-vert>.bf-li:only-child::after{content:''; display:block; position:absolute;
-  left:-14px; right:auto; top:24px; bottom:-30px; width:0; height:auto;
-  border:0 none; border-left:1.4px solid var(--line-tree); border-radius:0}
-.bf-vert>.bf-li:last-child::after{display:none}
+.bf-tree{position:relative; margin:0 auto}
+.bf-net{position:absolute; inset:0; pointer-events:none}
+.bf-elbl{position:absolute; font:700 8px/1 var(--mono); letter-spacing:.14em;
+  color:#6E6650; pointer-events:none; -webkit-user-select:none; user-select:none}
+.bf-elbl.lit{color:var(--accent)}
 .bf-vseg{align-items:center}
 .bf-vlab{font:700 8px/1 var(--mono); letter-spacing:.14em; color:var(--faint); padding:0 5px 0 8px}
-/* THE BOX (v1.3.0 MATTE — owner: "sleek, bold text, their chosen color matte
-   fill"). The box IS its color now: a flat matte fill of the tier's deep hue
-   or the owner's picked swatch, name in heavy ink computed for contrast
-   (_bfInk). No washes, no rings, no gloss — fill + ink + one soft drop. */
-.bf-box{position:relative; cursor:pointer; -webkit-tap-highlight-color:transparent;
-  /* v1.11.2 (owner reference chart: "objects should be uniform in shape and
-     size"): ONE card size for every object — fixed width, fixed height,
-     content centered; names/stations truncate instead of stretching. */
-  width:124px; min-width:124px; max-width:124px; height:48px; box-sizing:border-box;
-  padding:6px 11px; border-radius:13px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-  background:var(--bfc,var(--t1)); color:var(--bfink,#FDF8E7);
-  /* v1.9.1 CRISP PASS (owner: "sleek/modern, crisp/clean, iOS fluidity"):
-     layered shadow (contact line + soft ambient) and springy transform
-     feedback instead of the flat brightness blink */
-  box-shadow:0 1px 1.5px rgba(20,14,4,.20), 0 6px 18px rgba(20,14,4,.15);
+.bf-box{position:absolute; transform:translateX(-50%); cursor:pointer; -webkit-tap-highlight-color:transparent;
+  height:22px; box-sizing:border-box; padding:0 10px; border-radius:7px; white-space:nowrap;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--bfbg,rgba(255,255,255,.12)); color:var(--bftx,#FFFFFF);
+  box-shadow:0 0 0 1.4px var(--bfrg,#FFFFFF), 0 0 9px var(--bfgl,rgba(255,255,255,.3));
   transition:transform .22s cubic-bezier(.32,1.4,.45,1), box-shadow .22s ease, opacity .18s ease;
   will-change:transform}
-.bf-box:active{transform:scale(.96)}
-@media(hover:hover){
-  .bf-box:hover{transform:translateY(-1.5px);
-    box-shadow:0 2px 3px rgba(20,14,4,.18), 0 10px 26px rgba(20,14,4,.22)}
-}
+@media(min-width:1100px){ .bf-box{height:24px; padding:0 12px;
+  box-shadow:0 0 0 1.5px var(--bfrg,#FFFFFF), 0 0 10px var(--bfgl,rgba(255,255,255,.3))} }
+.bf-box:active{transform:translateX(-50%) scale(.96)}
 /* v1.10.0 — a box that just joined the diagram springs in (FLIP enter state) */
-.bf-box.bf-enter{opacity:0; transform:scale(.85)}
-.bf-nm{font:900 10.5px/1.25 var(--body); color:var(--bfink,#FDF8E7); letter-spacing:.01em;
-  max-width:102px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.bf-st{font:600 8.5px/1.2 var(--mono); letter-spacing:.03em; color:var(--bfink,#FDF8E7); opacity:.7;
-  max-width:102px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.bf-t1{--bfc:var(--t1)} .bf-t2{--bfc:var(--t2)} .bf-t3{--bfc:var(--t3)} .bf-t4{--bfc:var(--t4)}
-.bf-box.bf-dim{opacity:.28}
-.bf-box.bf-foc{box-shadow:0 0 0 2px var(--accent), 0 0 12px rgba(var(--accent-rgb),.35)}
-/* v1.0.3 GROUPS — an owner-named filler element that shapes the hierarchy.
-   v1.9.1 (owner: "looks like edit mode in Word"): the dashed ring is RETIRED —
-   the engraved GROUP kicker alone marks filler. Same crisp box as everything. */
-.bf-grptag{font:700 7px/1 var(--mono); letter-spacing:.18em; color:var(--bfink,#FDF8E7); opacity:.55; margin-top:1px}
+.bf-box.bf-enter{opacity:0; transform:translateX(-50%) scale(.85)}
+.bf-nm{font:900 9px/1 var(--body); letter-spacing:.01em}
+@media(min-width:1100px){ .bf-nm{font-size:10px} }
+/* tier light (design 5a): ring = tier color · fill = 13% tint · text = pale tint */
+.bf-t1{--bfrg:#FFFFFF; --bfbg:rgba(255,255,255,.12); --bftx:#FFFFFF; --bfgl:rgba(255,255,255,.3)}
+.bf-t2{--bfrg:#6FC7E8; --bfbg:rgba(111,199,232,.13); --bftx:#BFE9FA; --bfgl:rgba(111,199,232,.3)}
+.bf-t3{--bfrg:#FFC95C; --bfbg:rgba(255,201,92,.13); --bftx:#FFDFA0; --bfgl:rgba(255,201,92,.3)}
+.bf-t4{--bfrg:#FF8FC0; --bfbg:rgba(255,143,192,.13); --bftx:#FFC4DE; --bfgl:rgba(255,143,192,.3)}
+.bf-box.bf-dim{opacity:.35}
+.bf-box.bf-foc{box-shadow:0 0 0 1.5px var(--bfrg,#FFFFFF), 0 0 0 3.5px rgba(245,215,110,.4),
+  0 0 16px var(--bfgl,rgba(255,255,255,.3))}
+/* a GROUP is filler — same light, dashed ring says "scaffold" */
+.bf-box.bf-grp{box-shadow:0 0 9px var(--bfgl,rgba(255,255,255,.3)); border:1.4px dashed var(--bfrg,#FFFFFF)}
 /* the fold caret sits under its box and carries the hidden count */
 /* v0.26.0 — the per-object ops: ＋ add subordinates · ✎ edit. Small and quiet so
    the box stays minimal, but always reachable without opening anything first. */
@@ -754,22 +725,23 @@ body.chart-min .ch-dock{padding:3px 6px; border-radius:999px; align-items:center
 @media(hover:hover){
   .bf-box:hover .bf-ops{opacity:1; pointer-events:auto}
   .bf-box:hover .bf-nm{opacity:.14}
-  .bf-box:hover .bf-st, .bf-box:hover .bf-grptag{opacity:.1}
 }
-.bf-nm,.bf-st,.bf-grptag{transition:opacity .16s ease}
+.bf-nm{transition:opacity .16s ease}
 .bf-op{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:0;
-  width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
-  background:color-mix(in srgb, var(--bfink,#FDF8E7) 12%, transparent); color:var(--bfink,#FDF8E7);
-  font:700 13px/1 var(--body);
+  width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  background:color-mix(in srgb, var(--bftx,#FFFFFF) 14%, transparent); color:var(--bftx,#FFFFFF);
+  font:700 12px/1 var(--body);
   transition:transform .16s cubic-bezier(.34,1.56,.64,1), background .16s ease}
-.bf-op:active{transform:scale(.86); background:color-mix(in srgb, var(--bfink,#FDF8E7) 22%, transparent)}
-@media(hover:hover){ .bf-op:hover{background:color-mix(in srgb, var(--bfink,#FDF8E7) 20%, transparent)} }
-.bf-box.bf-dim .bf-ops{opacity:.5}
-.bf-caret{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:3px 0 0;
-  padding:2px 9px; border-radius:999px; background:var(--panel-2); color:var(--dim);
-  box-shadow:0 0 0 1px var(--line); font:800 8.5px/1.5 var(--mono); letter-spacing:.04em;
+.bf-op:active{transform:scale(.86); background:color-mix(in srgb, var(--bftx,#FFFFFF) 24%, transparent)}
+@media(hover:hover){ .bf-op:hover{background:color-mix(in srgb, var(--bftx,#FFFFFF) 22%, transparent)} }
+@media(hover:hover){ .bf-box.bf-dim:hover .bf-ops{opacity:.5} }   /* dimmed boxes cap their ops — and only under a pointer */
+/* the fold caret hangs just under its box on the plot */
+.bf-caret{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
+  position:absolute; transform:translateX(-50%); z-index:2;
+  padding:1px 7px; border-radius:999px; background:#141006; color:var(--dim);
+  box-shadow:0 0 0 1px var(--line); font:800 8px/1.4 var(--mono); letter-spacing:.04em;
   transition:transform .16s cubic-bezier(.34,1.56,.64,1), color .16s ease, box-shadow .16s ease}
-.bf-caret:active{transform:scale(.9)}
+.bf-caret:active{transform:translateX(-50%) scale(.9)}
 .bf-caret.on{color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
 /* v1.9.1 micro-motion — every chart control answers the finger (iOS grammar) */
 .bf-dep,.bf-zb,.bf-zpct{transition:transform .15s cubic-bezier(.34,1.56,.64,1), background .15s ease, color .15s ease}
@@ -822,10 +794,14 @@ body.chart-min .ch-dock{padding:3px 6px; border-radius:999px; align-items:center
   width:24px; height:24px; border-radius:50%; flex:none;
   background:rgba(0,0,0,.35); color:var(--accent); font:800 12px/1 var(--body)}
 .bf-addsub{width:100%; margin-top:8px}
-/* the chart foot — one quiet add action, not a slab */
-#briefStage .bf-foot{display:flex; padding-top:8px}
-#briefStage .bf-foot .bf-act{margin:0 auto; min-height:34px; padding:0 14px;
-  border-radius:17px; font:700 11px/1 var(--body)}
+/* the chart foot — two QUIET chips on the console (v1.15.0: the bright slab
+   pair died with the card; the dock's ADD is the primary door now) */
+#briefStage .bf-foot{display:flex; justify-content:center; gap:8px; padding-top:10px}
+#briefStage .bf-foot .bf-act{flex:0 0 auto; width:auto; margin:0; min-height:30px; padding:0 13px;
+  border-radius:15px; font:700 10.5px/1 var(--body); color:var(--dim);
+  background:rgba(0,0,0,.35); box-shadow:inset 0 0 0 1px var(--line)}
+#briefStage .bf-foot .bf-act.in{color:var(--accent); background:rgba(0,0,0,.35);
+  box-shadow:inset 0 0 0 1px rgba(245,215,110,.4)}
 /* v1.11.0 iOS segments · v1.13.0 (owner: "same black and gold color scheme"):
    the tracks wear the DOCK's material now — dark pill, cream cells, gold ON.
    The separate .bf-bar row is retired; tracks live in the head. */
@@ -879,25 +855,15 @@ body.chart-min .ch-dock{padding:3px 6px; border-radius:999px; align-items:center
 /* the quiet offer (v0.10.0): the chain grew — export glows twice, says nothing */
 @keyframes xpPulse{0%,100%{box-shadow:0 0 0 1px var(--line)} 35%{box-shadow:0 0 0 2px var(--accent), 0 0 14px rgba(var(--accent-rgb),.55)}}
 .xp-pulse{animation:xpPulse 1.4s ease 2; color:var(--accent)}
-body.brief-mode{
-  --line-tree:rgba(60,48,16,.34);
-  /* THE INVERTED ROOM — brief flips the scheme (owner law: map = main, brief =
-     inverted). Values only; the canvas keeps map paint because it reads tokens
-     from the document element, while DOM chrome inherits these body-scoped ones.
-     Tier tokens go to their ink-end (t2 stays cool, never green). */
-  --ground:#F3ECD4; --panel:#FBF6E4; --panel-2:#E9E0C4;
-  --line:rgba(60,48,16,.28);
-  --text:#191305; --dim:#4E4526; --faint:#6E6442;
-  --accent:#8A6D00; --accent-rgb:138,109,0; --accent-deep:#6B5400; --accent-wash:rgba(138,109,0,.14);
-  --signal:#8A4D18; --signal-wash:rgba(138,77,24,.14);
-  --danger:#AC2418; --ok:#166F3E;
-  --t1:#0D1117; --t2:#0B6484; --t3:#9A4D00; --t4:#A1246E;
-  --glass-hi:rgba(252,247,230,.94); --glass-lo:rgba(238,229,203,.9);
-  --spec:rgba(255,255,255,.8); --drop:0 10px 26px -12px rgba(60,48,16,.3);
-  background:#F3ECD4;
-}
-body.brief-mode::before{content:''; position:absolute; inset:6px; border-radius:20px;  /* body is the non-scrolling 100dvh anchor — absolute is fixed here, and the no-fixed law holds */
-  box-shadow:0 0 0 1.5px var(--accent); pointer-events:none; z-index:14}
+/* v1.15.0 — THE CREAM INVERSION IS RETIRED (owner's design handoff, 3b/5a):
+   brief stays in the black-and-gold room. The room change is said by the seg,
+   a quiet gold frame, a dimmed globe and the brief dock — never a palette
+   flip. (The old body-scoped token override lived here; the canvas never
+   inverted because _mTok reads the document element — that asymmetry is gone
+   with the inversion itself.) */
+body.brief-mode::before{content:''; position:absolute; inset:8px; border-radius:20px;  /* body is the non-scrolling 100dvh anchor — absolute is fixed here, and the no-fixed law holds */
+  box-shadow:0 0 0 1.5px rgba(245,215,110,.55); pointer-events:none; z-index:14}
+body.brief-mode #globeCanvas{opacity:.78}
 /* v1.14.0: the time ledger PERSISTS in brief (design 2a — the old corner clocks
    vanished there; the owner called that a bug to fix). */
 .bf-empty{padding:8px 2px 6px; text-align:left; display:flex; flex-direction:column; gap:8px}
@@ -1429,6 +1395,30 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <span class="nv-fablbl" aria-hidden="true"></span>
 </nav>
 
+<!-- v1.15.0 BRIEF DOCK (design 2b): the file tools leave the chart head for one
+     bottom command dock — ADD · NAMES · LINES │ BRIEFS · EXPORT · LEDGER. Same
+     dock material and delegation contracts (data-* rides the cell). On phones
+     the pill spans the width with a center gap the FAB sits in. -->
+<div id="briefDock" class="ch-dock" aria-label="Brief tools">
+  <span class="ch-tool" data-bfsearch="1" role="button" tabindex="0" aria-label="Add an organization or US state" title="Add to the brief"><span class="od-ico">＋</span><span class="ch-lbl">Add</span></span>
+  <span class="ch-tool" data-bfnm="1" role="button" tabindex="0" aria-label="Names on the globe" title="Names on the globe"><span class="od-ico bf-vw">Aa</span><span class="ch-lbl">Names</span></span>
+  <span class="ch-tool" data-bfln="1" role="button" tabindex="0" aria-label="Connecting lines" title="Connecting lines"><span class="od-ico bf-vw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span><span class="ch-lbl">Lines</span></span>
+  <span class="ch-div" aria-hidden="true"></span>
+  <span class="bd-gap" aria-hidden="true"></span>
+  <span class="ch-tool" data-bfbriefs="1" role="button" tabindex="0" aria-label="Briefs — save or load a whole diagram" title="Briefs"><span class="od-ico">▤</span><span class="ch-lbl">Briefs</span></span>
+  <span class="ch-tool" data-xpbtn="1" role="button" tabindex="0" aria-label="Export" title="Export"><span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span><span class="ch-lbl">Export</span></span>
+  <span class="ch-tool" data-bfledger="1" role="button" tabindex="0" aria-label="Ledger — the saved-data repository" title="Ledger"><span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="M15 4v16"></path></svg></span><span class="ch-lbl">Ledger</span></span>
+</div>
+
+<!-- v1.15.0 CHART-TO-GLOBE LEADER (design 5a): a dotted curve from the focused
+     chart box to its base dot on the globe behind, ending in a gold selection
+     diamond + label. DOM/SVG, re-anchored on every dirty frame like the
+     callout tail; hidden while gesturing, minimized, or on the far side. -->
+<div id="bfLeader" hidden aria-hidden="true">
+  <svg class="bl-svg"><path class="bl-path" d=""></path><rect class="bl-dia" width="14" height="14"></rect></svg>
+  <span class="bl-lbl"></span>
+</div>
+
 <!-- family legend / layer list — swatch · name · count; tap toggles the family -->
 <section id="legendPanel" class="glass card" hidden aria-label="Map layers"></section>
 
@@ -1461,6 +1451,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.15.0 • THE DARK CONSOLE (owner's design handoff, options 5a + 2b + 3b).
+//            The cream inversion is RETIRED — brief stays black-and-gold; the
+//            room is said by the seg, a quiet gold frame, a globe dimmed to
+//            78% and the new bottom brief dock (ADD·NAMES·LINES│BRIEFS·
+//            EXPORT·LEDGER — the chart head keeps only ⌗, the org count,
+//            L1-L4 with a ⌄ + hold-to-stack hint, and ZOOM). The chart is
+//            rebuilt as a frameless illuminated console: content-hugging
+//            boxes on a 24px grid, tier-tint fills with glowing tier rings,
+//            echelon hairlines + L-labels, rounded-elbow connectors with a
+//            glow+crisp lit chain and junction beads, stacks on one straight
+//            spine under the parent, and a dotted chart-to-globe leader from
+//            the focused box to its base dot (gold diamond + name).
 //   v1.14.0 • THE MAP ROOM REFRESH (owner's design handoff, option 3a + 2a).
 //            A MAP|BRIEF segmented pill under the wordmark is the room door
 //            (FAB hold stays a shortcut; in Brief the FAB reads TO MAP and a
@@ -2514,7 +2516,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.14.0';
+const APP_VERSION = 'v1.15.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -2892,6 +2894,7 @@ function startGlobeLoop(cv){
     }
     if(GlobeState.dirty){ drawGlobe(cv, ctx); GlobeState.dirty=false;
       try{ if(window._coTrack) _coTrack(); }catch(_){}   // the callout rides its dot
+      try{ if(window._bfLeaderTrack) _bfLeaderTrack(); }catch(_){}   // v1.15.0: the chart leader rides too
     }
     GlobeState.raf=requestAnimationFrame(frame);
   }
@@ -5590,6 +5593,12 @@ function setMode(m){
   // MINIMIZED every time brief opens — one tap on ⌗ CHART expands it
   if(brief) document.body.classList.add('chart-min');
   if(brief) renderBrief();
+  // v1.15.0 (design 2b): the search pill speaks the room's language, the brief
+  // dock mirrors the view flags, and the leader clears when the room changes.
+  try{ const si=document.getElementById('searchInput');
+    if(si) si.placeholder=brief?'Search orgs + US states to add':'Search bases + units'; }catch(_){}
+  try{ _bdSync(); }catch(_){}
+  try{ if(window._bfLeaderTrack) _bfLeaderTrack(); }catch(_){}
   try{                                            // the sheet follows the mode
     const host=document.getElementById('dossier');
     // v0.7.0: brief opens on the GLOBE picture — no sheet until an object is
@@ -5612,11 +5621,14 @@ try{ window.setMode=setMode; }catch(_){}
 // only (owner law: minimal on the object, everything in the popup); minimize (⌗)
 // collapses the card to its tab. Chips open the object popup.
 function renderBrief(){
-  // v0.25.0 — THE HIERARCHY CHART (A-ORG-1's technique, rebuilt sleek). A real
-  // TOP-DOWN org chart: nested <ul>/<li> with CSS connector risers, boxes centred
-  // under their parent. Every box is MINIMAL — the name, and a fold caret when it
-  // has children. Tapping a box opens its sheet, where the options live (add a
-  // subordinate under THIS org, colour, stripe, move, note, remove).
+  // v1.15.0 — THE ILLUMINATED CONSOLE (design 5a). The ul/li rail tree and the
+  // 124×48 matte card are RETIRED: the chart is one absolutely-positioned plot.
+  // Boxes hug their content on a fixed grid (48px level pitch desktop / 40
+  // phone; 32/30 stack pitch), lit from within — tier-tint fill, glowing tier
+  // ring, pale tier text. One SVG net carries echelon hairlines, rounded-elbow
+  // connectors, the focused chain's glow pass and gold junction beads. Every
+  // data-* contract (bfobj/bfaddkids/bfedit/bffold/bfdepth/bfzoom/chmin/
+  // bffocusclear/bfsearch/bfgrpnew) is unchanged.
   const el=document.getElementById('briefStage'); if(!el) return;
   const _flip=_bfFlipCapture(el);                  // v1.10.0 FLUID CHART: remember where every box IS
   const esc=_odEsc, escA=_odEscA;
@@ -5644,32 +5656,22 @@ function renderBrief(){
   }
   // the head is a DIV (real <button> tracks live inside it now — buttons
   // cannot nest); data-chmin + role button keep the tap contract.
+  // v1.15.0 (design 2b): the head is CHART-SCOPED — ⌗, the org count, the
+  // L1-L4 track (⌄ on the active cell + the hold-to-stack hint), ZOOM. The
+  // file tools live in the bottom #briefDock now.
   let h='<div class="ch-head" data-chmin="1" role="button" tabindex="0" aria-label="Minimize or expand the chart">'
     +'<span class="ch-mk">⌗</span>'
+    +(memN?('<span class="ch-n">'+memN+' ORG'+(memN===1?'':'S')+'</span>'):'')
     +((memN&&_deep)?('<span class="bf-seg bf-vseg">'+[1,2,3,4].map(function(n){
-        return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+' — hold to stack">L'+n+'</button>';
-      }).join('')+'</span>'):'')
+        return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+' — hold to stack">L'+n+(dep===n?' ⌄':'')+'</button>';
+      }).join('')+'</span>'
+      +'<span class="ch-hint">HOLD A LEVEL<br>TO STACK IT</span>'):'')
     +(memN?('<span class="bf-seg bf-zseg"><span class="bf-vlab">ZOOM</span>'
       +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">−</button>'
       +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
       +'<button type="button" class="bf-zb" data-bfzoom="+" aria-label="Bigger">+</button>'
     +'</span>'):'')
     +((memN&&foc)?'<button type="button" class="bf-clearfoc" data-bffocusclear="1">Show all ✕</button>':'')
-    // v1.9.0 (owner: label the tools) · v1.12.1 THE DOCK (owner reference:
-    // the dark iOS pill toolbar, one amber active slot): the four tools live
-    // in ONE dark pill — uniform slots, gold circle = toggle ON. The data-
-    // attribute rides the wrapper — closest() delegation absorbs the move.
-    +'<span class="ch-dock">'
-    +'<span class="ch-tool'+(GlobeState._bfNamesOff?' off':'')+'" data-bfnm="1" role="button" aria-label="'+(GlobeState._bfNamesOff?'Show names on the globe':'Hide names on the globe')+'" title="Names on the globe">'
-      +'<span class="od-ico bf-vw'+(GlobeState._bfNamesOff?' off':'')+'">Aa</span><span class="ch-lbl">Names</span></span>'
-    +'<span class="ch-tool'+(GlobeState._bfLinesOff?' off':'')+'" data-bfln="1" role="button" aria-label="'+(GlobeState._bfLinesOff?'Show connecting lines':'Hide connecting lines')+'" title="Connecting lines">'
-      +'<span class="od-ico bf-vw'+(GlobeState._bfLinesOff?' off':'')+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span><span class="ch-lbl">Lines</span></span>'
-    +'<span class="ch-div" aria-hidden="true"></span>'
-    +'<span class="ch-tool" data-bfbriefs="1" role="button" aria-label="Briefs — save or load a whole diagram" title="Briefs">'
-      +'<span class="od-ico">▤</span><span class="ch-lbl">Briefs</span></span>'
-    +'<span class="ch-tool" data-xpbtn="1" role="button" aria-label="Export" title="Export">'
-      +'<span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span><span class="ch-lbl">Export</span></span>'
-    +'</span>'
     +'</div>';
   if(!memN){
     h+='<div class="bf-empty"><b>The brief is empty</b>'
@@ -5679,84 +5681,213 @@ function renderBrief(){
       // lives in the SHEET (the inline foot form fought the keyboard and lost)
       +'<button type="button" class="bf-addsel" data-bfgrpnew="">⊞ Start with a group</button>'
       +'</div>';
-    el.innerHTML=h; return;
+    el.innerHTML=h; try{ _bdSync(); }catch(_){} return;
   }
-  // (v1.13.0: the chain map, focus walk and the LEVELS/ZOOM tracks moved UP
-  // into the head build — the separate control bar is retired.)
-  // ── ONE BOX. Minimal by design: the name, a station line only when it adds
-  // something, and a fold caret carrying the hidden-descendant count.
+  // ── THE LAYOUT (v1.15.0): content-hugging boxes on the fixed grid. Widths
+  // come from a shared measuring canvas (the harness stub's fixed 40 is fine —
+  // geometry stays deterministic). Stacked levels flatten into one column
+  // directly under the parent's center on a single straight spine.
+  let desk=true; try{ desk=!(window.matchMedia && matchMedia('(max-width:1099px)').matches); }catch(_){}
+  const BH=desk?24:22, PITCH=desk?48:40, SPITCH=desk?32:30, GAP=28, GUT=24, PADT=4, FS=desk?10:9;
   const kidsOf=function(k){ return C.order.filter(function(x){ return C.nodes[x].parent===k; }); };
   const descN=function(k){ let n=0; const q=kidsOf(k); while(q.length){ n++; kidsOf(q.shift()).forEach(function(c){ q.push(c); }); } return n; };
-  const nodeHtml=function(k, lvl){
+  const stacked=function(l){ return (BRIEF.vert||[]).indexOf(Math.min(4,l))>=0; };
+  const visKids=function(k,lvl){ if(lvl>=dep || fold[k]) return []; return kidsOf(k); };
+  let meas=null;
+  try{ const mcv=window.__bfMeasCv||(window.__bfMeasCv=document.createElement('canvas'));
+    meas=mcv.getContext('2d'); if(meas) meas.font='900 '+FS+"px 'Segoe UI',system-ui,sans-serif"; }catch(_){}
+  const TXT={}, BW={}, SW={};
+  const boxW=function(k){ if(BW[k]) return BW[k];
+    const n=C.nodes[k]; const t=(n.kind==='custom')?n.name:_bfAbbr(n.name);
+    TXT[k]=t; let w=0; try{ w=meas?meas.measureText(t).width:0; }catch(_){}
+    if(!w || !isFinite(w)) w=t.length*FS*0.62;
+    return (BW[k]=Math.max(44, Math.round(w)+(desk?24:20))); };
+  const colW=function(k,lvl){ let w=boxW(k); visKids(k,lvl).forEach(function(c){ w=Math.max(w, colW(c,lvl+1)); }); return w; };
+  const subW=function(k,lvl){
+    const bw=boxW(k);
+    const kids=visKids(k,lvl);
+    if(!kids.length) return (SW[k]=bw);
+    let w;
+    if(stacked(lvl+1)){ w=bw; kids.forEach(function(c){ w=Math.max(w, colW(c,lvl+1)); }); }
+    else { let sum=0; kids.forEach(function(c,i){ sum+=subW(c,lvl+1)+(i?GAP:0); }); w=Math.max(bw, sum); }
+    return (SW[k]=w);
+  };
+  const POS={}, edges=[], colSegs=[], lvlMinY={};
+  let maxY=0, maxLvl=1;
+  const reg=function(k,cx,y,lvl){ POS[k]={cx:Math.round(cx), y:Math.round(y), lvl:lvl};
+    if(lvlMinY[lvl]==null || y<lvlMinY[lvl]) lvlMinY[lvl]=Math.round(y);
+    if(y+BH>maxY) maxY=y+BH; if(lvl>maxLvl) maxLvl=lvl; };
+  const place=function(k,lvl,x0,y){
+    const kids=visKids(k,lvl), w=SW[k];
+    if(kids.length && stacked(lvl+1)){
+      const cx=x0+w/2; reg(k,cx,y,lvl);
+      const ref={y:y+PITCH}; const flat=[];
+      const walk=function(kk,ll){ flat.push(kk); reg(kk,cx,ref.y,ll); ref.y+=SPITCH; visKids(kk,ll).forEach(function(c){ walk(c,ll+1); }); };
+      kids.forEach(function(c){ walk(c,lvl+1); });
+      for(let i=0;i<flat.length;i++){
+        const a=(i===0)?k:flat[i-1];
+        colSegs.push({x:Math.round(cx), y1:POS[a].y+BH, y2:POS[flat[i]].y, p:a, c:flat[i]});
+      }
+      return cx;
+    }
+    if(!kids.length){ const cx=x0+w/2; reg(k,cx,y,lvl); return cx; }
+    let x=x0; let sum=0; kids.forEach(function(c,i){ sum+=SW[c]+(i?GAP:0); });
+    x+=Math.max(0,(w-sum)/2);
+    const centers=[];
+    kids.forEach(function(c){ centers.push(place(c,lvl+1,x,y+PITCH)); x+=SW[c]+GAP; });
+    const cx=(centers[0]+centers[centers.length-1])/2;
+    reg(k,cx,y,lvl);
+    kids.forEach(function(c){ edges.push({p:k,c:c}); });
+    return cx;
+  };
+  const roots=C.order.filter(function(k){ return C.nodes[k].lvl===1; });
+  roots.forEach(function(r){ subW(r,1); });
+  let X=GUT;
+  roots.forEach(function(r,i){ if(i) X+=40; place(r,1,X,PADT); X+=SW[r]; });
+  const W=Math.max(Math.round(X+12), 180);
+  const H=Math.round(maxY+14);
+  // ── THE NET: hairlines under each horizontal band, rounded-elbow connectors,
+  // the lit chain (glow + crisp passes) with gold junction beads, dim strokes
+  // off-chain. One SVG, coordinates straight from the layout.
+  const litLvl={};
+  if(branch) branch.forEach(function(k){ if(POS[k]) litLvl[POS[k].lvl]=1; });
+  const isLit=function(a2,b2){ return branch && branch.has(a2) && branch.has(b2); };
+  const elbow=function(px,py2,cx2,cy){
+    if(Math.abs(px-cx2)<1) return 'M'+px+' '+py2+'V'+cy;
+    const yj=py2+8, d2=(cx2>px)?1:-1;
+    return 'M'+px+' '+py2+'V'+(yj-4)+'Q'+px+' '+yj+' '+(px+4*d2)+' '+yj
+      +'H'+(cx2-4*d2)+'Q'+cx2+' '+yj+' '+cx2+' '+(yj+4)+'V'+cy;
+  };
+  let netBase='', netDim='', netGlow='', netBeads='';
+  edges.forEach(function(e2){ const P=POS[e2.p], Q=POS[e2.c]; if(!P||!Q) return;
+    const d3=elbow(P.cx,P.y+BH,Q.cx,Q.y);
+    if(branch){
+      if(isLit(e2.p,e2.c)){ netGlow+=d3;
+        if(Math.abs(P.cx-Q.cx)>=1) netBeads+='<circle cx="'+P.cx+'" cy="'+(P.y+BH+8)+'" r="2.4"></circle>'; }
+      else netDim+=d3;
+    } else netBase+=d3;
+  });
+  colSegs.forEach(function(s2){ if(s2.y2<=s2.y1) return; const d3='M'+s2.x+' '+s2.y1+'V'+s2.y2;
+    if(branch){ if(isLit(s2.p,s2.c)) netGlow+=d3; else netDim+=d3; } else netBase+=d3; });
+  let hair='', lbls='';
+  for(let l=1;l<=maxLvl;l++){
+    if(lvlMinY[l]==null) continue;
+    lbls+='<span class="bf-elbl'+(litLvl[l]?' lit':'')+'" style="left:2px;top:'+(lvlMinY[l]+Math.round((BH-8)/2))+'px">L'+l+'</span>';
+    if(l<maxLvl && lvlMinY[l+1]!=null) hair+='M'+GUT+' '+(lvlMinY[l+1]-8)+'H'+(W-4);
+  }
+  const net='<svg class="bf-net" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'
+    +(hair?('<path d="'+hair+'" fill="none" stroke="rgba(245,215,110,.08)" stroke-width="1"></path>'):'')
+    +(netBase?('<path d="'+netBase+'" fill="none" stroke="rgba(245,215,110,.34)" stroke-width="1.4" stroke-linecap="round"></path>'):'')
+    +(netDim?('<path d="'+netDim+'" fill="none" stroke="rgba(245,215,110,.18)" stroke-width="1.4" stroke-linecap="round"></path>'):'')
+    +(netGlow?('<path d="'+netGlow+'" fill="none" stroke="rgba(245,215,110,.28)" stroke-width="5" stroke-linecap="round" opacity=".5"></path>'
+             +'<path d="'+netGlow+'" fill="none" stroke="rgba(245,215,110,.85)" stroke-width="1.6" stroke-linecap="round"></path>'):'')
+    +(netBeads?('<g fill="#F5D76E">'+netBeads+'</g>'):'')
+    +'</svg>';
+  // ── THE BOXES: name only (design 3b law — station lines and the GROUP tag
+  // are retired; a group's dashed ring says filler). Hover ops ride inside.
+  let boxes='';
+  C.order.forEach(function(k){ const P=POS[k]; if(!P) return;
     const n=C.nodes[k];
-    const kids=(lvl>=dep)?[]:kidsOf(k);
-    const folded=!!fold[k] && kids.length;
     const dim=(branch && !branch.has(k))?' bf-dim':'';
     const isFoc=(foc===k)?' bf-foc':'';
-    const tier=Math.min(4,n.lvl);
-    const tcls='bf-t'+tier;                                  // quote-adjacent for dead-lint
-    const col=n.color||'';
-    // v1.3.0 MATTE: a chosen color IS the fill — its ink is picked by luminance
-    const sty=col?(' style="--bfc:'+col+';--bfink:'+_bfInk(col)+'"'):'';
-    const stn=(n.kind==='state')?'state'
-      :((n.kind==='custom'&&n.pinned)?(n.bs||'')                    // v1.4.0: a PLACE names its host base
-      :((n.lat!=null&&n.kind==='org')?_bfBaseOf(n.ref):''));
-    // v1.0.3 — a GROUP wears a dashed ring + engraved tag;
-    // v1.4.0 — a PLACE (pinned custom) is a real object, not filler: no dash, no tag
+    const tcls='bf-t'+Math.min(4,n.lvl);                     // bf-t1 bf-t2 bf-t3 bf-t4 (dead-lint literals)
     const grp=(n.kind==='custom'&&!n.pinned)?' bf-grp':'';
-    let r='<li class="bf-li">';
-    r+='<div class="bf-box '+tcls+grp+dim+isFoc+'"'+sty+' data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
-      +'<span class="bf-nm">'+esc((n.kind==='custom')?n.name:_bfAbbr(n.name))+'</span>'
-      +(grp?'<span class="bf-grptag">GROUP</span>':'')
-      +(stn?('<span class="bf-st">'+esc(stn)+'</span>'):'')
-      // v0.26.0 — the two ops the owner asked for, right on the object: ＋ opens the
-      // multi-select picker to add subordinates UNDER this org, ✎ opens its sheet.
+    const col=n.color||'';
+    let vars='';
+    if(col){ const t2=_bfTint(col); vars='--bfrg:'+col+';--bfbg:'+t2.bg+';--bftx:'+t2.tx+';--bfgl:'+t2.gl+';'; }
+    boxes+='<div class="bf-box '+tcls+grp+dim+isFoc+'" style="left:'+P.cx+'px;top:'+P.y+'px;'+vars+'" data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
+      +'<span class="bf-nm">'+esc(TXT[k]||n.name)+'</span>'
       +'<span class="bf-ops">'
         +'<button type="button" class="bf-op" data-bfaddkids="'+escA(k)+'" aria-label="Add subordinates under '+escA(n.name)+'" title="Add subordinates">+</button>'
         +'<button type="button" class="bf-op" data-bfedit="'+escA(k)+'" aria-label="Edit '+escA(n.name)+'" title="Edit">'
           +'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5l5 5"></path><path d="M4 20l1-4.5L16 4.5a1.6 1.6 0 0 1 2.3 0l1.2 1.2a1.6 1.6 0 0 1 0 2.3L8.5 19 4 20z"></path></svg>'
         +'</button>'
-      +'</span>'
-      +'</div>';
-    if(kids.length) r+='<button type="button" class="bf-caret'+(folded?' on':'')+'" data-bffold="'+escA(k)+'" aria-expanded="'+(folded?'false':'true')+'" aria-label="'+(folded?'Expand':'Collapse')+' branch">'
-      +(folded?('+'+descN(k)):'\u25be')+'</button>';
-    if(kids.length && !folded){
-      // v1.5.0 — a STACKED level lays its litter out as a column (left rail
-      // connectors); wrap logic is a horizontal concern and does not apply
-      if((BRIEF.vert||[]).indexOf(Math.min(4,lvl+1))>=0){
-        r+='<ul class="bf-kids bf-vert">'+kids.map(function(c){ return nodeHtml(c, lvl+1); }).join('')+'</ul>';
-      } else {
-      // SIZING (A-ORG-1 §2.1): a wide litter wraps into rows instead of one endless
-      // ribbon, so a 50-sibling chain still fits the pane at a readable size.
-      let rows=[kids];
-      if(kids.length>6){ const per=Math.ceil(Math.sqrt(kids.length*1.7)); rows=[];
-        for(let i2=0;i2<kids.length;i2+=per) rows.push(kids.slice(i2,i2+per)); }
-      if(rows.length>1) r+='<div class="bf-kgroup">';
-      rows.forEach(function(row,ri){
-        r+='<ul class="bf-kids'+(ri?' bf-krow2':'')+'">'+row.map(function(c){ return nodeHtml(c, lvl+1); }).join('')+'</ul>';
-      });
-      if(rows.length>1) r+='</div>';
-      }
+      +'</span></div>';
+    const realKids=kidsOf(k);
+    if(realKids.length && P.lvl<dep){
+      const folded=!!fold[k];
+      boxes+='<button type="button" class="bf-caret'+(folded?' on':'')+'" style="left:'+P.cx+'px;top:'+(P.y+BH+2)+'px" data-bffold="'+escA(k)+'" aria-expanded="'+(folded?'false':'true')+'" aria-label="'+(folded?'Expand':'Collapse')+' branch">'
+        +(folded?('+'+descN(k)):'▾')+'</button>';
     }
-    return r+'</li>';
-  };
-  const roots=C.order.filter(function(k){ return C.nodes[k].lvl===1; });
-  const zst=GlobeState._bfZoom?(' style="zoom:'+GlobeState._bfZoom+'"'):'';
-  h+='<div class="bf-wrap"><ul class="bf-tree"'+zst+'>'
-    +roots.map(function(r){
-      // the per-root eye rides ABOVE its tree so a whole component can drop out
-      return (hid.has(r)?'':'')+nodeHtml(r,1);
-    }).join('')+'</ul></div>';
-  // v1.0.3 \u2014 the foot offers BOTH build moves: a real org (search) or a GROUP
+  });
+  const zst=GlobeState._bfZoom?('zoom:'+GlobeState._bfZoom+';'):'';
+  h+='<div class="bf-wrap"><div class="bf-tree" style="width:'+W+'px;height:'+H+'px;'+zst+'">'
+    +net+lbls+boxes+'</div></div>';
+  // v1.0.3 — the foot offers BOTH build moves: a real org (search) or a GROUP
   // (an owner-named filler node that shapes the hierarchy). v1.0.4: the name
-  // form opens in the SHEET (_bfGroupSheet) \u2014 the inline foot form collapsed
+  // form opens in the SHEET (_bfGroupSheet) — the inline foot form collapsed
   // under the phone keyboard in the owner's recording. Never bring it back.
-  h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">\u2295 Add organization</button>'
-    +'<button type="button" class="bf-act" data-bfgrpnew="">\u229e New group</button></div>';
+  h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">⊕ Add organization</button>'
+    +'<button type="button" class="bf-act" data-bfgrpnew="">⊞ New group</button></div>';
   el.innerHTML=h;
   try{ _bfFit(); }catch(_){}
+  try{ _bdSync(); }catch(_){}
+  try{ if(window._bfLeaderTrack) _bfLeaderTrack(); }catch(_){}
   _bfFlipPlay(el, _flip);                          // v1.10.0: …then glide everything to where it now BELONGS
 }
+// v1.15.0 — the dock state mirror: the bottom #briefDock is static markup, so
+// its Names/Lines cells re-read the view flags after every render/mode change.
+function _bdSync(){
+  try{
+    const d=document.getElementById('briefDock'); if(!d) return;
+    [['[data-bfnm]', !!GlobeState._bfNamesOff], ['[data-bfln]', !!GlobeState._bfLinesOff]].forEach(function(pair){
+      const cell=d.querySelector(pair[0]); if(!cell) return;
+      cell.classList.toggle('off', pair[1]);
+      const ico=cell.querySelector('.bf-vw'); if(ico) ico.classList.toggle('off', pair[1]);
+    });
+  }catch(_){}
+}
+// v1.15.0 — illuminated recipe for an owner-picked swatch: ring = the swatch,
+// fill = 13% tint, glow = 30%, text = the swatch lifted 65% toward white.
+function _bfTint(hex){
+  try{
+    const h2=String(hex).replace('#','');
+    const r=parseInt(h2.slice(0,2),16), g=parseInt(h2.slice(2,4),16), b=parseInt(h2.slice(4,6),16);
+    const up=function(v){ return Math.round(v+(255-v)*0.65); };
+    return { bg:'rgba('+r+','+g+','+b+',.13)', gl:'rgba('+r+','+g+','+b+',.3)',
+      tx:'rgb('+up(r)+','+up(g)+','+up(b)+')' };
+  }catch(_){ return {bg:'rgba(255,255,255,.12)', gl:'rgba(255,255,255,.3)', tx:'#FFFFFF'}; }
+}
+// v1.15.0 — THE CHART-TO-GLOBE LEADER (design 5a): a dotted curve from the
+// focused box's edge to its base dot behind the console, ending in a gold
+// selection diamond + label. DOM/SVG like the callout tail — dirty-gated,
+// projected via GlobeState.__mCss, hidden on the far hemisphere / while the
+// chart is minimized / outside the brief room (belt: CSS hides those too).
+function _bfLeaderTrack(){
+  const led=document.getElementById('bfLeader'); if(!led) return;
+  const off=function(){ if(!led.hidden) led.hidden=true; };
+  try{
+    if(!document.body.classList.contains('brief-mode') || document.body.classList.contains('chart-min')) return off();
+    const foc=GlobeState._bfFocus; if(!foc) return off();
+    const Cc=GlobeState.__bfC; const n=(Cc&&Cc.nodes)?Cc.nodes[foc]:null;
+    if(!n || n.lat==null || n.lon==null) return off();
+    const m=GlobeState.__mCss; if(!m) return off();
+    const p=_projectLonLat(n.lon, n.lat, m);
+    if(p[2]<0) return off();
+    const bx=document.querySelector('#briefStage .bf-box.bf-foc'); if(!bx) return off();
+    const r=bx.getBoundingClientRect(); if(!r.width) return off();
+    const dx=Math.round(p[0]), dy=Math.round(p[1]);
+    let sx=(r.left+r.right)/2, sy=(dy<r.top)?r.top:r.bottom;
+    if(dx<r.left-20){ sx=r.left; sy=(r.top+r.bottom)/2; }
+    else if(dx>r.right+20){ sx=r.right; sy=(r.top+r.bottom)/2; }
+    const path=led.querySelector('.bl-path'), dia=led.querySelector('.bl-dia'), lbl=led.querySelector('.bl-lbl');
+    if(path) path.setAttribute('d','M'+sx+' '+sy+'Q'+(Math.round(sx+(dx-sx)*0.35))+' '+(Math.round(sy+(dy-sy)*0.75))+' '+dx+' '+dy);
+    if(dia){ dia.setAttribute('x',dx-7); dia.setAttribute('y',dy-7); dia.setAttribute('transform','rotate(45 '+dx+' '+dy+')'); }
+    if(lbl){
+      let t='';
+      try{
+        if(n.kind==='org'){ const s=siteById(ogEffSite(n.ref||foc)||''); t=s?(s.base+(s.st?(' '+s.st):'')):n.name; }
+        else if(n.kind==='custom' && n.pinned){ t=n.bs||n.name; }
+        else t=n.name;
+      }catch(_){ t=n.name||''; }
+      lbl.textContent=String(t||'').toUpperCase();
+      lbl.style.left=(dx+12)+'px'; lbl.style.top=(dy+4)+'px';
+    }
+    led.hidden=false;
+  }catch(_){ off(); }
+}
+try{ window._bfLeaderTrack=_bfLeaderTrack; }catch(_){}
+
 // ═══ v1.10.0 THE FLUID CHART (owner: "operate like iOS or Twitter —
 // fluidity/movement"). FLIP over the whole chart: before a re-render we
 // remember every box's on-screen rect; after the new layout (and _bfFit's
@@ -5798,7 +5929,9 @@ function _bfFlipPlay(el, old){
       const z=(b.offsetWidth>0)?(r.width/b.offsetWidth):1;   // CSS-zoom compensation
       b.style.transition='none';
       b.style.transformOrigin='0 0';
-      b.style.transform='translate('+(dx/z)+'px,'+(dy/z)+'px)'
+      // v1.15.0: boxes are absolutely positioned with a translateX(-50%) base —
+      // the FLIP transform must carry it or the first frame jumps half a width
+      b.style.transform='translateX(-50%) translate('+(dx/z)+'px,'+(dy/z)+'px)'
         +((o.w>1&&r.width>1)?(' scale('+(o.w/r.width)+','+(o.h/r.height)+')'):'');
       moves.push({b:b});
     });
@@ -5834,20 +5967,8 @@ function _bfFit(){
 function _bfCenter(wrap,tree){
   try{ wrap.scrollLeft=Math.max(0,(tree.scrollWidth*(parseFloat(tree.style.zoom)||1)-wrap.clientWidth)/2); }catch(_){}
 }
-function _bfBaseOf(orgId){
-  try{ const s=siteById(ogEffSite(orgId)||''); return s?s.base:''; }catch(_){ return ''; }
-}
-// v1.3.0 — ink for a matte fill: relative luminance picks dark ink on light
-// swatches, cream ink on deep ones (the brief room's tier hues are all deep).
-function _bfInk(hex){
-  try{
-    const h=String(hex).replace('#','');
-    const L=0.2126*(parseInt(h.slice(0,2),16)/255)
-          +0.7152*(parseInt(h.slice(2,4),16)/255)
-          +0.0722*(parseInt(h.slice(4,6),16)/255);
-    return L>0.58?'#221A08':'#FDF8E7';
-  }catch(_){ return '#FDF8E7'; }
-}
+// (v1.15.0: _bfBaseOf and _bfInk retired with the matte card — the leader
+// resolves host bases inline and _bfTint owns the illuminated color recipe.)
 try{ window.renderBrief=renderBrief; }catch(_){}
 
 // ---- BREADCRUMB TRAIL (v0.2.0) — the globe stroll's memory. Session-only (the
@@ -7495,6 +7616,9 @@ if(!window._odWired){
       return; }
     const blg=e.target.closest('[data-bfbriefs]');
     if(blg){ _sbArm=false; _sbLoadArm=-1; try{ _sbOpenSheet(); }catch(_){} return; }   // v1.8.0: head door to the briefs shelf — never minimizes the chart
+    // v1.15.0 — the brief dock's LEDGER cell opens the Repository drawer
+    const bld=e.target.closest('[data-bfledger]');
+    if(bld){ try{ window.Repo && Repo.open(); }catch(_){} return; }
     const bnm=e.target.closest('[data-bfnm]');
     if(bnm){ GlobeState._bfNamesOff=!GlobeState._bfNamesOff;
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }

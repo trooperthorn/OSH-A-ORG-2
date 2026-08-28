@@ -1243,3 +1243,48 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
   markup asserts must grep the raw source (html), only JS-written innerHTML
   exists on IDS[...] stubs. Also: probes must reset zone state they inherit
   (selectSite(null) first) — earlier probes leak selections.
+
+## v1.15.0 — the dark console (design 5a + 2b + 3b) — AMENDS v1.2.0/v1.3.0/v1.11.2/v1.11.3/v1.12.1
+- CREAM RETIRED: the body.brief-mode token override + #F3ECD4 paint are GONE.
+  Brief is said by: the seg, body.brief-mode::before (inset 8, r20, ring
+  rgba(245,215,110,.55)), #globeCanvas opacity .78, and the brief dock.
+  Never reintroduce a palette flip.
+- CONSOLE LAW: #briefStage is a frameless radial pool (no ring, no drop):
+  radial-gradient(ellipse 90% 100% at 50% 30%, rgba(6,5,4,.82) 55%,
+  transparent). Phone: 6px gutters, r18; desktop: centered 880px via
+  left/right:0 + margin auto (NEVER transform — the stage scrolls).
+- CHART GRAMMAR (replaces the ul/li rail tree + 124×48 card): renderBrief
+  computes an ABSOLUTE layout — content-hugging boxes (measured on a shared
+  canvas; min 44px; +24/+20 padding) at height 24 desk / 22 phone, level
+  pitch 48/40, stack pitch 32/30, sibling gap 28, left gutter 24 for the
+  L-labels. Positions ride the markup (left/top in each box's style) so the
+  stub-DOM probes can assert geometry from the HTML string.
+- ILLUMINATED BOX: fill = tier 13% tint · ring = tier color (1.5px) · glow
+  0 0 10px 30% · text = pale tier tint (.bf-t1..t4 own the vars; owner
+  swatches go through _bfTint: ring=swatch, text lifted 65% to white).
+  Focus adds 3.5px rgba(245,215,110,.4) + 16px glow; off-chain .35 opacity;
+  groups wear a DASHED ring (the GROUP tag and .bf-st sublines are retired
+  — name-only law). Boxes translateX(-50%): every transform (active/enter/
+  FLIP) must carry it or the box jumps half a width.
+- THE NET: one SVG per render — echelon hairlines (rgba .08 at next-band
+  minus 8), base tree rgba .34/1.4 when unfocused; with a focus the lit
+  chain draws twice (5px .28 at 50% + 1.6px .85) with r2.4 gold beads at
+  its elbow drops and everything else at .18. Elbows are 4px corner quads;
+  columns are straight V spines.
+- STACKING: a stacked level FLATTENS into one column on the parent's
+  center; descendants of stacked nodes continue the same column. Proof =
+  shared left + descending tops (geometry, not classes).
+- DOCK SPLIT (2b): the chart head is chart-scoped (⌗ · N ORGS · L1-L4 with
+  ⌄ on the active cell + HOLD-A-LEVEL hint (desktop) · ZOOM · focus chip).
+  #briefDock (static markup, .ch-dock material) carries ADD(data-bfsearch)
+  NAMES LINES │ BRIEFS EXPORT LEDGER(data-bfledger→Repo.open). Being
+  static, its toggle cells need _bdSync() after every render/mode change.
+  Phone: full-width strip, .bd-gap spacer under the FAB. Foot chips went
+  QUIET (dark, inset ring) — the bright slab pair died with the card.
+- LEADER LAW: #bfLeader (DOM/SVG, z15) re-anchors in the SAME dirty-frame
+  hook as _coTrack; hidden when unfocused/minimized/map-room/far-side.
+  Label = host base + state, uppercase; 14px gold diamond at the dot.
+- Search placeholder swaps per room in setMode.
+- LESSON: `.bf-box.bf-dim .bf-ops{opacity:.5}` outside the hover gate had
+  leaked ops onto touch screens since v1.11.0 — visible only once boxes
+  went translucent. Overlay opacity rules live INSIDE @media(hover:hover).
