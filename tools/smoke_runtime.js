@@ -807,32 +807,63 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     global.setMode('map');
   }catch(e){ fails++; console.log('✗ BRIEF probe: '+e.message); }
 
-  // ── PROBE: LCD clocks (s5, v0.6.0 — seg7 faces, SELECT auto-fill + manual) ──
+  // ── PROBE: THE TIME LEDGER (v1.14.0, design 2a — one chip, two rows: LOCAL
+  // ticks seconds, BASE keeps the zone brain: auto-fill, manual precedence,
+  // toggle-off, the zone sheet; the seg7 engine is retired) ──
   { let ok=true;
-    const tl=IDS['clockTL'], tr=IDS['clockTR'];
-    const hl=tl?tl.innerHTML:'';
-    if(!/seg7-d/.test(hl) || !/bt-z/.test(hl)){ ok=false; fails++; console.log('✗ CLOCK #clockTL no LCD face: "'+String(hl).slice(0,60)+'"'); }
-    let ht=tr?tr.innerHTML:'';
-    if(!(/SELECT/.test(ht) || /seg7-d/.test(ht))){ ok=false; fails++; console.log('✗ CLOCK #clockTR neither idle nor zone face: "'+String(ht).slice(0,60)+'"'); }
+    // earlier probes may have left a zone — return to the blank state first
+    try{ global.selectSite(null); global.tickClocks(); }catch(_){}
+    const led=IDS['timeLedger'];
+    let lh=led?led.innerHTML:'';
+    if(!/tl-k/.test(lh) || !/LOCAL/.test(lh) || !/BASE/.test(lh)){ ok=false; fails++; console.log('✗ LEDGER rows missing: "'+String(lh).slice(0,80)+'"'); }
+    if(!/tl-d/.test(lh) || !/\d\d:\d\d:\d\d/.test(lh)){ ok=false; fails++; console.log('✗ LEDGER local row has no hh:mm:ss digits'); }
+    if(!/tl-idle/.test(lh)){ ok=false; fails++; console.log('✗ LEDGER base row must idle (—:—) before any zone exists'); }
+    if(/seg7/.test(lh)){ ok=false; fails++; console.log('✗ LEDGER must not carry seg7 faces (retired v1.14.0)'); }
     try{
-      global.selectSite('fort-bragg');                      // → nearest region = US Eastern
+      global.selectSite('fort-bragg');                      // → zone table: US Eastern
       const z=global._selZone;
-      if(!z || !z.auto || z.tz!=='America/New_York'){ ok=false; fails++; console.log('✗ SELECT auto-fill wrong: '+JSON.stringify(z)); }
-      ht=tr?tr.innerHTML:'';
-      if(!/seg7-d/.test(ht)){ ok=false; fails++; console.log('✗ SELECT cell has no LCD face after auto-fill'); }
+      if(!z || !z.auto || z.tz!=='America/New_York'){ ok=false; fails++; console.log('✗ BASE auto-fill wrong: '+JSON.stringify(z)); }
+      lh=led?led.innerHTML:'';
+      if(/tl-idle/.test(lh)){ ok=false; fails++; console.log('✗ BASE row still idle after auto-fill'); }
       global.pickZone('Asia/Seoul','Korea');                // manual pick wins…
       if(!global._selZone || global._selZone.tz!=='Asia/Seoul' || global._selZone.auto){ ok=false; fails++; console.log('✗ manual pick did not win'); }
       global.pickZone('Asia/Seoul','Korea');                // …and toggles off on repeat
       if(global._selZone!==null){ ok=false; fails++; console.log('✗ pick toggle-off failed'); }
       global.selectSite(null);
-    }catch(e){ ok=false; fails++; console.log('✗ LCD select probe: '+e.message); }
+    }catch(e){ ok=false; fails++; console.log('✗ ledger select probe: '+e.message); }
     try{
       global._tzOpenSheet();
       const dh=IDS['dossier']?IDS['dossier'].innerHTML:'';
       if(!/data-tzpick="11"/.test(dh) || !/data-tzclear/.test(dh)){ ok=false; fails++; console.log('✗ zone sheet rows missing'); }
       global.hideDossier();
     }catch(e){ ok=false; fails++; console.log('✗ zone sheet probe: '+e.message); }
-    if(ok) console.log('  ✓ LCD clocks: seg7 faces + auto-fill (Bragg→US Eastern) + manual pick/toggle-off + zone sheet');
+    if(ok) console.log('  ✓ time ledger: LOCAL hh:mm:ss + BASE idle→auto-fill (Bragg→US Eastern) + manual pick/toggle-off + zone sheet · seg7 retired');
+  }
+
+  // ── PROBE: THE MAP-ROOM CONSOLE (v1.14.0, design 3a — mode seg, labeled
+  // satellites, callout rail + counted tiles, ⌘K hint) ──
+  { let ok=true;
+    try{
+      // static markup asserts read the SOURCE (the stub DOM does not parse
+      // children of markup elements — only JS-written innerHTML exists on stubs)
+      if(html.indexOf('id="modeSeg"')<0 || html.indexOf('data-mode="map"')<0 || html.indexOf('data-mode="brief"')<0){ ok=false; fails++; console.log('✗ MODE SEG missing MAP/BRIEF cells'); }
+      global.setMode('brief');
+      if(!document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(brief) did not flag the body'); }
+      global.setMode('map');
+      if(document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(map) did not clear the flag'); }
+      const nrHtml=(html.split('id="navRow"')[1]||'').split('</div>\n</div>')[0];
+      ['UNDO','CLEAR','ZOOM −','ZOOM +','SAVED','LAYERS'].forEach(function(lb){
+        if(nrHtml.indexOf('>'+lb+'<')<0){ ok=false; fails++; console.log('✗ SATELLITE label missing: '+lb); } });
+      if(/navSat-brief/.test(html)){ ok=false; fails++; console.log('✗ the Brief satellite must be retired (the seg is the door)'); }
+      if(html.indexOf('sp-kbd')<0 || html.indexOf('nv-fablbl')<0){ ok=false; fails++; console.log('✗ ⌘K hint chip or FAB label missing from markup'); }
+      global.selectSite('fort-bragg');
+      const ch=IDS['calloutCard']?IDS['calloutCard'].innerHTML:'';
+      if(ch.indexOf('co-rail')<0 || ch.indexOf('data-cox')<0){ ok=false; fails++; console.log('✗ CALLOUT header rail (with ✕) missing'); }
+      if(ch.indexOf('co-subin')<0){ ok=false; fails++; console.log('✗ CALLOUT inline sub missing'); }
+      if(!/co-ic[^>]*>[\s\S]*?<b>\d+<\/b>/.test(ch)){ ok=false; fails++; console.log('✗ CALLOUT tiles carry no counts'); }
+      global.selectSite(null);
+    }catch(e){ ok=false; fails++; console.log('✗ console probe: '+e.message); }
+    if(ok) console.log('  ✓ map console: MODE SEG switches rooms · labeled satellites (no brief sat) · callout rail + inline sub + counted tiles');
   }
 
   // ── PROBE (non-fatal): drawGlobe on the stub ctx — the stub canvas is

@@ -1209,3 +1209,37 @@ closeouts. The stepping label POLICY is now load-bearing:
   border stretch (WA/OR at 46°N, lon -118.5) and assert the run sequence.
   Classify pixels by NEAREST palette target under distance 60 — first-hit
   under a loose 90 misread pink as purple (they sit 85 apart).
+
+## v1.14.0 — the map room refresh (owner's design handoff: options 3a + 2a)
+The handoff bundle (design_handoff_ui_enhancements) is the design source of
+truth for v1.14–v1.16; its README + committed artboards carry exact values.
+- MODE SEG LAW: #modeSeg (glass pill under wordmark+verTag, centered, phone
+  top +52 / desktop +50) is THE room door. Active cell = literal #F5D76E with
+  #141006 ink (dock-material law — literals survive the cream room). Active
+  state is pure CSS off body.brief-mode — no JS state. FAB hold stays a
+  shortcut; in Brief a plain FAB tap returns to map (label swaps to TO MAP
+  via .nv-fablbl::after content). The Brief satellite is RETIRED.
+- TIME LEDGER LAW (AMENDS v0.6.0 clocks): ONE #timeLedger chip top-right
+  replaces #clockTL/#clockTR; seg7 engine deleted. LOCAL row ticks SECONDS
+  on desktop (1s boundary setTimeout, hidden-tab skip, typing guard, __k
+  dedupe); phone is compact hh:mm (2a phone mock) at top +88 under the seg.
+  BASE row keeps the whole zone brain untouched (auto-fill precedence,
+  manual pin, toggle-off, 12-region sheet); the whole chip opens the sheet.
+  Ledger persists in brief ON DESKTOP; phone brief hides it (phone mocks
+  carry none — the chart owns the band). Chrome lists updated: gesturing,
+  body.intro, canvas label-avoidance, outside-tap control list.
+- CALLOUT RAIL LAW: map-room cards open with .co-rail (full-bleed strip,
+  rgba(245,215,110,.07)): ≤2 command-chain chips (data-codrill) › HERE, ✕
+  right. Name + inline .co-subin on one row. All three tiles carry counts
+  (UNITS n / CONNECT subN / DETAILS recCount of host site). co-docked top:
+  phone +136 (below the ledger), desktop +64 (the freed corner).
+- SATELLITE LAW: every nav control wears a permanent micro-label (.nv-lbl,
+  never a tooltip). Calm state = quiet glass + accent glyph; bright gold ring
+  reserved for :active. Desktop: 56px circles, groups 96px off the FAB.
+  Phone: ONE labeled glass strip (radius 20, inset 10) ABOVE the FAB at
+  bottom +92; nav-open lifts the search pill to +188 so nothing stacks.
+- ⌘K: hint chip .sp-kbd desktop-only; ⌘K and / already focused search.
+- STUB-DOM LESSON: smoke's stub never parses markup CHILDREN — static
+  markup asserts must grep the raw source (html), only JS-written innerHTML
+  exists on IDS[...] stubs. Also: probes must reset zone state they inherit
+  (selectSite(null) first) — earlier probes leak selections.

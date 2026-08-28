@@ -304,6 +304,24 @@ body{
   font:600 8.5px/1 var(--mono); letter-spacing:.14em; color:var(--faint);
   opacity:.9; pointer-events:none; -webkit-user-select:none; user-select:none}
 
+/* v1.14.0 — THE MODE SEG (design 3a): glass pill, two cells, centered under the
+   wordmark + build stamp. The active cell is solid accent with dark ink — pure
+   CSS off body.brief-mode. Literal gold/ink pair (dock-material law) so the
+   pill reads the same in both rooms. */
+#modeSeg{position:absolute; z-index:22; left:50%; transform:translateX(-50%);
+  top:calc(env(safe-area-inset-top,0px) + 52px);
+  display:flex; gap:2px; padding:3px; border-radius:var(--r-pill)}
+.ms-cell{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  padding:6px 14px; border-radius:999px; background:none; color:var(--dim);
+  font:800 9.5px/1 var(--body); letter-spacing:.12em; -webkit-tap-highlight-color:transparent}
+body:not(.brief-mode) .ms-cell[data-mode="map"],
+body.brief-mode .ms-cell[data-mode="brief"]{background:#F5D76E; color:#141006}
+.ms-cell:active{transform:scale(.96)}
+@media(min-width:1100px){
+  #modeSeg{top:calc(env(safe-area-inset-top,0px) + 50px)}
+  .ms-cell{padding:6px 16px; font-size:10px}
+}
+
 /* v0.34.0 — BOOT TITLE. The veil is transparent glass over the REAL spinning
    globe; only the big mark + version sit on it. body.intro parks the chrome;
    body.intro-invert flips the canvas to the paper look for one beat
@@ -318,15 +336,15 @@ body{
   -webkit-user-select:none; user-select:none}
 #introVeil .in-ver{font:600 10px/1 var(--mono); letter-spacing:.18em; color:var(--faint);
   transform:translateY(-16vh)}
-body.intro #titleBar, body.intro #searchPill, body.intro .clock,
+body.intro #titleBar, body.intro #searchPill, body.intro #timeLedger, body.intro #modeSeg,
 body.intro #navDock, body.intro #navRow, body.intro #legendPanel{opacity:0 !important; pointer-events:none !important}
 
 /* CHROME YIELDS (v0.8.0 automation): while a gesture is moving the globe, every
    floating surface steps back so the world owns the screen; it breathes back in
    the moment the hand lifts. Pure CSS response to one body flag. */
-body.gesturing #titleBar, body.gesturing #searchPill, body.gesturing .clock,
+body.gesturing #titleBar, body.gesturing #searchPill, body.gesturing #timeLedger, body.gesturing #modeSeg,
 body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
-#titleBar, #searchPill, .clock, #briefStage, #legendPanel{transition:opacity .3s ease}
+#titleBar, #searchPill, #timeLedger, #modeSeg, #briefStage, #legendPanel{transition:opacity .3s ease}
 
 /* SEARCH — standalone, one job, search-engine calm */
 #searchPill{
@@ -343,6 +361,13 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 }
 #searchPill input::placeholder{color:var(--faint)}
 #searchPill:focus-within{box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), var(--drop)}
+/* v1.14.0 — the ⌘K hint chip (desktop only; ⌘K and / already focus the field) */
+.sp-kbd{display:none}
+@media(min-width:1100px){
+  .sp-kbd{display:inline-flex; flex:none; padding:5px 8px; border-radius:8px;
+    background:rgba(0,0,0,.35); box-shadow:inset 0 0 0 1px var(--line);
+    font:700 10px/1 var(--mono); color:var(--faint); pointer-events:none}
+}
 #appMenu{
   position:absolute; z-index:45; right:var(--safe-r);
   top:calc(env(safe-area-inset-top,0px) + 54px);
@@ -462,47 +487,64 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 #nvMark{pointer-events:none; display:block; -webkit-user-drag:none}
 #nvRing{position:absolute; inset:1px; pointer-events:none; transform:rotate(-90deg)}
 #nvRing circle{stroke:var(--signal); stroke-width:3; stroke-linecap:round; transition:none}
+/* v1.14.0 (design 3a) — LABELED SATELLITES. Every control wears its name as a
+   permanent micro-label (never a tooltip). Calm state = quiet glass circle with
+   an accent glyph; the bright gold illumination is reserved for :active. */
+.nv-cell{display:flex; flex-direction:column; align-items:center; gap:5px; flex:0 0 auto}
+.nv-lbl{font:700 6.5px/1 var(--mono); letter-spacing:.14em; color:var(--dim);
+  white-space:nowrap; -webkit-user-select:none; user-select:none}
 .nv-sat{
   appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  position:relative; width:44px; height:44px; border-radius:50%; padding:0; flex:0 0 auto;
-  display:flex; align-items:center; justify-content:center; color:var(--text);
+  position:relative; width:40px; height:40px; border-radius:50%; padding:0; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center; color:var(--accent);
+  background:none; box-shadow:none;
 }
 .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
-/* v0.21.0 — popped-out ring controls are ILLUMINATED YELLOW (owner: easy to see
-   and identify). Bright accent glyph, gold ring, lifted glass, soft glow. */
-body.nav-open .nv-sat{
-  color:var(--accent);
-  background:linear-gradient(180deg, rgba(60,46,14,.96), rgba(32,24,8,.96));
-  box-shadow:0 0 0 1.5px var(--accent), inset 0 1px 0 var(--spec), 0 0 16px rgba(245,215,110,.35), var(--drop);
-}
-body.nav-open .nv-sat:active{ background:var(--accent-wash); box-shadow:0 0 0 2px var(--accent), 0 0 20px rgba(245,215,110,.5) }
-/* v0.16.0 — THE CONTROL ROW (owner: the ring's pop-outs go left-to-right under
-   the search bar, not a circle, to maximize space). Full-width bar just below
-   the search pill; the pill lifts while the row is open so the row sits under it. */
+.nv-sat:disabled + .nv-lbl{opacity:.35}
+.nv-sat:active{ background:var(--accent-wash); box-shadow:0 0 0 2px var(--accent), 0 0 20px rgba(245,215,110,.5) }
+/* Phone: the satellites live in ONE labeled glass dock strip above the FAB
+   (design 3a); the search pill steps up while the strip is out. */
 #navRow{
   position:absolute; z-index:43;
-  left:max(var(--safe-l),12px); right:max(var(--safe-r),12px);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 14px);   /* the globe's own band */
-  height:68px;
-  display:flex; align-items:center; justify-content:space-between;
+  left:10px; right:10px;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 92px);
+  display:flex; align-items:flex-start; justify-content:space-around;
+  padding:8px 6px 7px; border-radius:20px;
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
   opacity:0; transform:translateY(10px); pointer-events:none;
   transition:opacity .18s ease, transform .18s ease;
 }
-.nv-side{display:flex; align-items:center; gap:8px}       /* three buttons per side, flanking the globe */
+.nv-side{display:contents}
 body.nav-open #navRow{opacity:1; transform:none; pointer-events:auto}
-/* v0.27.0 — DESKTOP RING (owner: "buttons much bigger … spread far apart and
-   easily missed"): the six satellites pull IN beside the globe button and grow.
-   One glance, one mouse travel — no more hunting the screen corners. */
+body.nav-open #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 188px)}
+body.nav-open #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 236px)}
+/* Desktop (design 3a): six 56px glass circles flanking the FAB, micro-labels
+   under each, groups pulled 96px off the globe button. */
 @media(min-width:1100px){
-  #navRow{left:50%; right:auto; transform:translate(-50%,10px); width:auto; justify-content:center; height:84px}
+  #navRow{left:50%; right:auto; transform:translate(-50%,10px); width:auto;
+    justify-content:center; align-items:flex-start; padding:6px 0 0;
+    background:none; box-shadow:none; border-radius:0;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 10px)}
   body.nav-open #navRow{transform:translate(-50%,0)}
-  .nv-side{gap:14px}
-  .nv-side:first-of-type{margin-right:120px}
-  .nv-side:last-of-type{margin-left:120px}
-  .nv-sat{width:64px; height:64px}
-  .nv-sat svg{width:26px; height:26px}
+  body.nav-open #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}
+  body.nav-open #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 160px)}
+  .nv-side{display:flex; align-items:flex-start; gap:16px}
+  .nv-side:first-of-type{margin-right:96px}
+  .nv-side:last-of-type{margin-left:96px}
+  .nv-cell{gap:5px}
+  .nv-lbl{font-size:7px; color:var(--dim)}
+  .nv-sat{width:56px; height:56px;
+    background:linear-gradient(180deg, rgba(26,22,14,.94), rgba(8,7,4,.96));
+    box-shadow:0 0 0 1px rgba(240,220,140,.28), inset 0 1px 0 var(--spec), var(--drop)}
 }
 body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,215,110,.35), inset 0 1px 0 var(--spec)}
+/* v1.14.0 — the FAB label: CONTROLS in the map room, TO MAP in the brief. */
+.nv-fablbl{position:absolute; left:0; top:3px; transform:translateX(-50%);
+  font:700 7px/1 var(--mono); letter-spacing:.14em; color:var(--accent);
+  white-space:nowrap; pointer-events:none; -webkit-user-select:none; user-select:none}
+.nv-fablbl::after{content:'CONTROLS'}
+body.brief-mode .nv-fablbl::after{content:'TO MAP'}
 
 /* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
    black ink, the page warms, a gold frame bounds the stage, the map chrome
@@ -517,7 +559,8 @@ body.brief-mode #briefStage{
      shows through above and below, and ⌗ CHART collapses it to a pill. */
   display:block; position:absolute; z-index:16;
   left:var(--safe-l); right:var(--safe-r);
-  top:calc(env(safe-area-inset-top,0px) + 58px);
+  /* v1.14.0: top clears the mode seg (the seg sits at +52 and is ~29px tall) */
+  top:calc(env(safe-area-inset-top,0px) + 92px);
   width:auto; max-height:56vh; max-height:56dvh;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   padding:10px 12px 12px; border-radius:var(--r-card);
@@ -855,29 +898,46 @@ body.brief-mode{
 }
 body.brief-mode::before{content:''; position:absolute; inset:6px; border-radius:20px;  /* body is the non-scrolling 100dvh anchor — absolute is fixed here, and the no-fixed law holds */
   box-shadow:0 0 0 1.5px var(--accent); pointer-events:none; z-index:14}
-/* v0.7.0: the wordmark keeps its gold — in brief the globe stays the full-screen
-   ground (dark), so ink gradients would vanish. The clocks yield; the legend
-   STAYS reachable (names/dots/lines toggles serve the brief picture too). */
-body.brief-mode .clock{display:none}
+/* v1.14.0: the time ledger PERSISTS in brief (design 2a — the old corner clocks
+   vanished there; the owner called that a bug to fix). */
 .bf-empty{padding:8px 2px 6px; text-align:left; display:flex; flex-direction:column; gap:8px}
 .bf-empty b{font:800 13px/1.3 var(--body)}
 .bf-empty span{font:500 11.5px/1.5 var(--body); color:var(--dim)}
 
-/* corner clocks — glass chips, mono + tabular numerals, readouts only.
-   TL/TR sit under the top edge; BL/BR above the stage bar. Empty = hidden
-   (the clock owner fills them; the skeleton shows no dead chrome). */
-.clock{
-  position:absolute; z-index:10; pointer-events:none;
-  padding:6px 10px; border-radius:var(--r-chip);
-  font:600 10px/1.45 var(--mono); font-variant-numeric:tabular-nums;
-  letter-spacing:.08em; color:var(--dim); text-transform:uppercase;
-  white-space:nowrap;
+/* v1.14.0 — THE TIME LEDGER (design 2a): one glass chip, top-right. Two-row
+   baseline grid — LOCAL hh:mm:ss (seconds tick) · BASE hh:mm; labels faint mono,
+   digits glowing accent mono, zones dim. The whole chip is the zone-sheet door
+   (the BASE row keeps today's tap-to-pick behavior). Empty = hidden. */
+#timeLedger{
+  position:absolute; z-index:10; appearance:none; -webkit-appearance:none; border:0;
+  margin:0; cursor:pointer; text-align:left; -webkit-tap-highlight-color:transparent;
+  /* phone (design 2a phone mock): compact chip BELOW the centered seg */
+  top:calc(env(safe-area-inset-top,0px) + 88px); right:var(--safe-r);
+  display:grid; grid-template-columns:auto auto auto; gap:3px 7px; align-items:baseline;
+  padding:7px 10px; border-radius:var(--r-chip); white-space:nowrap;
 }
-.clock:empty{display:none}
-#clockTL{top:calc(env(safe-area-inset-top,0px) + 58px); left:var(--safe-l)}
-#clockTR{top:calc(env(safe-area-inset-top,0px) + 58px); right:var(--safe-r);
-  pointer-events:auto; cursor:pointer; border:none; -webkit-tap-highlight-color:transparent}
-#clockTR:active{filter:brightness(1.35)}
+#timeLedger:empty{display:none}
+#timeLedger:active{filter:brightness(1.25)}
+.tl-k{font:700 6.5px/1 var(--mono); letter-spacing:.14em; color:var(--faint)}
+.tl-d{font:800 11px/1 var(--mono); font-variant-numeric:tabular-nums; color:var(--accent);
+  text-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
+.tl-d.tl-idle{color:var(--faint); text-shadow:none}
+.tl-z{font:700 7px/1 var(--mono); color:var(--dim)}
+/* phone brief: the chart owns the top band (2a/3b phone mocks carry no ledger);
+   the desktop brief keeps the ledger (design 5a). */
+@media(max-width:1099px){ body.brief-mode #timeLedger{display:none} }
+@media(min-width:1100px){
+  #timeLedger{gap:3px 8px; padding:9px 12px}
+  .tl-k{font-size:7px; letter-spacing:.16em}
+  .tl-d{font-size:13px}
+  .tl-z{font-size:8px}
+}
+/* zone sheet rows: name left, live face right; pinned wears the accent */
+.tz-row .rc-top{display:flex; align-items:center; gap:8px; flex:1; max-width:none; min-height:44px}
+.tz-hh{margin-left:auto; font:700 11px var(--mono); font-variant-numeric:tabular-nums;
+  letter-spacing:.06em; color:var(--dim)}
+.tz-on{color:var(--accent)}
+.tz-on .tz-hh{color:var(--accent)}
 
 
 
@@ -918,12 +978,9 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   #searchResults{left:0; right:0; width:560px; margin-inline:auto;
     bottom:calc(env(safe-area-inset-bottom,0px) + 160px)}   /* three-row law holds on desktop too */
   #themeSwitch{top:calc(env(safe-area-inset-top,0px) + 12px); right:24px}
-  /* clocks take the true corners */
-  /* below the title tiles — the SELECT cell is a live button and must never
-     hide under the ⋯ tile's hit area */
-  #clockTL{top:calc(env(safe-area-inset-top,0px) + 64px); left:18px}
-  #clockTR{top:calc(env(safe-area-inset-top,0px) + 64px); right:18px}
-  #clockTR:hover{filter:brightness(1.15)}
+  /* the time ledger takes the true corner (design 2a: top 64, right 18) */
+  #timeLedger{top:calc(env(safe-area-inset-top,0px) + 64px); right:18px}
+  #timeLedger:hover{filter:brightness(1.12)}
   /* v0.32.0 ONE SURFACE (owner: "initial pop up on the left side and then
      details show on the right? Pick one and expand off the same pop up"):
      the dossier panel now occupies the EXACT rail the docked card lives on
@@ -1217,6 +1274,22 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   box-shadow:inset 0 0 0 1px var(--line); font:700 10px/1 var(--body);
   max-width:178px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}   /* v0.31.0: "Maryland Nationa…" earned its room */
 .co-pilechip:active{filter:brightness(1.3)}
+/* v1.14.0 (design 3a) — THE HEADER RAIL: a full-bleed strip atop the card with
+   the command chain as breadcrumb chips and the ✕ on its right. */
+.co-rail{display:flex; align-items:center; gap:6px; margin:-10px -12px 0; padding:8px 12px;
+  border-radius:14px 14px 0 0; background:rgba(245,215,110,.07); box-shadow:0 1px 0 var(--line)}
+.co-railchip{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
+  padding:4px 8px; border-radius:7px; background:rgba(0,0,0,.32); color:var(--accent);
+  font:700 9px/1 var(--mono); letter-spacing:.02em;
+  max-width:112px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.co-railchip:active{filter:brightness(1.3)}
+.co-railhere{font:700 9px/1 var(--mono); color:var(--faint)}
+.co-railsep{color:var(--faint); font:700 9px/1 var(--body)}
+.co-rail .co-x{margin:-4px -6px 0 auto}
+.co-rail + .co-head{padding-top:11px}
+.co-subin{flex:none; max-width:46%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:600 10.5px/1 var(--body); color:var(--dim)}
+.co-head .co-subin{align-self:baseline; margin-top:3px}
 .co-icrow{display:flex; gap:6px; padding-top:9px}
 .co-ic{flex:1; appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
   display:flex; flex-direction:column; align-items:center; gap:2px; min-height:56px;
@@ -1237,15 +1310,18 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s ease}
 #dossier{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 88px)}
 #calloutCard.co-docked{
-  /* 114px: fully BELOW the corner clocks (top 58px + ~52px chip) — the card's ✕
-     landed under the BASE TIME chip at 96px (re-verify, gestures journey) */
-  left:var(--safe-l) !important; right:var(--safe-r); top:calc(env(safe-area-inset-top,0px) + 114px) !important;
+  /* 136px: fully BELOW the phone time ledger (top 88px + ~44px chip); the ✕
+     must never land under another control (re-verify law, gestures journey) */
+  left:var(--safe-l) !important; right:var(--safe-r); top:calc(env(safe-area-inset-top,0px) + 136px) !important;
   width:auto; max-height:42vh; max-height:42dvh; overflow-y:auto;
   -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
 }
 #calloutCard.co-docked .co-tail{display:none}
 @media(min-width:1100px){
-  #calloutCard.co-docked{ right:auto; width:400px; max-height:64vh }
+  /* desktop (design 3a): the card takes the freed top-left corner at 64px —
+     the ledger owns the matching right corner */
+  #calloutCard.co-docked{ right:auto; width:400px; max-height:64vh;
+    top:calc(env(safe-area-inset-top,0px) + 64px) !important }
 }
 /* while a section is open the icon tiles shrink to a slim tab row — the section
    is the content now (owner: minimal, expand on demand) */
@@ -1290,6 +1366,14 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <span id="verTag" aria-label="Build version"></span>
 </header>
 
+<!-- v1.14.0 MODE SEG (design handoff 3a): the room switch, always visible,
+     centered under the wordmark. Tap = setMode; the FAB hold stays a shortcut.
+     Active cell is pure CSS off body.brief-mode — no JS state to drift. -->
+<div id="modeSeg" class="glass" role="tablist" aria-label="Room">
+  <button type="button" class="ms-cell" data-mode="map" role="tab">MAP</button>
+  <button type="button" class="ms-cell" data-mode="brief" role="tab">BRIEF</button>
+</div>
+
 <!-- v0.34.0 BOOT TITLE (owner: "brief intro... spinning globe, A-ORG-2 in big
      print, main color → invert → back, then the map"). ~2.3s, tap skips,
      prefers-reduced-motion skips entirely. The globe behind is the REAL one. -->
@@ -1303,6 +1387,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <span class="sp-ico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></span>
   <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
          spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
+  <span class="sp-kbd" aria-hidden="true">⌘K</span>
 </div>
 <div id="searchResults" class="glass" role="listbox" aria-label="Search results"></div>
 <section id="appMenu" class="glass card" hidden aria-label="Menu"></section>
@@ -1314,17 +1399,19 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      Home is gone (redundant: back walks you out of anywhere). -->
 <!-- MAP CONTROL ROW (v0.16.0 owner: left-to-right under the search bar, not a
      circle — maximizes space). Same six controls + IDs; the ring is now a row. -->
+<!-- v1.14.0 (design 3a): every satellite wears its name — micro-labels under the
+     circles on desktop, one labeled dock strip on phones. The Brief satellite is
+     retired: the mode seg is the room door now (FAB hold stays the shortcut). -->
 <div id="navRow" aria-label="Map controls">
   <div class="nv-side">
-    <button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
-    <button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear selection"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
-    <button id="navSat-zoomout" class="nv-sat glass" type="button" aria-label="Zoom out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+    <div class="nv-cell"><button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button><span class="nv-lbl">UNDO</span></div>
+    <div class="nv-cell"><button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear selection"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button><span class="nv-lbl">CLEAR</span></div>
+    <div class="nv-cell"><button id="navSat-zoomout" class="nv-sat glass" type="button" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button><span class="nv-lbl">ZOOM −</span></div>
   </div>
   <div class="nv-side">
-    <button id="navSat-zoomin" class="nv-sat glass" type="button" aria-label="Zoom in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
-    <button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
-    <button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button>
-    <button id="navSat-brief" class="nv-sat glass" type="button" aria-label="Switch between Map and Brief"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="5" rx="1.4"></rect><path d="M7.2 9v3.2M7.2 12.2H5m2.2 0h2.2M5 12.2v2.6m4.4-2.6v2.6"></path><rect x="3" y="14.8" width="4" height="4.4" rx="1.2"></rect><rect x="7.4" y="14.8" width="4" height="4.4" rx="1.2"></rect><path d="M14.5 6.5h5.5M14.5 10h5.5M14.5 13.5h4"></path></svg></button>
+    <div class="nv-cell"><button id="navSat-zoomin" class="nv-sat glass" type="button" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><span class="nv-lbl">ZOOM +</span></div>
+    <div class="nv-cell"><button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button><span class="nv-lbl">SAVED</span></div>
+    <div class="nv-cell"><button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button><span class="nv-lbl">LAYERS</span></div>
   </div>
 </div>
 
@@ -1337,6 +1424,9 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
          referenced not inlined to keep index.html lean (the 45 KB land path). -->
     <img id="nvMark" src="logo.svg" width="60" height="60" alt="" aria-hidden="true" draggable="false">
   </button>
+  <!-- v1.14.0: the FAB says what it is — CONTROLS in the map room, TO MAP in
+       the brief (CSS content swap off body.brief-mode; no JS state). -->
+  <span class="nv-fablbl" aria-hidden="true"></span>
 </nav>
 
 <!-- family legend / layer list — swatch · name · count; tap toggles the family -->
@@ -1363,14 +1453,24 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 <!-- BRIEF stage — full screen when body.brief-mode; precise CSS lines, tier law. -->
 <section id="briefStage" aria-label="Brief"></section>
 
-<!-- LCD clocks (v0.6.0 owner directive C): LOCAL top-left · SELECT top-right,
-     7-segment faces, no font. Empty until the clock owner fills them —
-     .clock:empty stays hidden. SELECT is a real button: tap picks a zone. -->
-<div id="clockTL" class="clock glass" aria-label="Local time"></div>
-<button id="clockTR" class="clock glass" type="button" aria-label="Select a time zone"></button>
+<!-- v1.14.0 THE TIME LEDGER (design 2a — replaces the two corner LCD clocks):
+     ONE glass chip top-right, two baseline-aligned rows — LOCAL ticks seconds,
+     BASE keeps the tap-to-pick-zone behavior (the whole chip opens the zone
+     sheet). Persists in Brief (the old clocks vanished there — fixed). -->
+<button id="timeLedger" class="glass" type="button" aria-label="Time ledger — tap to pick the base time zone"></button>
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.14.0 • THE MAP ROOM REFRESH (owner's design handoff, option 3a + 2a).
+//            A MAP|BRIEF segmented pill under the wordmark is the room door
+//            (FAB hold stays a shortcut; in Brief the FAB reads TO MAP and a
+//            tap returns). The two corner LCD clocks merge into ONE time
+//            ledger chip top-right — LOCAL ticks seconds, BASE keeps the
+//            tap-to-pick zone brain — and it PERSISTS in brief. The callout
+//            gains a header rail (command-chain crumbs + ✕) and counted stat
+//            tiles. Nav satellites wear permanent micro-labels: six 56px
+//            circles flanking the FAB on desktop, one labeled dock strip on
+//            phones. Desktop search shows the ⌘K hint chip. seg7 retired.
 //   v1.13.1 • THE SEAM (owner: "for shared lines need the borders on both to
 //            be more distinct — bolden"). Brief state outlines bolden from a
 //            3.6 to an 8.4 clipped band (4.2 visible inside every border) and
@@ -2414,8 +2514,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.13.1';
-const APP_UPDATED = '27 August 2026';
+const APP_VERSION = 'v1.14.0';
+const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
 // boots, so the reviewer always knows which build they are looking at. The
@@ -3803,7 +3903,7 @@ function _gChromeZones(m){
     if(cr && cr.width>0 && cr.height>0){
       const kx=W/cr.width, ky=H/cr.height, live=[], PAD=4;
       const sels=['#searchPill','#searchResults','#dossier','#titleBar',
-                  '#clockTL','#clockTR','#navGlobe',
+                  '#timeLedger','#modeSeg','#navGlobe',
                   '#calloutCard','#briefStage','#navRow'];   // v0.29.0 audit: canvas text must never ghost under glass
       for(const s of sels){
         const el=document.querySelector(s); if(!el) continue;
@@ -6191,10 +6291,32 @@ function _coRender(){
                       :(s.st||'')));               // the base card's title IS the base — the sub adds only the state
   const nrec=(s&&typeof recCount==='function')?recCount(_coId):0;
   const brief=document.body.classList.contains('brief-mode');
-  let h='<div class="co-head"><div class="co-name">'+esc(name)+'</div>'
-    +'<button class="co-x" type="button" data-cox="1" aria-label="Clear selection">✕</button></div>'
-    +'<div class="co-sub">'+esc(sub)+'</div>';
   const briefSubj = ag ? ag.id : (sOg ? sOg.id : null);   // the ORG the card speaks for (null = the base itself)
+  let h='';
+  if(!brief){
+    // v1.14.0 (design 3a) — the header rail: up to two command-chain ancestors
+    // as chips (tap = drill the card there, same data-codrill contract), then
+    // HERE, then the ✕. Base cards get the rail too (chip-less) so the close
+    // control lives in one place.
+    let chain=[];
+    try{ if(briefSubj && typeof ogChainUp==='function'){
+      for(const a of ogChainUp(briefSubj)){
+        if(typeof _OG_CATS!=='undefined' && _OG_CATS[a.id]) continue;
+        chain.push(a); if(chain.length>=2) break;
+      } } }catch(_){}
+    chain.reverse();
+    h+='<div class="co-rail">'
+      +chain.map(function(a){ return '<button type="button" class="co-railchip" data-codrill="'+escA(a.id)+'" title="'+escA(a.name)+'">'+esc(_bfAbbr(a.name).toUpperCase())+'</button>'; }).join('<span class="co-railsep">›</span>')
+      +(chain.length?'<span class="co-railsep">›</span>':'')
+      +'<span class="co-railhere">HERE</span>'
+      +'<button class="co-x" type="button" data-cox="1" aria-label="Clear selection">✕</button></div>';
+    h+='<div class="co-head"><div class="co-name">'+esc(name)+'</div>'
+      +(sub?('<span class="co-subin">'+esc(sub)+'</span>'):'')+'</div>';
+  } else {
+    h+='<div class="co-head"><div class="co-name">'+esc(name)+'</div>'
+      +'<button class="co-x" type="button" data-cox="1" aria-label="Clear selection">✕</button></div>'
+      +'<div class="co-sub">'+esc(sub)+'</div>';
+  }
   // ═══ v0.27.0 THE COMPACT CARD (owner: "only the base name and location with
   // these icons should be shown initially — everything else expands"). Map mode
   // renders the name, the location, and THREE icons: Units (with the tenant
@@ -6234,10 +6356,13 @@ function _coRender(){
       +'<b>'+unitsN+'</b><span>Units</span></button>';
     if(canConx) h+='<button type="button" class="co-ic'+(sec==='conx'?' on':'')+'" data-coic="conx" aria-label="Show connections">'
       +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2.2"></circle><circle cx="12" cy="6" r="2.2"></circle><circle cx="19" cy="19" r="2.2"></circle><path d="M6.5 17L10.5 8M13.5 8l4 9"></path></svg>'
-      +'<b>&nbsp;</b><span>Connect</span></button>';
-    if(hostSite) h+='<button type="button" class="co-ic" data-codetail="'+escA(hostSite.id)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records">'
+      +'<b>'+(subN||'&nbsp;')+'</b><span>Connect</span></button>';   // v1.14.0 (design 3a): every tile carries its count
+    if(hostSite){
+      let drec=0; try{ drec=(typeof recCount==='function')?recCount(hostSite.id):0; }catch(_){}
+      h+='<button type="button" class="co-ic" data-codetail="'+escA(hostSite.id)+'"'+(ag?(' data-codeorg="'+escA(ag.id)+'"'):'')+' aria-label="Details and records">'
       +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>'
-      +'<b>&nbsp;</b><span>Details</span></button>';
+      +'<b>'+(drec||'&nbsp;')+'</b><span>Details</span></button>';
+    }
     h+='</div>';
     // ── UNITS — the picker (base) / the drill navigator with crumbs (org)
     if(sec==='units' && unitsN){
@@ -7468,7 +7593,7 @@ if(!window._odWired){
     // #globeCanvas is excluded: the globe runs its own tap law (tapAtScreen),
     // and the click that trails a dot-tap must not undo the selection it made.
     if(document.body.classList.contains('brief-mode')){
-      const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navRow,#navDock,#legendPanel,#exportSheet,#appMenu,#titleBar,#clockTL,#clockTR,#bfArmBar,#errToast,#sbxNote');
+      const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navRow,#navDock,#legendPanel,#exportSheet,#appMenu,#titleBar,#timeLedger,#modeSeg,#bfArmBar,#errToast,#sbxNote');
       if(!ctrl){
         const dz2=document.getElementById('dossier');
         const dirty=(_coId!=null)||(dz2&&!dz2.hidden)||GlobeState._bfFocus||GlobeState._bfAddUnder||GlobeState._bfAddArm||_bfAnnEdit||_bfRnEdit||window._bfGrpForm||_orgForm;
@@ -7754,7 +7879,7 @@ function _rdbOpen(){
           // manual picks only ever land here; a zone set before the load finished wins
           if(v && v.tz && (!window._selZone || window._selZone.auto)){
             window._selZone={tz:v.tz, label:v.label};
-            try{ const b=document.getElementById('clockTR'); if(b) b.__k=null; tickClocks(); }catch(_){}
+            try{ const b=document.getElementById('timeLedger'); if(b) b.__k=null; tickClocks(); }catch(_){}
           }
         };
       }catch(_){}
@@ -8876,8 +9001,8 @@ if(!window.__xpWired){ window.__xpWired=true;
 // ═══════════════════════════════════════════════════════════════════════════════
 // s5-clocks.js — A-ORG-2 shell: THE LCD PAIR (v0.6.0 owner directive C: "time in
 // LCD format with ability to select the zone"). Two 7-segment cells on the stage:
-//   #clockTL  LOCAL  — the platform zone, named (EDT/CST…), never an offset.
-//   #clockTR  SELECT — any of 12 theater zones; auto-fills from every selection
+//   #timeLedger LOCAL row — the platform zone, named (EDT/CST…), never an offset.
+//   #timeLedger BASE row — any of 12 theater zones; auto-fills from every selection
 //                      (nearest region to the selected site), manual pick always
 //                      wins. Idle face: ◷ / SELECT. Tap = zone sheet.
 // (PORTED from A-ORG-1 index.html — the source is truth; names kept where ported.)
@@ -8915,26 +9040,33 @@ if(!window.__xpWired){ window.__xpWired=true;
 // Exports (top-level — the final assembly concatenates into ONE <script>):
 //   SEG7_MAP, seg7Digit, seg7HTML, civilianTime, CLOCK_REGIONS,
 //   nearRegion, autoFillSelect, pickZone, tickClocks, initClocks, _tzOpenSheet,
-//   _ckArm, _ckBeat, _ckWake, _ckEsc, _ckInjectCSS, _selSave
+//   _ckArm, _ckBeat, _ckWake, _ckEsc, _selSave
 //   window state: _selZone (SELECT zone) · __lastMin · __ckT · __visT · __tzLbl
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// ---- seg7 engine (PORTED verbatim; geometry from ada3f5d~1 L982-988) ----------
-const SEG7_MAP={'0':'abcdef','1':'bc','2':'abged','3':'abgcd','4':'fgbc','5':'afgcd','6':'afgedc','7':'abc','8':'abcdefg','9':'abcfgd','-':'g',' ':''};
-function seg7Digit(ch){
-  const on=SEG7_MAP[ch]!==undefined?SEG7_MAP[ch]:'';
-  let s='<span class="seg7-d">';
-  ['a','b','c','d','e','f','g'].forEach(function(g){ s+='<i class="sg sg-'+g+(on.indexOf(g)>=0?' on':'')+'"></i>'; });
-  return s+'</span>';
+// v1.14.0 — the seg7 LCD engine is RETIRED (design 2a): the time ledger renders
+// glowing mono digits instead. The zone brain below (regions, tables, precedence,
+// the sheet) survives unchanged — only the faces changed.
+
+// ---- ledger faces: 24h mono digits + a short zone name (EDT/CET…) ------------
+function _tzAbbr(tz, d){
+  try{
+    const o={timeZoneName:'short'}; if(tz) o.timeZone=tz;
+    const p=new Intl.DateTimeFormat('en-US',o).formatToParts(d||new Date());
+    const z=(p.find(function(x){ return x.type==='timeZoneName'; })||{}).value||'';
+    return /GMT|UTC/i.test(z)?'':z;
+  }catch(_){ return ''; }
 }
-function seg7HTML(str){
-  let s='<span class="seg7">';
-  for(const ch of String(str)) s+= ch===':' ? '<span class="seg7-colon"><i></i><i></i></span>' : seg7Digit(ch);
-  return s+'</span>';
+function _ledTime(tz, d, secs){
+  try{
+    const o={hour:'2-digit',minute:'2-digit',hour12:false};
+    if(secs) o.second='2-digit';
+    if(tz) o.timeZone=tz;
+    return new Intl.DateTimeFormat('en-GB',o).format(d||new Date());
+  }catch(_){ return secs?'--:--:--':'--:--'; }
 }
 
-// 12h civilian face for an IANA zone (PORTED ~L18780: leading-zero hours — the
-// LCD always shows 2+2 digits; '--:--' failure face maps to segment g / blank).
+// 12h civilian face for an IANA zone (zone-sheet rows still speak civilian).
 function civilianTime(tz, d){
   d=d||new Date();
   try{
@@ -8981,7 +9113,7 @@ window._setSelZone=function(z, o){
   // auto-fill traffic never touches storage (o.ephemeral) — otherwise a pre-kv-load
   // auto pass could delete a persisted manual pick before the load restores it
   if(!(o&&o.ephemeral)) _selSave();
-  try{ const b=document.getElementById('clockTR'); if(b) b.__k=null; }catch(_){}
+  try{ const b=document.getElementById('timeLedger'); if(b) b.__k=null; }catch(_){}
   try{ tickClocks(); }catch(_){}
 };
 
@@ -9060,67 +9192,50 @@ function pickZone(tz, label){
   else window._setSelZone({tz:tz, label:String(label).toUpperCase().slice(0,12)});
 }
 
-// ---- The repaint brain (PORTED name + __k write-dedupe ~L18799) ---------------
-// One Date() feeds both faces; a cell whose key did not change costs nothing.
+// ---- The repaint brain (v1.14.0: ONE ledger \u2014 the __k write-dedupe survives) --
+// LOCAL row shows hh:mm:ss and ticks every second; BASE shows hh:mm in the
+// picked zone (idle face until a zone exists). One innerHTML swap per change.
 function tickClocks(){
-  const now=new Date();
   try{
-    const el=document.getElementById('clockTL');
-    if(el){
-      const c=civilianTime(undefined, now);          // undefined tz = platform local
-      const lbl=window.__tzLbl||'LOCAL';
-      const key=c.time+'|'+c.ap+'|'+lbl;
-      if(el.__k!==key){ el.__k=key;
-        el.innerHTML='<span class="bt-t">'+seg7HTML(c.time)
-          +(c.ap?'<span class="bt-ap">'+c.ap+'</span>':'')
-          +'</span><span class="bt-z">'+_ckEsc(lbl)+'</span>';
-      }
-    }
-  }catch(_){}
-  try{
-    const bs=document.getElementById('clockTR');
-    if(bs){
-      const z=window._selZone;
-      if(z && z.tz){
-        const c=civilianTime(z.tz, now);
-        const key=c.time+'|'+c.ap+'|'+z.tz+'|'+z.label;
-        if(bs.__k!==key){ bs.__k=key;
-          bs.innerHTML='<span class="bt-t">'+seg7HTML(c.time)
-            +(c.ap?'<span class="bt-ap">'+c.ap+'</span>':'')
-            +'</span><span class="bt-z">'+_ckEsc(z.label)+'</span>';
-        }
-      } else if(bs.__k!=='idle'){ bs.__k='idle';
-        bs.innerHTML='<span class="bt-t bt-idle">\u2014:\u2014</span><span class="bt-z">BASE TIME</span>';   // v0.30.0 audit #20: an awaiting clock, not a mystery button
-      }
-    }
+    const el=document.getElementById('timeLedger'); if(!el) return;
+    const now=new Date();
+    // seconds tick on LOCAL — desktop only (the 2a phone mock is hh:mm; a
+    // stubbed matchMedia falls through to seconds so the harness sees them)
+    let secs=true; try{ if(window.matchMedia && matchMedia('(max-width:1099px)').matches) secs=false; }catch(_){}
+    const lt=_ledTime(null, now, secs);
+    const lz=String(window.__tzLbl||_tzAbbr(null, now)||'').slice(0,8);
+    const z=window._selZone;
+    let bt='\u2014:\u2014', bz='SET', idle=' tl-idle';
+    if(z && z.tz){ bt=_ledTime(z.tz, now, false); bz=(_tzAbbr(z.tz, now)||String(z.label||'')).slice(0,8); idle=''; }
+    const key=lt+'|'+lz+'|'+bt+'|'+bz;
+    if(el.__k===key) return;
+    el.__k=key;
+    el.innerHTML='<span class="tl-k">LOCAL</span><span class="tl-d">'+_ckEsc(lt)+'</span><span class="tl-z">'+_ckEsc(lz)+'</span>'
+      +'<span class="tl-k">BASE</span><span class="tl-d'+idle+'">'+_ckEsc(bt)+'</span><span class="tl-z">'+_ckEsc(bz)+'</span>';
   }catch(_){}
 }
 
-// ---- Minute-boundary beat (latch + typing guard PORTED ~L22216-22225) ---------
+// ---- Second-boundary beat (v1.14.0: LOCAL ticks seconds). Hidden tabs skip the
+// repaint (the wake path snaps current on return); typing never fights a tick.
 function _ckBeat(){
   try{
-    const d=new Date();
-    const mm=d.getMinutes();
-    if(window.__lastMin!==mm){
-      window.__lastMin=mm;
-      const ae=document.activeElement;
-      const typing=ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA');
-      if(!typing) tickClocks();
-    }
+    const ae=document.activeElement;
+    const typing=ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA');
+    if(!typing && !document.hidden) tickClocks();
   }catch(_){}
   _ckArm();
 }
 
-// setTimeout-to-boundary: sleep until just past the next :00 (+40ms landing
-// guard; an early fire no-ops on the latch and the re-arm self-corrects).
+// setTimeout-to-boundary: sleep until just past the next second (+20ms landing
+// guard; the __k dedupe makes an early fire free).
 function _ckArm(){
   try{ clearTimeout(window.__ckT); }catch(_){}
-  window.__ckT=setTimeout(_ckBeat, 60000-(Date.now()%60000)+40);
+  window.__ckT=setTimeout(_ckBeat, 1000-(Date.now()%1000)+20);
 }
 
 // ---- Wake (PORTED ~L22186): throttled background tabs snap current on return.
 function _ckWake(){
-  try{ window.__lastMin=-1; tickClocks(); }catch(_){}
+  try{ tickClocks(); }catch(_){}
   _ckArm();
 }
 
@@ -9169,12 +9284,10 @@ function initClocks(){
       window.__tzLbl=z;
     }
   }catch(_){}
-  _ckInjectCSS();
-  window.__lastMin=new Date().getMinutes();   // first paint owns the current minute
   tickClocks();
   _ckArm();
   try{
-    const b=document.getElementById('clockTR');
+    const b=document.getElementById('timeLedger');
     if(b && !b.__tzWired){ b.__tzWired=1; b.addEventListener('click', function(){ try{ _tzOpenSheet(); }catch(_){} }); }
   }catch(_){}
   try{ if(!window.__visT){ window.__visT=1;
@@ -9185,41 +9298,8 @@ function initClocks(){
 
 addEventListener('load', function(){ setTimeout(function(){ try{ initClocks(); }catch(_){} }, 0); });
 
-// ---- CSS (construction-phase injection, s3 precedent; tokens only; the exact
-//      A-ORG-1 seg7 geometry — keep .sg-a…g greppable-literal: A-ORG-1 lost them
-//      to a dead-code purge that could not see 'sg-'+g. Scale rides CSS zoom on
-//      .seg7 (the scaling law), never font-size. .clock static rules (position,
-//      glass) still apply; this layer re-voices the interior for the LCD pair. --
-function _ckInjectCSS(){
-  if(document.getElementById('s5ClockCSS')) return;      // the final-assembly no-op guard
-  const st=document.createElement('style'); st.id='s5ClockCSS';
-  st.textContent=
-    '.clock{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 13px}'+
-    '.bt-t{display:inline-flex;align-items:center;gap:2px;font:800 22px/1 var(--body);color:var(--accent)}'+ /* font sizes only the idle ◷ glyph */
-    '.bt-ap{font:800 9.5px var(--body);letter-spacing:.04em;color:var(--accent);'+
-      'text-shadow:0 0 4px rgba(var(--accent-rgb),.6);margin-left:2px}'+
-    '.bt-z{font:800 9px/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}'+
-    /* ── seg7 engine — 12×21px digits, seven clip-path bars, no font ── */
-    '.seg7{display:inline-flex;align-items:center;gap:3px;zoom:.92}'+
-    '.seg7-d{position:relative;display:inline-block;width:12px;height:21px;vertical-align:middle}'+
-    '.seg7-d .sg{position:absolute;display:block;background:transparent}'+   /* unlit = nothing (v4.8.1 law) */
-    '.seg7-d .sg.on{background:var(--accent);box-shadow:0 0 4px rgba(var(--accent-rgb),.6)}'+
-    '.sg-a{top:0;left:1.6px;right:1.6px;height:2.4px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}'+
-    '.sg-g{top:9.3px;left:1.6px;right:1.6px;height:2.4px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}'+
-    '.sg-d{bottom:0;left:1.6px;right:1.6px;height:2.4px;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%)}'+
-    '.sg-f{top:1.6px;left:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
-    '.sg-b{top:1.6px;right:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
-    '.sg-e{bottom:1.6px;left:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
-    '.sg-c{bottom:1.6px;right:0;width:2.4px;height:7.7px;clip-path:polygon(50% 0,100% 12%,100% 88%,50% 100%,0 88%,0 12%)}'+
-    '.seg7-colon{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;height:21px;padding:0 1px}'+
-    '.seg7-colon i{width:2.6px;height:2.6px;border-radius:1px;background:var(--accent);box-shadow:0 0 4px rgba(var(--accent-rgb),.6)}'+
-    /* zone sheet rows: name left, live face right; pinned wears the accent */
-    '.tz-row .rc-top{display:flex;align-items:center;gap:8px;flex:1;max-width:none;min-height:44px}'+
-    '.tz-hh{margin-left:auto;font:700 11px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:.06em;color:var(--dim)}'+
-    '.tz-on{color:var(--accent)}.tz-on .tz-hh{color:var(--accent)}'+
-    '@media(min-width:1100px){.seg7{zoom:1.05}}';
-  document.head.appendChild(st);
-}
+// (v1.14.0: the s5 CSS injection retired with the seg7 engine — the ledger and
+// zone-sheet row rules live in the static <style> like all other chrome.)
 
 
 // ─── Shell boot spine — everything below survives with zero modules present ────
@@ -9333,7 +9413,12 @@ function bootShell(){
         var held=_nvHold; _nvHold=null; _nvId=null;
         cancelAnimationFrame(_nvRAF); _nvRingReset();
         if(_nvFired){ _nvFired=false; return; }          // the 3s flip consumed this press
-        if(held && e.type==='pointerup') _nvSet(!_nvOpen);   // short press = toggle the ring
+        // v1.14.0 (design 5a): in Brief a plain FAB tap RETURNS TO MAP (the
+        // label says so); the ring only pops in the map room. Hold still flips.
+        if(held && e.type==='pointerup'){
+          if(document.body.classList.contains('brief-mode')){ try{ setMode('map'); }catch(_){} }
+          else _nvSet(!_nvOpen);                         // short press = toggle the ring
+        }
       };
       window.addEventListener('pointerup', _nvEnd);
       window.addEventListener('pointercancel', _nvEnd);
@@ -9396,9 +9481,9 @@ function bootShell(){
       if(e.target.closest('#navSat-zoomin')){
         try{ GlobeState._touched=true; GlobeState.zoom=Math.min(28, GlobeState.zoom*1.45); globeMark(); }catch(_){}
         _nvSet(true); return; }
-      if(e.target.closest('#navSat-brief')){ _nvSet(false);
-        try{ setMode(document.body.classList.contains('brief-mode')?'map':'brief'); }catch(_){}
-        return; }
+      // v1.14.0: the Brief satellite is retired — the MODE SEG is the room door.
+      var msc=e.target.closest('#modeSeg .ms-cell');
+      if(msc){ try{ setMode(msc.getAttribute('data-mode')); }catch(_){} return; }
       if(e.target.closest('#navSat-saved')){ _nvSet(false); try{ _svOpenSheet(); }catch(_){} return; }
       if(e.target.closest('#navSat-layers')){ _nvSet(false);
         try{
