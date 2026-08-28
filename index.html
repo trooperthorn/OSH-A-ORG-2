@@ -1451,6 +1451,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.16.0 • THE WORLD TOUR (owner's design handoff, option 4b — replaces
+//            the spin+invert boot title). ~2.9s on the real canvas: one
+//            continuous westward pan on the 28°N track; Korea/Japan/Pacific
+//            ignite and Camp Humphreys pulses; the signal-orange lineage
+//            line leaps Humphreys → Arifjan → Wiesbaden → the Pentagon with
+//            arrival flashes, lighting each theater as it lands (light
+//            accumulates, never dims); the finale floods every remaining
+//            group under a gold bloom over CONUS while the wordmark
+//            condenses in from wide tracking and the chrome fades up. Tap
+//            skips; prefers-reduced-motion opens straight on the resting
+//            map. The paper-invert beat is retired. Coupled timers move:
+//            version toast 4000 · coach 3800 · db chip floor 4600.
 //   v1.15.0 • THE DARK CONSOLE (owner's design handoff, options 5a + 2b + 3b).
 //            The cream inversion is RETIRED — brief stays black-and-gold; the
 //            room is said by the seg, a quiet gold frame, a globe dimmed to
@@ -2516,7 +2528,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //            Suite: data-lint · harness_globe · smoke · ship-lint · dead-lint (incl.
 //            zero-foreign-origin + 900 KB budget gates) — all green; live-browser
 //            audit: zero console messages across boot + all six interaction probes.
-const APP_VERSION = 'v1.15.0';
+const APP_VERSION = 'v1.16.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -2535,7 +2547,7 @@ try{
         if(localStorage.getItem('a2Coached') && typeof _bfToast==='function') _bfToast('A-ORG-2 '+APP_VERSION);
       }
     }catch(_){}
-  }, 5600);   // v1.0.2: after the retimed ~4.6s boot title — the toast may not crash the intro
+  }, 4000);   // v1.16.0: after the ~2.9s world tour — the toast may not crash the intro
   // v1.0.0 — FIRST-RUN COACH: for users who are not the owner. Three hints,
   // once ever (a2Coached), pointer-transparent, gone at the first touch or 14s.
   setTimeout(function(){
@@ -2556,7 +2568,7 @@ try{
         document.removeEventListener('pointerdown', h, true); setTimeout(go, 150);
       }, true);
     }catch(_){}
-  }, 5400);   // v1.0.2: after the retimed boot title — chips must never sit under the veil
+  }, 3800);   // v1.16.0: after the ~2.9s world tour — chips must never sit under the veil
 }catch(_){}
 
 // ---- GlobeState — the shared globe spine (shell-owned; modules consume) --------
@@ -2923,13 +2935,10 @@ function drawGlobe(cv, ctx){
   let wCoast=(W&&W.coast)||wAcc, wLand=(W&&W.land)||'64,178,152';
   let oHi=(W&&W.oceanHi)||'#0f1d1a', oLo=(W&&W.oceanLo)||'#091110';
   const wGlow=!!(W&&W.glow);
-  // v0.34.0 — the boot title's one-beat PAPER flip is a REAL palette swap
-  // (a CSS invert filter turned the gold grey-green — Lumen's gold must stay
-  // gold). Cream ground, bronze ink, parchment land; markers keep their own inks.
-  if(GlobeState._introInvert){
-    wAcc='150,110,40'; wCoast='96,72,22'; wLand='226,215,185';
-    oHi='#F1EBD8'; oLo='#E3DABF';
-  }
+  // (v1.16.0: the boot title's one-beat paper invert retired with the world
+  // tour — the tour tells its story in light, never a palette flip. The old
+  // lesson stands: a CSS invert filter turns Lumen's gold grey-green; if a
+  // paper beat ever returns it must be a REAL palette swap right here.)
   if(wGlow){
     // instrument mode (token --world-glow:1) — the A-ORG-1 limb halo survives as an option
     const ag=ctx.createRadialGradient(m.cx,m.cy,m.R*0.88, m.cx,m.cy,m.R*1.20);
@@ -3987,11 +3996,17 @@ function drawGlobeMarkers(ctx, m){
     // selected organization and their connections — hide all other ones"). With an
     // ORG driving the map, everything off its chain leaves the picture entirely.
     if(GlobeState.selOrg && !onChain) continue;
+    // v1.16.0 BOOT TOUR: while the tour runs only LIT groups paint (the light
+    // accumulates westward, design 4b); clusters and labels stand down.
+    if(GlobeState._bootMode){
+      const bl=GlobeState._bootLit;
+      if(!(bl && (bl.has('*') || bl.has(String(inst.grp||'').split('|')[0])))) continue;
+    }
     // class filter (legend): chain members stay — the picture outranks the layers
     if(!onChain && _famOffSet().has(cls)) continue;
     // CLUSTERS (A-ORG-1 §3.4, gate 1.6 · 44px grid): at world zoom, ordinary
     // sites divert into count badges; the badge pass draws after this loop.
-    if(GlobeState.zoom<1.6 && !onChain){
+    if(GlobeState.zoom<1.6 && !onChain && !GlobeState._bootMode){
       if(!dotsOff){
         (GlobeState._clu||(GlobeState._clu=[])).push({x:sx, y:sy, lat:inst.lat, lon:inst.lon, c:(CLS_META[cls]||CLS_META.base).c});
         GlobeState._screen.push({inst, sx, sy, depth:p[2]});
@@ -4079,7 +4094,7 @@ function drawGlobeMarkers(ctx, m){
   }
 
   // Tiny labels for the rest, zoom-gated (keeps world view clean).
-  if(GlobeState.zoom >= 1.5 && !GlobeState._namesOff){
+  if(GlobeState.zoom >= 1.5 && !GlobeState._namesOff && !GlobeState._bootMode){
     ctx.save();
     try{ ctx.letterSpacing='0.35px'; }catch(_){}
     ctx.textBaseline='middle';
@@ -4569,6 +4584,7 @@ function drawMarkersHook(ctx, m){
   drawGlobeMarkers(ctx, m);
   drawClusters(ctx, m);
   try{ drawBriefStates(ctx, m, true); }catch(_){}    // v0.24.0: state names last — they share the label collision list
+  try{ if(GlobeState._bootMode && typeof _bootPaint==='function') _bootPaint(ctx, m); }catch(_){}   // v1.16.0: the tour's own light
 }
 
 // ---- Tap hit-test for m3 (PORT of handleGlobeTap's best-dot loop) --------------
@@ -7992,7 +8008,7 @@ function _rdbOpen(){
         gdb.onsuccess=function(){ const v=gdb.result&&gdb.result.v; if(v&&v.url){ _dbCfg=v;
           // v1.2.0 chip waits out the boot title; v1.11.0 — with auto on it
           // CONNECTS instead of asking (chip only as the failure fallback)
-          try{ setTimeout(function(){ if(!_dbAutoBoot()) _dbChipShow(); }, Math.max(600, 6200-performance.now())); }catch(_){}
+          try{ setTimeout(function(){ if(!_dbAutoBoot()) _dbChipShow(); }, Math.max(600, 4600-performance.now())); }catch(_){}
         } };
       }catch(_){}
       try{
@@ -9762,11 +9778,73 @@ function bootShell(){
 }
 bootShell();
 
-// ── v0.34.0 BOOT TITLE (retimed v1.0.2, owner: faster spin, 4–5 s) — three
-// revolutions of the real globe under the big mark over ~4.6 s:
-// main color → one PAPER-INVERT beat (45–72% of the flight) → main → the map.
-// Tap skips. prefers-reduced-motion skips entirely (motion law). Ends exactly
-// where it started (whole revolutions), so the map view lands untouched.
+// ── v1.16.0 THE BOOT WORLD TOUR (design 4b — replaces the v0.34.0 spin+invert
+// title). ~2.9s over the REAL canvas: one continuous westward pan on the 28°N
+// track (camera centers 130°E → 57°E → 16°W → 89°W, even rate), four beats —
+// PACIFIC (kj/pi/gu ignite, Camp Humphreys pulses) → SW ASIA (the signal-
+// orange lineage line leaps Humphreys→Arifjan, swa lights) → EUROPE (hop to
+// Wiesbaden, eur lights, the wordmark condenses in from wide tracking) →
+// FINALE (hop to the Pentagon, every remaining group floods with a gold
+// bloom over CONUS, chrome fades up). Light ACCUMULATES — nothing lit ever
+// goes dark. Tap skips; prefers-reduced-motion opens straight on the resting
+// map; the paper-invert beat is retired with the old title.
+function _bootPaint(ctx, m){
+  var B=GlobeState._boot; if(!B) return;
+  var now=B.t||0;
+  ctx.save();
+  // the lineage line — lifted great-circle segments, drawn up to the beat's
+  // progress (slerp copied from drawSubtleArcs; partial-stroke is boot-only)
+  var seg=B.seg;
+  var drawHop=function(a,b,f){
+    var av=lonLatToVec(a.lon,a.lat), bv=lonLatToVec(b.lon,b.lat);
+    var dot=Math.max(-1,Math.min(1,av[0]*bv[0]+av[1]*bv[1]+av[2]*bv[2]));
+    var om=Math.acos(dot), so=Math.sin(om);
+    ctx.beginPath(); var started=false;
+    var SEG=40, lim=Math.max(1,Math.round(SEG*Math.max(0,Math.min(1,f))));
+    for(var i=0;i<=lim;i++){ var t2=i/SEG, w1,w2;
+      if(so<1e-6){ w1=1-t2; w2=t2; } else { w1=Math.sin((1-t2)*om)/so; w2=Math.sin(t2*om)/so; }
+      var lift=1+0.08*Math.sin(Math.PI*t2);
+      var pt=_projectVec([(av[0]*w1+bv[0]*w2)*lift,(av[1]*w1+bv[1]*w2)*lift,(av[2]*w1+bv[2]*w2)*lift], m);
+      if(pt[2]<-0.02){ started=false; continue; }
+      if(!started){ ctx.moveTo(pt[0],pt[1]); started=true; } else ctx.lineTo(pt[0],pt[1]);
+    }
+    ctx.strokeStyle='rgba(255,179,92,.9)'; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.stroke();
+  };
+  for(var k=1;k<=seg && k<B.hops.length;k++) drawHop(B.hops[k-1], B.hops[k], (k===seg)?B.segP:1);
+  // Camp Humphreys pulse (beat 1): bright dot + two expanding rings
+  if(seg===0){
+    var hp=B.hops[0], p0=_projectLonLat(hp.lon,hp.lat,m);
+    if(p0[2]>=0){
+      ctx.fillStyle='#FFD98C'; ctx.beginPath(); ctx.arc(p0[0],p0[1],3.2,0,Math.PI*2); ctx.fill();
+      [0,0.45].forEach(function(off){
+        var q=(B.segP+off)%1;
+        ctx.strokeStyle='rgba(245,215,110,'+(0.7*(1-q)).toFixed(3)+')'; ctx.lineWidth=1.6;
+        ctx.beginPath(); ctx.arc(p0[0],p0[1],4+q*16,0,Math.PI*2); ctx.stroke();
+      });
+    }
+  }
+  // arrival flash at each hop landing: #FFD98C dot + 12px ring, ~450ms
+  (B.flash||[]).forEach(function(fl){
+    var age=(now-fl.t)/450; if(age<0||age>1) return;
+    var hp2=B.hops[fl.i]; if(!hp2) return;
+    var pp=_projectLonLat(hp2.lon,hp2.lat,m); if(pp[2]<0) return;
+    ctx.fillStyle='#FFD98C'; ctx.beginPath(); ctx.arc(pp[0],pp[1],3,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(255,217,140,'+(1-age).toFixed(3)+')'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(pp[0],pp[1],4+age*12,0,Math.PI*2); ctx.stroke();
+  });
+  // the finale bloom over CONUS — the run's biggest illumination
+  if(seg===3){
+    var c0=_projectLonLat(-98,39,m);
+    if(c0[2]>=0){
+      var bp=Math.min(1,B.segP*1.4), R2=Math.max(1,(m.R||200)*0.55*bp);
+      var gr=ctx.createRadialGradient(c0[0],c0[1],0,c0[0],c0[1],R2);
+      gr.addColorStop(0,'rgba(245,215,110,'+(0.26*(1-0.4*bp)).toFixed(3)+')');
+      gr.addColorStop(1,'rgba(245,215,110,0)');
+      ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(c0[0],c0[1],R2,0,Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
 (function(){
   try{
     var veil=document.getElementById('introVeil');
@@ -9774,26 +9852,66 @@ bootShell();
     var rm=false; try{ rm=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(_){}
     if(rm || window.__SANDBOX){ try{ veil.remove(); }catch(_){} return; }
     var vv=veil.querySelector('.in-ver'); if(vv) vv.textContent=APP_VERSION;
+    var mark=veil.querySelector('.in-mark');
     document.body.classList.add('intro');
     veil.hidden=false;
-    var T=4600, REVS=3, t0=performance.now(), y0=GlobeState.yaw||0, n=0, done=false;
+    var T=2900, t0=performance.now(), n=0, done=false;
+    var HOPS=[ {lat:36.97, lon:127.03},   // Camp Humphreys
+               {lat:28.86, lon:48.15},    // Camp Arifjan
+               {lat:50.08, lon:8.24},     // Wiesbaden
+               {lat:38.87, lon:-77.06} ]; // The Pentagon
+    var GRPS=[ ['kj','pi','gu'], ['swa'], ['eur'], null ];   // null = flood everything
+    var startZoom=GlobeState.zoom||1.5;
+    GlobeState._bootMode=true;
+    GlobeState._bootLit=new Set();
+    GlobeState._boot={hops:HOPS, seg:0, segP:0, flash:[], t:t0};
     var ease=function(p){ return p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2; };
     var fin=function(){
       if(done) return; done=true;
-      try{ GlobeState._introInvert=false; GlobeState.yaw=y0; _rebuildGlobeQ(); GlobeState.dirty=true; globeMark(); }catch(_){}
+      GlobeState._bootMode=false; GlobeState._bootLit=null; GlobeState._boot=null;
+      try{ if(mark){ mark.style.letterSpacing=''; mark.style.textIndent=''; mark.style.opacity=''; } }catch(_){}
       document.body.classList.remove('intro');
       veil.style.opacity='0'; veil.style.pointerEvents='none';
       setTimeout(function(){ try{ veil.remove(); }catch(_){} }, 500);
+      // ease down onto the resting frame (the boot pose the shell set)
+      try{ if(typeof flyToLatLon==='function') flyToLatLon(33, -78, startZoom);
+           else { _faceLonLatAngles(-78, 33); GlobeState.zoom=startZoom; } }catch(_){}
+      try{ GlobeState.dirty=true; globeMark(); }catch(_){}
     };
     veil.addEventListener('pointerdown', fin);
+    var litSeg=-1;
     var step=function(now){
       if(done) return;
       if(++n>900){ fin(); return; }                       // hard cap — no environment may loop this
       var p=Math.min(1,(now-t0)/T);
+      var seg=Math.min(3, Math.floor(p*4)), segP=p*4-seg;
       try{
-        GlobeState.yaw=y0 - ease(p)*Math.PI*2*REVS;
-        GlobeState._introInvert=(p>0.45 && p<0.72);       // the paper beat — real palette, in the renderer
-        _rebuildGlobeQ(); GlobeState.dirty=true; globeMark();
+        // one continuous westward pan: 130°E → 89°W on the 28°N track
+        var lon=130-219*p;
+        GlobeState.yaw=(lon-90)*Math.PI/180;
+        GlobeState.pitch=28*Math.PI/180;
+        GlobeState.zoom=1.05+0.25*ease(p);
+        _rebuildGlobeQ();
+        if(seg!==litSeg){
+          litSeg=seg;
+          var g=GRPS[seg];
+          if(g) g.forEach(function(x){ GlobeState._bootLit.add(x); });
+          else GlobeState._bootLit.add('*');
+          if(seg>0) GlobeState._boot.flash.push({i:seg, t:now});   // the line just landed
+        }
+        GlobeState._boot.seg=seg; GlobeState._boot.segP=segP; GlobeState._boot.t=now;
+        // the wordmark condenses in from wide tracking through beats 3-4
+        if(mark){
+          if(p>0.48){
+            var wp=Math.min(1,(p-0.48)/0.44);
+            mark.style.letterSpacing=(0.5-0.16*wp)+'em';
+            mark.style.textIndent=(0.5-0.16*wp)+'em';
+            mark.style.opacity=String(0.22+0.78*wp);
+          } else {
+            mark.style.letterSpacing='0.5em'; mark.style.textIndent='0.5em'; mark.style.opacity='0.12';
+          }
+        }
+        GlobeState.dirty=true; globeMark();
       }catch(_){}
       if(p>=1){ fin(); return; }
       requestAnimationFrame(step);

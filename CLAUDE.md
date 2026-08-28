@@ -1288,3 +1288,30 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - LESSON: `.bf-box.bf-dim .bf-ops{opacity:.5}` outside the hover gate had
   leaked ops onto touch screens since v1.11.0 — visible only once boxes
   went translucent. Overlay opacity rules live INSIDE @media(hover:hover).
+
+## v1.16.0 — the world tour (design 4b) — REPLACES the v0.34.0 boot title
+- THE TOUR: ~2.9s over the real canvas. One continuous westward pan on the
+  28°N track (lon = 130 − 219·p, yaw=(lon−90)·π/180, pitch=28°, zoom eases
+  1.05→1.30). Four beats (p·4): PACIFIC (kj/pi/gu ignite, Humphreys pulses)
+  → SW ASIA (lineage line Humphreys→Arifjan, swa) → EUROPE (→Wiesbaden,
+  eur; wordmark condenses .5em→.34em, opacity .22→1 — letter-spacing AND
+  text-indent move in lockstep or the mark drifts) → FINALE (→Pentagon,
+  '*' floods all groups, gold bloom over CONUS at 55% of the globe radius).
+  LIGHT ACCUMULATES — nothing lit ever dims. fin() lands with
+  flyToLatLon(33,−78,startZoom); tap skips; prefers-reduced-motion or
+  __SANDBOX opens straight on the resting map; 900-frame hard cap.
+- THE GATE: GlobeState._bootMode + _bootLit (Set of primary grp tokens,
+  '*' floods). drawGlobeMarkers skips unlit sites, the cluster diversion
+  and the tiny-label pass while _bootMode is up — the tour paints DOTS,
+  never badges. _bootPaint (hooked at drawMarkersHook tail) draws the
+  partial-progress lineage line (slerp+8% lift copy — drawSubtleArcs has
+  no progress param), the Humphreys double ring, #FFD98C arrival flashes
+  (450ms) and the finale bloom. State torn down entirely in fin().
+- RETIRED: the spin+invert title and GlobeState._introInvert consumption.
+  The old lesson stands in place: any future paper beat must be a REAL
+  palette swap in drawGlobe, never a CSS invert (gold goes grey-green).
+- COUPLED TIMERS moved with T: version toast 4000 · first-run coach 3800 ·
+  #dbChip floor 4600. If T changes again, move all three.
+- PROOF PATTERN: sample the tour on the PAGE clock (injected setTimeout
+  recorder), never the test's — a mid-run Playwright screenshot costs
+  ~0.5s of wall time and slides every later sample into the wrong beat.

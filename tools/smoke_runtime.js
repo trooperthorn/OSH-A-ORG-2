@@ -891,6 +891,33 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(ok) console.log('  ✓ map console: MODE SEG switches rooms · labeled satellites (no brief sat) · callout rail + inline sub + counted tiles');
   }
 
+  // ── PROBE: THE BOOT TOUR's light gate (v1.16.0, design 4b) — while
+  // _bootMode is up only LIT groups paint; '*' floods; the gate never leaks
+  // into normal draws. _bootPaint exists for the hook. ──
+  { let bok=true;
+    try{
+      if(typeof global._bootPaint!=='function'){ bok=false; fails++; console.log('✗ BOOT _bootPaint missing'); }
+      const cvb=IDS['globeCanvas'];
+      global.GlobeState._bootMode=true;
+      global.GlobeState._bootLit=new Set(['kj']);
+      global.GlobeState._boot={hops:[{lat:36.97,lon:127.03}], seg:0, segP:0.5, flash:[], t:0};
+      global._faceLonLatAngles(127, 37);                 // face Korea so kj sites are frontside
+      global.drawGlobe(cvb, ctxStub);
+      const litN=(global.GlobeState._screen||[]).length;
+      global.GlobeState._bootLit=new Set(['*']);
+      global.drawGlobe(cvb, ctxStub);
+      const allN=(global.GlobeState._screen||[]).length;
+      global.GlobeState._bootMode=false; global.GlobeState._bootLit=null; global.GlobeState._boot=null;
+      global._faceLonLatAngles(-78, 33);
+      global.drawGlobe(cvb, ctxStub);
+      const normN=(global.GlobeState._screen||[]).length;
+      if(!(litN>0 && litN<=13)){ bok=false; fails++; console.log('✗ BOOT gate: kj-only should paint ≤13 dots, saw '+litN); }
+      if(!(allN>litN)){ bok=false; fails++; console.log('✗ BOOT gate: * flood must widen the picture ('+litN+' → '+allN+')'); }
+      if(!(normN>=allN)){ bok=false; fails++; console.log('✗ BOOT gate leaked into the normal draw ('+normN+' < '+allN+')'); }
+    }catch(e){ bok=false; fails++; console.log('✗ BOOT probe threw: '+e.message); }
+    if(bok) console.log('  ✓ boot tour: kj-only gate → * flood → gate off (light accumulates, never leaks) · _bootPaint present');
+  }
+
   // ── PROBE (non-fatal): drawGlobe on the stub ctx — the stub canvas is
   // "disconnected" so the dirty-gated loop idles exactly as in A-ORG-1's smoke;
   // this direct call surfaces render-path reference gaps without gating the boot. ──
