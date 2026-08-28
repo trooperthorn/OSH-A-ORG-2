@@ -502,43 +502,32 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
 .nv-sat:disabled + .nv-lbl{opacity:.35}
 .nv-sat:active{ background:var(--accent-wash); box-shadow:0 0 0 2px var(--accent), 0 0 20px rgba(245,215,110,.5) }
-/* Phone: the satellites live in ONE labeled glass dock strip above the FAB
-   (design 3a); the search pill steps up while the strip is out. */
+/* v1.18.0 THE RAIL (owner: "navigation buttons readily available — a side
+   panel on the right; I underestimated how often they're needed"). The
+   satellites are PERMANENT chrome now: one vertical glass rail pinned to the
+   right edge, mid-height, always live. The FAB short-press collapses/reopens
+   it (body.nav-off); the map room never hides it on its own. */
 #navRow{
   position:absolute; z-index:43;
-  left:10px; right:10px;
-  bottom:calc(env(safe-area-inset-bottom,0px) + 92px);
-  display:flex; align-items:flex-start; justify-content:space-around;
-  padding:8px 6px 7px; border-radius:20px;
+  right:6px; left:auto; top:50%; bottom:auto; transform:translateY(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:9px;
+  padding:10px 5px; border-radius:20px;
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
-  opacity:0; transform:translateY(10px); pointer-events:none;
+  opacity:1; pointer-events:auto;
   transition:opacity .18s ease, transform .18s ease;
 }
 .nv-side{display:contents}
-body.nav-open #navRow{opacity:1; transform:none; pointer-events:auto}
-body.nav-open #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 188px)}
-body.nav-open #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 236px)}
-/* Desktop (design 3a): six 56px glass circles flanking the FAB, micro-labels
-   under each, groups pulled 96px off the globe button. */
+body.nav-off #navRow{opacity:0; transform:translate(10px,-50%); pointer-events:none}
+body.brief-mode #navRow{display:none}   /* the brief room has its own rail (#briefDock) */
 @media(min-width:1100px){
-  #navRow{left:50%; right:auto; transform:translate(-50%,10px); width:auto;
-    justify-content:center; align-items:flex-start; padding:6px 0 0;
-    background:none; box-shadow:none; border-radius:0;
-    bottom:calc(env(safe-area-inset-bottom,0px) + 10px)}
-  body.nav-open #navRow{transform:translate(-50%,0)}
-  body.nav-open #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}
-  body.nav-open #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 160px)}
-  .nv-side{display:flex; align-items:flex-start; gap:16px}
-  .nv-side:first-of-type{margin-right:96px}
-  .nv-side:last-of-type{margin-left:96px}
+  #navRow{right:18px; gap:12px}
   .nv-cell{gap:5px}
   .nv-lbl{font-size:7px; color:var(--dim)}
   .nv-sat{width:56px; height:56px;
     background:linear-gradient(180deg, rgba(26,22,14,.94), rgba(8,7,4,.96));
     box-shadow:0 0 0 1px rgba(240,220,140,.28), inset 0 1px 0 var(--spec), var(--drop)}
 }
-body.nav-open #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 22px rgba(245,215,110,.35), inset 0 1px 0 var(--spec)}
 /* v1.14.0 — the FAB label: CONTROLS in the map room, TO MAP in the brief. */
 .nv-fablbl{position:absolute; left:0; top:3px; transform:translateX(-50%);
   font:700 7px/1 var(--mono); letter-spacing:.14em; color:var(--accent);
@@ -558,7 +547,7 @@ body.brief-mode #briefStage{
      near-black that the world glows through at the edges; no ring, no drop.
      Full pane minus 6px gutters on phone; centered 880px on desktop. */
   display:block; position:absolute; z-index:16;
-  left:6px; right:6px;
+  left:6px; right:60px;   /* v1.18.0: the right rail owns the edge */
   /* v1.16.3 (owner: "maximize space — push top up and bottom down"): the
      console hugs the seg (+84) and may run down to the lowered search pill */
   top:calc(env(safe-area-inset-top,0px) + 84px);
@@ -613,18 +602,22 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch
 .ch-tool.off .ch-lbl{opacity:.55}
 .ch-div{flex:none; width:1px; height:20px; background:rgba(242,228,188,.28); margin:4px 4px 0; align-self:flex-start}
 #briefDock{display:none}
-body.brief-mode #briefDock{display:inline-flex; position:absolute; z-index:43;
-  right:calc(50% + 52px); bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
+/* v1.18.0 THE RAIL, brief side: same panel grammar as the map's #navRow —
+   one vertical pill on the right edge, always live. The bottom band frees up. */
+body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:2px;
+  position:absolute; z-index:43;
+  right:6px; left:auto; top:50%; bottom:auto; transform:translateY(-50%);
+  padding:9px 5px}
+#briefDock .ch-div{width:20px; height:1px; margin:3px 0; align-self:center}
+#briefDock .bd-gap{display:none}
 body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .15s ease}
 @media(max-width:1099px){
-  body.brief-mode #briefDock{left:10px; right:10px; justify-content:space-between; padding:6px 8px 5px}
-  #briefDock .bd-gap{flex:none; width:70px}
-  /* v1.16.3: the bottom band drops — the search pill sits just above the dock
-     (74) instead of the map room's 96, and the results shelf follows */
+  /* v1.16.3: the search pill sits just above the FAB band in brief (74),
+     and the results shelf follows */
   body.brief-mode #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
   body.brief-mode #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 126px)}
 }
-@media(min-width:1100px){ #briefDock .bd-gap{display:none} }
+@media(min-width:1100px){ body.brief-mode #briefDock{right:18px} }
 /* v1.15.0 — the chart-to-globe leader */
 #bfLeader{position:absolute; inset:0; z-index:15; pointer-events:none}
 #bfLeader[hidden]{display:none}
@@ -1288,7 +1281,9 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 #calloutCard.co-docked{
   /* 136px: fully BELOW the phone time ledger (top 88px + ~44px chip); the ✕
      must never land under another control (re-verify law, gestures journey) */
-  left:var(--safe-l) !important; right:var(--safe-r); top:calc(env(safe-area-inset-top,0px) + 136px) !important;
+  /* v1.18.0 (owner): the overview stays on the LEFT — the right edge belongs
+     to the nav rail, so the card never covers it */
+  left:var(--safe-l) !important; right:calc(var(--safe-r) + 56px); top:calc(env(safe-area-inset-top,0px) + 136px) !important;
   width:auto; max-height:42vh; max-height:42dvh; overflow-y:auto;
   -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
 }
@@ -1461,6 +1456,16 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.18.0 • THE RAILS (owner: "navigation buttons readily available — a
+//            side panel on the right; same for brief; overview/details stay
+//            left; lines most direct; fit stuck at 62%"). Map satellites and
+//            the brief dock are PERMANENT vertical rails pinned to the right
+//            edge (FAB short-press collapses/reopens the map rail; outside
+//            taps no longer close it). The overview card keeps the left,
+//            clear of the rail. Brief connectors drop the shared junction
+//            rail for direct vertical-tangent diagonals through the empty
+//            inter-row band. Fit's 0.62 readability floor (the "stuck 62%")
+//            drops to 0.30 — Fit really fits now.
 //   v1.17.3 • THE QUIET MAP (owner: "border state/country lines dimmer for
 //            contrast; backfill a little dimmer; increase zoom"). Linework
 //            recedes so the light owns the picture: coast/shore .92→.55,
@@ -1748,7 +1753,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.17.3';
+const APP_VERSION = 'v1.18.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -4789,7 +4794,7 @@ function selectSite(id, o){
     try{ flyToLatLon(s.lat, s.lon, Math.max(GlobeState.zoom||1, 2.6)); }catch(_){}
   }
   try{ _trailPush(s.id); }catch(_){}
-  try{ if(document.body.classList.contains('nav-open')) window._nvSet(true); }catch(_){}
+  try{ if(!document.body.classList.contains('nav-off')) window._nvSet(true); }catch(_){}
   try{ if(typeof autoFillSelect==='function') autoFillSelect(s); }catch(_){}   // SELECT clock follows the selection (manual pick wins)
   // v0.9.0 (owner references): identity arrives AT the dot — the sheet only on ▤
   try{ hideDossier(); }catch(_){}
@@ -4964,11 +4969,15 @@ function renderBrief(){
   const litLvl={};
   if(branch) branch.forEach(function(k){ if(POS[k]) litLvl[POS[k].lvl]=1; });
   const isLit=function(a2,b2){ return branch && branch.has(a2) && branch.has(b2); };
+  // v1.18.0 THE DIRECT LINE (owner): no more shared horizontal junction rail —
+  // each connector drops out of the parent, takes the straightest diagonal
+  // through the empty band between rows (no boxes live there), and lands on
+  // the child from above. Vertical tangents at both ends keep it reading as
+  // an org line, not a scribble.
   const elbow=function(px,py2,cx2,cy){
     if(Math.abs(px-cx2)<1) return 'M'+px+' '+py2+'V'+cy;
-    const yj=py2+8, d2=(cx2>px)?1:-1;
-    return 'M'+px+' '+py2+'V'+(yj-4)+'Q'+px+' '+yj+' '+(px+4*d2)+' '+yj
-      +'H'+(cx2-4*d2)+'Q'+cx2+' '+yj+' '+cx2+' '+(yj+4)+'V'+cy;
+    const k=Math.min(10, Math.max(4, (cy-py2)*0.35));
+    return 'M'+px+' '+py2+'C'+px+' '+(py2+k)+' '+cx2+' '+(cy-k)+' '+cx2+' '+cy;
   };
   let netBase='', netDim='', netGlow='', netBeads='';
   edges.forEach(function(e2){ const P=POS[e2.p], Q=POS[e2.c]; if(!P||!Q) return;
@@ -5169,7 +5178,10 @@ function _bfFit(){
   if(GlobeState._bfZoom){ _bfCenter(wrap,tree); return; }   // manual zoom wins
   tree.style.zoom='';
   const avail=wrap.clientWidth||1, natural=tree.scrollWidth||1;
-  const fit=Math.max(0.62, Math.min(1, (avail-4)/natural));   // never shrink past readable — pan instead
+  // v1.18.0 (owner: "fit is stuck at 62%"): the readability floor CLAMPED wide
+  // charts at 0.62 and they overflowed into pan — Fit now really fits, with a
+  // deep floor only against microscopic type.
+  const fit=Math.max(0.30, Math.min(1, (avail-4)/natural));
   if(fit<0.999) tree.style.zoom=fit;
   GlobeState.__bfFitPct=fit;
   const pct=document.querySelector('#briefStage .bf-zpct');
@@ -8643,7 +8655,7 @@ function bootShell(){
       cv.addEventListener('wheel', function(e){
         if(e.ctrlKey||e.metaKey){ GlobeState._touched=true; _gyOn(); _gyOff();
           // ring rocker stays honest while wheel-zooming with the ring out
-          try{ if(document.body.classList.contains('nav-open')) window._nvSet(true); }catch(_){}
+          try{ if(!document.body.classList.contains('nav-off')) window._nvSet(true); }catch(_){}
         }
       }, {passive:true});
       window.addEventListener('pointerup', _gyOff);
@@ -8679,7 +8691,7 @@ function bootShell(){
     if(_ring){ _ring.style.strokeDasharray=_ringLen; _nvRingReset(); }
     window._nvSet=function(open){
       _nvOpen=open;
-      document.body.classList.toggle('nav-open', open);
+      document.body.classList.toggle('nav-off', !open);   // v1.18.0: the rail is DEFAULT-ON
       try{ ng.setAttribute('aria-expanded', open?'true':'false'); }catch(_){}
       var bk=document.getElementById('navSat-back');
       if(bk) bk.disabled=!((GlobeState._undo||[]).length);
@@ -8694,6 +8706,7 @@ function bootShell(){
       var zi=document.getElementById('navSat-zoomin');
       if(zi) zi.disabled=(GlobeState.zoom>=27.9);
     };
+    try{ window._nvSet(true); }catch(_){}   // v1.18.0: the rail is on from boot
     var _holdTick=function(){
       if(!_nvHold) return;
       var p=Math.min(1,(performance.now()-_nvT0)/3000);
@@ -8701,7 +8714,7 @@ function bootShell(){
       if(p>=1){
         _nvHold=null; _nvFired=true; _nvRingReset();
         try{ setMode(document.body.classList.contains('brief-mode')?'map':'brief'); }catch(_){}
-        try{ window._nvSet(false); }catch(_){}   // the ring never survives a mode flip
+        try{ window._nvSet(true); }catch(_){}    // v1.18.0: the rail rides through a mode flip
         try{ navigator.vibrate&&navigator.vibrate(30); }catch(_){}
         return;
       }
@@ -8733,19 +8746,12 @@ function bootShell(){
       window.addEventListener('pointercancel', _nvEnd);
       ng.addEventListener('click', function(e){ e.preventDefault(); });   // pointerup owns it
     }
-    // outside press: close the ring AND swallow that tap before the canvas turns
-    // it into a selection (capture phase beats m3's pointerdown; tapAtScreen
-    // consumes the flag; window pointerup clears it so a swallowed DRAG never
-    // poisons the next gesture).
-    document.addEventListener('pointerdown', function(e){
-      if(_nvOpen && e.target && e.target.closest && !e.target.closest('#navDock') && !e.target.closest('#navRow')){
-        _nvSet(false); GlobeState._navSwallow=true;
-      }
-    }, true);
+    // v1.18.0: the rail is permanent chrome — outside taps no longer close it
+    // (the auto-close + tap-swallow died with the pop-up ring; _navSwallow
+    // stays as a field other paths read, always false now).
     window.addEventListener('pointerup', function(){ setTimeout(function(){ GlobeState._navSwallow=false; },0); });
     document.addEventListener('keydown', function(e){
       if(e.key!=='Escape') return;
-      if(_nvOpen){ _nvSet(false); return; }
       try{
         const cc=document.getElementById('calloutCard');
         if(cc && !cc.hidden) selectSite(null);              // parity with the callout's ✕
@@ -8782,7 +8788,7 @@ function bootShell(){
           }
         }catch(_){}
         _nvSet(true); return; }
-      if(e.target.closest('#navSat-clear')){ _nvSet(false); try{ clearAll(); }catch(_){} return; }
+      if(e.target.closest('#navSat-clear')){ _nvSet(true); try{ clearAll(); }catch(_){} return; }
       // ZOOM ± stay open — the ring is a zoom rocker while it's out.
       if(e.target.closest('#navSat-zoomout')){
         try{ GlobeState._touched=true; GlobeState.zoom=Math.max(1.0, GlobeState.zoom/1.45); globeMark(); }catch(_){}
@@ -8793,8 +8799,8 @@ function bootShell(){
       // v1.14.0: the Brief satellite is retired — the MODE SEG is the room door.
       var msc=e.target.closest('#modeSeg .ms-cell');
       if(msc){ try{ setMode(msc.getAttribute('data-mode')); }catch(_){} return; }
-      if(e.target.closest('#navSat-saved')){ _nvSet(false); try{ _svOpenSheet(); }catch(_){} return; }
-      if(e.target.closest('#navSat-layers')){ _nvSet(false);
+      if(e.target.closest('#navSat-saved')){ _nvSet(true); try{ _svOpenSheet(); }catch(_){} return; }
+      if(e.target.closest('#navSat-layers')){ _nvSet(true);
         try{
           var p=document.getElementById('legendPanel');
           if(p){ if(p.hidden) renderLegend(); p.hidden=!p.hidden; }

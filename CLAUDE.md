@@ -1451,3 +1451,29 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - Live proof: boot must land at 1.8; pixel note — the UT/WY border sample
   point sits next to Hill AFB's glow, so border-level pixel reads there
   are contaminated; judge linework from the screenshot, not that sample.
+
+## v1.18.0 — the rails (owner: "side panel on the right, readily available — I underestimated how often they're needed")
+- THE RAIL LAW: navigation is PERMANENT chrome — one vertical glass rail
+  pinned to the right edge, mid-height, in BOTH rooms. Map = #navRow
+  (UNDO·CLEAR·ZOOM−·ZOOM+·SAVED·LAYERS); Brief = #briefDock
+  (Add·Names·Lines·Briefs·Export·Ledger), same panel grammar. Phone
+  right:6px, desktop right:18px. body.brief-mode hides #navRow (the brief
+  rail owns the edge there).
+- COLLAPSE: FAB short-press toggles body.nav-off (map rail only); outside
+  taps and ESC no longer close it — the pop-up-ring era (_navSwallow
+  setter, outside-pointerdown close) is deleted. _nvSet(true) refreshes
+  disabled states and is called at boot, after sat actions, and on mode
+  flips. nav-open (the class) is retired.
+- LEFT IS CONTENT, RIGHT IS CONTROL: the docked callout keeps the left —
+  phone right inset +56px so it never covers the rail; desktop was
+  already a 400px left card. #briefStage phone right gutter 6→60px.
+- THE DIRECT LINE: elbow() emits vertical-tangent cubics (C px,(py+k) …)
+  straight through the empty inter-row band — no boxes live between rows,
+  so the direct diagonal cannot cross content. The shared junction rail
+  (V…Q…H…Q…V at parentBottom+8) is retired; smoke bans its grammar and
+  requires the C builder. colSegs stack spines stay vertical.
+- THE REAL FIT: _bfFit's floor 0.62 → 0.30 (the owner's "stuck at 62%"
+  WAS the floor clamping wide charts into pan). Fit means fit.
+- Probe notes: the smoke chart fixture is a single-child chain → every
+  connector is a plain V; C-curve law lives as a SOURCE assert, not a
+  render assert. Search-pill brief law (+74) unchanged and still pinned.

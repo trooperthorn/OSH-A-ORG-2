@@ -777,6 +777,18 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(html.indexOf('drawClusters')>=0 || html.indexOf('_cluHits')>=0){
         gok=false; fails++; console.log('✗ the cluster-badge system is back (retired v1.17.0 — the constellation owns world zoom)'); }
       if(typeof global._glowDot!=='function'){ gok=false; fails++; console.log('✗ _glowDot (the shared ignited-dot recipe) is missing'); }
+      // v1.18.0 THE RAILS: both rooms carry a permanent right-edge rail; the
+      // map rail collapses only via nav-off; brief hides the map rail.
+      if(html.indexOf('body.nav-off #navRow')<0){ gok=false; fails++; console.log('✗ the map rail lost its nav-off collapse law (v1.18.0)'); }
+      if(html.indexOf('body.brief-mode #navRow{display:none}')<0){ gok=false; fails++; console.log('✗ brief must hide the map rail (v1.18.0)'); }
+      if(html.indexOf('body.brief-mode #briefDock{display:flex; flex-direction:column')<0){ gok=false; fails++; console.log('✗ the brief dock is not a vertical right rail (v1.18.0)'); }
+      if(html.indexOf('Math.max(0.62,')>=0 || html.indexOf('Math.max(0.30,')<0){ gok=false; fails++; console.log('✗ the fit floor law drifted (v1.18.0: 0.30, never 0.62)'); }
+      // v1.18.0 THE DIRECT LINE: connectors are cubic diagonals, not the old
+      // junction-rail elbows. (This probe's fixture is a single-child chain —
+      // centers align, every path is a plain V — so pin the LAW in source:
+      // the elbow builder emits C curves; the junction-rail grammar is gone.)
+      if(html.indexOf("'C'+px+' '+(py2+k)")<0){ gok=false; fails++; console.log('✗ the direct C-curve elbow builder is gone (v1.18.0)'); }
+      if(html.indexOf("Q'+px+' '+yj")>=0){ gok=false; fails++; console.log('✗ the junction-rail elbow grammar is back (retired v1.18.0)'); }
       // v1.17.1 (owner: "it still shows the white dots"): the glass reticle
       // paints CHAIN MEMBERS ONLY — exactly one reticle fill in source — and
       // the tiny labels ink in the ignited gold, never ice-white.
