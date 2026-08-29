@@ -151,7 +151,7 @@ sw.js CACHE ↔ changelog entry move together, lint-enforced).
   state models. It is a design decision with real cost, not a P0 bug fix — **advise, decide,
   then schedule** (CLAUDE.md v0.33.1 standing law #4).
 
-### R-10 — one surface, two names (found in recon, not in the spec's log) · Severity H
+### R-10 — one surface, two names · Severity H · **RESOLVED in v1.18.1**
 
 The v1.8.0 rename ("the side panel is the REPOSITORY … `window.Ledger` is gone") landed in
 the panel title, the app-menu row and the API — but **not on the primary door**.
@@ -176,6 +176,19 @@ names are invisible to users and renaming them is churn against a 91%-full byte 
 
 **Watch:** `.ch-lbl` width — "Repository" is 4 characters longer than "Ledger" in a dock cell
 sized for short labels. Check it does not wrap or clip the dock at 390px before shipping.
+
+**Outcome (v1.18.1):** the watch item was real. REPOSITORY measures 51.2px in a 44px slot, so
+the brief rail grew 54 → 61px and began overlapping `#briefStage` by **7.2px** (measured, 390px)
+— the v1.18.0 `right:60px` gutter was sized for the narrower rail. Gutter moved 60 → 70px;
+clearance now −2.8px. Nothing clips at either breakpoint (`scrollWidth === clientWidth` on every
+rail label). Rail labels also lifted 6.5 → 7.5px (8px desktop) and both rails now honour
+`env(safe-area-inset-right)` using the project's existing pattern rather than the spec's
+`max(16px, …)` formula.
+
+**Guards shipped with it** (standing law #3), all three confirmed to FAIL when the drift is put back:
+every user-facing name for the panel must equal the panel's own `.ld-title`; `window.Ledger` must
+stay undefined (a *runtime* check — a source grep false-positives on the changelog prose, which
+cost one iteration); no rail label under 7px.
 
 ### R5 — Stand up the browser probe FIRST
 - Commit a Playwright probe asserting: fit percentage, effective type size, intra-level box
@@ -219,9 +232,13 @@ sized for short labels. Check it does not wrap or clip the dock at 390px before 
   the stack feature working.
 - **Whether the screenshots are HEAD.** `APP_VERSION` is `v1.18.0` `:1756`, matching — but
   CLAUDE.md v1.33.1 records a prior review made against a stale service-worker build.
-- **Whether R-10 is the only naming drift.** I checked the Repository/Ledger pair only. Other
-  v1.x renames may have left doors behind in the same way; a sweep of user-facing labels
-  against the law sections has not been done.
+- **The label-vs-law sweep is DONE (v1.18.1) and found nothing else.** Every retirement recorded
+  in CLAUDE.md was checked against user-facing positions: "Annotate"→"Add note", the "Callout"
+  placeholder, "Show on map" (v0.21.0), the Dots/Lines legend rows (v0.22.0), the GROUP tag and
+  `.bf-st` sublines (v1.15.0), the Brief satellite (v1.14.0), `nav-open` (v1.18.0), the cluster
+  badges (v1.17.0) — all clean. The only residue is three stale *comments* mentioning the retired
+  "⌗ CHART" title (`:543`, `:1576`, `:4810`); comments are not user-facing and were left alone
+  against a 91%-full byte budget. **R-10 was the only user-facing naming drift in the app.**
 - **Parent-drift at real scale.** `place()`'s parent `cx` is the midpoint of child *centres*
   `:4958`, not of its allocated slot: 0.88% of 60,000 randomised trees overlap, worst 8.5px.
   Real, minor, never observed on live org data.

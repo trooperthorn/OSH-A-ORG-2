@@ -491,7 +491,7 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
    permanent micro-label (never a tooltip). Calm state = quiet glass circle with
    an accent glyph; the bright gold illumination is reserved for :active. */
 .nv-cell{display:flex; flex-direction:column; align-items:center; gap:5px; flex:0 0 auto}
-.nv-lbl{font:700 6.5px/1 var(--mono); letter-spacing:.14em; color:var(--dim);
+.nv-lbl{font:700 7.5px/1 var(--mono); letter-spacing:.12em; color:var(--dim);
   white-space:nowrap; -webkit-user-select:none; user-select:none}
 .nv-sat{
   appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
@@ -509,7 +509,7 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
    it (body.nav-off); the map room never hides it on its own. */
 #navRow{
   position:absolute; z-index:43;
-  right:6px; left:auto; top:50%; bottom:auto; transform:translateY(-50%);
+  right:calc(env(safe-area-inset-right,0px) + 6px); left:auto; top:50%; bottom:auto; transform:translateY(-50%);
   display:flex; flex-direction:column; align-items:center; gap:9px;
   padding:10px 5px; border-radius:20px;
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
@@ -521,9 +521,9 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 body.nav-off #navRow{opacity:0; transform:translate(10px,-50%); pointer-events:none}
 body.brief-mode #navRow{display:none}   /* the brief room has its own rail (#briefDock) */
 @media(min-width:1100px){
-  #navRow{right:18px; gap:12px}
+  #navRow{right:calc(env(safe-area-inset-right,0px) + 18px); gap:12px}
   .nv-cell{gap:5px}
-  .nv-lbl{font-size:7px; color:var(--dim)}
+  .nv-lbl{font-size:8px; color:var(--dim)}
   .nv-sat{width:56px; height:56px;
     background:linear-gradient(180deg, rgba(26,22,14,.94), rgba(8,7,4,.96));
     box-shadow:0 0 0 1px rgba(240,220,140,.28), inset 0 1px 0 var(--spec), var(--drop)}
@@ -547,7 +547,7 @@ body.brief-mode #briefStage{
      near-black that the world glows through at the edges; no ring, no drop.
      Full pane minus 6px gutters on phone; centered 880px on desktop. */
   display:block; position:absolute; z-index:16;
-  left:6px; right:60px;   /* v1.18.0: the right rail owns the edge */
+  left:6px; right:70px;   /* v1.18.0: the right rail owns the edge (v1.18.1: 60→70 — REPOSITORY is a wider label than LEDGER, so the rail is wider) */
   /* v1.16.3 (owner: "maximize space — push top up and bottom down"): the
      console hugs the seg (+84) and may run down to the lowered search pill */
   top:calc(env(safe-area-inset-top,0px) + 84px);
@@ -598,7 +598,7 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch
 .ch-dock .bf-vw{color:#F2E4BC}
 .ch-dock .bf-vw:not(.off){background:var(--accent); color:#141006; border-radius:50%}
 .ch-dock .bf-vw.off{background:none; opacity:.5}
-.ch-lbl{font:700 6.5px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:rgba(242,228,188,.6)}
+.ch-lbl{font:700 7.5px/1 var(--mono); letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; color:rgba(242,228,188,.6)}
 .ch-tool.off .ch-lbl{opacity:.55}
 .ch-div{flex:none; width:1px; height:20px; background:rgba(242,228,188,.28); margin:4px 4px 0; align-self:flex-start}
 #briefDock{display:none}
@@ -606,7 +606,7 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch
    one vertical pill on the right edge, always live. The bottom band frees up. */
 body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:2px;
   position:absolute; z-index:43;
-  right:6px; left:auto; top:50%; bottom:auto; transform:translateY(-50%);
+  right:calc(env(safe-area-inset-right,0px) + 6px); left:auto; top:50%; bottom:auto; transform:translateY(-50%);
   padding:9px 5px}
 #briefDock .ch-div{width:20px; height:1px; margin:3px 0; align-self:center}
 #briefDock .bd-gap{display:none}
@@ -617,7 +617,7 @@ body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .1
   body.brief-mode #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
   body.brief-mode #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 126px)}
 }
-@media(min-width:1100px){ body.brief-mode #briefDock{right:18px} }
+@media(min-width:1100px){ body.brief-mode #briefDock{right:calc(env(safe-area-inset-right,0px) + 18px)} }
 /* v1.15.0 — the chart-to-globe leader */
 #bfLeader{position:absolute; inset:0; z-index:15; pointer-events:none}
 #bfLeader[hidden]{display:none}
@@ -1412,7 +1412,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <span class="bd-gap" aria-hidden="true"></span>
   <span class="ch-tool" data-bfbriefs="1" role="button" tabindex="0" aria-label="Briefs — save or load a whole diagram" title="Briefs"><span class="od-ico">▤</span><span class="ch-lbl">Briefs</span></span>
   <span class="ch-tool" data-xpbtn="1" role="button" tabindex="0" aria-label="Export" title="Export"><span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span><span class="ch-lbl">Export</span></span>
-  <span class="ch-tool" data-bfledger="1" role="button" tabindex="0" aria-label="Ledger — the saved-data repository" title="Ledger"><span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="M15 4v16"></path></svg></span><span class="ch-lbl">Ledger</span></span>
+  <span class="ch-tool" data-bfledger="1" role="button" tabindex="0" aria-label="Repository — IDs and saved map data" title="Repository"><span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="M15 4v16"></path></svg></span><span class="ch-lbl">Repository</span></span>
 </div>
 
 <!-- v1.15.0 CHART-TO-GLOBE LEADER (design 5a): a dotted curve from the focused
@@ -1456,6 +1456,29 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.18.1 • THE DOOR SAYS WHAT THE ROOM SAYS. v1.8.0 renamed the side
+//            panel to the Repository and retired window.Ledger; the rename
+//            landed on the panel title, the ⋯ menu row and the API — but not
+//            on the brief dock's own cell, so for ten releases a control
+//            labelled LEDGER opened a drawer titled Repository. The cell
+//            (label, title, aria-label) now says Repository. #ledger, .ld-*
+//            and the _ledger* functions are UNCHANGED — v1.8.0 names them
+//            and .ld-* vs .lg-* is a never-reuse rule. Rail labels lifted
+//            6.5px → 7.5px (8px desktop): nothing was ever clipped —
+//            measured, scrollWidth === clientWidth on every label — the type
+//            was simply too small to read, which is what surfaced as "SAVD"
+//            and a bare "ZOOM". Both rails now honour env(safe-area-inset-
+//            right); offsets are preserved at a zero inset so nothing moves
+//            on a notchless screen. REPOSITORY is a wider word than LEDGER,
+//            so the brief rail grew 54→61px and #briefStage's right gutter
+//            moves 60→70px to keep the console clear of it (measured: was
+//            overlapping by 7.2px). Smoke gains the invariant, not the
+//            instance — every user-facing name for the panel must match the
+//            panel's own title, window.Ledger must stay gone (runtime check,
+//            not a source grep), and no rail label may sit under 7px. All
+//            three guards were confirmed to FAIL when the drift is put back.
+//            A sweep of every retirement recorded in CLAUDE.md found no
+//            other user-facing name still carrying an old label.
 //   v1.18.0 • THE RAILS (owner: "navigation buttons readily available — a
 //            side panel on the right; same for brief; overview/details stay
 //            left; lines most direct; fit stuck at 62%"). Map satellites and
@@ -1753,7 +1776,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.18.0';
+const APP_VERSION = 'v1.18.1';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first

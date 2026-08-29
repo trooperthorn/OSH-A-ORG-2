@@ -761,10 +761,34 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(st2.indexOf('ch-hint')<0 || st2.indexOf('HOLD A LEVEL')<0){ gok=false; fails++; console.log('✗ HEAD hold-to-stack hint missing'); }
       if(!/bf-dep on[^>]*>L\d ⌄</.test(st2)){ gok=false; fails++; console.log('✗ active level cell missing its ⌄ stack affordance'); }
       const dk=(html.split('id="briefDock"')[1]||'').split('\n</div>')[0];
-      ['>Add<','>Names<','>Lines<','>Briefs<','>Export<','>Ledger<'].forEach(function(lb){
+      ['>Add<','>Names<','>Lines<','>Briefs<','>Export<','>Repository<'].forEach(function(lb){
         if(dk.indexOf('<span class="ch-lbl">'+lb.slice(1,-1)+'<')<0){ gok=false; fails++; console.log('✗ DOCK tool label missing: '+lb); } });
       if(dk.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ DOCK cluster divider missing'); }
       if(dk.indexOf('data-bfledger')<0 || dk.indexOf('data-bfsearch')<0){ gok=false; fails++; console.log('✗ DOCK Add/Ledger doors missing'); }
+      // v1.18.1 THE DOOR SAYS WHAT THE ROOM SAYS. The v1.8.0 rename (window.Ledger
+      // gone, the panel IS the Repository) landed on the panel title, the app-menu
+      // row and the API but NOT on this dock cell, so a control labelled Ledger
+      // opened a drawer titled Repository for ten releases. The invariant, not the
+      // instance: every user-facing name for the panel must be the SAME word.
+      (function(){
+        var title=(html.match(/<div class="ld-title">[^<]*<\/div>/)||[''])[0].replace(/<[^>]+>/g,'').replace(/[^A-Za-z]/g,'');
+        if(!title){ gok=false; fails++; console.log('✗ Repository panel title not found'); return; }
+        var cell=(dk.match(/data-bfledger[\s\S]*?<span class="ch-lbl">([^<]+)<\/span>/)||[])[1]||'';
+        var aria=(dk.match(/data-bfledger="1"[^>]*aria-label="([^"—]+)/)||[])[1]||'';
+        [['dock label',cell],['aria-label',aria]].forEach(function(pair){
+          if(pair[1].trim().toLowerCase()!==title.toLowerCase()){
+            gok=false; fails++;
+            console.log('✗ door/panel name drift — panel says "'+title+'", '+pair[0]+' says "'+pair[1].trim()+'"'); } });
+        // runtime, not a source grep: the changelog prose legitimately says
+        // "window.Ledger is gone", and a grep cannot tell prose from an assignment.
+        if(typeof global.Ledger!=='undefined'){ gok=false; fails++; console.log('✗ window.Ledger is back — v1.8.0 retired it'); }
+      })();
+      // v1.18.1 rail legibility: 6.5px read as SAVD / bare ZOOM in the owner's
+      // review. Nothing was ever clipped (measured) — the type was just too small.
+      ['.nv-lbl{font:700 ','.ch-lbl{font:700 '].forEach(function(sel){
+        var m=html.split(sel)[1]; if(!m){ gok=false; fails++; console.log('✗ rail label rule missing: '+sel); return; }
+        var px=parseFloat(m);
+        if(!(px>=7)){ gok=false; fails++; console.log('✗ rail label below the 7px legibility floor: '+sel+px+'px'); } });
       if(st2.indexOf('ch-dock')>=0){ gok=false; fails++; console.log('✗ the dock must be OUT of the chart head (v1.15.0 split)'); }
       // v1.16.3 (owner, twice now): NO dashed rings on chart objects — ever
       if(html.indexOf('dashed var(--bfrg')>=0){ gok=false; fails++; console.log('✗ the group ring is dashed again (v1.9.1/v1.16.3 law: solid only)'); }
