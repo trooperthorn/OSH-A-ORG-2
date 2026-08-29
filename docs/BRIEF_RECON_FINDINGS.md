@@ -151,6 +151,32 @@ sw.js CACHE ↔ changelog entry move together, lint-enforced).
   state models. It is a design decision with real cost, not a P0 bug fix — **advise, decide,
   then schedule** (CLAUDE.md v0.33.1 standing law #4).
 
+### R-10 — one surface, two names (found in recon, not in the spec's log) · Severity H
+
+The v1.8.0 rename ("the side panel is the REPOSITORY … `window.Ledger` is gone") landed in
+the panel title, the app-menu row and the API — but **not on the primary door**.
+
+| Surface | Shipped copy | Line |
+|---|---|---|
+| Brief dock cell | **Ledger** (`.ch-lbl`, `title`, and `aria-label` "Ledger — the saved-data repository") | `:1415` |
+| Panel header | **▤ Repository** | `:7785` |
+| ⋯ app-menu row | **Repository — IDs & saved map data** | `:8824` |
+| API | `window.Repo` present · `window.Ledger` undefined (correct) | `:7854` |
+
+Verified live: the cell labelled *Ledger* opens a drawer titled *Repository*. The panel is
+otherwise healthy — content and empty state both render, no brief-surface leak (v1.8.0
+content law holds).
+
+**Change:** rename the dock cell to Repository — `.ch-lbl`, `title` and `aria-label` at `:1415`.
+One line, user-facing only.
+
+**Do not** rename `#ledger`, `.ld-*`, or the `_ledger*` functions. v1.8.0 names `#ledger`/`.ld-*`
+explicitly, and `.ld-*` vs `.lg-*` (legend) is a documented never-reuse rule; the function
+names are invisible to users and renaming them is churn against a 91%-full byte budget.
+
+**Watch:** `.ch-lbl` width — "Repository" is 4 characters longer than "Ledger" in a dock cell
+sized for short labels. Check it does not wrap or clip the dock at 390px before shipping.
+
 ### R5 — Stand up the browser probe FIRST
 - Commit a Playwright probe asserting: fit percentage, effective type size, intra-level box
   geometry, and rail label legibility, at 390×844 and 1440×900.
@@ -193,6 +219,9 @@ sw.js CACHE ↔ changelog entry move together, lint-enforced).
   the stack feature working.
 - **Whether the screenshots are HEAD.** `APP_VERSION` is `v1.18.0` `:1756`, matching — but
   CLAUDE.md v1.33.1 records a prior review made against a stale service-worker build.
+- **Whether R-10 is the only naming drift.** I checked the Repository/Ledger pair only. Other
+  v1.x renames may have left doors behind in the same way; a sweep of user-facing labels
+  against the law sections has not been done.
 - **Parent-drift at real scale.** `place()`'s parent `cx` is the midpoint of child *centres*
   `:4958`, not of its allocated slot: 0.88% of 60,000 randomised trees overlap, worst 8.5px.
   Real, minor, never observed on live org data.
