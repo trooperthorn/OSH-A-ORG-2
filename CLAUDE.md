@@ -1649,9 +1649,33 @@ folded in; the judgments are in the run journal.
   different meanings — the exact confusion the owner caught.
 - GlobeState._usaceOff is DELETED, with its branch in the tiny-label pass. A
   family's names now follow the ONE Labels switch, like every other family.
-  Smoke asserts exactly one data-vw (names) and bans the flag by name.
+  Smoke asserts exactly one data-vw (names) and bans the flag in CODE SHAPE
+  (see the testing law below — the first cut of that ban matched this very
+  changelog entry, and v1.23.1 shipped with a red suite because of it).
 - COMPAT: svCapture/svUpdate stop writing lay.u; _camApply ignores it on read,
   so a view saved before v1.23.1 still recalls — it just no longer restores a
   setting that no longer exists. .lg-dep (the "turn the USACE layer on first"
   dependent-row treatment) retires with it.
 - The list is down to six rows, 165px tall.
+
+## TESTING LAW — two rules paid for twice
+These are not style notes. Each was learned by shipping a red suite, and the
+second time the lesson only lived in a session's memory, so it did not survive.
+It lives here now.
+
+1. **A negative source assert is scoped to CODE, never to a bare token.** The
+   file documents its own history: every retirement gets a changelog sentence
+   that names the thing retired. `html.indexOf('_usaceOff')>=0` therefore fires
+   on the sentence announcing the deletion — the assert fails precisely because
+   the work succeeded. Ban the shapes the identifier can wear as code
+   (`/_usaceOff\s*[=;,)\]'"]/`), the way the `body.nav-off` ban was scoped to
+   `body.nav-off #` and `classList.toggle('nav-off'`. Then prove the scoped
+   assert by re-injecting each regression shape and watching it fire — a
+   negative assert that has never fired is not known to work.
+2. **The suite runs LAST — after the APP_VERSION bump, the sw.js CACHE bump and
+   the changelog entry, not before.** Those three edits are themselves source
+   changes, and smoke reads the source as a string. A green run taken before
+   the ship ritual is a green run of a bundle that was never shipped. v1.23.1
+   passed all five, then took its changelog entry, then committed: the entry
+   broke the probe added in the same release. Order is: edit → ship ritual →
+   five tools → commit.

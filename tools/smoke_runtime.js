@@ -494,7 +494,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
        || lg.innerHTML.indexOf('data-vw="usace"')>=0
        || lg.innerHTML.indexOf('data-vw="dots"')>=0 || lg.innerHTML.indexOf('data-vw="lines"')>=0){
       fails++; console.log('✗ LAYERS wants exactly ONE view toggle (Labels); no per-family label mutes'); }
-    if(html.indexOf('_usaceOff')>=0){ fails++; console.log('✗ the USACE label mute is back (retired v1.23.1)'); }
+    // Scoped to CODE, not prose. The v1.23.1 changelog entry names the retired
+    // flag in an English sentence ("GlobeState._usaceOff and its draw-loop
+    // branch are deleted"), so a bare-token ban fails on the very history that
+    // records the retirement — the same trap the body.nav-off ban fell into.
+    // Match only the shapes the flag can wear as code: an assignment, a string
+    // key in the view table, or a read inside an expression.
+    if(/_usaceOff\s*[=;,)\]'"]/.test(html)){ fails++; console.log('✗ the USACE label mute is back (retired v1.23.1)'); }
     if((lg.innerHTML.match(/data-fam=/g)||[]).length!==5
        || (lg.innerHTML.match(/data-lyp=/g)||[]).length!==5
        || lg.innerHTML.indexOf('aria-pressed')<0){
