@@ -789,7 +789,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(typeof global._glowDot!=='function'){ gok=false; fails++; console.log('✗ _glowDot (the shared ignited-dot recipe) is missing'); }
       // v1.18.0 THE RAILS: both rooms carry a permanent right-edge rail; the
       // map rail collapses only via nav-off; brief hides the map rail.
-      if(html.indexOf('body.nav-off #navPod')<0){ gok=false; fails++; console.log('✗ the pod lost its nav-off collapse law'); }
+      // v1.21.0 (owner: "no tap needed"): the pod is unconditional chrome —
+      // nothing may hide it, so the collapse class must stay retired.
+      if(html.indexOf('body.nav-off #')>=0 || html.indexOf("classList.toggle('nav-off'")>=0){
+        gok=false; fails++; console.log('✗ the pod collapse law is back (retired v1.21.0 — the pod never hides)'); }
       if(html.indexOf('body.brief-mode #navPod .tp-h{display:none}')<0){ gok=false; fails++; console.log('✗ brief must hide the pod camera controls'); }
       if(html.indexOf('body.brief-mode #briefDock{display:flex; flex-direction:column')<0){ gok=false; fails++; console.log('✗ the brief dock is not a vertical right rail (v1.18.0)'); }
       if(html.indexOf('Math.max(0.62,')>=0 || html.indexOf('Math.max(0.30,')<0){ gok=false; fails++; console.log('✗ the fit floor law drifted (v1.18.0: 0.30, never 0.62)'); }
@@ -933,12 +936,20 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(npHtml.indexOf('nv-lbl')>=0 || html.indexOf('.nv-lbl{')>=0){
         ok=false; fails++; console.log('✗ the pod captions are back (retired v1.20.0 — they set the width)'); }
       // the doors are integrated, not side buttons
-      if(html.indexOf('id="lyChip"')<0 || html.indexOf('class="sp-star"')<0){
-        ok=false; fails++; console.log('✗ the integrated doors are missing (#lyChip + .sp-star)'); }
+      // v1.21.0: the layers are embedded IN the globe button — tap pops the
+      // selections out around it, a three-second hold saves the view.
+      if(html.indexOf('id="lyRing"')<0 || html.indexOf('class="sp-star"')<0){
+        ok=false; fails++; console.log('✗ the embedded layer ring or the saved star is missing'); }
+      if(html.indexOf('id="lyChip"')>=0){
+        ok=false; fails++; console.log('✗ the layer chip is back (retired v1.21.0 — the globe carries it)'); }
+      if(html.indexOf("svCapture();")<0 || html.indexOf("_bfToast('View saved")<0){
+        ok=false; fails++; console.log('✗ the 3s hold no longer saves a view'); }
+      if(html.indexOf("setMode(document.body.classList.contains('brief-mode')?'map':'brief')")>=0){
+        ok=false; fails++; console.log('✗ the FAB hold still flips rooms (v1.21.0: it saves a view)'); }
       if(html.indexOf('id="navRow"')>=0 || html.indexOf('navSat-saved')>=0 || html.indexOf('navSat-layers')>=0){
         ok=false; fails++; console.log('✗ the side-button door rail is back (retired v1.20.0)'); }
-      if(html.indexOf('id="lyCount"')<0){
-        ok=false; fails++; console.log('✗ the layer chip lost its live count'); }
+      if(html.indexOf('data-lysat=')<0){
+        ok=false; fails++; console.log('✗ the pop-out selections are missing'); }
       // retirements — a retired style is not retired until a probe guards it
       ['>ZOOM −<','>ZOOM +<','class="nv-side"','id="legendPanel"','#legendPanel{','.lg-head',
        "_disc('lg-classes'","('View '+(SAVEDV.length+1))",'#themeSwitch','dz-min'].forEach(function(nd){

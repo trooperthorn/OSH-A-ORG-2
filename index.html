@@ -343,13 +343,13 @@ body.brief-mode .ms-cell[data-mode="brief"]{background:#F5D76E; color:#141006}
 #introVeil .in-ver{font:600 10px/1 var(--mono); letter-spacing:.18em; color:var(--faint);
   transform:translateY(-16vh)}
 body.intro #titleBar, body.intro #searchPill, body.intro #timeLedger, body.intro #modeSeg,
-body.intro #navDock, body.intro #navPod, body.intro #lyChip{opacity:0 !important; pointer-events:none !important}
+body.intro #navDock, body.intro #navPod{opacity:0 !important; pointer-events:none !important}
 
 /* CHROME YIELDS (v0.8.0 automation): while a gesture is moving the globe, every
    floating surface steps back so the world owns the screen; it breathes back in
    the moment the hand lifts. Pure CSS response to one body flag. */
 body.gesturing #titleBar, body.gesturing #searchPill, body.gesturing #timeLedger, body.gesturing #modeSeg,
-body.gesturing #briefStage, body.gesturing #navPod, body.gesturing #lyChip,
+body.gesturing #briefStage, body.gesturing #navPod,
 body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
 #titleBar, #searchPill, #timeLedger, #modeSeg, #briefStage{transition:opacity .3s ease}
 
@@ -528,7 +528,9 @@ body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
 }
 #navPod{gap:8px; padding:7px 4px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
 body.tp-live #navPod{opacity:1}
-body.nav-off #navPod{opacity:0; transform:translateX(10px); pointer-events:none}
+/* v1.21.0 (owner: "keep navigation controls bottom right and they can still
+   be available, no tap needed"): the pod no longer collapses. The FAB's tap
+   belongs to the layers now, and nothing hides the transport. */
 body.brief-mode #navPod .tp-h{display:none}   /* no camera and no undo stack in the brief room */
 /* v1.20.0: 34px of ink, still 48px of thumb — the glyphs carry the meaning */
 #navPod .nv-sat{width:34px; height:34px}
@@ -554,22 +556,6 @@ body.brief-mode #navPod .tp-h{display:none}   /* no camera and no undo stack in 
   width:50px; height:40px; transform:translate(-50%,-50%)}
 .tp-half:active{background:var(--accent-wash)}
 .tp-half:disabled{opacity:.35; pointer-events:none}
-/* THE LAYER CHIP — the scope readout IS the control. Same glass, same
-   baseline grid and same key/value type as the time ledger it mirrors, so the
-   two top corners read as one instrument row. */
-#lyChip{
-  position:absolute; z-index:10; appearance:none; -webkit-appearance:none; border:0;
-  margin:0; cursor:pointer; text-align:left; -webkit-tap-highlight-color:transparent;
-  top:calc(env(safe-area-inset-top,0px) + 88px); left:var(--safe-l);
-  display:grid; grid-template-columns:auto auto; gap:3px 7px; align-items:baseline;
-  padding:7px 10px; border-radius:var(--r-chip); white-space:nowrap;
-}
-#lyChip .tl-k{grid-column:1 / -1}
-#lyChip:active{filter:brightness(1.25)}
-.ly-md{font:800 11px/1 var(--mono); letter-spacing:.06em; color:var(--dim)}
-.ly-ct{font:800 11px/1 var(--mono); font-variant-numeric:tabular-nums; color:var(--dim)}
-#lyChip.on .ly-md, #lyChip.on .ly-ct{color:var(--accent); text-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
-body.brief-mode #lyChip{display:none}
 /* THE SAVED STAR — "go back to somewhere" belongs where "go somewhere" lives */
 .sp-star{appearance:none; -webkit-appearance:none; border:0; margin:0; padding:0; cursor:pointer;
   position:relative; flex:none; width:30px; height:30px; border-radius:50%;
@@ -605,8 +591,37 @@ body.brief-mode #briefStage{right:var(--gut)}
 .nv-fablbl{position:absolute; left:0; top:3px; transform:translateX(-50%);
   font:700 7px/1 var(--mono); letter-spacing:.14em; color:var(--accent);
   white-space:nowrap; pointer-events:none; -webkit-user-select:none; user-select:none}
-.nv-fablbl::after{content:'CONTROLS'}
-body.brief-mode .nv-fablbl::after{content:'TO MAP'}
+/* v1.21.0: the label under the globe IS the scope readout — the button that
+   controls the layers says what the layers are showing. */
+.nv-fablbl{white-space:nowrap}
+body.ly-on .nv-fablbl{color:var(--accent)}
+/* THE POP-OUTS — the selections orbit the globe, then hide the moment one is
+   made. Each rides #navDock's origin: the FAB centre is (0, -34) from it. */
+#lyRing{position:absolute; left:0; bottom:0; width:0; height:0; pointer-events:none}
+.ly-sat{
+  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  position:absolute; left:0; bottom:34px; width:50px; height:50px; padding:0;
+  border-radius:50%; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:1px;
+  background:linear-gradient(180deg, rgba(26,22,14,.96), rgba(8,7,4,.97));
+  box-shadow:0 0 0 1px rgba(240,220,140,.30), inset 0 1px 0 var(--spec), var(--drop);
+  color:var(--dim); opacity:0; pointer-events:none;
+  transform:translate(-50%,50%) scale(.55);
+  transition:transform .19s cubic-bezier(.22,1,.36,1), opacity .15s ease;
+}
+.ly-sat b{font:700 13px/1 var(--body); color:var(--text)}
+.ly-sat span{font:800 6.5px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase}
+.ly-sat.on{box-shadow:0 0 0 1.6px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
+  color:var(--accent)}
+.ly-sat.on b{color:var(--accent)}
+.ly-sat:active{background:var(--accent-wash)}
+body.ly-on #lyRing{pointer-events:auto}
+body.ly-on .ly-sat{opacity:1; pointer-events:auto;
+  transform:translate(calc(-50% + var(--lx)), calc(50% - var(--ly))) scale(1)}
+body.ly-on #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 26px rgba(245,215,110,.4), inset 0 1px 0 var(--spec)}
+body.ly-on #searchPill, body.ly-on #searchResults{opacity:0; pointer-events:none}
+/* the save-hold paints the ring the FAB already carries */
+body.ly-save #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 30px rgba(245,215,110,.55), inset 0 1px 0 var(--spec)}
 
 /* BRIEF MODE — unmistakably a different room: the bar goes solid gold with
    black ink, the page warms, a gold frame bounds the stage, the map chrome
@@ -982,7 +997,6 @@ body.brief-mode #globeCanvas{opacity:.78}
 .tz-on .tz-hh{color:var(--accent)}
 
 
-
 /* ─── 5 · DIAGNOSTICS SURFACES (load-bearing — never remove) ───────────────── */
 /* A-ORG-1 #errToast (~L2108) ported verbatim except position:fixed→absolute
    (reliability contract; body is the viewport so geometry is identical). */
@@ -1048,7 +1062,6 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   /* toast docks to the corner on wide screens (A-ORG-1 ~L2139) */
   #errToast{left:auto; right:24px; max-width:520px; bottom:24px}
 }
-
 
 /* ═══ v0.2.0 CHROME — trail · legend · export sheet · slim-first dossier
    (owner references: edge chrome, the globe never impeded) ═══ */
@@ -1253,7 +1266,6 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   color:#141006; font:800 13px/1 var(--body);
 }
 .bf-ann{display:block; margin-top:4px; font:600 10px/1.35 var(--body); font-style:normal; color:var(--signal)}
-
 
 /* ═══ THE ANCHORED CALLOUT (v0.9.0): identity at the pin, depth in the sheet ═══ */
 #calloutCard{
@@ -1491,7 +1503,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 </div>
 
 <nav id="navDock" aria-label="Navigation">
-    <button id="navGlobe" type="button" aria-expanded="false" aria-label="Navigation — tap for controls, hold to switch mode">
+    <button id="navGlobe" type="button" aria-expanded="false" aria-label="Layers — tap for the selections, hold three seconds to save this view">
     <svg id="nvRing" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="33" fill="none"></circle></svg>
     <!-- the Lumen globe mark (v0.15.0): real-geography glossy globe — gold continents
          on black ocean, gold graticule, orange rim (owner reference, 22 Aug). Same
@@ -1501,7 +1513,12 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   </button>
   <!-- v1.14.0: the FAB says what it is — CONTROLS in the map room, TO MAP in
        the brief (CSS content swap off body.brief-mode; no JS state). -->
-  <span class="nv-fablbl" aria-hidden="true"></span>
+  <span class="nv-fablbl" id="lyState" aria-hidden="true"></span>
+    <!-- v1.21.0 (owner: "embed the layers with the globe. Tap for the
+         selections to populate around the globe as pop outs. Make selections
+         then they are hidden"). The pop-outs hang off #navDock's own origin,
+         so they orbit the globe button wherever it sits. -->
+    <div id="lyRing" aria-label="Layer selections"></div>
 </nav>
 
 <!-- v1.15.0 BRIEF DOCK (design 2b): the file tools leave the chart head for one
@@ -1557,16 +1574,21 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      sheet). Persists in Brief (the old clocks vanished there — fixed). -->
 <button id="timeLedger" class="glass" type="button" aria-label="Time ledger — tap to pick the base time zone"></button>
 
-<!-- v1.20.0 THE LAYER CHIP (owner: "saved and layers should not be side buttons
-     anymore — figure out a better way to have them integrated"). The scope
-     readout had to live somewhere permanent anyway, so it becomes the control:
-     a status chip in the free top-left corner, mirroring the time ledger on the
-     right. It always says what the map is showing, and tapping it opens the
-     Layers pane. -->
-<button id="lyChip" class="glass" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Layers — tap to change what the map shows"><span class="tl-k">LAYERS</span><span class="ly-md" id="lyState">BASES</span><span class="ly-ct" id="lyCount">119</span></button>
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.21.0 • THE GLOBE IS THE LAYERS (owner: "saving a view is done by holding
+//            center globe button for 3 seconds. Keep navigation controls bottom
+//            right … no tap needed. Embed the layers with the globe. Tap for the
+//            selections to populate around the globe as pop outs. Make
+//            selections then they are hidden"). Tapping the globe button orbits
+//            the five named modes plus a More door around it; picking one
+//            applies it and the ring closes behind it. Holding the button for
+//            three seconds SAVES THE CURRENT VIEW — the ring it already carried
+//            is the progress bar. The label under the globe became the scope
+//            readout (BASES · 119), so the button that controls the layers says
+//            what they are showing, and #lyChip retires. The transport pod no
+//            longer collapses: body.nav-off is gone and nothing hides it.
 //   v1.20.0 • THE SLIM POD & THE INTEGRATED DOORS (owner: "control buttons can
 //            be much skinnier. Also the saved and layers should not be side
 //            buttons anymore — figure out a better way to have them integrated
@@ -1895,7 +1917,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.20.0';
+const APP_VERSION = 'v1.21.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -2133,7 +2155,6 @@ function globeMetrics(cv){
   return { dpr, w, h, cx:w/2, cy:h/2, R };
 }
 
-
 // Ring → cached Cartesian vertices (PORT of A-ORG-1 L16059-16068; cache re-keyed
 // by ring identity — m6 and smoothFallbackOnce always swap whole arrays, so a
 // WeakMap can never go stale). Consumed every frame by m2's drawGlobePath.
@@ -2149,7 +2170,6 @@ function _ringXYZ(ring){
   _ringXYZCache.set(ring,a);
   return a;
 }
-
 
 /* ══════════ module: m2-render ══════════ */
 /* ============================================================================
@@ -2435,7 +2455,6 @@ function smoothFallbackOnce(){
 // the interim CDN-rung copies that briefly lived here were removed at M1
 // integration so no cross-origin fetch can survive concatenation order).
 
-
 /* ══════════ module: m3-input ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
 // m3-input.js — A-ORG-2 M3 pointer interaction (PORTED from A-ORG-1)
@@ -2703,7 +2722,6 @@ function globeGlideStep(dt){
   }
 }
 
-
 /* ══════════ module: m4-camera ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
 // m4-camera.js — A-ORG-2 M4 camera moves (PORTED from A-ORG-1)
@@ -2851,7 +2869,6 @@ function flyToLatLon(lat, lon, zoom, onArrive){
 // (fitGlobeToSites and resetGlobeView cut at v0.8.0 — the Home satellite
 // retired by owner decree ("redundant"), and with it their last call sites.
 // Recover from git history if a frame-to-set gesture ever returns.)
-
 
 /* ══════════ module: m5-markers ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -3073,12 +3090,43 @@ function lySync(){                        // the ONE writer of the scope readout
     const el=document.getElementById('lyState'); if(!el) return;
     const off=_famOffSet(), k=lyKey();
     const m=LY_MODES.filter(function(x){ return x.k===k; })[0];
-    el.textContent=(m?m.n:'CUSTOM');
-    const ct=document.getElementById('lyCount'); if(ct) ct.textContent=lyShown(off);
-    const chip=document.getElementById('lyChip');
-    if(chip) chip.classList.toggle('on', off.size>0 || !!GlobeState._namesOff || !!GlobeState._usaceOff);
+    if(document.body.classList.contains('brief-mode')){ el.textContent='TO MAP'; return; }
+    el.textContent=(m?m.n:'CUSTOM')+' · '+lyShown(off);
+    document.body.classList.toggle('ly-on-dim', false);
+    el.style.color=(off.size>0 || GlobeState._namesOff || GlobeState._usaceOff)?'var(--accent)':'';
+    try{ _lyRingPaint(); }catch(_){}
   }catch(_){}
 }
+// ═══ v1.21.0 THE POP-OUTS ═══ tap the globe and the selections orbit it;
+// make one and they are gone again. Six on a 140° arc above the button —
+// the five named modes plus the door to the full pane for family-level work.
+function _lyRingPaint(){
+  try{
+    const host=document.getElementById('lyRing'); if(!host) return;
+    const k=lyKey();
+    const items=LY_MODES.map(function(m){ return {k:m.k, n:m.n, c:lyModeN(m), on:(k===m.k)}; });
+    items.push({k:'more', n:'More', c:'⋯', on:false});
+    const N=items.length, R=112, A0=156, A1=24;
+    host.innerHTML=items.map(function(it,i){
+      const a=(A0-(A0-A1)*(i/(N-1)))*Math.PI/180;
+      const lx=Math.round(Math.cos(a)*R), ly=Math.round(Math.sin(a)*R);
+      return '<button type="button" class="ly-sat'+(it.on?' on':'')+'" data-lysat="'+it.k+'"'
+        +' aria-pressed="'+(it.on?'true':'false')+'" style="--lx:'+lx+'px; --ly:'+ly+'px"'
+        +' aria-label="'+(it.k==='more'?'More layer options':(it.n+' — '+it.c+' sites'))+'">'
+        +'<b>'+it.c+'</b><span>'+it.n+'</span></button>';
+    }).join('');
+  }catch(_){}
+}
+function lyRing(open){
+  try{
+    const on=!!open && !document.body.classList.contains('brief-mode');
+    if(on) _lyRingPaint();
+    document.body.classList.toggle('ly-on', on);
+    const g=document.getElementById('navGlobe');
+    if(g) g.setAttribute('aria-expanded', on?'true':'false');
+  }catch(_){}
+}
+try{ window.lyRing=lyRing; }catch(_){}
 function lyMode(k){
   const m=LY_MODES.filter(function(x){ return x.k===k; })[0]; if(!m) return;
   GlobeState._famOff=new Set(m.off);
@@ -3356,7 +3404,7 @@ function _gChromeZones(m){
       const kx=W/cr.width, ky=H/cr.height, live=[], PAD=4;
       const sels=['#searchPill','#searchResults','#dossier','#titleBar',
                   '#timeLedger','#modeSeg','#navGlobe',
-                  '#calloutCard','#briefStage','#lyChip','#navPod','#briefDock','#exportSheet'];   // v0.29.0 audit: canvas text must never ghost under glass
+                  '#calloutCard','#briefStage','#navDock','#navPod','#briefDock','#exportSheet'];   // v0.29.0 audit: canvas text must never ghost under glass
       for(const s of sels){
         const el=document.querySelector(s); if(!el) continue;
         const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
@@ -4015,7 +4063,6 @@ function siteHitTest(x, y){
   return best?best.inst:null;
 }
 
-
 /* ══════════ module: m6-mapdata ══════════ */
 /* ============================================================================
    modules/m6-mapdata.js — A-ORG-2 M6: map data — same-origin TopoJSON load+decode
@@ -4369,7 +4416,6 @@ function _namedStateShapes(topo, geographic){
   if(out['United States Virgin Islands'] && !out['Virgin Islands']) out['Virgin Islands']=out['United States Virgin Islands'];
   return out;
 }
-
 
 /* ══════════ module: s3-search ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -4833,7 +4879,6 @@ function _srInjectCSS(){
   //  owns the #searchResults/.sr-row recipe; dual ownership was fighting it.)
 }
 
-
 /* ══════════ module: s4-dossier ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
 // s4-dossier.js — A-ORG-2 shell: THE DOSSIER + THE SELECTION BRAIN (single-brain
@@ -5148,7 +5193,7 @@ function selectSite(id, o){
     try{ flyToLatLon(s.lat, s.lon, Math.max(GlobeState.zoom||1, 2.6)); }catch(_){}
   }
   try{ _trailPush(s.id); }catch(_){}
-  try{ if(!document.body.classList.contains('nav-off')) window._nvSet(true); }catch(_){}
+  try{ tpSync(); }catch(_){}
   try{ if(typeof autoFillSelect==='function') autoFillSelect(s); }catch(_){}   // SELECT clock follows the selection (manual pick wins)
   // v0.9.0 (owner references): identity arrives AT the dot — the sheet only on ▤
   try{ hideDossier(); }catch(_){}
@@ -5158,8 +5203,11 @@ function selectSite(id, o){
 
 // ---- MODE (v0.3.0 control law): MAP ⇄ BRIEF — one seg, unmistakable shift ----
 function setMode(m){
+  try{ lyRing(false); }catch(_){}     // v1.21.0: the pop-outs never cross rooms
+
   const brief=(m==='brief');
   document.body.classList.toggle('brief-mode', brief);
+  try{ lySync(); }catch(_){}          // v1.21.0: the globe's label follows the room
   // the globe picture is the hero (owner law): the chart supplement arrives
   // MINIMIZED every time brief opens — one tap on ⌗ CHART expands it
   if(brief) document.body.classList.add('chart-min');
@@ -5931,7 +5979,6 @@ function _odRender(s){
   }
   return h;
 }
-
 
 // ═══ THE ANCHORED CALLOUT (v0.9.0 owner references): the popup lives AT the
 // dot. Identity + nested action circles beside the marker; a caret tail points
@@ -6938,6 +6985,12 @@ if(!window._odWired){
     if(st2){ _shArm=false; _shRnId=null; _shRmArm=null; _shOpen(_shVal(st2,'data-shtab')); return; }
     const lyp=e.target.closest('[data-lyp]');
     if(lyp){ lyMode(_shVal(lyp,'data-lyp')); _shOpen('lay'); return; }
+    // v1.21.0: a pop-out selection applies and the ring closes behind it
+    const lst=e.target.closest('[data-lysat]');
+    if(lst){ const k=lst.getAttribute('data-lysat');
+      lyRing(false);
+      if(k==='more') _shOpen('lay'); else lyMode(k);
+      return; }
     const lrw=e.target.closest('.lg-row');
     if(lrw && lrw.closest('#dossier')){
       const vw=_shVal(lrw,'data-vw');
@@ -7316,7 +7369,7 @@ if(!window._odWired){
     // #globeCanvas is excluded: the globe runs its own tap law (tapAtScreen),
     // and the click that trails a dot-tap must not undo the selection it made.
     if(document.body.classList.contains('brief-mode')){
-      const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navPod,#lyChip,#navDock,#exportSheet,#appMenu,#titleBar,#timeLedger,#modeSeg,#bfArmBar,#errToast,#sbxNote');
+      const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navPod,#navDock,#exportSheet,#appMenu,#titleBar,#timeLedger,#modeSeg,#bfArmBar,#errToast,#sbxNote');
       if(!ctrl){
         const dz2=document.getElementById('dossier');
         const dirty=(_coId!=null)||(dz2&&!dz2.hidden)||GlobeState._bfFocus||GlobeState._bfAddUnder||GlobeState._bfAddArm||_bfAnnEdit||_bfRnEdit||window._bfGrpForm||_orgForm;
@@ -7429,7 +7482,6 @@ function _odInjectCSS(){
     '}';
   document.head.appendChild(st);
 }
-
 
 /* ══════════ module: s7-records ══════════ */
 /* ============================================================================
@@ -7916,7 +7968,6 @@ try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, addGr
   move:bfMove, reorder:bfReorder, color:bfColor, stripe:bfStripe,
   note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth, stack:bfStack,
   node:bfNode, kids:bfKids, list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}
-
 
 // v0.10.0 SESSION MEMORY: the app reopens exactly where you left it. The room
 // (camera · selection · mode) writes to kv 'session' every few seconds, only
@@ -8616,7 +8667,6 @@ function _dbSheet(){
   _sheetFlag();
 }
 
-
 /* ══════════ module: s6-export ══════════ */
 /* ============================================================================
    s6-export (NEW at v0.2.0) — THE SNAPSHOT SPINE. The flagship export contract:
@@ -8838,7 +8888,6 @@ if(!window.__xpWired){ window.__xpWired=true;
     if(p&&!p.hidden&&!e.target.closest('#exportSheet')) p.hidden=true;
   });
 }
-
 
 /* ══════════ module: s5-clocks ══════════ */
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -9144,7 +9193,6 @@ addEventListener('load', function(){ setTimeout(function(){ try{ initClocks(); }
 // (v1.14.0: the s5 CSS injection retired with the seg7 engine — the ledger and
 // zone-sheet row rules live in the static <style> like all other chrome.)
 
-
 // ─── Shell boot spine — everything below survives with zero modules present ────
 function bootShell(){
   // Desktop radius factor (PORT of A-ORG-1 ~L22187; re-checked on resize below).
@@ -9177,7 +9225,7 @@ function bootShell(){
       cv.addEventListener('wheel', function(e){
         if(e.ctrlKey||e.metaKey){ GlobeState._touched=true; _gyOn(); _gyOff();
           // ring rocker stays honest while wheel-zooming with the ring out
-          try{ if(!document.body.classList.contains('nav-off')) window._nvSet(true); }catch(_){}
+          try{ tpSync(); }catch(_){}
         }
       }, {passive:true});
       window.addEventListener('pointerup', _gyOff);
@@ -9211,13 +9259,10 @@ function bootShell(){
     var _ringLen=2*Math.PI*33;
     var _nvRingReset=function(){ if(_ring) _ring.style.strokeDashoffset=_ringLen; };
     if(_ring){ _ring.style.strokeDasharray=_ringLen; _nvRingReset(); }
-    window._nvSet=function(open){
-      _nvOpen=open;
-      document.body.classList.toggle('nav-off', !open);   // v1.18.0: the column is DEFAULT-ON
-      try{ ng.setAttribute('aria-expanded', open?'true':'false'); }catch(_){}
-      tpSync();                                           // v1.19.0: one refresher owns the states
-    };
-    try{ window._nvSet(true); }catch(_){}   // v1.18.0: the column is on from boot
+    // v1.21.0: the pod is unconditional chrome; _nvSet survives only as the
+    // transport refresher every older path already calls.
+    window._nvSet=function(){ tpSync(); };
+    try{ window._nvSet(true); }catch(_){}
     try{ _tpWire(); lySync(); }catch(_){}   // v1.19.0: the pod's pointer law + the scope readout
     var _holdTick=function(){
       if(!_nvHold) return;
@@ -9225,11 +9270,17 @@ function bootShell(){
       if(_ring) _ring.style.strokeDashoffset=String(_ringLen*(1-p));
       if(p>=1){
         _nvHold=null; _nvFired=true; _nvRingReset();
-        try{ setMode(document.body.classList.contains('brief-mode')?'map':'brief'); }catch(_){}
-        try{ window._nvSet(true); }catch(_){}    // v1.18.0: the rail rides through a mode flip
+        document.body.classList.remove('ly-save');
+        // v1.21.0 (owner): a three-second hold SAVES THIS VIEW. The ring the
+        // button already carried is the progress bar, so the gesture explains
+        // itself while it happens.
+        try{ lyRing(false); }catch(_){}
+        try{ const nm=svCapture();
+          _bfToast('View saved — “'+nm+'”'); }catch(_){}
         try{ navigator.vibrate&&navigator.vibrate(30); }catch(_){}
         return;
       }
+      document.body.classList.toggle('ly-save', p>0.12);
       _nvRAF=requestAnimationFrame(_holdTick);
     };
     if(ng){
@@ -9240,6 +9291,7 @@ function bootShell(){
       window.addEventListener('pointermove', function(e){
         if(_nvHold && e.pointerId===_nvId && Math.hypot(e.clientX-_nvX, e.clientY-_nvY)>12){
           _nvHold=null; cancelAnimationFrame(_nvRAF); _nvRingReset();
+          document.body.classList.remove('ly-save');
         }
       });
       var _nvEnd=function(e){
@@ -9249,9 +9301,10 @@ function bootShell(){
         if(_nvFired){ _nvFired=false; return; }          // the 3s flip consumed this press
         // v1.14.0 (design 5a): in Brief a plain FAB tap RETURNS TO MAP (the
         // label says so); the ring only pops in the map room. Hold still flips.
+        document.body.classList.remove('ly-save');
         if(held && e.type==='pointerup'){
           if(document.body.classList.contains('brief-mode')){ try{ setMode('map'); }catch(_){} }
-          else _nvSet(!_nvOpen);                         // short press = toggle the ring
+          else { try{ lyRing(!document.body.classList.contains('ly-on')); }catch(_){} }
         }
       };
       window.addEventListener('pointerup', _nvEnd);
@@ -9262,8 +9315,17 @@ function bootShell(){
     // (the auto-close + tap-swallow died with the pop-up ring; _navSwallow
     // stays as a field other paths read, always false now).
     window.addEventListener('pointerup', function(){ setTimeout(function(){ GlobeState._navSwallow=false; },0); });
+    // the pop-outs are a transient choice — anything else dismisses them
+    document.addEventListener('pointerdown', function(e){
+      try{
+        if(!document.body.classList.contains('ly-on')) return;
+        if(e.target && e.target.closest && (e.target.closest('#navDock') || e.target.closest('#lyRing'))) return;
+        lyRing(false);
+      }catch(_){}
+    }, true);
     document.addEventListener('keydown', function(e){
       if(e.key!=='Escape') return;
+      if(document.body.classList.contains('ly-on')){ lyRing(false); return; }
       try{
         const cc=document.getElementById('calloutCard');
         if(cc && !cc.hidden) selectSite(null);              // parity with the callout's ✕
@@ -9410,7 +9472,6 @@ function bootShell(){
   // set in :root is THE look. The mockup switcher and the slate/field candidate
   // blocks were retired to git history @ v0.1.1; --world-glow survives as a token.
   document.documentElement.setAttribute('data-app-theme','lumen');
-
 
   // DIAGNOSTICS TOAST (PORT of A-ORG-1 ~L13977): uncaught errors + rejections
   // self-report with real details; capture lives in the first-byte head script.

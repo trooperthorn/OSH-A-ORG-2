@@ -1571,3 +1571,29 @@ folded in; the judgments are in the run journal.
   cannot toggle its own pane shut from there — the head ✕ and the grip are the
   closers, which is the shipped sheet grammar. The chip sits above the drawer
   and toggles normally.
+
+## v1.21.0 — the globe is the layers (owner: hold to save · pod always available · layers embedded in the globe as pop-outs)
+- THE GLOBE BUTTON IS THE LAYER CONTROL. A tap fans the five named modes plus a
+  More door around it on a 112px arc (156°→24°), each showing its live count;
+  picking one applies it and the ring closes behind it — "make selections then
+  they are hidden". Escape, an outside press, or a second tap also close it.
+  The pop-outs ride #navDock's own origin, so they orbit the button wherever it
+  sits. While they are up the search pill YIELDS (opacity 0): the arc's ends
+  land in the pill's band, and the ring is a transient choice, not a coexisting
+  surface.
+- A THREE-SECOND HOLD SAVES THE VIEW. The ring the FAB already carried becomes
+  the progress bar, so the gesture explains itself while it happens; body.ly-save
+  brightens the button from 12% in, and the save toasts its name. The old
+  hold-to-flip-rooms is retired — the mode seg has been the room door since
+  v1.14.0, so the hold was free.
+- THE LABEL UNDER THE GLOBE IS THE SCOPE READOUT ("BASES · 119"). The button
+  that controls the layers says what they are showing. #lyChip retires; the
+  ::after CONTROLS/TO MAP content rules retire with it, and lySync() now writes
+  the label — which means setMode MUST call lySync or the brief room keeps
+  showing a map scope (caught live).
+- THE POD NEVER HIDES. body.nav-off is deleted and _nvSet survives only as the
+  transport refresher older paths call. Smoke bans both the class and its
+  toggle — scoped to `body.nav-off #` and the toggle call, because an unscoped
+  ban matched this changelog's own sentence about the retirement.
+- The brief room keeps its law: no pop-outs there, the label reads TO MAP, and
+  a plain tap still returns to the map.
