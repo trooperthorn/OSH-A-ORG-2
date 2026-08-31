@@ -1626,3 +1626,18 @@ folded in; the judgments are in the run journal.
 - Storage is unchanged: two arrays, two kv keys, two clocks. Only the surface
   consolidated — "saved at the ID or account level, or a full saved view"
   describes what was already true; v1.22.0 just puts all three in one place.
+
+## v1.23.0 — the quiet list (owner: "super compact layers in bottom left · translucent · do not take up more page than you need to")
+- SIZED TO ITS CONTENT, NOT TO A COLUMN: width:max-content capped at
+  min(56vw,190px). The panel reserves nothing; it is exactly as wide as its
+  longest row and no wider. Measured 183×187 against v1.22.0's 200×277.
+- BOTTOM LEFT, the corner nothing else claims — the pod owns bottom right and
+  the search band owns the strip between them, so the list stays clear of both
+  (bottom +152 still).
+- TRANSLUCENT, not a plate: rgba(20,17,10,.58)→rgba(6,5,4,.66) with a .13
+  hairline instead of the full glass triple. The globe's meridians read
+  through it, which is the point — it is a film over the map, not a panel on
+  top of it. The .glass backdrop blur still applies.
+- COMPACT METRICS: 22px rows, 10px body type, an 11px checkbox with a 2.8×5.8
+  tick, 6.5px mode chips at 3×5 padding. Every row is still a full-width tap
+  target, so the shrink costs reach nothing.

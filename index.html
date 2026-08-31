@@ -595,39 +595,44 @@ body.brief-mode #briefStage{right:var(--gut)}
    controls the layers says what the layers are showing. */
 .nv-fablbl{white-space:nowrap}
 body.ly-on .nv-fablbl{color:var(--accent)}
-/* THE LAYER LIST (v1.22.0) — checkboxes, not circles: quiet rows in the
-   bottom-right corner beside the pod, close enough to the globe button that
-   opened them to read as one gesture. A check applies instantly. */
+/* THE LAYER LIST (v1.22.0, recut v1.23.0 — owner: "super compact layers in
+   bottom left. Translucent and do not take up more page than you need to").
+   It sizes to its own content (width:max-content) instead of reserving a
+   column, sits in the free bottom-LEFT corner, and reads as a film over the
+   globe rather than a panel on top of it. */
 #lyPanel{
   position:absolute; z-index:44;
-  right:calc(var(--rail-r) + var(--rail-w) + 8px);
+  left:var(--safe-l);
   bottom:calc(env(safe-area-inset-bottom,0px) + 152px);   /* clear of the search band */
-  width:200px; padding:7px 6px 6px; border-radius:14px;
+  width:max-content; max-width:min(56vw,190px);
+  padding:4px 5px 5px; border-radius:11px;
+  background:linear-gradient(180deg, rgba(20,17,10,.58), rgba(6,5,4,.66));
+  box-shadow:0 0 0 1px rgba(240,220,140,.13), var(--drop);
   opacity:0; transform:translateY(6px) scale(.97); pointer-events:none;
   transition:opacity .16s ease, transform .18s cubic-bezier(.22,1,.36,1);
 }
 #lyPanel[hidden]{display:none}
 body.ly-on #lyPanel{opacity:1; transform:none; pointer-events:auto}
-.ly-modes{display:flex; flex-wrap:wrap; gap:3px; padding:0 2px 6px}
+.ly-modes{display:flex; flex-wrap:wrap; gap:2px; padding:0 1px 4px}
 .ly-md{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  flex:0 1 auto; padding:5px 7px; border-radius:7px; background:rgba(0,0,0,.32);
-  font:800 7px/1 var(--mono); letter-spacing:.06em; color:var(--faint); text-transform:uppercase;
+  flex:0 1 auto; padding:3px 5px; border-radius:5px; background:rgba(0,0,0,.3);
+  font:800 6.5px/1 var(--mono); letter-spacing:.04em; color:var(--faint); text-transform:uppercase;
   white-space:nowrap}
 .ly-md.on{background:var(--accent-wash); color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
 .ly-cb{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  display:flex; align-items:center; gap:8px; width:100%; padding:6px 6px; border-radius:8px;
-  background:none; color:var(--text); font:600 11.5px/1.2 var(--body); text-align:left;
-  min-height:30px}
+  display:flex; align-items:center; gap:6px; width:100%; padding:3px 4px; border-radius:6px;
+  background:none; color:var(--text); font:600 10px/1.15 var(--body); text-align:left;
+  min-height:22px}
 .ly-cb:active{background:var(--accent-wash)}
-.ly-bx{flex:none; width:14px; height:14px; border-radius:4px; position:relative;
-  box-shadow:inset 0 0 0 1.3px rgba(240,220,140,.42)}
+.ly-bx{flex:none; width:11px; height:11px; border-radius:3px; position:relative;
+  box-shadow:inset 0 0 0 1.2px rgba(240,220,140,.42)}
 .ly-cb.on .ly-bx{background:var(--accent); box-shadow:none}
-.ly-cb.on .ly-bx::after{content:''; position:absolute; left:4.4px; top:1.4px;
-  width:3.6px; height:7.4px; border:solid #141006; border-width:0 1.9px 1.9px 0; transform:rotate(42deg)}
+.ly-cb.on .ly-bx::after{content:''; position:absolute; left:3.6px; top:1px;
+  width:2.8px; height:5.8px; border:solid #141006; border-width:0 1.6px 1.6px 0; transform:rotate(42deg)}
 .ly-cb .ly-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .ly-cb:not(.on) .ly-nm{color:var(--faint)}
-.ly-cb .ly-n{flex:none; font:700 9.5px/1 var(--mono); color:var(--faint)}
-.ly-sep{height:1px; margin:5px 6px; background:var(--line)}
+.ly-cb .ly-n{flex:none; margin-left:8px; font:700 8px/1 var(--mono); color:var(--faint)}
+.ly-sep{height:1px; margin:3px 4px; background:rgba(240,220,140,.13)}
 body.ly-on #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 26px rgba(245,215,110,.4), inset 0 1px 0 var(--spec)}
 /* the save-hold paints the ring the FAB already carries */
 body.ly-save #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 30px rgba(245,215,110,.55), inset 0 1px 0 var(--spec)}
@@ -1599,6 +1604,12 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.23.0 • THE QUIET LIST (owner: "super compact layers in bottom left.
+//            Translucent and do not take up more page than you need to"). The
+//            layer list moves to the free bottom-LEFT corner, sizes itself to
+//            its own content (width:max-content, capped at 190px) instead of
+//            reserving a fixed column, and drops from the full glass plate to
+//            a translucent film — rows at 22px with 10px type and an 11px box.
 //   v1.22.0 • THE REPOSITORY (owner: "these need to match across brief and
 //            maps … the layers don't need to be these big circles, small
 //            subtle check boxes or a small checkbox list in bottom right …
@@ -1952,7 +1963,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.22.0';
+const APP_VERSION = 'v1.23.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
