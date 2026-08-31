@@ -531,7 +531,7 @@ body.tp-live #navPod{opacity:1}
 /* v1.21.0 (owner: "keep navigation controls bottom right and they can still
    be available, no tap needed"): the pod no longer collapses. The FAB's tap
    belongs to the layers now, and nothing hides the transport. */
-body.brief-mode #navPod .tp-h{display:none}   /* no camera and no undo stack in the brief room */
+body.brief-mode #navPod{display:none}   /* v1.22.0: the brief dock IS the pod there */
 /* v1.20.0: 34px of ink, still 48px of thumb — the glyphs carry the meaning */
 #navPod .nv-sat{width:34px; height:34px}
 #navPod .nv-sat svg{width:19px; height:19px}
@@ -595,31 +595,40 @@ body.brief-mode #briefStage{right:var(--gut)}
    controls the layers says what the layers are showing. */
 .nv-fablbl{white-space:nowrap}
 body.ly-on .nv-fablbl{color:var(--accent)}
-/* THE POP-OUTS — the selections orbit the globe, then hide the moment one is
-   made. Each rides #navDock's origin: the FAB centre is (0, -34) from it. */
-#lyRing{position:absolute; left:0; bottom:0; width:0; height:0; pointer-events:none}
-.ly-sat{
-  appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  position:absolute; left:0; bottom:34px; width:50px; height:50px; padding:0;
-  border-radius:50%; display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:1px;
-  background:linear-gradient(180deg, rgba(26,22,14,.96), rgba(8,7,4,.97));
-  box-shadow:0 0 0 1px rgba(240,220,140,.30), inset 0 1px 0 var(--spec), var(--drop);
-  color:var(--dim); opacity:0; pointer-events:none;
-  transform:translate(-50%,50%) scale(.55);
-  transition:transform .19s cubic-bezier(.22,1,.36,1), opacity .15s ease;
+/* THE LAYER LIST (v1.22.0) — checkboxes, not circles: quiet rows in the
+   bottom-right corner beside the pod, close enough to the globe button that
+   opened them to read as one gesture. A check applies instantly. */
+#lyPanel{
+  position:absolute; z-index:44;
+  right:calc(var(--rail-r) + var(--rail-w) + 8px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 152px);   /* clear of the search band */
+  width:200px; padding:7px 6px 6px; border-radius:14px;
+  opacity:0; transform:translateY(6px) scale(.97); pointer-events:none;
+  transition:opacity .16s ease, transform .18s cubic-bezier(.22,1,.36,1);
 }
-.ly-sat b{font:700 13px/1 var(--body); color:var(--text)}
-.ly-sat span{font:800 6.5px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase}
-.ly-sat.on{box-shadow:0 0 0 1.6px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
-  color:var(--accent)}
-.ly-sat.on b{color:var(--accent)}
-.ly-sat:active{background:var(--accent-wash)}
-body.ly-on #lyRing{pointer-events:auto}
-body.ly-on .ly-sat{opacity:1; pointer-events:auto;
-  transform:translate(calc(-50% + var(--lx)), calc(50% - var(--ly))) scale(1)}
+#lyPanel[hidden]{display:none}
+body.ly-on #lyPanel{opacity:1; transform:none; pointer-events:auto}
+.ly-modes{display:flex; flex-wrap:wrap; gap:3px; padding:0 2px 6px}
+.ly-md{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  flex:0 1 auto; padding:5px 7px; border-radius:7px; background:rgba(0,0,0,.32);
+  font:800 7px/1 var(--mono); letter-spacing:.06em; color:var(--faint); text-transform:uppercase;
+  white-space:nowrap}
+.ly-md.on{background:var(--accent-wash); color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
+.ly-cb{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  display:flex; align-items:center; gap:8px; width:100%; padding:6px 6px; border-radius:8px;
+  background:none; color:var(--text); font:600 11.5px/1.2 var(--body); text-align:left;
+  min-height:30px}
+.ly-cb:active{background:var(--accent-wash)}
+.ly-bx{flex:none; width:14px; height:14px; border-radius:4px; position:relative;
+  box-shadow:inset 0 0 0 1.3px rgba(240,220,140,.42)}
+.ly-cb.on .ly-bx{background:var(--accent); box-shadow:none}
+.ly-cb.on .ly-bx::after{content:''; position:absolute; left:4.4px; top:1.4px;
+  width:3.6px; height:7.4px; border:solid #141006; border-width:0 1.9px 1.9px 0; transform:rotate(42deg)}
+.ly-cb .ly-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.ly-cb:not(.on) .ly-nm{color:var(--faint)}
+.ly-cb .ly-n{flex:none; font:700 9.5px/1 var(--mono); color:var(--faint)}
+.ly-sep{height:1px; margin:5px 6px; background:var(--line)}
 body.ly-on #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 26px rgba(245,215,110,.4), inset 0 1px 0 var(--spec)}
-body.ly-on #searchPill, body.ly-on #searchResults{opacity:0; pointer-events:none}
 /* the save-hold paints the ring the FAB already carries */
 body.ly-save #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 30px rgba(245,215,110,.55), inset 0 1px 0 var(--spec)}
 
@@ -679,25 +688,28 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch
 .ch-dock{display:inline-flex; align-items:flex-start; gap:1px;
   background:#141006; border-radius:22px; padding:5px 7px 3px;
   box-shadow:0 0 0 1px rgba(240,220,140,.22), 0 1px 2px rgba(20,14,4,.28)}
-.ch-tool{display:inline-flex; flex-direction:column; align-items:center; gap:1px; min-width:44px;
-  cursor:pointer; -webkit-tap-highlight-color:transparent}
-.ch-tool .od-ico, .ch-tool .ch-lbl{pointer-events:none}
 .ch-dock .od-ico{background:none; box-shadow:none; color:#F2E4BC; width:28px; height:28px}
 .ch-dock .bf-vw{color:#F2E4BC}
 .ch-dock .bf-vw:not(.off){background:var(--accent); color:#141006; border-radius:50%}
 .ch-dock .bf-vw.off{background:none; opacity:.5}
-.ch-lbl{font:700 6.5px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:rgba(242,228,188,.6)}
-.ch-tool.off .ch-lbl{opacity:.55}
 .ch-div{flex:none; width:1px; height:20px; background:rgba(242,228,188,.28); margin:4px 4px 0; align-self:flex-start}
 #briefDock{display:none}
 /* v1.18.0 THE RAIL, brief side: same panel grammar as the map's #navPod —
    one vertical pill on the right edge, always live. The bottom band frees up. */
-body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:2px;
+body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:8px;
   position:absolute; z-index:43;
-  right:var(--rail-r); left:auto; top:auto; bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
-  transform:none; padding:9px 8px}
+  right:var(--rail-r); left:auto; top:auto; bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
+  transform:none; padding:7px 4px; border-radius:20px;
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
+  box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
+  opacity:.55; transition:opacity .18s ease}
+body.tp-live #briefDock{opacity:1}
+#briefDock .nv-sat{width:34px; height:34px}
+#briefDock .nv-sat svg{width:19px; height:19px}
+#briefDock .ch-div{width:18px; height:1px; margin:2px 0; background:var(--line); align-self:center}
+.bd-aa{font:800 15px/1 var(--body)}
+#briefDock .bf-vw.off{opacity:.42}
 #briefDock .ch-div{width:20px; height:1px; margin:3px 0; align-self:center}
-#briefDock .bd-gap{display:none}
 body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .15s ease}
 @media(max-width:1099px){
   /* v1.16.3: the search pill sits just above the FAB band in brief (74),
@@ -705,7 +717,10 @@ body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .1
   body.brief-mode #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
   body.brief-mode #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 126px)}
 }
-@media(min-width:1100px){ body.brief-mode #briefDock{bottom:calc(env(safe-area-inset-bottom,0px) + 120px)} }
+@media(min-width:1100px){
+  body.brief-mode #briefDock{bottom:calc(env(safe-area-inset-bottom,0px) + 20px); gap:10px; padding:9px}
+  #briefDock .nv-sat{width:44px; height:44px}
+}
 /* v1.15.0 — the chart-to-globe leader */
 #bfLeader{position:absolute; inset:0; z-index:15; pointer-events:none}
 #bfLeader[hidden]{display:none}
@@ -732,6 +747,9 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
 #ledger.on .ld-scrim{opacity:1}
 #ledger.on .ld-panel{transform:none}
 .ld-head{display:flex; align-items:center; gap:8px; margin-bottom:6px}
+.ld-tabs{margin:2px 0 10px}
+.ld-pane .rc-row{padding:8px 0}
+.ld-pane .sh-acts .od-ico{width:28px; height:28px}
 .ld-title{font-weight:900; font-size:15px; letter-spacing:.06em; color:var(--text)}
 .ld-sub{font-size:11px; color:var(--faint)}
 .ld-pad{padding:6px 0 2px; line-height:1.45}
@@ -839,8 +857,6 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
 .bf-dep:active,.bf-zb:active,.bf-zpct:active{transform:scale(.9)}
 .bf-act{transition:transform .16s cubic-bezier(.32,1.4,.45,1), filter .16s ease}
 .bf-act:active{transform:scale(.98)}
-.ch-tool .od-ico{transition:transform .16s cubic-bezier(.34,1.56,.64,1)}
-.ch-tool:active .od-ico{transform:scale(.86)}
 /* the control bar — depth dial + zoom, one quiet row */
 /* the armed "adding under X" bar — says where the next pick will land */
 /* v0.26.0 — the ＋ multi-select picker */
@@ -1514,26 +1530,28 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <!-- v1.14.0: the FAB says what it is — CONTROLS in the map room, TO MAP in
        the brief (CSS content swap off body.brief-mode; no JS state). -->
   <span class="nv-fablbl" id="lyState" aria-hidden="true"></span>
-    <!-- v1.21.0 (owner: "embed the layers with the globe. Tap for the
-         selections to populate around the globe as pop outs. Make selections
-         then they are hidden"). The pop-outs hang off #navDock's own origin,
-         so they orbit the globe button wherever it sits. -->
-    <div id="lyRing" aria-label="Layer selections"></div>
+    <!-- v1.21.0: the globe button is the layer control (tap = the selections,
+         hold three seconds = save this view). v1.22.0 (owner: "the layers
+         don't need to be these big circles, small subtle check boxes or a
+         small checkbox list in bottom right") — the selections are a quiet
+         checkbox list now, anchored above the pod. -->
 </nav>
 
 <!-- v1.15.0 BRIEF DOCK (design 2b): the file tools leave the chart head for one
      bottom command dock — ADD · NAMES · LINES │ BRIEFS · EXPORT · LEDGER. Same
      dock material and delegation contracts (data-* rides the cell). On phones
      the pill spans the width with a center gap the FAB sits in. -->
+<!-- v1.22.0 (owner: "these need to match across brief and maps"). The brief
+     room wears the map pod's grammar exactly: the same 42px strip, the same
+     glyph-only cells, ✕ on top behind a hairline. BRIEFS · EXPORT · LEDGER
+     left this strip for the Repository — they are saved things, not tools. -->
 <div id="briefDock" class="ch-dock" aria-label="Brief tools">
-  <span class="ch-tool" data-bfsearch="1" role="button" tabindex="0" aria-label="Add an organization or US state" title="Add to the brief"><span class="od-ico">＋</span><span class="ch-lbl">Add</span></span>
-  <span class="ch-tool" data-bfnm="1" role="button" tabindex="0" aria-label="Names on the globe" title="Names on the globe"><span class="od-ico bf-vw">Aa</span><span class="ch-lbl">Names</span></span>
-  <span class="ch-tool" data-bfln="1" role="button" tabindex="0" aria-label="Connecting lines" title="Connecting lines"><span class="od-ico bf-vw"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></span><span class="ch-lbl">Lines</span></span>
+  <button class="nv-sat glass" type="button" data-bfclear="1" aria-label="Clear the brief"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
   <span class="ch-div" aria-hidden="true"></span>
-  <span class="bd-gap" aria-hidden="true"></span>
-  <span class="ch-tool" data-bfbriefs="1" role="button" tabindex="0" aria-label="Briefs — save or load a whole diagram" title="Briefs"><span class="od-ico">▤</span><span class="ch-lbl">Briefs</span></span>
-  <span class="ch-tool" data-xpbtn="1" role="button" tabindex="0" aria-label="Export" title="Export"><span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></span><span class="ch-lbl">Export</span></span>
-  <span class="ch-tool" data-bfledger="1" role="button" tabindex="0" aria-label="Ledger — the saved-data repository" title="Ledger"><span class="od-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="M15 4v16"></path></svg></span><span class="ch-lbl">Ledger</span></span>
+  <button class="nv-sat glass" type="button" data-bfsearch="1" aria-label="Add an organization or US state"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+  <button class="nv-sat glass bf-vw" type="button" data-bfnm="1" aria-label="Names on the globe"><span class="bd-aa">Aa</span></button>
+  <button class="nv-sat glass bf-vw" type="button" data-bfln="1" aria-label="Connecting lines"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></button>
+  <button class="nv-sat glass" type="button" data-xpbtn="1" aria-label="Export"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>
 </div>
 
 <!-- v1.15.0 CHART-TO-GLOBE LEADER (design 5a): a dotted curve from the focused
@@ -1559,6 +1577,10 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 <!-- dossier: THE drawer (single-brain law — one drawer) -->
 <section id="dossier" class="glass card" role="dialog" aria-label="Dossier" hidden></section>
 
+<!-- v1.22.0 THE LAYER LIST — small, subtle, bottom right, beside the controls
+     it belongs with. The globe button opens it; a check applies instantly. -->
+<section id="lyPanel" class="glass" aria-label="Layers" hidden></section>
+
 <!-- THE ANCHORED CALLOUT (v0.9.0 owner references): the popup lives AT the dot —
      caret tail on the marker, tracks it every dirty frame, flips to fit. -->
 <div id="calloutCard" hidden></div>
@@ -1577,6 +1599,19 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.22.0 • THE REPOSITORY (owner: "these need to match across brief and
+//            maps … the layers don't need to be these big circles, small
+//            subtle check boxes or a small checkbox list in bottom right …
+//            we need a side panel pop out app wide that consolidates all the
+//            ledger, saved info, saved views to keep as a full repository").
+//            Both rooms now wear ONE control grammar: the same 42px glyph pod
+//            on the right edge (map: ✕ · UNDO · ZOOM; brief: ✕ · ADD · NAMES ·
+//            LINES · EXPORT). The orbiting layer circles are retired for a
+//            quiet checkbox list in the bottom-right corner — modes on one
+//            line above it, a check applies instantly and the list stays up
+//            while you work. And the ledger drawer became THE REPOSITORY: one
+//            app-wide side panel with VIEWS · BRIEFS · RECORDS, reachable from
+//            either room by the ★ in the search pill.
 //   v1.21.0 • THE GLOBE IS THE LAYERS (owner: "saving a view is done by holding
 //            center globe button for 3 seconds. Keep navigation controls bottom
 //            right … no tap needed. Embed the layers with the globe. Tap for the
@@ -1917,7 +1952,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.21.0';
+const APP_VERSION = 'v1.22.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3102,19 +3137,29 @@ function lySync(){                        // the ONE writer of the scope readout
 // the five named modes plus the door to the full pane for family-level work.
 function _lyRingPaint(){
   try{
-    const host=document.getElementById('lyRing'); if(!host) return;
-    const k=lyKey();
-    const items=LY_MODES.map(function(m){ return {k:m.k, n:m.n, c:lyModeN(m), on:(k===m.k)}; });
-    items.push({k:'more', n:'More', c:'⋯', on:false});
-    const N=items.length, R=112, A0=156, A1=24;
-    host.innerHTML=items.map(function(it,i){
-      const a=(A0-(A0-A1)*(i/(N-1)))*Math.PI/180;
-      const lx=Math.round(Math.cos(a)*R), ly=Math.round(Math.sin(a)*R);
-      return '<button type="button" class="ly-sat'+(it.on?' on':'')+'" data-lysat="'+it.k+'"'
-        +' aria-pressed="'+(it.on?'true':'false')+'" style="--lx:'+lx+'px; --ly:'+ly+'px"'
-        +' aria-label="'+(it.k==='more'?'More layer options':(it.n+' — '+it.c+' sites'))+'">'
-        +'<b>'+it.c+'</b><span>'+it.n+'</span></button>';
-    }).join('');
+    const host=document.getElementById('lyPanel'); if(!host) return;
+    const off=_famOffSet(), c=lyCounts(), k=lyKey();
+    let h='<div class="ly-modes">';
+    LY_MODES.forEach(function(m){
+      h+='<button type="button" class="ly-md'+(k===m.k?' on':'')+'" data-lysat="'+m.k+'"'
+        +' aria-pressed="'+(k===m.k?'true':'false')+'" aria-label="'+m.n+' — '+lyModeN(m)+' sites">'+m.n+'</button>';
+    });
+    h+='</div>';
+    Object.keys(CLS_META).forEach(function(fk){
+      const n=c[fk]||0, on=!off.has(fk);
+      h+='<button type="button" class="ly-cb'+(on?' on':'')+'" data-lyfam="'+fk+'" role="checkbox"'
+        +' aria-checked="'+(on?'true':'false')+'"><span class="ly-bx"></span>'
+        +'<span class="ly-nm">'+CLS_META[fk].n+'</span><span class="ly-n">'+n+'</span></button>';
+    });
+    h+='<div class="ly-sep"></div>';
+    [['names','Labels','_namesOff'],['usace','USACE labels','_usaceOff']].forEach(function(v){
+      const on=!GlobeState[v[2]];
+      h+='<button type="button" class="ly-cb'+(on?' on':'')+'" data-lyvw="'+v[0]+'" role="checkbox"'
+        +' aria-checked="'+(on?'true':'false')+'"><span class="ly-bx"></span>'
+        +'<span class="ly-nm">'+v[1]+'</span></button>';
+    });
+    host.innerHTML=h;
+    host.hidden=false;
   }catch(_){}
 }
 function lyRing(open){
@@ -6981,16 +7026,20 @@ if(!window._odWired){
     const _shTab=function(){ const h=document.getElementById('dossier');
       return (h && h.dataset && h.dataset.shTab) || 'sv'; };
     const _shVal=function(el,a){ return el.getAttribute(a); };
+    const ldt=e.target.closest('[data-ldtab]');
+    if(ldt){ _ldSet(ldt.getAttribute('data-ldtab')); return; }
     const st2=e.target.closest('[data-shtab]');
     if(st2){ _shArm=false; _shRnId=null; _shRmArm=null; _shOpen(_shVal(st2,'data-shtab')); return; }
     const lyp=e.target.closest('[data-lyp]');
     if(lyp){ lyMode(_shVal(lyp,'data-lyp')); _shOpen('lay'); return; }
-    // v1.21.0: a pop-out selection applies and the ring closes behind it
+    // v1.22.0: a MODE is one decision, so it closes the list behind you; a
+    // CHECKBOX is one of several, so the list stays up while you work.
     const lst=e.target.closest('[data-lysat]');
-    if(lst){ const k=lst.getAttribute('data-lysat');
-      lyRing(false);
-      if(k==='more') _shOpen('lay'); else lyMode(k);
-      return; }
+    if(lst){ lyMode(lst.getAttribute('data-lysat')); lyRing(false); return; }
+    const lcb=e.target.closest('[data-lyfam]');
+    if(lcb){ lyFam(lcb.getAttribute('data-lyfam')); return; }
+    const lvw=e.target.closest('[data-lyvw]');
+    if(lvw){ lyView(lvw.getAttribute('data-lyvw')); return; }
     const lrw=e.target.closest('.lg-row');
     if(lrw && lrw.closest('#dossier')){
       const vw=_shVal(lrw,'data-vw');
@@ -7270,7 +7319,7 @@ if(!window._odWired){
     if(blg){ _sbArm=false; _sbLoadArm=-1; try{ _sbOpenSheet(); }catch(_){} return; }   // v1.8.0: head door to the briefs shelf — never minimizes the chart
     // v1.15.0 — the brief dock's LEDGER cell opens the Repository drawer
     const bld=e.target.closest('[data-bfledger]');
-    if(bld){ try{ window.Repo && Repo.open(); }catch(_){} return; }
+    if(bld){ try{ _ldSet('records'); Repo.open(); }catch(_){} return; }
     const bnm=e.target.closest('[data-bfnm]');
     if(bnm){ GlobeState._bfNamesOff=!GlobeState._bfNamesOff;
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
@@ -8169,7 +8218,17 @@ function _shPaneShelf(kind,P){
 }
 // ONE DRAWER, TWO PANES. The map room's doors open LAYERS|VIEWS; the brief
 // room's ▤ opens its own single pane — the rooms stay severed (v0.24.0).
+// v1.22.0: the shelves render inside the Repository now. _shOpen survives as
+// the repaint door every rung already calls — it re-renders the open section
+// rather than opening a second surface.
 function _shOpen(tab){
+  if(tab==='sv'||tab==='bf'){
+    _ldTab=(tab==='bf')?'briefs':'views';
+    try{ _ledgerPaint(); }catch(_){}
+    try{ const l=document.getElementById('ledger');
+      if(l && !l.classList.contains('on')) Repo.open(); }catch(_){}
+    return;
+  }
   const host=document.getElementById('dossier'); if(!host) return;
   try{ _odInjectCSS(); }catch(_){}
   try{ calloutHide(); }catch(_){}                  // the surface budget: one at a time
@@ -8352,10 +8411,31 @@ function _ldItem(kind, it){
   const K={people:'P',specs:'S',notes:'N',links:'L'}[kind];
   return '<div class="ld-it"><span class="ld-itk">'+K+'</span><span class="ld-itx">'+(tx||'—')+'</span></div>';
 }
+// ═══ v1.22.0 THE REPOSITORY (owner: "a side panel pop out app wide that
+// consolidates all the ledger, saved info, saved views to keep as a full
+// repository. Everything will either be saved at the ID or account level or a
+// full saved view") ═══
+// One panel, three sections, both rooms: VIEWS (a camera + a scope you named),
+// BRIEFS (a whole diagram), RECORDS (everything filed under an ID). The two
+// shelves that used to live in the bottom sheet render here instead — same
+// _shRow anatomy, one home.
+let _ldTab='views';
+function _ldSet(t){ _ldTab=t; try{ _ledgerPaint(); }catch(_){} }
+try{ window._ldSet=_ldSet; }catch(_){}
+function _ldTabs(){
+  const T=[['views','Views'],['briefs','Briefs'],['records','Records']];
+  return '<div class="od-tabs ld-tabs" role="tablist">'+T.map(function(t){
+    return '<button class="od-tab'+(_ldTab===t[0]?' on':'')+'" type="button" role="tab"'
+      +' aria-selected="'+(_ldTab===t[0])+'" data-ldtab="'+t[0]+'">'+t[1]+'</button>';
+  }).join('')+'</div>';
+}
 function _ledgerHTML(){
   const esc=_odEsc, escA=_odEscA;
   let h='<div class="ld-head"><div class="ld-title">▤ Repository</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-ldclose="1" aria-label="Close">✕</button></div>';
+  h+=_ldTabs();
+  if(_ldTab==='views') return h+'<div class="ld-pane">'+_shPaneShelf('sv','sv')+'</div>';
+  if(_ldTab==='briefs') return h+'<div class="ld-pane">'+_shPaneShelf('bf','sb')+'</div>';
   h+='<div class="ld-sub ld-pad">Everything entered on the map — every ID and the People, Specs, Notes and Links filed under it. Tap an ID to read its items; tap an installation to open it on the map.</div>';
   let any=false;
   Object.keys(RECORDS).sort(function(a,b){ return _lgSiteName(a).localeCompare(_lgSiteName(b)); }).forEach(function(id){
@@ -8423,6 +8503,10 @@ function _ledgerTap(e){
   if(go){ const id=go.getAttribute('data-ldgo'); _ledgerClose();
     try{ setMode('map'); if(siteById(id)) selectSite(id); }catch(_){} return; }
 }
+function _ledgerPaint(){
+  try{ const b=document.querySelector('#ledger .ld-panel'); if(b) b.innerHTML=_ledgerHTML(); }catch(_){}
+}
+try{ window._ledgerPaint=_ledgerPaint; }catch(_){}
 try{ window.Repo={ open:_ledgerOpen, close:_ledgerClose, html:_ledgerHTML,
   sel:function(k){ _ldSel=k; } }; }catch(_){}       // sel: harness hook — _ldSel is a closure var, unreachable otherwise
 function recBackup(){
@@ -9319,7 +9403,7 @@ function bootShell(){
     document.addEventListener('pointerdown', function(e){
       try{
         if(!document.body.classList.contains('ly-on')) return;
-        if(e.target && e.target.closest && (e.target.closest('#navDock') || e.target.closest('#lyRing'))) return;
+        if(e.target && e.target.closest && (e.target.closest('#navDock') || e.target.closest('#lyPanel'))) return;
         lyRing(false);
       }catch(_){}
     }, true);
@@ -9361,7 +9445,9 @@ function bootShell(){
       // beside the ledger) and the ★ in the search pill each toggle their pane.
       var _dz=document.getElementById('dossier');
       if(e.target.closest('.sp-star')){
-        try{ if(_dz && !_dz.hidden && _dz.dataset.shTab==='sv') hideDossier(); else _shOpen('sv'); }catch(_){}
+        // v1.22.0: one repository, reachable from either room
+        try{ _ldSet(document.body.classList.contains('brief-mode')?'briefs':'views');
+          Repo.open(); }catch(_){}
         return; }
       if(e.target.closest('#lyChip')){
         try{ if(_dz && !_dz.hidden && _dz.dataset.shTab==='lay') hideDossier(); else _shOpen('lay'); }catch(_){}

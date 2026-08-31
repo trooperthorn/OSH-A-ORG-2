@@ -1597,3 +1597,32 @@ folded in; the judgments are in the run journal.
   ban matched this changelog's own sentence about the retirement.
 - The brief room keeps its law: no pop-outs there, the label reads TO MAP, and
   a plain tap still returns to the map.
+
+## v1.22.0 — the repository (owner: rooms must match · layers as checkboxes · one app-wide side panel)
+- ONE CONTROL GRAMMAR, BOTH ROOMS. The brief dock IS the map's pod now: same
+  42px strip, same right inset, same bottom, same glyph-only cells, ✕ on top
+  behind a hairline. Map pod = ✕ · UNDO · ZOOM; brief pod = ✕ · ADD · NAMES ·
+  LINES · EXPORT. body.brief-mode hides #navPod entirely — one column, one
+  occupant. The .ch-tool/.ch-lbl/.bd-gap caption vocabulary retires with the
+  captions, and smoke bans captions from the dock.
+- LAYERS ARE CHECKBOXES, NOT CIRCLES. The orbiting .ly-sat satellites are
+  retired for #lyPanel: a 200px list in the bottom-right corner, modes as one
+  wrapped row of small chips above seven checkbox rows (five classes with
+  counts, then Labels and USACE labels). A MODE is one decision, so it closes
+  the list behind you; a CHECKBOX is one of several, so the list stays up while
+  you work. The panel sits ABOVE the search band (bottom +152) — anchored in
+  the corner without crossing the pill.
+- THE REPOSITORY IS ONE PANEL, APP-WIDE. The ledger drawer became a three-
+  section panel — VIEWS · BRIEFS · RECORDS — reachable from either room by the
+  ★ in the search pill (it opens on Briefs in the brief room, Views on the map).
+  The two shelves render inside it with the same _shRow anatomy; _shOpen('sv'|
+  'bf') survives as the repaint door so every existing rung keeps working.
+- SUPERSEDED LAW, DELIBERATELY: v1.8.0 said "no brief ledger — the repository
+  is map data only", and a smoke probe enforced it. The owner replaced that
+  with "consolidate all the ledger, saved info, saved views … as a full
+  repository". The probe now asserts the OPPOSITE and says why. When a probe
+  encodes an owner preference, superseding it is a decision to state, not a
+  test to quietly delete.
+- Storage is unchanged: two arrays, two kv keys, two clocks. Only the surface
+  consolidated — "saved at the ID or account level, or a full saved view"
+  describes what was already true; v1.22.0 just puts all three in one place.

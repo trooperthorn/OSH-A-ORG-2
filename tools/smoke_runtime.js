@@ -723,25 +723,38 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(global.Briefs.list().length!==1 || global.Briefs.list()[0].n!=='Remote Shelf'){ wok=false; fails++; console.log('✗ SAVED BRIEFS newest-wins merge failed'); }
       global._dbApply({briefs:{list:[], mod:1}});
       if(global.Briefs.list().length!==1){ wok=false; fails++; console.log('✗ SAVED BRIEFS: an OLDER remote shelf must not clobber'); }
-      // v1.8.0 — briefs live in the BRIEF ROOM's own sheet, off the chart head
+      // v1.22.0 (owner): briefs live in THE REPOSITORY's Briefs section now —
+      // one app-wide panel consolidating views, briefs and records. This
+      // deliberately supersedes the v1.8.0 "no brief ledger" law, which the
+      // owner replaced with "consolidate … to keep as a full repository".
       global.Briefs.open();
-      const sh=IDS['dossier']?IDS['dossier'].innerHTML:'';
-      if(sh.indexOf('Save current brief')<0 || sh.indexOf('Remote Shelf')<0 || sh.indexOf('data-sbload')<0){ wok=false; fails++; console.log('✗ BRIEFS SHEET must carry save + the shelf'); }
+      const sh=global.Repo.html();
+      if(sh.indexOf('Save current brief')<0 || sh.indexOf('Remote Shelf')<0 || sh.indexOf('data-sbload')<0){ wok=false; fails++; console.log('✗ REPOSITORY Briefs section must carry save + the shelf'); }
       // v1.8.0 — the repository: map data only, IDs unfold to their actual items
       global.recAddId('fort-bragg','ID-900');
       global.recAdd('fort-bragg','people',{name:'Ledger Probe', role:'S3', xid:'ID-900'});
+      global._ldSet('records');
       let rh=global.Repo.html();
-      if(rh.indexOf('Repository')<0 || rh.indexOf('Fort Bragg')<0 || rh.indexOf('ID-900')<0 || rh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ REPOSITORY must show the org, the ID and its P count'); }
-      if(rh.indexOf('Save current brief')>=0 || rh.indexOf('Remote Shelf')>=0){ wok=false; fails++; console.log('✗ REPOSITORY must NOT carry the briefs shelf (owner: no brief ledger)'); }
+      if(rh.indexOf('Repository')<0 || rh.indexOf('Fort Bragg')<0 || rh.indexOf('ID-900')<0 || rh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ REPOSITORY Records section must show the org, the ID and its P count'); }
+      // the sections stay SEPARATE — Records never mixes the shelves in
+      if(rh.indexOf('Save current brief')>=0 || rh.indexOf('Remote Shelf')>=0){ wok=false; fails++; console.log('✗ the Records section must not carry the briefs shelf'); }
+      // all three sections are reachable from one panel
+      ['views','briefs','records'].forEach(function(t){
+        if(rh.indexOf('data-ldtab="'+t+'"')<0){ wok=false; fails++; console.log('✗ REPOSITORY section missing: '+t); } });
       if(rh.indexOf('Ledger Probe')>=0){ wok=false; fails++; console.log('✗ REPOSITORY items must stay folded until the ID is tapped'); }
       global.Repo.sel('fort-bragg|ID-900');
       rh=global.Repo.html();
       if(rh.indexOf('Ledger Probe')<0 || rh.indexOf('S3')<0){ wok=false; fails++; console.log('✗ REPOSITORY expanded ID must show the saved item text'); }
       global.Repo.sel(null);
-      // v1.15.0: the BRIEFS door lives on the bottom brief dock (static markup)
+      // v1.22.0: the brief dock is a POD like the map's — tools only. Briefs,
+      // Export-as-saved-thing and the Ledger moved into the Repository.
       global.renderBrief();
-      const _bd=(html.split('id="briefDock"')[1]||'').split('</div>')[0];
-      if(_bd.indexOf('data-bfbriefs')<0){ wok=false; fails++; console.log('✗ BRIEFS door missing from the brief dock'); }
+      const _bd=(html.split('id="briefDock"')[1]||'').split('\n</div>')[0];
+      if(_bd.indexOf('data-bfbriefs')>=0 || _bd.indexOf('data-bfledger')>=0){
+        wok=false; fails++; console.log('✗ the brief dock still carries repository doors (retired v1.22.0)'); }
+      if(_bd.indexOf('ch-lbl')>=0){ wok=false; fails++; console.log('✗ the brief dock must wear the map pod grammar (no captions)'); }
+      ['data-bfclear','data-bfsearch','data-bfnm','data-bfln','data-xpbtn'].forEach(function(d){
+        if(_bd.indexOf(d)<0){ wok=false; fails++; console.log('✗ brief pod control missing: '+d); } });
       // cleanup
       try{ (global.RECORDS['fort-bragg'].people||[]).pop(); global.recDelId('fort-bragg','ID-900'); }catch(_){}
       global.Briefs.remove(0);
@@ -770,12 +783,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!/\d+ ORGS?</.test(st2)){ gok=false; fails++; console.log('✗ HEAD org count (.ch-n) missing'); }
       if(st2.indexOf('ch-hint')<0 || st2.indexOf('HOLD A LEVEL')<0){ gok=false; fails++; console.log('✗ HEAD hold-to-stack hint missing'); }
       if(!/bf-dep on[^>]*>L\d ⌄</.test(st2)){ gok=false; fails++; console.log('✗ active level cell missing its ⌄ stack affordance'); }
-      const dk=(html.split('id="briefDock"')[1]||'').split('\n</div>')[0];
-      ['>Add<','>Names<','>Lines<','>Briefs<','>Export<','>Ledger<'].forEach(function(lb){
-        if(dk.indexOf('<span class="ch-lbl">'+lb.slice(1,-1)+'<')<0){ gok=false; fails++; console.log('✗ DOCK tool label missing: '+lb); } });
-      if(dk.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ DOCK cluster divider missing'); }
-      if(dk.indexOf('data-bfledger')<0 || dk.indexOf('data-bfsearch')<0){ gok=false; fails++; console.log('✗ DOCK Add/Ledger doors missing'); }
-      if(st2.indexOf('ch-dock')>=0){ gok=false; fails++; console.log('✗ the dock must be OUT of the chart head (v1.15.0 split)'); }
+      // v1.22.0: the brief dock's caption contract retired with the captions —
+      // the pod grammar is asserted in the repository probe above.
       // v1.16.3 (owner, twice now): NO dashed rings on chart objects — ever
       if(html.indexOf('dashed var(--bfrg')>=0){ gok=false; fails++; console.log('✗ the group ring is dashed again (v1.9.1/v1.16.3 law: solid only)'); }
       if(html.indexOf('border:1.4px solid var(--bfrg')<0){ gok=false; fails++; console.log('✗ the group ring lost its solid border'); }
@@ -793,7 +802,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // nothing may hide it, so the collapse class must stay retired.
       if(html.indexOf('body.nav-off #')>=0 || html.indexOf("classList.toggle('nav-off'")>=0){
         gok=false; fails++; console.log('✗ the pod collapse law is back (retired v1.21.0 — the pod never hides)'); }
-      if(html.indexOf('body.brief-mode #navPod .tp-h{display:none}')<0){ gok=false; fails++; console.log('✗ brief must hide the pod camera controls'); }
+      if(html.indexOf('body.brief-mode #navPod{display:none}')<0){ gok=false; fails++; console.log('✗ the brief room must yield the column to its own pod'); }
       if(html.indexOf('body.brief-mode #briefDock{display:flex; flex-direction:column')<0){ gok=false; fails++; console.log('✗ the brief dock is not a vertical right rail (v1.18.0)'); }
       if(html.indexOf('Math.max(0.62,')>=0 || html.indexOf('Math.max(0.30,')<0){ gok=false; fails++; console.log('✗ the fit floor law drifted (v1.18.0: 0.30, never 0.62)'); }
       // v1.18.0 THE DIRECT LINE: connectors are cubic diagonals, not the old
@@ -865,7 +874,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(global.Briefs.list().length!==base+1){ wck=false; fails++; console.log('✗ WC: update must NOT mint a new record'); }
       if(!(global.Briefs.list()[0].nodes||[]).some(function(n){ return n.n==='WC Beta'; })){ wck=false; fails++; console.log('✗ WC: update did not capture the new state'); }
       global._sbOpenSheet();
-      const wsh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      const wsh=global.Repo.html();          // v1.22.0: the shelves render in the Repository
       if(wsh.indexOf('data-sbupdate')<0 || wsh.indexOf('WORKING COPY')<0){ wck=false; fails++; console.log('✗ WC: sheet must lead with Save-changes and mark the working copy'); }
       global.Briefs.save('WC Fork');
       if(global.Briefs.list().length!==base+2 || global.GlobeState._sbActive===id0){ wck=false; fails++; console.log('✗ WC: save-as-new must mint a sibling and take over as active'); }
@@ -938,8 +947,11 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // the doors are integrated, not side buttons
       // v1.21.0: the layers are embedded IN the globe button — tap pops the
       // selections out around it, a three-second hold saves the view.
-      if(html.indexOf('id="lyRing"')<0 || html.indexOf('class="sp-star"')<0){
-        ok=false; fails++; console.log('✗ the embedded layer ring or the saved star is missing'); }
+      if(html.indexOf('id="lyPanel"')<0 || html.indexOf('class="sp-star"')<0){
+        ok=false; fails++; console.log('✗ the layer checkbox list or the repository star is missing'); }
+      if(html.indexOf('.ly-sat{')>=0){ ok=false; fails++; console.log('✗ the orbiting layer circles are back (retired v1.22.0 — checkboxes now)'); }
+      if(html.indexOf('data-lyfam=')<0 || html.indexOf('ly-bx')<0){
+        ok=false; fails++; console.log('✗ the layer list is not checkboxes'); }
       if(html.indexOf('id="lyChip"')>=0){
         ok=false; fails++; console.log('✗ the layer chip is back (retired v1.21.0 — the globe carries it)'); }
       if(html.indexOf("svCapture();")<0 || html.indexOf("_bfToast('View saved")<0){
@@ -949,7 +961,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(html.indexOf('id="navRow"')>=0 || html.indexOf('navSat-saved')>=0 || html.indexOf('navSat-layers')>=0){
         ok=false; fails++; console.log('✗ the side-button door rail is back (retired v1.20.0)'); }
       if(html.indexOf('data-lysat=')<0){
-        ok=false; fails++; console.log('✗ the pop-out selections are missing'); }
+        ok=false; fails++; console.log('✗ the mode row is missing from the layer list'); }
       // retirements — a retired style is not retired until a probe guards it
       ['>ZOOM −<','>ZOOM +<','class="nv-side"','id="legendPanel"','#legendPanel{','.lg-head',
        "_disc('lg-classes'","('View '+(SAVEDV.length+1))",'#themeSwitch','dz-min'].forEach(function(nd){
@@ -1021,7 +1033,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         V.pin(r0.id);
         if(V.list()[0].pin!==true){ ok=false; fails++; console.log('✗ pin did not stick'); }
         V.open();
-        const sh=IDS['dossier'].innerHTML;
+        const sh=global.Repo.html();         // v1.22.0: one panel holds every saved thing
         if(sh.indexOf('data-svgo="'+r0.id)<0 || sh.indexOf('sh-gl')<0
            || sh.indexOf('data-svrn=')<0 || sh.indexOf('data-svpin=')<0){
           ok=false; fails++; console.log('✗ shelf row anatomy incomplete (id-addressed row + glyph + rename + pin)'); }
