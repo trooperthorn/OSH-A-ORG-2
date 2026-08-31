@@ -176,6 +176,12 @@
   --faint:#9C947E;                        /* 5.85:1 worst case                   */
   --safe-l:calc(env(safe-area-inset-left,0px) + 12px);
   --safe-r:calc(env(safe-area-inset-right,0px) + 12px);
+  /* v1.19.0 THE COLUMN: one token set owns the right control column, so
+     "left is content, right is control" is a value the layout enforces
+     instead of a hand-tuned inset per surface. */
+  --rail-w:60px;
+  --rail-r:var(--safe-r);
+  --gut:calc(var(--rail-r) + var(--rail-w) + 12px);
   --accent:#F5D76E;                       /* the illuminated yellow — selection/live */
   --accent-rgb:245,215,110;               /* the same light, for rgba() glows (LCD) */
   --accent-deep:#D4B54A;
@@ -337,14 +343,15 @@ body.brief-mode .ms-cell[data-mode="brief"]{background:#F5D76E; color:#141006}
 #introVeil .in-ver{font:600 10px/1 var(--mono); letter-spacing:.18em; color:var(--faint);
   transform:translateY(-16vh)}
 body.intro #titleBar, body.intro #searchPill, body.intro #timeLedger, body.intro #modeSeg,
-body.intro #navDock, body.intro #navRow, body.intro #legendPanel{opacity:0 !important; pointer-events:none !important}
+body.intro #navDock, body.intro #navRow, body.intro #navPod{opacity:0 !important; pointer-events:none !important}
 
 /* CHROME YIELDS (v0.8.0 automation): while a gesture is moving the globe, every
    floating surface steps back so the world owns the screen; it breathes back in
    the moment the hand lifts. Pure CSS response to one body flag. */
 body.gesturing #titleBar, body.gesturing #searchPill, body.gesturing #timeLedger, body.gesturing #modeSeg,
-body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
-#titleBar, #searchPill, #timeLedger, #modeSeg, #briefStage, #legendPanel{transition:opacity .3s ease}
+body.gesturing #briefStage, body.gesturing #navRow, body.gesturing #navPod,
+body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
+#titleBar, #searchPill, #timeLedger, #modeSeg, #briefStage{transition:opacity .3s ease}
 
 /* SEARCH — standalone, one job, search-engine calm */
 #searchPill{
@@ -502,31 +509,83 @@ body.gesturing #briefStage, body.gesturing #legendPanel, body.gesturing #callout
 .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
 .nv-sat:disabled + .nv-lbl{opacity:.35}
 .nv-sat:active{ background:var(--accent-wash); box-shadow:0 0 0 2px var(--accent), 0 0 20px rgba(245,215,110,.5) }
-/* v1.18.0 THE RAIL (owner: "navigation buttons readily available — a side
-   panel on the right; I underestimated how often they're needed"). The
-   satellites are PERMANENT chrome now: one vertical glass rail pinned to the
-   right edge, mid-height, always live. The FAB short-press collapses/reopens
-   it (body.nav-off); the map room never hides it on its own. */
-#navRow{
+/* v1.19.0 THE COLUMN (owner: "zoom in/zoom out & 'undo'/'x' should be their
+   own navigation buttons … easily accessible and discrete for use but out of
+   the way"). ONE right-edge column, TWO objects in frequency order: the
+   transport POD owns the bottom thumb band (94-261px from the thumb, down
+   from 449-630 on the v1.18.0 rail), the two DOORS sit above it. Same width,
+   same inset, same glass — the rooms read as one product. "Discrete" is
+   opacity on a plate, never a plateless glyph and never a timer: gold over a
+   lit coastline is 1.03:1, so the plate never dims; the column rests at .55
+   (4.71:1, clears WCAG 1.4.11) and lifts to 1 on any pointerdown. */
+#navRow, #navPod{
   position:absolute; z-index:43;
-  right:6px; left:auto; top:50%; bottom:auto; transform:translateY(-50%);
-  display:flex; flex-direction:column; align-items:center; gap:9px;
-  padding:10px 5px; border-radius:20px;
+  right:var(--rail-r); left:auto; top:auto; transform:none;
+  display:flex; flex-direction:column; align-items:center;
+  border-radius:20px;
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec), var(--drop);
-  opacity:1; pointer-events:auto;
+  opacity:.55; pointer-events:auto;
   transition:opacity .18s ease, transform .18s ease;
 }
-.nv-side{display:contents}
-body.nav-off #navRow{opacity:0; transform:translate(10px,-50%); pointer-events:none}
-body.brief-mode #navRow{display:none}   /* the brief room has its own rail (#briefDock) */
+#navRow{gap:9px; padding:10px 4px; bottom:calc(env(safe-area-inset-bottom,0px) + 272px)}
+#navPod{gap:8px; padding:8px 10px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+body.tp-live #navRow, body.tp-live #navPod{opacity:1}
+body.nav-off #navRow, body.nav-off #navPod{opacity:0; transform:translateX(10px); pointer-events:none}
+body.brief-mode #navRow{display:none}   /* the brief room has its own doors (#briefDock) */
+body.brief-mode #navPod .tp-h{display:none}   /* no camera and no undo stack in the brief room */
+#navPod .ch-div{width:22px; height:1px; margin:3px 0; background:var(--line); align-self:center}
+/* 40px of ink, 48px of thumb — the .co-x::after idiom. Smallest pod pitch is
+   59.5px, so no two hit rects touch. */
+.nv-sat{touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+.nv-sat::after{content:''; position:absolute; left:50%; top:50%;
+  width:48px; height:48px; transform:translate(-50%,-50%)}
+/* THE ROCKER — one object, two ends, a hairline seam, never a gap: three
+   near-identical circles are indistinguishable to a thumb that isn't looking,
+   and a miss lands on the other half of the same control. */
+.tp-rock{display:flex; flex-direction:column; width:40px; height:84px; border-radius:20px;
+  overflow:hidden; background:rgba(0,0,0,.30); box-shadow:inset 0 0 0 1px var(--line)}
+.tp-half{appearance:none; -webkit-appearance:none; border:0; margin:0; padding:0; cursor:pointer;
+  position:relative; flex:0 0 42px; width:40px; display:flex; align-items:center;
+  justify-content:center; background:none; color:var(--accent);
+  touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+  transition:background-color .12s ease}
+.tp-half + .tp-half{box-shadow:inset 0 1px 0 var(--line)}
+.tp-half::after{content:''; position:absolute; left:50%; top:50%;
+  width:56px; height:42px; transform:translate(-50%,-50%)}
+.tp-half:active{background:var(--accent-wash)}
+.tp-half:disabled{opacity:.35; pointer-events:none}
+/* THE LIVE SCOPE READOUT — the map opened with 166 of 285 sites hidden and,
+   until v1.19.0, said nothing. One writer: lySync(). */
+.nv-state{margin-top:2px; max-width:52px; text-align:center; white-space:pre-line;
+  font:800 7px/1.35 var(--mono); letter-spacing:.10em; color:var(--dim);
+  -webkit-user-select:none; user-select:none; pointer-events:none}
+.nv-state.on{color:var(--accent)}
+/* THE GUTTER LAW — content never enters the column. Replaces every hand-tuned
+   right inset, and closes the v1.18.0 defect where the z43 rail painted over
+   the z40 #dossier's right edge (the Saved sheet's delete ✕ was unreachable). */
+#calloutCard.co-docked{right:var(--gut)}
+#dossier{right:calc(var(--gut) - 4px)}
+#searchPill{right:max(var(--gut), calc(50% - 300px))}
+#searchResults{right:max(var(--gut), calc(50% - 300px))}
+#coachRow{right:var(--gut)}
+#errToast{right:var(--gut)}
+body.brief-mode #briefStage{right:var(--gut)}
 @media(min-width:1100px){
-  #navRow{right:18px; gap:12px}
+  :root{--rail-w:78px; --rail-r:18px}
+  #navRow{gap:12px; padding:10px 8px; bottom:calc(env(safe-area-inset-bottom,0px) + 356px)}
+  #navPod{gap:10px; padding:10px 11px; bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
   .nv-cell{gap:5px}
   .nv-lbl{font-size:7px; color:var(--dim)}
   .nv-sat{width:56px; height:56px;
     background:linear-gradient(180deg, rgba(26,22,14,.94), rgba(8,7,4,.96));
     box-shadow:0 0 0 1px rgba(240,220,140,.28), inset 0 1px 0 var(--spec), var(--drop)}
+  .nv-sat::after{width:56px; height:56px}
+  .tp-rock{width:56px; height:116px; border-radius:28px}
+  .tp-half{flex:0 0 58px; width:56px}
+  .tp-half::after{width:72px; height:58px}
+  .nv-state{max-width:64px; font-size:7.5px}
+  #errToast{left:auto; right:var(--gut); max-width:520px}
 }
 /* v1.14.0 — the FAB label: CONTROLS in the map room, TO MAP in the brief. */
 .nv-fablbl{position:absolute; left:0; top:3px; transform:translateX(-50%);
@@ -547,7 +606,7 @@ body.brief-mode #briefStage{
      near-black that the world glows through at the edges; no ring, no drop.
      Full pane minus 6px gutters on phone; centered 880px on desktop. */
   display:block; position:absolute; z-index:16;
-  left:6px; right:60px;   /* v1.18.0: the right rail owns the edge */
+  left:6px; right:var(--gut);   /* v1.19.0: the gutter token owns the edge */
   /* v1.16.3 (owner: "maximize space — push top up and bottom down"): the
      console hugs the seg (+84) and may run down to the lowered search pill */
   top:calc(env(safe-area-inset-top,0px) + 84px);
@@ -606,8 +665,8 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch
    one vertical pill on the right edge, always live. The bottom band frees up. */
 body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:2px;
   position:absolute; z-index:43;
-  right:6px; left:auto; top:50%; bottom:auto; transform:translateY(-50%);
-  padding:9px 5px}
+  right:var(--rail-r); left:auto; top:auto; bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
+  transform:none; padding:9px 8px}
 #briefDock .ch-div{width:20px; height:1px; margin:3px 0; align-self:center}
 #briefDock .bd-gap{display:none}
 body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .15s ease}
@@ -617,7 +676,7 @@ body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .1
   body.brief-mode #searchPill{bottom:calc(env(safe-area-inset-bottom,0px) + 74px)}
   body.brief-mode #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 126px)}
 }
-@media(min-width:1100px){ body.brief-mode #briefDock{right:18px} }
+@media(min-width:1100px){ body.brief-mode #briefDock{bottom:calc(env(safe-area-inset-bottom,0px) + 120px)} }
 /* v1.15.0 — the chart-to-globe leader */
 #bfLeader{position:absolute; inset:0; z-index:15; pointer-events:none}
 #bfLeader[hidden]{display:none}
@@ -779,7 +838,7 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
   background:linear-gradient(180deg, transparent, var(--panel) 22%)}
 .bf-commit.in{background:var(--accent); color:#1a1305; box-shadow:none}
 .bf-commit.in:active{filter:brightness(1.1)}
-.bf-toast{position:fixed; left:50%; transform:translateX(-50%) translateY(8px); z-index:60;
+.bf-toast{position:fixed; left:calc((100% - var(--gut)) / 2); transform:translateX(-50%) translateY(8px); z-index:60;   /* v1.19.0: centred on the CONTENT, so it never drifts under the control column */
   bottom:calc(env(safe-area-inset-bottom,0px) + 180px); padding:9px 14px; border-radius:12px;
   background:linear-gradient(180deg, rgba(60,46,14,.98), rgba(32,24,8,.98));
   box-shadow:0 0 0 1.3px var(--accent), 0 8px 22px -10px rgba(0,0,0,.7);
@@ -933,11 +992,19 @@ body.brief-mode #globeCanvas{opacity:.78}
 /* ─── 6 · FOCUS + MOTION DISCIPLINE ────────────────────────────────────────── */
 /* ported focus-visible idiom (A-ORG-1 ~L4890), accent-voiced for arctic */
 button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focus-visible{
-  outline:2px solid var(--accent); outline-offset:2px}
+  outline:2px solid var(--accent); outline-offset:2px;
+  box-shadow:0 0 0 4px rgba(6,5,4,.9)}   /* v1.19.0: a gold ring alone has no
+     guaranteed adjacent colour over an arbitrary globe pixel — the dark halo
+     buys the ring its contrast wherever focus lands */
 #searchPill input:focus-visible{outline:none}   /* the pill's focus-within ring speaks */
 /* all motion dies under prefers-reduced-motion (doctrine) */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important; animation:none!important}
+  /* v1.19.0: vestibular motion dies, TAP CONFIRMATION lives. A control that
+     cannot acknowledge a press reads as broken, and these are the only
+     single-pointer path to zoom out. */
+  .nv-sat,.tp-half,.ly-tile,.lg-row,.od-tab{
+    transition:opacity .12s ease, background-color .12s ease, box-shadow .12s ease !important}
 }
 
 /* ─── 7 · DESKTOP ≥1100px — ENHANCEMENTS ONLY (phone-first is sacred) ──────── */
@@ -946,7 +1013,6 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   #searchPill{left:0; right:0; width:560px; margin-inline:auto}
   #searchResults{left:0; right:0; width:560px; margin-inline:auto;
     bottom:calc(env(safe-area-inset-bottom,0px) + 160px)}   /* three-row law holds on desktop too */
-  #themeSwitch{top:calc(env(safe-area-inset-top,0px) + 12px); right:24px}
   /* the time ledger takes the true corner (design 2a: top 64, right 18) */
   #timeLedger{top:calc(env(safe-area-inset-top,0px) + 64px); right:18px}
   #timeLedger:hover{filter:brightness(1.12)}
@@ -958,7 +1024,6 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
   #dossier{left:var(--safe-l); right:auto; width:400px;
     top:calc(env(safe-area-inset-top,0px) + 114px); bottom:auto;
     max-height:calc(100vh - 180px); max-height:calc(100dvh - 180px)}
-  #stageBar{bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
   /* hovers live ONLY here */
   .pill:hover,.chip:hover{
     box-shadow:0 0 0 1px var(--accent), inset 0 1px 0 var(--spec), var(--drop);
@@ -975,20 +1040,55 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
    (owner references: edge chrome, the globe never impeded) ═══ */
 /* (trail bar retired at v0.3.0 — crumbs live in the sheet header) */
 
-#legendPanel{position:absolute; z-index:40; left:var(--safe-l);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
-  width:min(78vw,280px); max-height:46vh; max-height:46dvh; overflow-y:auto;
-  -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding:6px}
-.lg-head{font:800 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
-  color:var(--faint); padding:8px 10px 6px}
+/* v1.19.0: #legendPanel is RETIRED — Layers is a pane of the one drawer.
+   The floating card bloomed bottom-LEFT from a right-edge button, shared
+   #searchPill's exact anchor at a higher z, was missing from the canvas
+   chrome zones, and its own button could never close it. The .lg-* row
+   vocabulary survives; only the container and its head are gone. */
 .lg-row{display:flex; align-items:center; gap:9px; width:100%; border:none; background:none;
   cursor:pointer; padding:8px 10px; border-radius:9px; color:var(--text); font:600 12.5px/1.2 var(--body); text-align:left}
 .lg-row:active{background:var(--accent-wash)}
-.lg-row.off{opacity:.38}
-.lg-row.off .lg-nm{text-decoration:line-through}
-.lg-sw{flex:none; width:11px; height:11px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.lg-row{min-height:48px}                 /* a thumb target in a sheet, not a list item */
+.lg-row.off .lg-nm, .lg-row.off .lg-ct{color:var(--faint); text-decoration:line-through}
+.lg-zero{opacity:.3; pointer-events:none}
+.lg-dep .lg-nm{color:var(--faint)}
+.lg-sw{flex:none; width:16px; height:16px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,.25)}
 .lg-sw-vw{box-shadow:none; background:none; display:flex; align-items:center; justify-content:center;
-  font:800 10px/1 var(--mono); color:var(--accent)}
+  font:800 9.5px/1 var(--mono); color:var(--accent)}
+/* THE MODE STRIP — every configuration of the map has a NAME, so the app can
+   never again show a filtered map without saying so. Modes WRAP the family
+   toggles; CUSTOM is derived and inert, never a tile you press. */
+.ly-strip{display:flex; gap:7px; overflow-x:auto; scrollbar-width:none; padding:8px 0 4px; margin:0 -2px}
+.ly-strip::-webkit-scrollbar{display:none}
+.ly-tile{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
+  flex:0 0 auto; width:84px; min-height:60px; padding:8px 6px; border-radius:12px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  background:rgba(0,0,0,.30); box-shadow:0 0 0 1px var(--line); color:var(--dim)}
+.ly-tile b{font:700 15px/1 var(--body); color:var(--text)}
+.ly-tile span{font:800 9px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase}
+.ly-tile.on{background:var(--accent-wash); box-shadow:0 0 0 1.5px var(--accent); color:var(--accent)}
+.ly-tile.on b{color:var(--accent)}
+.ly-tile:active{background:var(--accent-wash)}
+.ly-cust{cursor:default; pointer-events:none}
+/* THE SHELF ROW — a saved thing answers "is this the one?" without opening:
+   a deterministic 30px glyph drawn from the record's own camera, zero stored
+   bytes (24 raster thumbs would be ~1MB through IndexedDB and the board). */
+.sh-gl{flex:none; width:30px; height:30px; fill:none; stroke:rgba(245,215,110,.55); stroke-width:1.3}
+.sh-gl .sh-pin{fill:var(--accent); stroke:none}
+.sh-acts{margin-left:auto; display:flex; align-items:center; gap:4px}
+/* the scope line is the point of the row — give it its own line rather than
+   letting the glyph and three actions squeeze it to "WORK…" */
+.sh-row{align-items:center}
+.sh-txt{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px}
+.sh-row .rc-top{flex:none; max-width:100%}
+.sh-row .rc-sub{flex:none; width:100%; white-space:normal; overflow:visible;
+  font:500 11px/1.3 var(--body)}
+.sh-acts .od-ico{width:30px; height:30px}
+.sh-acts .od-ico{margin-left:0}
+.sh-pn{color:var(--faint)}
+.sh-pn.on{color:var(--accent)}
+.sh-rn{color:var(--faint)}
+.sr-tag-view{background:var(--accent-wash); color:var(--accent)}
 .lg-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .lg-ct{flex:none; font:700 10.5px/1 var(--mono); color:var(--faint)}
 
@@ -1026,16 +1126,6 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 .xp-row:active{background:var(--accent-wash)}
 .xp-row b{display:block; font:700 13px/1.25 var(--body)}
 .xp-row span{display:block; font:500 11px/1.35 var(--body); color:var(--dim); margin-top:1px}
-
-/* slim-first dossier: the bottom NAME BAR (owner reference #2). Phone-scoped —
-   desktop's side card never covers the sphere. Collapsed shows head + unit +
-   stats; a fade hints at depth; tapping the card body toggles. */
-@media (max-width:1099px){
-  #dossier.dz-min{max-height:132px; overflow:hidden}  /* absolute base stays — relative here once dropped the card into page flow */
-  #dossier.dz-min::after{content:''; position:absolute; left:0; right:0; bottom:0; height:34px;
-    background:linear-gradient(180deg, rgba(0,0,0,0), var(--glass-lo)); pointer-events:none;
-    border-radius:0 0 var(--r-card) var(--r-card)}
-}
 
 /* ═══ v0.4.0 DATASTORE — sheet tabs · record rows · one add/edit form ═══ */
 .od-tabs{display:flex; gap:4px; margin-top:12px; border-radius:12px; background:rgba(0,0,0,.35);
@@ -1283,7 +1373,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      must never land under another control (re-verify law, gestures journey) */
   /* v1.18.0 (owner): the overview stays on the LEFT — the right edge belongs
      to the nav rail, so the card never covers it */
-  left:var(--safe-l) !important; right:calc(var(--safe-r) + 56px); top:calc(env(safe-area-inset-top,0px) + 136px) !important;
+  left:var(--safe-l) !important; right:var(--gut); top:calc(env(safe-area-inset-top,0px) + 136px) !important;
   width:auto; max-height:42vh; max-height:42dvh; overflow-y:auto;
   -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
 }
@@ -1373,17 +1463,28 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 <!-- v1.14.0 (design 3a): every satellite wears its name — micro-labels under the
      circles on desktop, one labeled dock strip on phones. The Brief satellite is
      retired: the mode seg is the room door now (FAB hold stays the shortcut). -->
-<div id="navRow" aria-label="Map controls">
-  <div class="nv-side">
-    <div class="nv-cell"><button id="navSat-back"  class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button><span class="nv-lbl">UNDO</span></div>
-    <div class="nv-cell"><button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear selection"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button><span class="nv-lbl">CLEAR</span></div>
-    <div class="nv-cell"><button id="navSat-zoomout" class="nv-sat glass" type="button" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button><span class="nv-lbl">ZOOM −</span></div>
-  </div>
-  <div class="nv-side">
-    <div class="nv-cell"><button id="navSat-zoomin" class="nv-sat glass" type="button" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><span class="nv-lbl">ZOOM +</span></div>
-    <div class="nv-cell"><button id="navSat-saved" class="nv-sat glass" type="button" aria-label="Saved"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button><span class="nv-lbl">SAVED</span></div>
-    <div class="nv-cell"><button id="navSat-layers" class="nv-sat glass" type="button" aria-label="Layers"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button><span class="nv-lbl">LAYERS</span></div>
-  </div>
+<!-- v1.19.0 THE DOORS (owner: "a brand new plan for save and especially the
+     layers sections"). The rail keeps only the two cells that OPEN a surface;
+     the four controls the owner circled moved to #navPod below. The LAYERS
+     cell wears the app's first honest scope readout: the map opens with 166
+     of 285 sites hidden and, until now, said nothing about it. -->
+<div id="navRow" role="toolbar" aria-orientation="vertical" aria-label="Map panels">
+<div class="nv-cell"><button id="navSat-saved" class="nv-sat glass" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Saved views"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button><span class="nv-lbl">SAVED</span></div>
+<div class="nv-cell"><button id="navSat-layers" class="nv-sat glass" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Layers"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button><span class="nv-lbl">LAYERS</span><span class="nv-state" id="lyState" aria-hidden="true">BASES
+119</span></div>
+</div>
+
+<!-- v1.19.0 THE POD (owner, verbatim: "zoom in/zoom out & 'undo'/'x' should be
+     their own navigation buttons. Redesign that has them easily accessible and
+     discrete for use but out of the way"). All four left the rail for the
+     bottom thumb band — 94-261px from the thumb, down from 449-630. Order is
+     consequence order: the reset sits farthest, UNDO between it and the
+     rocker, so a slip off zoom lands on the recovery and never on the reset. -->
+<div id="navPod" role="toolbar" aria-orientation="vertical" aria-label="Camera and history">
+<div class="nv-cell"><button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear the map"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button><span class="nv-lbl">CLEAR</span></div>
+<span class="ch-div" aria-hidden="true"></span>
+<div class="nv-cell tp-h"><button id="navSat-back" class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button><span class="nv-lbl">UNDO</span></div>
+<div class="nv-cell tp-h"><span class="tp-rock"><button id="navSat-zoomin" class="tp-half" type="button" aria-label="Zoom in — hold to keep zooming"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><button id="navSat-zoomout" class="tp-half" type="button" aria-label="Zoom out — hold to keep zooming"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button></span><span class="nv-lbl">ZOOM</span></div>
 </div>
 
 <nav id="navDock" aria-label="Navigation">
@@ -1425,7 +1526,6 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 </div>
 
 <!-- family legend / layer list — swatch · name · count; tap toggles the family -->
-<section id="legendPanel" class="glass card" hidden aria-label="Map layers"></section>
 
 <!-- export chooser — the Snapshot spine's front door -->
 <section id="exportSheet" class="glass card" hidden aria-label="Export">
@@ -1456,6 +1556,27 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.19.0 • THE POD & THE MODES (owner: "zoom in/zoom out & 'undo'/'x'
+//            should be their own navigation buttons … easily accessible and
+//            discrete for use but out of the way" + "a brand new plan for save
+//            and especially the layers sections … the most intuitive way to
+//            display this … sustainable moving forward"). The four circled
+//            controls left the rail for #navPod, a vertical glass pod in the
+//            bottom thumb band — 94-261px from the thumb, down from 449-630.
+//            Zoom is one fused rocker with hold-to-repeat; it now cancels a
+//            live camera tween and enters the undo stack (one slot per burst).
+//            The rail keeps two labelled doors, SAVED and LAYERS, and the
+//            LAYERS cell wears the app's first honest scope readout: the map
+//            opened with 166 of 285 sites hidden and never said so.
+//            #legendPanel is retired — Layers and Saved are two tabs of the
+//            ONE drawer, with five named modes (BASES 119 · COMMAND 126 ·
+//            SUPPORT 191 · GUARD 206 · ALL 285) and a derived CUSTOM. Saved
+//            views can be named at capture, renamed, pinned and searched, and
+//            they now carry the layer state they were saved with; recall is
+//            map-only and clamps a corrupt camera. Records written by a device
+//            still on v1.18.0 will lack id/lay/pin — they still recall (camera
+//            only). The --gut token replaces every hand-tuned right inset and
+//            closes the v1.18.0 defect where the rail painted over the sheet.
 //   v1.18.0 • THE RAILS (owner: "navigation buttons readily available — a
 //            side panel on the right; same for brief; overview/details stay
 //            left; lines most direct; fit stuck at 62%"). Map satellites and
@@ -1753,7 +1874,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.18.0';
+const APP_VERSION = 'v1.19.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -2779,7 +2900,7 @@ function flyToLatLon(lat, lon, zoom, onArrive){
 //      re-marking dirty from inside a draw would fight the redraw-only-when-dirty
 //      law. globeMark() fires only from _syncSelArcs (an event, not a frame).
 //   4. _gChromeZones measures the A-ORG-2 shell contract ids (#searchPill,
-//      #searchResults, #dossier, #stageBar, #clockTL/TR/BL/BR, #themeSwitch,
+//      #searchResults, #dossier, #navRow/#navPod, #timeLedger,
 //      #verChip) instead of A-ORG-1's v22 selector list, and its no-DOM fallback is
 //      [] (A-ORG-1 fell back to its legacy v13 static zones, which describe a layout
 //      A-ORG-2 never had).
@@ -2896,54 +3017,125 @@ function _famOffSet(){
   if(!GlobeState._famOff){ GlobeState._famOff=new Set(_FAM_DEFAULT_OFF); }
   return GlobeState._famOff;
 }
-function renderLegend(){
-  const el=document.getElementById('legendPanel'); if(!el) return;
+// ═══ v1.19.0 THE MODES (owner: "a brand new plan for … especially the layers
+// sections … the most intuitive way to display this") ═══
+// The map opened with 166 of its 285 sites hidden and said NOTHING — a filter
+// the user never applied, with no memory to recover from, so missing data reads
+// as data that does not exist. The fix is a naming law: every configuration of
+// the map is a NAMED MODE, printed permanently on the LAYERS cell. BASES stops
+// being an undocumented constant (_FAM_DEFAULT_OFF) and becomes a choice you can
+// see, name and leave. Modes WRAP the family toggles — they never replace them —
+// and CUSTOM is derived, never a tile you press.
+const LY_MODES=[
+  {k:'bases',   n:'BASES',   off:['hq','depot','usace','guard']},
+  {k:'command', n:'COMMAND', off:['depot','usace','guard']},
+  {k:'support', n:'SUPPORT', off:['hq','guard']},
+  {k:'guard',   n:'GUARD',   off:['hq','depot','usace']},
+  {k:'all',     n:'ALL',     off:[]}];
+let _lyCt=null;
+function lyCounts(){
+  if(_lyCt) return _lyCt;
+  const c={}; for(const st of _sitesArr()){ const k=clsOf(st.id); c[k]=(c[k]||0)+1; }
+  return (_lyCt=c);
+}
+function lyShown(off){ const c=lyCounts(); let n=0; for(const k in c){ if(!off.has(k)) n+=c[k]; } return n; }
+function lyModeN(m){ const c=lyCounts(); let n=0; for(const k in c){ if(m.off.indexOf(k)<0) n+=c[k]; } return n; }
+function lyKey(){
   const off=_famOffSet();
-  const counts={}; for(const st of _sitesArr()){ const k=clsOf(st.id); counts[k]=(counts[k]||0)+1; }
-  let h='<div class="lg-head">Layers</div>';
-  // v0.22.0 — VIEW toggles trimmed to the two that matter (owner: "too many
-  // options for turning off lines, dots"). Dots and Lines are gone: the map's
-  // connections now follow the selection, and hiding dots only broke selection.
-  [['names','Labels','_namesOff'],['usace','USACE labels','_usaceOff']].forEach(function(v){
-    h+='<button type="button" class="lg-row'+(GlobeState[v[2]]?' off':'')+'" data-vw="'+v[0]+'">'
-      +'<span class="lg-sw lg-sw-vw">'+(v[0]==='names'?'A':'U')+'</span>'
-      +'<span class="lg-nm">'+v[1]+'</span><span class="lg-ct">'+(GlobeState[v[2]]?'off':'on')+'</span></button>';
-  });
-  // v0.22.0 — Classes collapse behind an accordion (owner: "too many options ...
-  // not by default"). The two view toggles stay; the class list expands on tap.
-  let famH=''; let famN=0;
-  for(const k of Object.keys(CLS_META)){
-    if(!counts[k]) continue; famN++;
-    famH+='<button type="button" class="lg-row'+(off.has(k)?' off':'')+'" data-fam="'+k+'">'
-      +'<span class="lg-sw" style="background:rgb('+CLS_META[k].c+')"></span>'
-      +'<span class="lg-nm">'+CLS_META[k].n+'</span><span class="lg-ct">'+counts[k]+'</span></button>';
+  for(const m of LY_MODES){
+    if(m.off.length===off.size && m.off.every(function(k){ return off.has(k); })) return m.k;
   }
-  h+=_disc('lg-classes','Classes', famH, {count:famN, def:false});
-  el.innerHTML=h;
+  return 'custom';
 }
-try{ window.renderLegend=renderLegend; }catch(_){}
-if(!window.__lgWired){ window.__lgWired=true;
-  document.addEventListener('click', function(e){
-    if(!e.target||!e.target.closest) return;
-    const r=e.target.closest('.lg-row');
-    if(r){
-      const vw=r.getAttribute('data-vw');
-      if(vw){                                            // view toggles: names · dots · lines
-        const flag={names:'_namesOff', usace:'_usaceOff'}[vw];
-        if(flag) GlobeState[flag]=!GlobeState[flag];
-      } else {
-        const k=r.getAttribute('data-fam');
-        const off=_famOffSet();
-        if(off.has(k)) off.delete(k); else off.add(k);
-      }
-      renderLegend();
-      if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true;
-      return; }
-    // tap-away closes the panel (never over the globe's tap — canvas taps route via m3)
-    const p=document.getElementById('legendPanel');
-    if(p&&!p.hidden&&!e.target.closest('#legendPanel')) p.hidden=true;
+function lySync(){                        // the ONE writer of the scope readout
+  try{
+    const el=document.getElementById('lyState'); if(!el) return;
+    const off=_famOffSet(), k=lyKey();
+    const m=LY_MODES.filter(function(x){ return x.k===k; })[0];
+    el.textContent=(m?m.n:'CUSTOM')+'\n'+lyShown(off);     // .nv-state is white-space:pre-line
+    el.classList.toggle('on', off.size>0 || !!GlobeState._namesOff || !!GlobeState._usaceOff);
+  }catch(_){}
+}
+function lyMode(k){
+  const m=LY_MODES.filter(function(x){ return x.k===k; })[0]; if(!m) return;
+  GlobeState._famOff=new Set(m.off);
+  renderLegend(); lySync(); try{ globeMark(); }catch(_){}
+}
+function lyFam(k){
+  const off=_famOffSet(); if(off.has(k)) off.delete(k); else off.add(k);
+  renderLegend(); lySync(); try{ globeMark(); }catch(_){}
+}
+function lyView(v){
+  const f={names:'_namesOff', usace:'_usaceOff'}[v]; if(!f) return;
+  GlobeState[f]=!GlobeState[f];
+  renderLegend(); lySync(); try{ globeMark(); }catch(_){}
+}
+// A search hit for a hidden family used to draw only while selected and then
+// vanish with no explanation — across 166 of 285 sites at first run. Gated on
+// the search path alone so nothing internal can weaken the boot default.
+function _lyEnsure(id){
+  try{
+    const k=clsOf(id), off=_famOffSet();
+    if(off.has(k)){
+      off.delete(k); renderLegend(); lySync(); try{ globeMark(); }catch(_){}
+      try{ _bfToast(CLS_META[k].n+' layer turned on so this stays visible'); }catch(_){}
+    }
+  }catch(_){}
+}
+// THE PANE — no accordion, nothing collapsed, no Apply/Cancel. The mutation is
+// a client-side Set, so the dots appearing IS the confirmation; the BASES tile
+// is the local reset and ✕ is the global one.
+function _shPaneLay(){
+  const off=_famOffSet(), c=lyCounts(), k=lyKey();
+  const shown=lyShown(off), total=lyShown(new Set());
+  const nOff=off.size;
+  let h='<div class="rc-sublab">Showing '+shown+' of '+total
+    +(nOff? (' · '+nOff+' layer'+(nOff>1?'s':'')+' off') : ' · all layers on')+'</div>';
+  h+='<div class="ly-strip">';
+  LY_MODES.forEach(function(m){
+    const on=(k===m.k);
+    h+='<button type="button" class="ly-tile'+(on?' on':'')+'" data-lyp="'+m.k+'" aria-pressed="'+(on?'true':'false')+'">'
+      +'<b>'+lyModeN(m)+'</b><span>'+m.n+'</span></button>';
   });
+  if(k==='custom') h+='<span class="ly-tile on ly-cust"><b>'+shown+'</b><span>Custom</span></span>';
+  h+='</div>';
+  h+='<div class="rc-sublab">Classes</div>';
+  const INI={base:'B', hq:'H', depot:'D', usace:'U', guard:'G'};
+  Object.keys(CLS_META).forEach(function(fk){
+    const n=c[fk]||0, hidden=off.has(fk);
+    // a family that silently vanished destroyed the user's ability to tell
+    // "none of these exist" from "this category was removed from the UI"
+    const cls='lg-row'+(n?(hidden?' off':''):' lg-zero');
+    h+='<button type="button" class="'+cls+'" data-fam="'+fk+'" aria-pressed="'+(hidden?'false':'true')+'">'
+      +'<span class="lg-sw lg-sw-vw">'+(INI[fk]||'·')+'</span>'
+      +'<span class="lg-nm">'+CLS_META[fk].n+'</span><span class="lg-ct">'+n+'</span></button>';
+  });
+  h+='<div class="rc-sublab">Map text</div>';
+  // v0.22.0 law holds: EXACTLY two view toggles, never dots/lines. Modes use
+  // data-lyp precisely so that count stays two.
+  [['names','Labels','_namesOff','A'],['usace','USACE labels','_usaceOff','U']].forEach(function(v){
+    const isOff=!!GlobeState[v[2]];
+    // "USACE labels" is inert until the USACE family is on — say so rather than
+    // letting the toggle look broken
+    const dep=(v[0]==='usace' && off.has('usace'));
+    h+='<button type="button" class="lg-row'+(isOff?' off':'')+(dep?' lg-dep':'')+'" data-vw="'+v[0]+'"'
+      +' aria-pressed="'+(isOff?'false':'true')+'"'
+      +(dep?' aria-label="USACE labels — turn the USACE layer on to see them"':'')+'>'
+      +'<span class="lg-sw lg-sw-vw">'+v[3]+'</span>'
+      +'<span class="lg-nm">'+v[1]+'</span><span class="lg-ct">'+(isOff?'off':'on')+'</span></button>';
+  });
+  return h;
 }
+// PURE re-render: it repaints the Layers pane if and only if the drawer is
+// already showing it, and can NEVER force a surface open.
+function renderLegend(){
+  const h=document.getElementById('dossier');
+  if(!h || h.hidden || h.dataset.shTab!=='lay') return;
+  _shOpen('lay');
+}
+try{ window.renderLegend=renderLegend;
+     window.Layers={ open:function(){ _shOpen('lay'); }, mode:lyMode, key:lyKey,
+       shown:function(){ return lyShown(_famOffSet()); } }; }catch(_){}
 
 // (parentChainOf cut at v0.11.0 with childrenOf — ogChainUp owns ancestry.)
 
@@ -3141,7 +3333,7 @@ function _gChromeZones(m){
       const kx=W/cr.width, ky=H/cr.height, live=[], PAD=4;
       const sels=['#searchPill','#searchResults','#dossier','#titleBar',
                   '#timeLedger','#modeSeg','#navGlobe',
-                  '#calloutCard','#briefStage','#navRow'];   // v0.29.0 audit: canvas text must never ghost under glass
+                  '#calloutCard','#briefStage','#navRow','#navPod','#briefDock','#exportSheet'];   // v0.29.0 audit: canvas text must never ghost under glass
       for(const s of sels){
         const el=document.querySelector(s); if(!el) continue;
         const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
@@ -4407,7 +4599,7 @@ function _sfsPaint(res){
   // total (audit #21 stands); when more exist beyond the cap it says "closest".
   const count = shown===1 ? '1 match'
     : (res.total>shown ? 'closest '+shown+' shown' : shown+' matches');
-  dd.innerHTML=res.list.map(function(e,i){
+  dd.innerHTML=_svSearchRows(res.q)+res.list.map(function(e,i){
     const isOrg=String(e.id).slice(0,3)==='og:';
     const isSt=!!bfStateName(e.id);
     const tag=isSt?'<span class="sr-tag sr-tag-state">STATE</span>'
@@ -4419,11 +4611,29 @@ function _sfsPaint(res){
   }).join('')+'<div class="sr-count">'+_srEsc(count)+'</div>';
 }
 
+// v1.19.0 ZERO-DOOR RECALL — typing a saved view's name ranks it above the raw
+// site. Prepended into the paint, never into _searchEntries(), so the index
+// keeps its exact-length contract.
+function _svSearchRows(q){
+  try{
+    const s2=String(q||'').trim().toLowerCase(); if(s2.length<2) return '';
+    const hits=SAVEDV.filter(function(v){ return v && String(v.n||'').toLowerCase().indexOf(s2)>=0; }).slice(0,2);
+    if(!hits.length) return '';
+    return '<div class="sr-count">SAVED</div>'+hits.map(function(v){
+      return '<button type="button" class="sr-row" role="option" aria-selected="false"'
+        +' data-svgo="'+_srEscA(_shId(v,_svSave))+'">'
+        +'<span class="sr-tag sr-tag-view">VIEW</span>'
+        +'<b>'+_srEsc(v.n||'')+'</b><span class="sr-sub">'+_srEsc(_shScope(v))+'</span></button>';
+    }).join('');
+  }catch(_){ return ''; }
+}
+
 // ---- THE select (mission contract; deviation 6 — m5 lazy-follows sel) ----------
 // v0.6.0: delegates to the canonical selectSite (s4) so a search pick rides the
 // SAME rails as every other pick — trail crumb, SELECT-clock auto-fill, brief
 // re-render. The inline body below is only the boot-order fallback (s4 absent).
 function searchSelect(id){
+  _lyEnsure(id);   // v1.19.0: never hand back a result the layers then hide
   // v0.24.0 — a US STATE pick. In the brief room it becomes a highlighted node;
   // on the map it is only a place to look at (the rooms never cross-write).
   const _stn=bfStateName(id);
@@ -4551,6 +4761,15 @@ document.addEventListener('keydown', function(e){
 
 document.addEventListener('click', function(e){
   if(!e.target.closest) return;
+  // v1.19.0: a saved view in the results recalls straight from the pill —
+  // zero doors between "I know its name" and being back there.
+  const sv=e.target.closest('#searchResults [data-svgo]');
+  if(sv){
+    try{ svRecall(sv.getAttribute('data-svgo')); }catch(_){}
+    const i0=_sfsField(); if(i0){ i0.value=''; try{ i0.blur(); }catch(_){} }
+    sfsRender(null);
+    return;
+  }
   const sb=e.target.closest('#searchResults [data-sfs]');
   if(sb){                                                // ported (~L22845): tap = pick
     searchSelect(sb.getAttribute('data-sfs'));
@@ -4743,18 +4962,130 @@ function _odEscA(v){ return String(v).replace(/"/g,'&quot;').replace(/</g,'&lt;'
 // UNDO SPINE (v0.8.0 owner: back = undo one step). Every discrete navigation
 // act — a pick, a clear, a double-tap dive, a cluster fly, a recall — pushes
 // the camera+selection it is about to replace. The ring's back pops one.
+// v1.19.0 THE CAMERA RECORD — one snapshot shape, one restore path. The undo
+// stack, saved views and (from here) every recall share them, so a fix like the
+// isFinite guard or the zoom clamp lands everywhere at once. _camSnap never
+// carries `lay`: undo restores the camera, not the layer state (an undo that
+// silently re-filtered the map would be a worse surprise than the one it fixes).
+function _camSnap(){
+  return { yaw:GlobeState.yaw, pitch:GlobeState.pitch, zoom:GlobeState.zoom,
+    sel:GlobeState.sel, brief:document.body.classList.contains('brief-mode'), ts:Date.now() };
+}
+function _camApply(st, o){
+  o=o||{};
+  try{ cameraCancel(); }catch(_){}
+  GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState.spin=false;
+  if(isFinite(st.yaw)) GlobeState.yaw=st.yaw;
+  if(isFinite(st.pitch)) GlobeState.pitch=st.pitch;
+  if(isFinite(st.zoom)) GlobeState.zoom=Math.max(1.0, Math.min(28, st.zoom));
+  if(o.lay && st.lay && Array.isArray(st.lay.f)){
+    GlobeState._famOff=new Set(st.lay.f);          // ALWAYS a Set — the harness law
+    GlobeState._namesOff=!!st.lay.n; GlobeState._usaceOff=!!st.lay.u;
+    try{ renderLegend(); }catch(_){} try{ lySync(); }catch(_){}
+  }
+  try{ if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  if(st.sel!=null && siteById(st.sel)) selectSite(st.sel,{keepCam:true, noUndo:true});
+  else selectSite(null,{noUndo:true});
+  if(o.room!==false){
+    try{ const want=st.brief?'brief':'map', cur=document.body.classList.contains('brief-mode')?'brief':'map';
+      if(want!==cur) setMode(want); }catch(_){}
+  }
+  try{ tpSync(); }catch(_){}
+}
 function _undoPush(){
   try{
     const u=GlobeState._undo||(GlobeState._undo=[]);
     const last=u[u.length-1];
-    const cur={yaw:GlobeState.yaw, pitch:GlobeState.pitch, zoom:GlobeState.zoom,
-      sel:GlobeState.sel, brief:document.body.classList.contains('brief-mode'),
-      ts:performance.now()};
+    const cur=_camSnap(); cur.ts=performance.now();
     if(last && last.sel===cur.sel && Math.abs(last.yaw-cur.yaw)<1e-4
        && Math.abs(last.pitch-cur.pitch)<1e-4 && Math.abs(last.zoom-cur.zoom)<1e-3) return;
     u.push(cur); if(u.length>24) u.shift();
   }catch(_){}
 }
+// ═══ v1.19.0 THE POD — the four controls the owner circled, with the five
+// defects their old rail branches carried, fixed:
+//   1. a zoom press now CANCELS a live camera tween (the rail's was the only
+//      zoom path that didn't — a press during a fly-to was overwritten next frame)
+//   2. hold-to-repeat: nine taps corner-to-corner is what "always needed" meant
+//   3. zoom enters the undo stack, coalesced to one slot per 600ms burst
+//   4. ✕ clears THEN syncs (the old order computed states from the pre-clear zoom)
+//   5. the disable thresholds killed each button a full step early (1.01 / 27.9)
+let _tpBurst=0, _tpRAF=0, _tpHold=null, _tpId=null, _tpDir=0, _tpLiveT=null;
+function tpLive(){
+  try{
+    document.body.classList.add('tp-live');
+    clearTimeout(_tpLiveT);
+    _tpLiveT=setTimeout(function(){ try{ document.body.classList.remove('tp-live'); }catch(_){} }, 1600);
+  }catch(_){}
+}
+function tpSync(){                       // THE ONLY refresher of transport state
+  try{
+    const u=document.getElementById('navSat-back');
+    if(u) u.disabled=!((GlobeState._undo||[]).length);
+    const zo=document.getElementById('navSat-zoomout');
+    if(zo) zo.disabled=(GlobeState.zoom<=1.001);
+    const zi=document.getElementById('navSat-zoomin');
+    if(zi) zi.disabled=(GlobeState.zoom>=27.99);
+    // ✕ is NEVER disabled (v0.32.2): it is the room reset, and a disabled
+    // button swallows its own tap silently.
+  }catch(_){}
+}
+function tpZoom(dir, ramp){
+  try{
+    if(!ramp){ try{ cameraCancel(); }catch(_){} }
+    GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState.spin=false;
+    const now=performance.now();
+    if(now-_tpBurst>600){ try{ _undoPush(); }catch(_){} }   // one slot per burst, not nine
+    _tpBurst=now; GlobeState._touched=true;
+    const f = ramp ? 1.06 : 1.45;
+    GlobeState.zoom = (dir>0) ? Math.min(28, GlobeState.zoom*f) : Math.max(1.0, GlobeState.zoom/f);
+    try{ globeMark(); }catch(_){}
+  }catch(_){}
+  if(!ramp) tpLive();
+  tpSync();
+}
+function tpUndo(){
+  const st=(GlobeState._undo||[]).pop();
+  if(st) _camApply(st,{room:true}); else tpSync();
+  tpLive();
+}
+function tpClear(){ try{ clearAll(); }catch(_){} tpSync(); tpLive(); }
+function _tpStop(e){
+  if(_tpId==null || (e && e.pointerId!=null && e.pointerId!==_tpId)) return;
+  _tpId=null; _tpDir=0;
+  clearTimeout(_tpHold);
+  try{ cancelAnimationFrame(_tpRAF); }catch(_){}
+  _tpRAF=0; tpSync();
+}
+function _tpRamp(){
+  if(!_tpDir) return;
+  tpZoom(_tpDir,true);
+  try{ _tpRAF=requestAnimationFrame(_tpRamp); }catch(_){}
+}
+function _tpWire(){
+  try{
+    [['navSat-zoomin',1],['navSat-zoomout',-1]].forEach(function(pair){
+      const b=document.getElementById(pair[0]); if(!b || !b.addEventListener) return;
+      // pointer-driven ONLY — a click branch too would double-fire tap and ramp
+      b.addEventListener('pointerdown', function(e){
+        if(_tpId!=null || b.disabled) return;
+        _tpId=(e&&e.pointerId!=null)?e.pointerId:1; _tpDir=pair[1];
+        try{ b.setPointerCapture(e.pointerId); }catch(_){}
+        tpZoom(_tpDir,false);
+        try{ navigator.vibrate && navigator.vibrate(8); }catch(_){}
+        _tpHold=setTimeout(_tpRamp, 350);
+      });
+    });
+    window.addEventListener('pointerup', _tpStop);
+    window.addEventListener('pointercancel', _tpStop);
+    window.addEventListener('blur', function(){ _tpStop(null); });
+    window.addEventListener('pointerdown', tpLive, {passive:true, capture:true});
+  }catch(_){}
+  tpSync();
+}
+try{ window.tpZoom=tpZoom; window.tpUndo=tpUndo; window.tpClear=tpClear; window.tpSync=tpSync; }catch(_){}
+
 function selectSite(id, o){
   if(!(o&&o.noUndo)) _undoPush();
   if(id==null){
@@ -5314,7 +5645,9 @@ function clearAll(){
   try{ if(typeof flyToLatLon==='function') flyToLatLon(24, -30, 1.0); }catch(_){}   // home: Atlantic-centered world
   try{ const i=document.getElementById('searchInput'); if(i) i.value=''; }catch(_){}
   try{ const r=document.getElementById('searchResults'); if(r){ r.innerHTML=''; r.classList.remove('sr-open'); } }catch(_){}
-  try{ ['legendPanel','exportSheet','appMenu'].forEach(function(id){
+  try{ GlobeState._famOff=new Set(_FAM_DEFAULT_OFF);   // v1.19.0: ✕ is the global reset
+    GlobeState._namesOff=false; GlobeState._usaceOff=false; lySync(); tpSync(); }catch(_){}
+  try{ ['exportSheet','appMenu'].forEach(function(id){
     const p=document.getElementById(id); if(p) p.hidden=true; }); }catch(_){}
   // v0.32.2 (owner: "'X' button still does not clear on brief"): the brief room
   // now ACTUALLY clears — popup, open forms, multi-pick, folds, minimized chart —
@@ -6568,41 +6901,84 @@ if(!window._odWired){
         try{ _bfToast('ID removed — its items kept their data, lost the tag'); }catch(_){}
         showDossier(id);
       } return; }
-    const sc=e.target.closest('[data-svcap]');
-    if(sc){ svCapture(); _svOpenSheet(); return; }
+    // ── v1.19.0 THE SHELF RUNGS — one set, kind read from the open tab ──
+    const _shTab=function(){ const h=document.getElementById('dossier');
+      return (h && h.dataset && h.dataset.shTab) || 'sv'; };
+    const _shVal=function(el,a){ return el.getAttribute(a); };
+    const st2=e.target.closest('[data-shtab]');
+    if(st2){ _shArm=false; _shRnId=null; _shRmArm=null; _shOpen(_shVal(st2,'data-shtab')); return; }
+    const lyp=e.target.closest('[data-lyp]');
+    if(lyp){ lyMode(_shVal(lyp,'data-lyp')); _shOpen('lay'); return; }
+    const lrw=e.target.closest('.lg-row');
+    if(lrw && lrw.closest('#dossier')){
+      const vw=_shVal(lrw,'data-vw');
+      if(vw) lyView(vw); else { const fk=_shVal(lrw,'data-fam'); if(fk) lyFam(fk); }
+      _shOpen('lay'); return; }
+    const lyx=e.target.closest('[data-lyclose]');
+    if(lyx){ hideDossier();
+      try{ ['navSat-layers','navSat-saved'].forEach(function(id){
+        const b=document.getElementById(id); if(b) b.setAttribute('aria-expanded','false'); }); }catch(_){}
+      return; }
+    // views + briefs share every rung below; P is the record kind
+    const svv=e.target.closest('[data-svsave],[data-sbsave]');
+    if(svv){ _shArm=true; _shRnId=null; _sbLoadArm=-1;
+      _shOpen(svv.hasAttribute('data-sbsave')?'bf':'sv');
+      try{ const f=document.getElementById('shName'); if(f){ f.focus(); f.select(); } }catch(_){}
+      return; }
+    const svx=e.target.closest('[data-svsavecancel],[data-sbsavecancel]');
+    if(svx){ _shArm=false; _shOpen(_shTab()); return; }
+    const svg2=e.target.closest('[data-svsavego],[data-sbsavego]');
+    if(svg2){ const tab=_shTab(), nm=String(((document.getElementById('shName')||{}).value)||'');
+      const saved=(tab==='bf')?sbCapture(nm):svCapture(nm);
+      _shArm=false; _shOpen(tab);
+      try{ _bfToast((tab==='bf'?'Brief':'View')+' saved as “'+(saved||nm)+'”'); }catch(_){}
+      return; }
+    const svu=e.target.closest('[data-svupdate],[data-sbupdate]');
+    if(svu){ const tab=_shTab(); const nm=(tab==='bf')?sbUpdate():svUpdate();
+      if(nm){ _shOpen(tab); try{ _bfToast('Saved to “'+nm+'”'); }catch(_){} }
+      else { _shArm=true; _shOpen(tab); }           // the active record vanished → save-as-new
+      return; }
+    const svr=e.target.closest('[data-svrn],[data-sbrn]');
+    if(svr){ _shRnId=_shVal(svr, svr.hasAttribute('data-sbrn')?'data-sbrn':'data-svrn');
+      _shArm=false; _shOpen(_shTab());
+      try{ const f=document.getElementById('shName'); if(f){ f.focus(); f.select(); } }catch(_){}
+      return; }
+    const svrg=e.target.closest('[data-svrngo],[data-sbrngo]');
+    if(svrg){ const tab=_shTab(), bf=(tab==='bf');
+      const id=_shVal(svrg, bf?'data-sbrngo':'data-svrngo');
+      const nm=String(((document.getElementById('shName')||{}).value)||'');
+      if(bf) sbRename(id,nm); else svRename(id,nm);
+      _shRnId=null; _shOpen(tab); return; }
+    const svrx=e.target.closest('[data-svrnx],[data-sbrnx]');
+    if(svrx){ _shRnId=null; _shOpen(_shTab()); return; }
+    const svp=e.target.closest('[data-svpin],[data-sbpin]');
+    if(svp){ const tab=_shTab(), bf=(tab==='bf');
+      const id=_shVal(svp, bf?'data-sbpin':'data-svpin');
+      if(bf) sbPin(id); else svPin(id);
+      _shOpen(tab); return; }
     const sg=e.target.closest('[data-svgo]');
-    if(sg){ svRecall(parseInt(sg.getAttribute('data-svgo'),10)); return; }
+    if(sg){ svRecall(_shVal(sg,'data-svgo')); return; }        // recall needs no arm — UNDO is 188px away
     const sr=e.target.closest('[data-svrm]');
-    if(sr){ svRemove(parseInt(sr.getAttribute('data-svrm'),10)); return; }
+    if(sr){ const id=_shVal(sr,'data-svrm');
+      if(_shRmArm!==id){ _shRmArm=id; _shOpen('sv'); return; }  // two-tap arm, the shipped grammar
+      svRemove(id); _shRmArm=null; _shOpen('sv'); return; }
     const sx=e.target.closest('[data-svclose]');
-    if(sx){ if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
-    // ---- v1.8.0 BRIEFS SHEET (save/load whole diagrams; the shelf rides the board) ----
-    // v1.12.0 — the working copy: save PROGRESS into the active record
-    const bsu=e.target.closest('[data-sbupdate]');
-    if(bsu){ const nm=sbUpdate();
-      if(nm){ _sbOpenSheet(); try{ _bfToast('Progress saved to “'+nm+'”'+(((typeof _dbState!=='undefined')&&_dbState==='live')?' — mirrored to your devices':'')); }catch(_){} }
-      else { _sbArm=true; _sbOpenSheet(); }         // active record vanished → fall back to save-as-new
-      return; }
-    const bsv=e.target.closest('[data-sbsave]');
-    if(bsv){ _sbArm=true; _sbLoadArm=-1; _sbOpenSheet();
-      try{ const f=document.getElementById('sbBriefName'); f&&f.focus(); }catch(_){} return; }
-    const bscx=e.target.closest('[data-sbsavecancel]');
-    if(bscx){ _sbArm=false; _sbOpenSheet(); return; }
-    const bsg=e.target.closest('[data-sbsavego]');
-    if(bsg){ const nm=String(((document.getElementById('sbBriefName')||{}).value)||'');
-      sbCapture(nm); _sbArm=false; _sbOpenSheet();
-      try{ _bfToast('Brief saved'+(((typeof _dbState!=='undefined')&&_dbState==='live')?' — on the board for your other devices':' — connect the database to sync it')); }catch(_){}
-      return; }
+    if(sx){ _shArm=false; _shRnId=null; _shRmArm=null;
+      if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
+    // ---- BRIEFS: the LOAD arm is KEPT — loading destroys unsaved work ----
     const bsl=e.target.closest('[data-sbload]');
-    if(bsl){ const i2=parseInt(bsl.getAttribute('data-sbload'),10);
-      if(_sbLoadArm!==i2){ _sbLoadArm=i2; _sbOpenSheet(); return; }   // first tap arms — loading replaces the working brief
+    if(bsl){ const i2=parseInt(_shVal(bsl,'data-sbload'),10);
+      if(_sbLoadArm!==i2){ _sbLoadArm=i2; _shOpen('bf'); return; }
       _sbLoadArm=-1;
       if(sbLoad(i2)){ hideDossier(); try{ _bfToast('Brief loaded'); }catch(_){} }
       return; }
     const bsr2=e.target.closest('[data-sbrm]');
-    if(bsr2){ sbRemove(parseInt(bsr2.getAttribute('data-sbrm'),10)); _sbLoadArm=-1; _sbOpenSheet(); return; }
+    if(bsr2){ const i3=parseInt(_shVal(bsr2,'data-sbrm'),10);
+      const rid=(SAVEDB[i3]&&SAVEDB[i3].id)||String(i3);
+      if(_shRmArm!==rid){ _shRmArm=rid; _shOpen('bf'); return; }
+      sbRemove(i3); _shRmArm=null; _sbLoadArm=-1; _shOpen('bf'); return; }
     const bsx2=e.target.closest('[data-sbclose]');
-    if(bsx2){ _sbArm=false; _sbLoadArm=-1; hideDossier(); return; }
+    if(bsx2){ _shArm=false; _shRnId=null; _shRmArm=null; _sbLoadArm=-1; hideDossier(); return; }
     const tp=e.target.closest('[data-tzpick]');
     if(tp){ const r=CLOCK_REGIONS[parseInt(tp.getAttribute('data-tzpick'),10)];
       if(r) pickZone(r.tz, r.name); _tzOpenSheet(); return; }
@@ -7585,53 +7961,207 @@ function _svSave(){
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'views', v:{v:1, list:SAVEDV, mod:_svMod}}); } }catch(_){}
   try{ dbPush(); }catch(_){}
 }
-function svCapture(){
-  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
-  SAVEDV.unshift({
-    n: sel ? sel.base : ('View '+(SAVEDV.length+1)),
-    yaw:GlobeState.yaw, pitch:GlobeState.pitch, zoom:GlobeState.zoom,
-    sel:GlobeState.sel, brief:document.body.classList.contains('brief-mode'),
-    ts:Date.now(),
-  });
-  if(SAVEDV.length>24) SAVEDV.pop();
-  _svSave();
+// ═══ v1.19.0 THE SHELF (owner: "a brand new plan for save …") ═══
+// A save is a small named DOCUMENT, not a slot: named at capture with a
+// pre-filled smart default, renameable forever, addressed by id (never by array
+// index — a board merge landing while the sheet is open used to shift every
+// index under a queued tap), carrying a glyph that answers "is this the one?"
+// and a printed SCOPE so recall is never a surprise. Storage does NOT merge:
+// views and briefs keep two keys, two arrays, two clocks. What unifies is the
+// grammar — one head, one primary, one row anatomy, one naming law.
+function _shId(r, save){
+  if(!r.id){ r.id=Date.now().toString(36)+Math.random().toString(36).slice(2,7); if(save) try{ save(); }catch(_){} }
+  return r.id;
 }
-function svRecall(i){
+function _shList(kind){ return kind==='bf'?SAVEDB:SAVEDV; }
+function _shFind(kind,id){
+  const A=_shList(kind);
+  for(let i=0;i<A.length;i++){ if(A[i] && String(A[i].id)===String(id)) return i; }
+  const n=parseInt(id,10);                         // legacy record, id not yet minted
+  return (isFinite(n) && A[n])?n:-1;
+}
+// a pin is a real guarantee: the cap evicts the oldest UNPINNED record
+function _shTrim(A){
+  while(A.length>24){
+    let i=A.length-1;
+    while(i>0 && A[i] && A[i].pin) i--;
+    A.splice(i,1);
+  }
+}
+// the scope, printed. Silent scope mismatch is the number-one reason saved
+// states feel broken — and it is what makes Saved and Layers ONE system:
+// a saved view is a mode plus a camera you named.
+function _shScope(v){
+  if(!v.lay || !Array.isArray(v.lay.f)) return 'camera only';
+  const st=new Set(v.lay.f);
+  const m=LY_MODES.filter(function(x){
+    return x.off.length===st.size && x.off.every(function(k){ return st.has(k); }); })[0];
+  const base = m ? m.n : Object.keys(CLS_META).filter(function(k){ return !st.has(k); })
+    .map(function(k){ return CLS_META[k].n; }).join(' + ');
+  return base + (v.lay.n?' · labels off':'');
+}
+// a preview with ZERO stored bytes: the glyph is DRAWN from the record's own
+// camera. 24 raster thumbnails would be ~1MB through IndexedDB and the board.
+function _shGlyph(kind,r){
+  if(kind==='bf'){
+    const n=Array.isArray(r.nodes)?r.nodes.length:0;
+    let g='<svg class="sh-gl" viewBox="0 0 30 30" aria-hidden="true">';
+    for(let i=0;i<3;i++){ const w=(i===0)?10:(i===1?16:22);
+      g+='<rect x="'+(15-w/2)+'" y="'+(7+i*7)+'" width="'+w+'" height="4" rx="2"'+(n>i?' class="sh-pin"':'')+'></rect>'; }
+    return g+'</svg>';
+  }
+  const yaw=+r.yaw||0, pit=+r.pitch||0;
+  const x=Math.max(4,Math.min(26, 15+9.5*Math.cos(pit)*Math.sin(yaw)));
+  const y=Math.max(4,Math.min(26, 15-9.5*Math.sin(pit)));
+  return '<svg class="sh-gl" viewBox="0 0 30 30" aria-hidden="true">'
+    +'<circle cx="15" cy="15" r="10"></circle><ellipse cx="15" cy="15" rx="4.4" ry="10"></ellipse>'
+    +'<line x1="5" y1="15" x2="25" y2="15"></line>'
+    +'<circle class="sh-pin" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="2.3"></circle></svg>';
+}
+function _shRow(kind,r,P,i){
+  const esc=_odEsc, id=_shId(r, kind==='bf'?_sbSave:_svSave);
+  if(_shRnId===id){
+    return '<div class="rc-row"><div class="rc-form">'
+      +'<input class="rc-in" id="shName" type="text" maxlength="60" value="'+esc(r.n||'')+'" placeholder="Name this '+(kind==='bf'?'brief':'view')+'">'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-'+P+'rnx="1">Cancel</button>'
+      +'<button class="rc-save" type="button" data-'+P+'rngo="'+id+'">Save</button></div></div></div>';
+  }
+  const armed=(kind==='bf' && _sbLoadArm===i);
+  const rmArm=(_shRmArm===id);
+  const isAct=!!(r.id && r.id===(kind==='bf'?GlobeState._sbActive:GlobeState._svActive));
+  const sub = (kind==='bf')
+    ? ((isAct?'WORKING COPY · ':'')+(Array.isArray(r.nodes)?r.nodes.length:0)+' objects · '+new Date(r.ts||0).toLocaleDateString())
+    : ((isAct?'WORKING VIEW · ':'')+_shScope(r)+' · z'+(+r.zoom||0).toFixed(1)+' · '+new Date(r.ts||0).toLocaleDateString());
+  return '<div class="rc-row sh-row">'+_shGlyph(kind,r)
+    +'<span class="sh-txt">'
+      +'<button class="rc-top sv-go'+(armed?' sb-arm':'')+'" type="button" data-'+P+(kind==='bf'?'load':'go')+'="'+(kind==='bf'?i:id)+'">'
+        +esc(r.n||'')+(armed?' — replace current?':'')+'</button>'
+      +'<span class="rc-sub">'+sub+'</span>'
+    +'</span>'
+    +'<span class="sh-acts">'
+      +'<button class="od-ico sh-pn'+(r.pin?' on':'')+'" type="button" data-'+P+'pin="'+id+'" aria-pressed="'+(r.pin?'true':'false')+'" aria-label="'+(r.pin?'Unpin':'Pin')+'">★</button>'
+      +'<button class="od-ico sh-rn" type="button" data-'+P+'rn="'+id+'" aria-label="Rename">✎</button>'
+      +'<button class="od-ico rc-dots'+(rmArm?' sb-arm':'')+'" type="button" data-'+P+'rm="'+(kind==='bf'?i:id)+'" aria-label="Delete">'
+        +(rmArm?'delete?':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>')
+      +'</button>'
+    +'</span></div>';
+}
+function _shPaneShelf(kind,P){
+  const A=_shList(kind), esc=_odEsc;
+  const brief=(kind==='bf');
+  const bn=brief?BRIEF.nodes.length:0;
+  const act=A.filter(function(r){ return r && r.id && r.id===(brief?GlobeState._sbActive:GlobeState._svActive); })[0];
+  let h='';
+  if(_shArm){
+    const dflt=brief?'':(function(){ const sel=GlobeState.sel?siteById(GlobeState.sel):null;
+      return sel?sel.base:(lyKey().toUpperCase()+' view'); })();
+    h+='<div class="rc-form"><input class="rc-in" id="shName" type="text" maxlength="60" value="'+esc(dflt)+'" placeholder="Name this '+(brief?'brief':'view')+'">'
+      +'<div class="rc-btns"><span class="od-sp"></span>'
+      +'<button class="rc-cancel" type="button" data-'+P+'savecancel="1">Cancel</button>'
+      +'<button class="rc-save" type="button" data-'+P+'savego="1">Save</button></div></div>';
+  } else if(act){
+    // the primary's verb says what pressing it does NOW
+    h+='<button class="rc-add" type="button" data-'+P+'update="1"'+(brief&&!bn?' disabled':'')+'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save changes to “'+esc(act.n||'')+'”</button>'
+      +'<button class="bf-qt" type="button" data-'+P+'save="1"'+(brief&&!bn?' disabled':'')+'>＋ Save as a new '+(brief?'brief':'view')+'…</button>';
+  } else if(brief){
+    h+='<button class="rc-add" type="button" data-sbsave="1"'+(bn?'':' disabled')+'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save current brief ('+bn+' objects)</button>';
+  } else {
+    h+='<button class="rc-add" type="button" data-svsave="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save this view</button>';
+  }
+  if(A.length){
+    const pinned=[], rest=[];
+    A.forEach(function(r,i){ (r&&r.pin?pinned:rest).push([r,i]); });
+    if(pinned.length){
+      h+='<div class="rc-sublab">Pinned</div>';
+      pinned.forEach(function(pr){ h+=_shRow(kind,pr[0],P,pr[1]); });
+      if(rest.length) h+='<div class="rc-sublab">Recent</div>';
+    }
+    rest.forEach(function(pr){ h+=_shRow(kind,pr[0],P,pr[1]); });
+    // an invisible cap is data loss the user attributes to a bug
+    if(A.length>=20) h+='<div class="rc-note">'+A.length+' of 24 saved · the oldest unpinned record drops next.</div>';
+  } else {
+    h+='<div class="rc-note">'+(brief
+      ? 'No saved briefs yet — save the current diagram and open it on any connected device. The brief room opens blank; your saves live here.'
+      : 'No saved views yet — frame the globe the way you want it, then Save this view. A view remembers the camera, the selection and the layers you had on.')+'</div>';
+  }
+  h+='<div class="rc-note">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
+    ?'Database LIVE — saved '+(brief?'briefs':'views')+' mirror your other devices.'
+    :'Connect the database (hold the A-ORG-2 mark → Database) to open saved '+(brief?'briefs':'views')+' on other devices.')+'</div>';
+  return h;
+}
+// ONE DRAWER, TWO PANES. The map room's doors open LAYERS|VIEWS; the brief
+// room's ▤ opens its own single pane — the rooms stay severed (v0.24.0).
+function _shOpen(tab){
+  const host=document.getElementById('dossier'); if(!host) return;
+  try{ _odInjectCSS(); }catch(_){}
+  try{ calloutHide(); }catch(_){}                  // the surface budget: one at a time
+  const brief=document.body.classList.contains('brief-mode');
+  tab = tab || (brief?'bf':'lay');
+  const kind=(tab==='bf')?'bf':'sv', P=(tab==='bf')?'sb':'sv';
+  if(tab!=='lay') _shList(kind).forEach(function(r){ if(r) _shId(r, kind==='bf'?_sbSave:_svSave); });
+  const name=(tab==='lay')?'Layers':(tab==='bf'?'Briefs':'Saved views');
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">'+name+'</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-'+((tab==='lay')?'lyclose':(P+'close'))+'="1" aria-label="Close">✕</button></div>';
+  if(!brief){
+    h+='<div class="od-tabs" role="tablist">'
+      +'<button class="od-tab'+(tab==='lay'?' on':'')+'" type="button" role="tab" aria-selected="'+(tab==='lay')+'" data-shtab="lay">LAYERS</button>'
+      +'<button class="od-tab'+(tab==='sv'?' on':'')+'" type="button" role="tab" aria-selected="'+(tab==='sv')+'" data-shtab="sv">VIEWS</button></div>';
+  }
+  h+=(tab==='lay')?_shPaneLay():_shPaneShelf(kind,P);
+  const kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
+  host.innerHTML=h; host.dataset.shTab=tab;
+  host.classList.remove('dz-peek','dz-half','dz-full');
+  host.classList.add(kept==='full'?'dz-full':'dz-half');
+  host.hidden=false; host.scrollTop=0;
+  try{ _sheetFlag(); }catch(_){}                   // _svOpenSheet did NEITHER of these
+  try{ ['navSat-layers','navSat-saved'].forEach(function(id){
+    const b=document.getElementById(id); if(b) b.setAttribute('aria-expanded','true'); }); }catch(_){}
+}
+function _svOpenSheet(){ _shOpen('sv'); }
+function svCapture(name){
+  const sel=GlobeState.sel?siteById(GlobeState.sel):null;
+  const rec=Object.assign(_camSnap(), {
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    n:(String(name||'').trim().slice(0,60)) || (sel?sel.base:(lyKey().toUpperCase()+' view')),
+    org:GlobeState.selOrg||null, pin:false,
+    lay:{ f:Array.from(_famOffSet()), n:GlobeState._namesOff?1:0, u:GlobeState._usaceOff?1:0 } });
+  SAVEDV.unshift(rec); _shTrim(SAVEDV);
+  GlobeState._svActive=rec.id; _svSave();
+  return rec.n;
+}
+function svUpdate(){
+  const id=GlobeState._svActive; if(!id) return false;
+  const r=SAVEDV.filter(function(v){ return v && v.id===id; })[0];
+  if(!r){ GlobeState._svActive=null; return false; }
+  Object.assign(r, _camSnap(), {id:r.id, n:r.n, pin:r.pin, org:GlobeState.selOrg||null,
+    lay:{ f:Array.from(_famOffSet()), n:GlobeState._namesOff?1:0, u:GlobeState._usaceOff?1:0 }});
+  _svSave(); return r.n;
+}
+function svRename(id,n){
+  const i=_shFind('sv',id); if(i<0) return;
+  SAVEDV[i].n=String(n||'').trim().slice(0,60)||SAVEDV[i].n; _svSave();
+}
+function svPin(id){ const i=_shFind('sv',id); if(i<0) return; SAVEDV[i].pin=!SAVEDV[i].pin; _svSave(); }
+function svRecall(id){
+  const i=(typeof id==='number')?id:_shFind('sv',id);
   const v=SAVEDV[i]; if(!v) return;
   try{ _undoPush(); }catch(_){}
-  try{ cameraCancel(); }catch(_){}
-  GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState.spin=false;
-  try{
-    GlobeState.yaw=v.yaw; GlobeState.pitch=v.pitch; GlobeState.zoom=v.zoom;
-    if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ();
-    globeMark();
-  }catch(_){}
-  if(v.sel && siteById(v.sel)) selectSite(v.sel, {keepCam:true, noUndo:true}); else selectSite(null, {noUndo:true});
-  try{ const want=v.brief?'brief':'map', cur=document.body.classList.contains('brief-mode')?'brief':'map';
-    if(want!==cur) setMode(want); }catch(_){}              // same room: the callout the select just opened survives
+  GlobeState._svActive=_shId(v,_svSave);
+  if(v.org) GlobeState.selOrg=v.org;
+  // MAP-ONLY: a brief:true record can never land in the empty brief room the
+  // v1.12.0 blank-slate law created. The flag is still written for board compat.
+  _camApply(v,{room:false, lay:true});
 }
-function svRemove(i){ SAVEDV.splice(i,1); _svSave(); _svOpenSheet(); }
-function _svOpenSheet(){
-  const host=document.getElementById('dossier'); if(!host) return;
-  _odInjectCSS();
-  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
-  h+='<div class="od-head od-head-slim"><div class="od-name">Saved views</div><span class="od-sp"></span>'
-    +'<button class="od-ico od-ico-x" type="button" data-svclose="1" aria-label="Close">✕</button></div>';
-  h+='<button class="rc-add" type="button" data-svcap="1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save current view</button>';
-  SAVEDV.forEach(function(v,i){
-    h+='<div class="rc-row">'
-      +'<button class="rc-top sv-go" type="button" data-svgo="'+i+'">'+_odEsc(v.n)+'</button>'
-      +'<span class="rc-sub">'+(v.brief?'brief · ':'')+new Date(v.ts).toLocaleDateString()+'</span>'
-      +'<button class="od-ico rc-dots" type="button" data-svrm="'+i+'" aria-label="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>'
-      +'</div>';
-  });
-  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
-  host.innerHTML=h;
-  host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add(_kept==='full'?'dz-full':'dz-half');
-  host.hidden=false;
+function svRemove(id){
+  const i=(typeof id==='number')?id:_shFind('sv',id); if(i<0) return;
+  if(SAVEDV[i] && SAVEDV[i].id===GlobeState._svActive) GlobeState._svActive=null;
+  SAVEDV.splice(i,1); _svSave();
 }
-try{ window.Views={ capture:svCapture, recall:svRecall, remove:svRemove, list:function(){ return SAVEDV.slice(); }, open:_svOpenSheet }; }catch(_){}
+try{ window.Views={ capture:svCapture, recall:svRecall, remove:svRemove, rename:svRename,
+  update:svUpdate, pin:svPin, list:function(){ return SAVEDV.slice(); }, open:_svOpenSheet };
+  window._shOpen=_shOpen; window.lyFam=lyFam; window.lyView=lyView; window.lySync=lySync; }catch(_){}
 
 // ── v1.7.0 SAVED BRIEFS (owner: "need a save brief function that saves it to
 // be accessed across multiple devices"). Named snapshots of the whole diagram
@@ -7656,7 +8186,7 @@ function sbCapture(name){
     nodes:JSON.parse(JSON.stringify(BRIEF.nodes)),
     hide:(BRIEF.hide||[]).slice(), vert:(BRIEF.vert||[]).slice() };
   SAVEDB.unshift(rec);
-  if(SAVEDB.length>24) SAVEDB.pop();              // same shelf depth as views
+  _shTrim(SAVEDB);                                // v1.19.0: a pin is a real guarantee
   GlobeState._sbActive=rec.id;
   _sbSave();
   return nm;
@@ -7691,6 +8221,11 @@ function sbLoad(i){
   try{ setMode('brief'); renderBrief(); globeMark(); _bfFrame(); }catch(_){}
   return true;
 }
+function sbRename(id,n){
+  const i=_shFind('bf',id); if(i<0) return;
+  SAVEDB[i].n=String(n||'').trim().slice(0,60)||SAVEDB[i].n; _sbSave();
+}
+function sbPin(id){ const i=_shFind('bf',id); if(i<0) return; SAVEDB[i].pin=!SAVEDB[i].pin; _sbSave(); }
 function sbRemove(i){
   const rec=SAVEDB[i];
   if(rec && rec.id && GlobeState._sbActive===rec.id) GlobeState._sbActive=null;
@@ -7702,51 +8237,10 @@ function sbRemove(i){
 // arm: loading replaces the working brief), delete. The repository panel
 // carries map data only.
 let _sbArm=false, _sbLoadArm=-1;
-function _sbOpenSheet(){
-  const host=document.getElementById('dossier'); if(!host) return;
-  _odInjectCSS();
-  const esc=_odEsc;
-  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
-  h+='<div class="od-head od-head-slim"><div class="od-name">Briefs</div><span class="od-sp"></span>'
-    +'<button class="od-ico od-ico-x" type="button" data-sbclose="1" aria-label="Close">✕</button></div>';
-  const bn=BRIEF.nodes.length;
-  // v1.12.0 THE WORKING COPY: with an active record, the primary saves
-  // PROGRESS INTO IT — one record, updated in place. Save-as-new is the
-  // quiet alternative. Without one, the first save names a new record.
-  const act=SAVEDB.find(function(b){ return b && b.id && b.id===GlobeState._sbActive; });
-  if(_sbArm){
-    h+='<div class="rc-form"><input class="rc-in" id="sbBriefName" type="text" maxlength="60" placeholder="Name this brief">'
-      +'<div class="rc-btns"><span class="od-sp"></span>'
-      +'<button class="rc-cancel" type="button" data-sbsavecancel="1">Cancel</button>'
-      +'<button class="rc-save" type="button" data-sbsavego="1">Save</button></div></div>';
-  } else if(act){
-    h+='<button class="rc-add" type="button" data-sbupdate="1"'+(bn?'':' disabled')+'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save changes to “'+esc(act.n)+'”</button>'
-      +'<button class="bf-qt" type="button" data-sbsave="1"'+(bn?'':' disabled')+'>＋ Save as a new brief…</button>';
-  } else {
-    h+='<button class="rc-add" type="button" data-sbsave="1"'+(bn?'':' disabled')+'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Save current brief ('+bn+' object'+(bn===1?'':'s')+')</button>';
-  }
-  if(SAVEDB.length){
-    SAVEDB.forEach(function(b,i){
-      const armed=(_sbLoadArm===i);
-      const isAct=!!(b.id && b.id===GlobeState._sbActive);
-      h+='<div class="rc-row">'
-        +'<button class="rc-top sv-go'+(armed?' sb-arm':'')+'" type="button" data-sbload="'+i+'">'+esc(b.n)+(armed?' — replace current?':'')+'</button>'
-        +'<span class="rc-sub">'+(isAct?'WORKING COPY · ':'')+(Array.isArray(b.nodes)?b.nodes.length:0)+' objects · '+new Date(b.ts||0).toLocaleDateString()+'</span>'
-        +'<button class="od-ico rc-dots" type="button" data-sbrm="'+i+'" aria-label="Delete saved brief"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>'
-        +'</div>';
-    });
-  } else h+='<div class="rc-note">No saved briefs yet — save the current diagram and open it on any connected device. The brief room opens blank; your work lives in the brief you save here.</div>';
-  h+='<div class="rc-note">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
-    ?'Database LIVE — saved briefs mirror your other devices.'
-    :'Connect the database (hold the A-ORG-2 mark → Database) to open saved briefs on other devices.')+'</div>';
-  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
-  host.innerHTML=h;
-  host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add(_kept==='full'?'dz-full':'dz-half');
-  host.hidden=false; host.scrollTop=0;
-  _sheetFlag();
-}
-try{ window.Briefs={ save:sbCapture, update:sbUpdate, load:sbLoad, remove:sbRemove, list:function(){ return SAVEDB.slice(); }, open:_sbOpenSheet }; }catch(_){}
+let _shArm=false, _shRnId=null, _shRmArm=null;   // v1.19.0 shelf UI state
+function _sbOpenSheet(){ _shOpen('bf'); }
+try{ window.Briefs={ save:sbCapture, update:sbUpdate, load:sbLoad, remove:sbRemove, rename:sbRename,
+  pin:sbPin, list:function(){ return SAVEDB.slice(); }, open:_sbOpenSheet }; }catch(_){}
 
 // ── v1.8.0 THE REPOSITORY (owner v1.7.0 correction: "don't need a brief
 // ledger … as information is input on the map — IDs, people, etc — need an
@@ -7954,7 +8448,8 @@ function _dbApply(data){
   }
   if(took){
     try{ const dz=document.getElementById('dossier');
-      if(dz && !dz.hidden && GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
+      if(dz && !dz.hidden && dz.dataset.shTab) _shOpen(dz.dataset.shTab);   // v1.19.0: keep the open pane
+      else if(dz && !dz.hidden && GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
     // v1.8.0: an open repository re-reads whatever the merge brought in
     try{ const lp=document.getElementById('ledger'); if(lp && lp.classList.contains('on')) _ledgerRender(); }catch(_){}
   }
@@ -8691,22 +9186,12 @@ function bootShell(){
     if(_ring){ _ring.style.strokeDasharray=_ringLen; _nvRingReset(); }
     window._nvSet=function(open){
       _nvOpen=open;
-      document.body.classList.toggle('nav-off', !open);   // v1.18.0: the rail is DEFAULT-ON
+      document.body.classList.toggle('nav-off', !open);   // v1.18.0: the column is DEFAULT-ON
       try{ ng.setAttribute('aria-expanded', open?'true':'false'); }catch(_){}
-      var bk=document.getElementById('navSat-back');
-      if(bk) bk.disabled=!((GlobeState._undo||[]).length);
-      var cl=document.getElementById('navSat-clear');
-      // v0.32.2 (owner: "'X' still does not clear on brief"): the sel==null gate
-      // made ✕ a DEAD button in the brief room (no map selection there, ever) —
-      // and even in the map room ✕ has a job with nothing selected (fly home,
-      // close panels). ✕ is the room reset: always live.
-      if(cl) cl.disabled=false;
-      var zo=document.getElementById('navSat-zoomout');
-      if(zo) zo.disabled=(GlobeState.zoom<=1.01);
-      var zi=document.getElementById('navSat-zoomin');
-      if(zi) zi.disabled=(GlobeState.zoom>=27.9);
+      tpSync();                                           // v1.19.0: one refresher owns the states
     };
-    try{ window._nvSet(true); }catch(_){}   // v1.18.0: the rail is on from boot
+    try{ window._nvSet(true); }catch(_){}   // v1.18.0: the column is on from boot
+    try{ _tpWire(); lySync(); }catch(_){}   // v1.19.0: the pod's pointer law + the scope readout
     var _holdTick=function(){
       if(!_nvHold) return;
       var p=Math.min(1,(performance.now()-_nvT0)/3000);
@@ -8760,6 +9245,12 @@ function bootShell(){
     document.addEventListener('keydown', function(e){
       var ae=document.activeElement;
       var typing=!!(ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable));
+      // v1.19.0: the quiet visual treatment costs desktop users nothing
+      if(!typing){
+        if(e.key==='+'||e.key==='='){ tpZoom(1); return; }
+        if(e.key==='-'){ tpZoom(-1); return; }
+        if((e.metaKey||e.ctrlKey) && (e.key==='z'||e.key==='Z')){ tpUndo(); return; }
+      }
       var k=(e.key==='k'||e.key==='K') && (e.metaKey||e.ctrlKey);
       var slash=e.key==='/' && !e.metaKey && !e.ctrlKey && !e.altKey && !typing;
       if(!k && !slash) return;
@@ -8770,41 +9261,20 @@ function bootShell(){
       if(!e.target||!e.target.closest) return;
       // BACK = undo one step (owner law): restore the last camera+selection
       // snapshot. Stays OPEN — undo invites repeats.
-      if(e.target.closest('#navSat-back')){
-        try{
-          var st=(GlobeState._undo||[]).pop();
-          if(st){
-            // kill any live camera writer FIRST — a fly tween or flick-glide
-            // would silently re-steer the restored camera (audit finding 1)
-            try{ cameraCancel(); }catch(_){}
-            GlobeState._gliding=false; GlobeState._velDX=0; GlobeState._velDY=0; GlobeState.spin=false;
-            GlobeState.yaw=st.yaw; GlobeState.pitch=st.pitch; GlobeState.zoom=st.zoom;
-            try{ if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ(); }catch(_){}
-            try{ globeMark(); }catch(_){}
-            if(st.sel!=null && siteById(st.sel)) selectSite(st.sel, {keepCam:true, noUndo:true});
-            else selectSite(null, {noUndo:true});
-            try{ var wantBrief=!!st.brief, isBrief=document.body.classList.contains('brief-mode');
-              if(wantBrief!==isBrief) setMode(wantBrief?'brief':'map'); }catch(_){}
-          }
-        }catch(_){}
-        _nvSet(true); return; }
-      if(e.target.closest('#navSat-clear')){ _nvSet(true); try{ clearAll(); }catch(_){} return; }
-      // ZOOM ± stay open — the ring is a zoom rocker while it's out.
-      if(e.target.closest('#navSat-zoomout')){
-        try{ GlobeState._touched=true; GlobeState.zoom=Math.max(1.0, GlobeState.zoom/1.45); globeMark(); }catch(_){}
-        _nvSet(true); return; }
-      if(e.target.closest('#navSat-zoomin')){
-        try{ GlobeState._touched=true; GlobeState.zoom=Math.min(28, GlobeState.zoom*1.45); globeMark(); }catch(_){}
-        _nvSet(true); return; }
+      if(e.target.closest('#navSat-back')){ tpUndo(); return; }
+      if(e.target.closest('#navSat-clear')){ tpClear(); return; }
+      // no zoom branch: the rocker halves are pointer-driven (_tpWire) so a tap
+      // and the hold-ramp can never double-fire
       // v1.14.0: the Brief satellite is retired — the MODE SEG is the room door.
       var msc=e.target.closest('#modeSeg .ms-cell');
       if(msc){ try{ setMode(msc.getAttribute('data-mode')); }catch(_){} return; }
-      if(e.target.closest('#navSat-saved')){ _nvSet(true); try{ _svOpenSheet(); }catch(_){} return; }
-      if(e.target.closest('#navSat-layers')){ _nvSet(true);
-        try{
-          var p=document.getElementById('legendPanel');
-          if(p){ if(p.hidden) renderLegend(); p.hidden=!p.hidden; }
-        }catch(_){} return; }
+      var _dz=document.getElementById('dossier');
+      if(e.target.closest('#navSat-saved')){
+        try{ if(_dz && !_dz.hidden && _dz.dataset.shTab==='sv') hideDossier(); else _shOpen('sv'); }catch(_){}
+        return; }
+      if(e.target.closest('#navSat-layers')){
+        try{ if(_dz && !_dz.hidden && _dz.dataset.shTab==='lay') hideDossier(); else _shOpen('lay'); }catch(_){}
+        return; }
     });
   }catch(_){}
 

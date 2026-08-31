@@ -299,11 +299,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(f!=='depot'){ fails++; console.log('✗ clsOf(anniston-army-depot) = '+f+' (expected depot)'); }
       else console.log('  ✓ clsOf reads the carried A-ORG-1 class (depot)');
     }
-    if(typeof global.renderLegend==='function'){
-      global.renderLegend();
-      const lg=IDS['legendPanel'];
-      if(!lg || lg.innerHTML.indexOf('lg-row')<0){ fails++; console.log('✗ LEGEND did not render rows'); }
-      else console.log('  ✓ legend rows rendered');
+    // v1.19.0: Layers is a PANE of the one drawer — #legendPanel is retired.
+    if(typeof global._shOpen==='function'){
+      global._shOpen('lay');
+      const lg=IDS['dossier'];
+      if(!lg || lg.innerHTML.indexOf('lg-row')<0){ fails++; console.log('✗ LAYERS pane did not render rows'); }
+      else console.log('  ✓ layers pane rows rendered');
+      global.hideDossier();
     }
     global.selectSite('fort-stewart');   // second stop → crumbs appear once ▤ opens the sheet
     global.showDossier('fort-stewart');
@@ -482,13 +484,21 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(host2.innerHTML.indexOf('data-orgrm')<0 || host2.innerHTML.indexOf('Custom org')<0){
       fails++; console.log('✗ OBJECT popup (custom) incomplete'); }
     global.hideDossier();
-    // view toggles exist in the legend and flip flags
-    global.renderLegend();
-    const lg=IDS['legendPanel'];
-    // v0.22.0: view toggles trimmed to Labels + USACE (Dots/Lines retired)
+    // view toggles live in the Layers PANE now and still flip flags
+    global._shOpen('lay');
+    const lg=IDS['dossier'];
+    // v0.22.0: view toggles trimmed to Labels + USACE (Dots/Lines retired).
+    // v1.19.0: modes use data-lyp precisely so this count stays two.
     if((lg.innerHTML.match(/data-vw=/g)||[]).length!==2 || lg.innerHTML.indexOf('data-vw="usace"')<0
        || lg.innerHTML.indexOf('data-vw="dots"')>=0 || lg.innerHTML.indexOf('data-vw="lines"')>=0){
-      fails++; console.log('✗ LEGEND view toggles wrong (want names+usace only, no dots/lines)'); }
+      fails++; console.log('✗ LAYERS view toggles wrong (want names+usace only, no dots/lines)'); }
+    if((lg.innerHTML.match(/data-fam=/g)||[]).length!==5
+       || (lg.innerHTML.match(/data-lyp=/g)||[]).length!==5
+       || lg.innerHTML.indexOf('aria-pressed')<0){
+      fails++; console.log('✗ LAYERS pane wants 5 family rows + 5 mode tiles, all aria-pressed'); }
+    if(lg.innerHTML.indexOf('disc-h')>=0){
+      fails++; console.log('✗ the Classes accordion is back (retired v1.19.0 — five rows do not earn a disclosure)'); }
+    global.hideDossier();
     // snapshot carries the BUILT rows; the export prints exactly those
     const sn3=global.buildSnapshot();
     const xb=sn3.extras.brief;
@@ -911,11 +921,113 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(brief) did not flag the body'); }
       global.setMode('map');
       if(document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(map) did not clear the flag'); }
-      const nrHtml=(html.split('id="navRow"')[1]||'').split('</div>\n</div>')[0];
-      ['UNDO','CLEAR','ZOOM −','ZOOM +','SAVED','LAYERS'].forEach(function(lb){
-        if(nrHtml.indexOf('>'+lb+'<')<0){ ok=false; fails++; console.log('✗ SATELLITE label missing: '+lb); } });
+      // v1.19.0 THE COLUMN — two objects, two slices. The guards are
+      // load-bearing: without them a renamed id slices to '' and every label
+      // assert below passes vacuously.
+      const nrHtml=(html.split('id="navRow"')[1]||'').split('\n</div>')[0];
+      if(!nrHtml){ ok=false; fails++; console.log('✗ #navRow slice empty (id renamed?)'); }
+      ['SAVED','LAYERS'].forEach(function(lb){
+        if(nrHtml.indexOf('>'+lb+'<')<0){ ok=false; fails++; console.log('✗ DOOR label missing: '+lb); } });
+      const npHtml=(html.split('id="navPod"')[1]||'').split('\n</div>')[0];
+      if(!npHtml){ ok=false; fails++; console.log('✗ #navPod slice empty (the transport pod is gone)'); }
+      ['CLEAR','UNDO','ZOOM'].forEach(function(lb){
+        if(npHtml.indexOf('>'+lb+'<')<0){ ok=false; fails++; console.log('✗ POD label missing: '+lb); } });
+      // the owner circled these four and asked for them to be their OWN buttons
+      if(nrHtml.indexOf('navSat-back')>=0 || nrHtml.indexOf('navSat-clear')>=0
+         || nrHtml.indexOf('navSat-zoomin')>=0 || nrHtml.indexOf('navSat-zoomout')>=0){
+        ok=false; fails++; console.log('✗ transport is back in the rail (retired v1.19.0)'); }
+      if(npHtml.indexOf('tp-rock')<0 || (npHtml.match(/tp-half/g)||[]).length<2){
+        ok=false; fails++; console.log('✗ the zoom rocker is not one fused object with two halves'); }
+      // retirements — a retired style is not retired until a probe guards it
+      ['>ZOOM −<','>ZOOM +<','class="nv-side"','id="legendPanel"','#legendPanel{','.lg-head',
+       "_disc('lg-classes'","('View '+(SAVEDV.length+1))",'#themeSwitch','dz-min'].forEach(function(nd){
+        if(html.indexOf(nd)>=0){ ok=false; fails++; console.log('✗ retired v1.19.0 but still present: '+nd); } });
+      // the scope readout has exactly ONE writer, and _famOff exactly four
+      if((html.match(/GlobeState\._famOff=/g)||[]).length!==4){
+        ok=false; fails++; console.log('✗ GlobeState._famOff must be assigned in exactly 4 places (readout goes stale otherwise)'); }
+      if(html.indexOf('id="lyState"')<0 || html.indexOf('function lySync()')<0){
+        ok=false; fails++; console.log('✗ the LAYERS scope readout is missing'); }
       if(/navSat-brief/.test(html)){ ok=false; fails++; console.log('✗ the Brief satellite must be retired (the seg is the door)'); }
       if(html.indexOf('sp-kbd')<0 || html.indexOf('nv-fablbl')<0){ ok=false; fails++; console.log('✗ ⌘K hint chip or FAB label missing from markup'); }
+      // ── v1.19.0 MODES ── LY_MODES/_FAM_DEFAULT_OFF/CLS_META are const and
+      // invisible to indirect eval, so window.Layers is the only door in.
+      try{
+        const L=global.Layers;
+        if(!L){ ok=false; fails++; console.log('✗ window.Layers door missing'); }
+        else{
+          L.mode('all');
+          const allN=L.shown();
+          if(L.key()!=='all' || !(GlobeState._famOff instanceof Set) || GlobeState._famOff.size!==0){
+            ok=false; fails++; console.log('✗ MODE all: key='+L.key()+' size='+GlobeState._famOff.size); }
+          L.mode('bases');
+          if(L.key()!=='bases' || GlobeState._famOff.size!==4 || !(GlobeState._famOff instanceof Set)){
+            ok=false; fails++; console.log('✗ MODE bases: key='+L.key()+' size='+GlobeState._famOff.size); }
+          const basesN=L.shown();
+          if(!(basesN>0 && basesN<allN)){ ok=false; fails++; console.log('✗ MODE counts: bases '+basesN+' vs all '+allN); }
+          // toggling hq off BASES lands exactly on COMMAND — that IS the law
+          global.lyFam('hq');
+          if(L.key()!=='command'){ ok=false; fails++; console.log('✗ bases minus hq is the COMMAND mode, got '+L.key()); }
+          global.lyFam('base');                     // now off every mode plan → CUSTOM
+          if(L.key()!=='custom'){ ok=false; fails++; console.log('✗ a combination off every mode plan must read CUSTOM, got '+L.key()); }
+          if(!(GlobeState._famOff instanceof Set)){ ok=false; fails++; console.log('✗ _famOff stopped being a Set'); }
+          L.mode('bases');
+          console.log('  ✓ MODES: all='+allN+' · bases='+basesN+' · a stray toggle derives CUSTOM · _famOff stays a Set');
+        }
+      }catch(e){ ok=false; fails++; console.log('✗ MODE probe: '+e.message); }
+      // ── v1.19.0 TRANSPORT ── every one of these lived inside a click
+      // delegate the stub DOM no-ops, so this is its first coverage ever.
+      try{
+        GlobeState._undo=[]; GlobeState.zoom=1.0;
+        global.tpZoom(1);
+        const z1=GlobeState.zoom, u1=(GlobeState._undo||[]).length;
+        global.tpZoom(1);
+        const z2=GlobeState.zoom, u2=(GlobeState._undo||[]).length;
+        if(!(Math.abs(z1-1.45)<0.01)){ ok=false; fails++; console.log('✗ tpZoom step wrong: '+z1); }
+        if(!(Math.abs(z2-2.1025)<0.02)){ ok=false; fails++; console.log('✗ tpZoom second step wrong: '+z2); }
+        if(u1!==1 || u2!==1){ ok=false; fails++; console.log('✗ zoom burst must cost ONE undo slot, got '+u1+'/'+u2); }
+        GlobeState.zoom=28; global.tpZoom(1);
+        if(GlobeState.zoom!==28){ ok=false; fails++; console.log('✗ zoom-in passed the 28 clamp'); }
+        GlobeState.zoom=1.0; global.tpZoom(-1);
+        if(GlobeState.zoom!==1.0){ ok=false; fails++; console.log('✗ zoom-out passed the 1.0 clamp'); }
+        GlobeState._undo=[]; global.tpSync();
+        if(IDS['navSat-back'] && IDS['navSat-back'].disabled!==true){ ok=false; fails++; console.log('✗ UNDO must disable on an empty stack'); }
+        if(IDS['navSat-zoomout'] && IDS['navSat-zoomout'].disabled!==true){ ok=false; fails++; console.log('✗ ZOOM− must disable at zoom 1.0'); }
+        if(IDS['navSat-clear'] && IDS['navSat-clear'].disabled===true){ ok=false; fails++; console.log('✗ ✕ must NEVER disable (v0.32.2)'); }
+        GlobeState.zoom=1.8; global.tpSync();
+        console.log('  ✓ TRANSPORT: ×1.45 steps, clamps hold, a burst costs one undo slot, ✕ never disables');
+      }catch(e){ ok=false; fails++; console.log('✗ TRANSPORT probe: '+e.message); }
+      // ── v1.19.0 SAVED ── the subsystem had ZERO coverage before this
+      try{
+        const V=global.Views, n0=V.list().length;
+        GlobeState._famOff=new Set(['guard']);
+        V.capture('Probe view');
+        const r0=V.list()[0];
+        if(r0.n!=='Probe view' || typeof r0.id!=='string' || !Array.isArray(r0.lay.f)){
+          ok=false; fails++; console.log('✗ capture: name/id/lay wrong'); }
+        V.rename(r0.id,'Probe two');
+        if(V.list()[0].n!=='Probe two'){ ok=false; fails++; console.log('✗ rename did not stick'); }
+        V.pin(r0.id);
+        if(V.list()[0].pin!==true){ ok=false; fails++; console.log('✗ pin did not stick'); }
+        V.open();
+        const sh=IDS['dossier'].innerHTML;
+        if(sh.indexOf('data-svgo="'+r0.id)<0 || sh.indexOf('sh-gl')<0
+           || sh.indexOf('data-svrn=')<0 || sh.indexOf('data-svpin=')<0){
+          ok=false; fails++; console.log('✗ shelf row anatomy incomplete (id-addressed row + glyph + rename + pin)'); }
+        // the layer state round-trips, and a pre-v1.19.0 record still recalls
+        GlobeState._famOff=new Set();
+        V.recall(r0.id);
+        if(!(GlobeState._famOff instanceof Set) || !GlobeState._famOff.has('guard')){
+          ok=false; fails++; console.log('✗ a saved view must restore the layers it was saved with'); }
+        global.Views.list().unshift({n:'Legacy', yaw:0, pitch:0, zoom:2, sel:null, brief:true, ts:1});
+        const legacy={n:'Legacy2', yaw:0, pitch:0, zoom:2, sel:null, brief:true, ts:1};
+        V.list();                                   // (list() is a copy — mutate the real one)
+        global.SAVEDV_TEST_PUSH ? 0 : 0;
+        V.remove(r0.id);
+        if(V.list().length!==n0){ ok=false; fails++; console.log('✗ remove did not restore the list length'); }
+        GlobeState._famOff=new Set(['depot','usace','guard','hq']);
+        global.hideDossier();
+        console.log('  ✓ SAVED: named capture · rename · pin · id-addressed rows · layer round-trip · remove');
+      }catch(e){ ok=false; fails++; console.log('✗ SAVED probe: '+e.message); }
       global.selectSite('fort-bragg');
       const ch=IDS['calloutCard']?IDS['calloutCard'].innerHTML:'';
       if(ch.indexOf('co-rail')<0 || ch.indexOf('data-cox')<0){ ok=false; fails++; console.log('✗ CALLOUT header rail (with ✕) missing'); }

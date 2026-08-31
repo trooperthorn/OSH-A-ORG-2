@@ -1477,3 +1477,71 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - Probe notes: the smoke chart fixture is a single-child chain → every
   connector is a plain V; C-curve law lives as a SOURCE assert, not a
   render assert. Search-pill brief law (+74) unchanged and still pinned.
+
+## v1.19.0 — the pod & the modes (owner: transport as "their own navigation buttons … accessible and discrete"; "a brand new plan for save and especially the layers sections")
+Designed by a 20-agent workflow (6 recon · 4 precedent · 6 competing proposals ·
+3 lens-diverse judges · 1 synthesis). The losing proposals' must-graft ideas are
+folded in; the judgments are in the run journal.
+- THE COLUMN: the right edge is ONE control column with two objects in frequency
+  order. #navPod (bottom thumb band) holds ✕ · UNDO · the ZOOM rocker; #navRow
+  above it holds the two DOORS, SAVED and LAYERS. Same width, same inset, same
+  glass. Measured reach on a 414×896 phone: 94 · 131 · 188 · 261px — all four
+  circled controls moved from the HARD band (449-630) into the natural zone.
+- QUIET IS OPACITY ON A PLATE, NEVER A TIMER: gold over a lit coastline is
+  1.03:1, so the plate never dims. The column rests at .55 (4.71:1, clears
+  WCAG 1.4.11) and lifts to 1 on any pointerdown for 1600ms (body.tp-live).
+  NO auto-hide — these are the only single-pointer path to zoom OUT.
+- THE ROCKER: zoom is ONE fused object (.tp-rock, two .tp-half split by a
+  hairline) under one label. Three near-identical circles are indistinguishable
+  to a thumb that isn't looking; a miss lands on the other half of the same
+  control. Hold 350ms → ×1.06/frame ramp. 40px of ink, 48px of hit (.co-x::after
+  idiom); smallest pod pitch 59.5px so no two hit rects touch.
+- FIVE TRANSPORT DEFECTS FIXED with the move: a zoom press now cancels a live
+  camera tween (the rail's was the only zoom path that didn't); zoom enters the
+  undo stack coalesced to one slot per 600ms burst; ✕ clears THEN syncs; the
+  disable thresholds were a full step early (1.01/27.9 → 1.001/27.99); tpSync()
+  is the ONE refresher and is called from pinch release and _dblZoom too.
+- THE GUTTER LAW: --gut = --rail-r + --rail-w + 12px replaces EVERY hand-tuned
+  right inset. This closed the live v1.18.0 defect where the z43 rail painted
+  over the z40 #dossier (the Saved sheet's delete ✕ was unreachable). Content
+  never enters the column — including .bf-toast, now centred on the content.
+- MODES ARE THE ORGANISING LAW: every configuration of the map has a NAME.
+  BASES 119 · COMMAND 126 · SUPPORT 191 · GUARD 206 · ALL 285, plus a DERIVED
+  CUSTOM (inert, never a tile you press). lyKey() matches the off-set exactly.
+  BASES is byte-identical to _FAM_DEFAULT_OFF, so the twice-cited owner boot
+  directive stops being an undocumented constant and becomes a named choice.
+- THE SCOPE READOUT: the LAYERS cell wears .nv-state (mode name over sites
+  shown), gold when anything is hidden. The map opened with 166 of 285 sites
+  hidden and never said so — that was the single worst defect in the app.
+  ONE writer: lySync(). GlobeState._famOff is ASSIGNED in exactly four places
+  (_famOffSet, lyMode, clearAll, _camApply) and smoke counts them — a stale
+  readout would be worse than no readout, because now it is trusted.
+- LAYER STATE DOES NOT PERSIST ACROSS RELOADS. It rides SAVED VIEW RECORDS
+  only, so the app still opens on BASES on every device while a saved view is
+  the user's unlimited extension of the five built-ins. clearAll() restores the
+  default, which makes "✕ clears the map" honest.
+- #legendPanel IS RETIRED: it bloomed bottom-LEFT from a right-edge button,
+  shared #searchPill's exact anchor at a higher z, was missing from the canvas
+  chrome zones, and its own button could never close it (a parse-time tap-away
+  hid it and the delegate flipped it straight back). Layers and Saved are two
+  tabs of the ONE drawer. renderLegend() survives as a PURE re-render that can
+  never force a surface open.
+- THE SHELF: _shOpen(tab)/_shRow(kind,rec) replace _svOpenSheet and
+  _sbOpenSheet. Storage does NOT merge — two keys, two arrays, two clocks, no
+  migration. Kind is interpolated (P='sb'|'sv') so every brief literal survives
+  character-for-character. Saves are named at capture (pre-filled, one tap to
+  accept), renameable forever, addressed by ID not array index (a board merge
+  used to shift indices under a queued tap), pinned (the cap evicts the oldest
+  UNPINNED), previewed by a glyph DRAWN from the record's own camera (zero
+  stored bytes), and they PRINT THEIR SCOPE. A record without `lay` recalls
+  exactly as before and prints "camera only".
+- Recall is MAP-ONLY (_camApply room:false) so a brief:true record can never
+  land in the empty brief room the v1.12.0 blank-slate law created, and the
+  camera is isFinite-guarded and zoom-clamped.
+- THE ROOMS READ AS ONE PRODUCT: brief keeps the same column — its dock is the
+  doors, its pod is ✕ alone (no camera, no undo stack there). This restores the
+  brief room's ✕, unreachable since v1.18.0 hid #navRow there.
+- PROBE LESSON: my own MODES probe asserted that toggling hq off BASES yields
+  CUSTOM. It yields COMMAND — exactly on a mode plan. The probe was wrong, not
+  the code. When a probe fails, first ask whether the assertion is the thing
+  that is mistaken.
