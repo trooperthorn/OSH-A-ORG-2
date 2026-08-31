@@ -487,11 +487,14 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     // view toggles live in the Layers PANE now and still flip flags
     global._shOpen('lay');
     const lg=IDS['dossier'];
-    // v0.22.0: view toggles trimmed to Labels + USACE (Dots/Lines retired).
-    // v1.19.0: modes use data-lyp precisely so this count stays two.
-    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==2 || lg.innerHTML.indexOf('data-vw="usace"')<0
+    // v0.22.0 retired Dots/Lines; v1.23.1 retired the USACE label mute too
+    // (owner: "remove USACE labels — they will follow the label checkbox").
+    // ONE view toggle now: a family's names follow its layer, full stop.
+    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==1 || lg.innerHTML.indexOf('data-vw="names"')<0
+       || lg.innerHTML.indexOf('data-vw="usace"')>=0
        || lg.innerHTML.indexOf('data-vw="dots"')>=0 || lg.innerHTML.indexOf('data-vw="lines"')>=0){
-      fails++; console.log('✗ LAYERS view toggles wrong (want names+usace only, no dots/lines)'); }
+      fails++; console.log('✗ LAYERS wants exactly ONE view toggle (Labels); no per-family label mutes'); }
+    if(html.indexOf('_usaceOff')>=0){ fails++; console.log('✗ the USACE label mute is back (retired v1.23.1)'); }
     if((lg.innerHTML.match(/data-fam=/g)||[]).length!==5
        || (lg.innerHTML.match(/data-lyp=/g)||[]).length!==5
        || lg.innerHTML.indexOf('aria-pressed')<0){

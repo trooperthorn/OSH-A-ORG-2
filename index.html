@@ -1099,7 +1099,6 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 .lg-row{min-height:48px}                 /* a thumb target in a sheet, not a list item */
 .lg-row.off .lg-nm, .lg-row.off .lg-ct{color:var(--faint); text-decoration:line-through}
 .lg-zero{opacity:.3; pointer-events:none}
-.lg-dep .lg-nm{color:var(--faint)}
 .lg-sw{flex:none; width:16px; height:16px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,.25)}
 .lg-sw-vw{box-shadow:none; background:none; display:flex; align-items:center; justify-content:center;
   font:800 9.5px/1 var(--mono); color:var(--accent)}
@@ -1604,6 +1603,15 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.23.1 • ONE LABEL SWITCH (owner: "why is there a USACE and USACE labels?
+//            Remove USACE labels. They will follow the label checkbox of other
+//            all others"). USACE is a LAYER — its 52 dots. The separate
+//            "USACE labels" mute was a v0.22.0 leftover from when USACE names
+//            crowded the map, and it made the list say the same word twice.
+//            GlobeState._usaceOff and its draw-loop branch are deleted; USACE
+//            names now obey the one Labels switch like every other family.
+//            Saved views stop writing lay.u, and an older record carrying it
+//            still recalls — the field is simply ignored.
 //   v1.23.0 • THE QUIET LIST (owner: "super compact layers in bottom left.
 //            Translucent and do not take up more page than you need to"). The
 //            layer list moves to the free bottom-LEFT corner, sizes itself to
@@ -1963,7 +1971,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.23.0';
+const APP_VERSION = 'v1.23.1';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -3139,7 +3147,7 @@ function lySync(){                        // the ONE writer of the scope readout
     if(document.body.classList.contains('brief-mode')){ el.textContent='TO MAP'; return; }
     el.textContent=(m?m.n:'CUSTOM')+' · '+lyShown(off);
     document.body.classList.toggle('ly-on-dim', false);
-    el.style.color=(off.size>0 || GlobeState._namesOff || GlobeState._usaceOff)?'var(--accent)':'';
+    el.style.color=(off.size>0 || GlobeState._namesOff)?'var(--accent)':'';
     try{ _lyRingPaint(); }catch(_){}
   }catch(_){}
 }
@@ -3163,12 +3171,14 @@ function _lyRingPaint(){
         +'<span class="ly-nm">'+CLS_META[fk].n+'</span><span class="ly-n">'+n+'</span></button>';
     });
     h+='<div class="ly-sep"></div>';
-    [['names','Labels','_namesOff'],['usace','USACE labels','_usaceOff']].forEach(function(v){
-      const on=!GlobeState[v[2]];
-      h+='<button type="button" class="ly-cb'+(on?' on':'')+'" data-lyvw="'+v[0]+'" role="checkbox"'
-        +' aria-checked="'+(on?'true':'false')+'"><span class="ly-bx"></span>'
-        +'<span class="ly-nm">'+v[1]+'</span></button>';
-    });
+    // v1.23.1 (owner: "why is there a USACE and USACE labels? Remove USACE
+    // labels. They will follow the label checkbox of other all others"). The
+    // v0.22.0 per-family label mute is retired — USACE is a LAYER (its dots),
+    // and its names now obey the one Labels switch like every other family.
+    const nmOn=!GlobeState._namesOff;
+    h+='<button type="button" class="ly-cb'+(nmOn?' on':'')+'" data-lyvw="names" role="checkbox"'
+      +' aria-checked="'+(nmOn?'true':'false')+'"><span class="ly-bx"></span>'
+      +'<span class="ly-nm">Labels</span></button>';
     host.innerHTML=h;
     host.hidden=false;
   }catch(_){}
@@ -3193,7 +3203,7 @@ function lyFam(k){
   renderLegend(); lySync(); try{ globeMark(); }catch(_){}
 }
 function lyView(v){
-  const f={names:'_namesOff', usace:'_usaceOff'}[v]; if(!f) return;
+  const f={names:'_namesOff'}[v]; if(!f) return;
   GlobeState[f]=!GlobeState[f];
   renderLegend(); lySync(); try{ globeMark(); }catch(_){}
 }
@@ -3240,17 +3250,13 @@ function _shPaneLay(){
   h+='<div class="rc-sublab">Map text</div>';
   // v0.22.0 law holds: EXACTLY two view toggles, never dots/lines. Modes use
   // data-lyp precisely so that count stays two.
-  [['names','Labels','_namesOff','A'],['usace','USACE labels','_usaceOff','U']].forEach(function(v){
-    const isOff=!!GlobeState[v[2]];
-    // "USACE labels" is inert until the USACE family is on — say so rather than
-    // letting the toggle look broken
-    const dep=(v[0]==='usace' && off.has('usace'));
-    h+='<button type="button" class="lg-row'+(isOff?' off':'')+(dep?' lg-dep':'')+'" data-vw="'+v[0]+'"'
-      +' aria-pressed="'+(isOff?'false':'true')+'"'
-      +(dep?' aria-label="USACE labels — turn the USACE layer on to see them"':'')+'>'
-      +'<span class="lg-sw lg-sw-vw">'+v[3]+'</span>'
-      +'<span class="lg-nm">'+v[1]+'</span><span class="lg-ct">'+(isOff?'off':'on')+'</span></button>';
-  });
+  // v1.23.1: ONE label switch — a family's names follow its layer, never a
+  // second per-family mute (the v0.22.0 USACE exception is retired).
+  const _nOff=!!GlobeState._namesOff;
+  h+='<button type="button" class="lg-row'+(_nOff?' off':'')+'" data-vw="names"'
+    +' aria-pressed="'+(_nOff?'false':'true')+'">'
+    +'<span class="lg-sw lg-sw-vw">A</span>'
+    +'<span class="lg-nm">Labels</span><span class="lg-ct">'+(_nOff?'off':'on')+'</span></button>';
   return h;
 }
 // PURE re-render: it repaints the Layers pane if and only if the drawer is
@@ -3665,7 +3671,6 @@ function drawGlobeMarkers(ctx, m){
       const inst=s.inst;
       if(GlobeState.selOrg && !(cmdSites && cmdSites.has(inst.id))) continue;   // v0.24.0: isolated picture, isolated names
       if(clsOf(inst.id)==='guard' && GlobeState.zoom<6.5) continue;   // guard names arrive only deep in
-      if(GlobeState._usaceOff && clsOf(inst.id)==='usace') continue;   // USACE names toggled off
       if(s.depth<0.25) continue;
       if(cmdSites && cmdSites.has(inst.id)) continue; // chain labels already drew in the dot loop
       // ZOOM LADDER (v0.10.0 tune — owner: COCOM labels crowded CONUS): density
@@ -5104,7 +5109,7 @@ function _camApply(st, o){
   if(isFinite(st.zoom)) GlobeState.zoom=Math.max(1.0, Math.min(28, st.zoom));
   if(o.lay && st.lay && Array.isArray(st.lay.f)){
     GlobeState._famOff=new Set(st.lay.f);          // ALWAYS a Set — the harness law
-    GlobeState._namesOff=!!st.lay.n; GlobeState._usaceOff=!!st.lay.u;
+    GlobeState._namesOff=!!st.lay.n;   // v1.23.1: lay.u (the retired USACE mute) is ignored
     try{ renderLegend(); }catch(_){} try{ lySync(); }catch(_){}
   }
   try{ if(typeof _rebuildGlobeQ==='function') _rebuildGlobeQ(); }catch(_){}
@@ -5773,7 +5778,7 @@ function clearAll(){
   try{ const i=document.getElementById('searchInput'); if(i) i.value=''; }catch(_){}
   try{ const r=document.getElementById('searchResults'); if(r){ r.innerHTML=''; r.classList.remove('sr-open'); } }catch(_){}
   try{ GlobeState._famOff=new Set(_FAM_DEFAULT_OFF);   // v1.19.0: ✕ is the global reset
-    GlobeState._namesOff=false; GlobeState._usaceOff=false; lySync(); tpSync(); }catch(_){}
+    GlobeState._namesOff=false; lySync(); tpSync(); }catch(_){}
   try{ ['exportSheet','appMenu'].forEach(function(id){
     const p=document.getElementById(id); if(p) p.hidden=true; }); }catch(_){}
   // v0.32.2 (owner: "'X' button still does not clear on brief"): the brief room
@@ -8274,7 +8279,7 @@ function svCapture(name){
     id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
     n:(String(name||'').trim().slice(0,60)) || (sel?sel.base:(lyKey().toUpperCase()+' view')),
     org:GlobeState.selOrg||null, pin:false,
-    lay:{ f:Array.from(_famOffSet()), n:GlobeState._namesOff?1:0, u:GlobeState._usaceOff?1:0 } });
+    lay:{ f:Array.from(_famOffSet()), n:GlobeState._namesOff?1:0 } });
   SAVEDV.unshift(rec); _shTrim(SAVEDV);
   GlobeState._svActive=rec.id; _svSave();
   return rec.n;
@@ -8284,7 +8289,7 @@ function svUpdate(){
   const r=SAVEDV.filter(function(v){ return v && v.id===id; })[0];
   if(!r){ GlobeState._svActive=null; return false; }
   Object.assign(r, _camSnap(), {id:r.id, n:r.n, pin:r.pin, org:GlobeState.selOrg||null,
-    lay:{ f:Array.from(_famOffSet()), n:GlobeState._namesOff?1:0, u:GlobeState._usaceOff?1:0 }});
+    lay:{ f:Array.from(_famOffSet()), n:GlobeState._namesOff?1:0 }});
   _svSave(); return r.n;
 }
 function svRename(id,n){

@@ -1641,3 +1641,17 @@ folded in; the judgments are in the run journal.
 - COMPACT METRICS: 22px rows, 10px body type, an 11px checkbox with a 2.8×5.8
   tick, 6.5px mode chips at 3×5 padding. Every row is still a full-width tap
   target, so the shrink costs reach nothing.
+
+## v1.23.1 — one label switch (owner: "why is there a USACE and USACE labels?")
+- USACE IS A LAYER, NOT A LABEL SETTING. Its checkbox governs its 52 dots. The
+  separate "USACE labels" row was a v0.22.0 leftover from when USACE names
+  crowded the map, and it made the list say the same word twice with two
+  different meanings — the exact confusion the owner caught.
+- GlobeState._usaceOff is DELETED, with its branch in the tiny-label pass. A
+  family's names now follow the ONE Labels switch, like every other family.
+  Smoke asserts exactly one data-vw (names) and bans the flag by name.
+- COMPAT: svCapture/svUpdate stop writing lay.u; _camApply ignores it on read,
+  so a view saved before v1.23.1 still recalls — it just no longer restores a
+  setting that no longer exists. .lg-dep (the "turn the USACE layer on first"
+  dependent-row treatment) retires with it.
+- The list is down to six rows, 165px tall.
