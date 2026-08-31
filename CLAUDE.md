@@ -1545,3 +1545,29 @@ folded in; the judgments are in the run journal.
   CUSTOM. It yields COMMAND — exactly on a mode plan. The probe was wrong, not
   the code. When a probe fails, first ask whether the assertion is the thing
   that is mistaken.
+
+## v1.20.0 — the slim pod & the integrated doors (owner: "control buttons can be much skinnier … saved and layers should not be side buttons anymore")
+- THE POD IS 42px WIDE. The captions were the only thing forcing 60px, and ✕,
+  the undo arrow and ± are universal glyphs, so they go: 34px of ink in a 42px
+  strip, still 48px of hit each (desktop 44/56). .nv-cell and .nv-lbl retire
+  with them, and a smoke assert bans both from ever coming back — this is the
+  ONE deliberate exception to the v1.14.0 permanent-micro-label law, and it is
+  scoped to the pod alone (every other control still wears its name).
+- THE DOORS ARE INTEGRATED, NOT DOCKED. #navRow is deleted. Each door moved to
+  the surface where its meaning already lives:
+  · LAYERS → #lyChip, a glass status chip in the free TOP-LEFT corner at the
+    ledger's exact top offset, so the two corners read as one instrument row
+    (LAYERS · BASES 119 on the left, LOCAL/BASE time on the right). The scope
+    readout had to be permanent anyway — making it the control costs zero new
+    surface. It goes gold whenever anything is hidden, and hides in brief.
+  · SAVED → .sp-star, a ★ inside the search pill. "Go back to somewhere"
+    belongs where "go somewhere" lives, and since v1.19.0 typing a view's name
+    already surfaces it there — the star is just the no-query entrance.
+- DOOR STATE SYNCS ON CLOSE: hideDossier() clears aria-expanded and the star's
+  lit class and deletes dataset.shTab, so a pane closed by the head ✕ or the
+  grip cannot leave its door looking open. (Caught live: the star stayed lit
+  after a ✕ close.)
+- KNOWN AND ACCEPTED: at dz-half the drawer covers the search pill, so the star
+  cannot toggle its own pane shut from there — the head ✕ and the grip are the
+  closers, which is the shipped sheet grammar. The chip sits above the drawer
+  and toggles normally.

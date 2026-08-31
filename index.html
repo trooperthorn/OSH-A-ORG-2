@@ -179,7 +179,7 @@
   /* v1.19.0 THE COLUMN: one token set owns the right control column, so
      "left is content, right is control" is a value the layout enforces
      instead of a hand-tuned inset per surface. */
-  --rail-w:60px;
+  --rail-w:42px;
   --rail-r:var(--safe-r);
   --gut:calc(var(--rail-r) + var(--rail-w) + 12px);
   --accent:#F5D76E;                       /* the illuminated yellow — selection/live */
@@ -343,13 +343,13 @@ body.brief-mode .ms-cell[data-mode="brief"]{background:#F5D76E; color:#141006}
 #introVeil .in-ver{font:600 10px/1 var(--mono); letter-spacing:.18em; color:var(--faint);
   transform:translateY(-16vh)}
 body.intro #titleBar, body.intro #searchPill, body.intro #timeLedger, body.intro #modeSeg,
-body.intro #navDock, body.intro #navRow, body.intro #navPod{opacity:0 !important; pointer-events:none !important}
+body.intro #navDock, body.intro #navPod, body.intro #lyChip{opacity:0 !important; pointer-events:none !important}
 
 /* CHROME YIELDS (v0.8.0 automation): while a gesture is moving the globe, every
    floating surface steps back so the world owns the screen; it breathes back in
    the moment the hand lifts. Pure CSS response to one body flag. */
 body.gesturing #titleBar, body.gesturing #searchPill, body.gesturing #timeLedger, body.gesturing #modeSeg,
-body.gesturing #briefStage, body.gesturing #navRow, body.gesturing #navPod,
+body.gesturing #briefStage, body.gesturing #navPod, body.gesturing #lyChip,
 body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
 #titleBar, #searchPill, #timeLedger, #modeSeg, #briefStage{transition:opacity .3s ease}
 
@@ -497,9 +497,8 @@ body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
 /* v1.14.0 (design 3a) — LABELED SATELLITES. Every control wears its name as a
    permanent micro-label (never a tooltip). Calm state = quiet glass circle with
    an accent glyph; the bright gold illumination is reserved for :active. */
-.nv-cell{display:flex; flex-direction:column; align-items:center; gap:5px; flex:0 0 auto}
-.nv-lbl{font:700 6.5px/1 var(--mono); letter-spacing:.14em; color:var(--dim);
-  white-space:nowrap; -webkit-user-select:none; user-select:none}
+/* v1.20.0: .nv-cell and .nv-lbl retired with #navRow — the pod's glyphs are
+   universal and the captions were the only thing forcing its width. */
 .nv-sat{
   appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
   position:relative; width:40px; height:40px; border-radius:50%; padding:0; flex:0 0 auto;
@@ -507,7 +506,6 @@ body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
   background:none; box-shadow:none;
 }
 .nv-sat:disabled{opacity:.35; cursor:default; pointer-events:none}
-.nv-sat:disabled + .nv-lbl{opacity:.35}
 .nv-sat:active{ background:var(--accent-wash); box-shadow:0 0 0 2px var(--accent), 0 0 20px rgba(245,215,110,.5) }
 /* v1.19.0 THE COLUMN (owner: "zoom in/zoom out & 'undo'/'x' should be their
    own navigation buttons … easily accessible and discrete for use but out of
@@ -518,7 +516,7 @@ body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
    opacity on a plate, never a plateless glyph and never a timer: gold over a
    lit coastline is 1.03:1, so the plate never dims; the column rests at .55
    (4.71:1, clears WCAG 1.4.11) and lifts to 1 on any pointerdown. */
-#navRow, #navPod{
+#navPod{
   position:absolute; z-index:43;
   right:var(--rail-r); left:auto; top:auto; transform:none;
   display:flex; flex-direction:column; align-items:center;
@@ -528,13 +526,14 @@ body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
   opacity:.55; pointer-events:auto;
   transition:opacity .18s ease, transform .18s ease;
 }
-#navRow{gap:9px; padding:10px 4px; bottom:calc(env(safe-area-inset-bottom,0px) + 272px)}
-#navPod{gap:8px; padding:8px 10px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
-body.tp-live #navRow, body.tp-live #navPod{opacity:1}
-body.nav-off #navRow, body.nav-off #navPod{opacity:0; transform:translateX(10px); pointer-events:none}
-body.brief-mode #navRow{display:none}   /* the brief room has its own doors (#briefDock) */
+#navPod{gap:8px; padding:7px 4px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+body.tp-live #navPod{opacity:1}
+body.nav-off #navPod{opacity:0; transform:translateX(10px); pointer-events:none}
 body.brief-mode #navPod .tp-h{display:none}   /* no camera and no undo stack in the brief room */
-#navPod .ch-div{width:22px; height:1px; margin:3px 0; background:var(--line); align-self:center}
+/* v1.20.0: 34px of ink, still 48px of thumb — the glyphs carry the meaning */
+#navPod .nv-sat{width:34px; height:34px}
+#navPod .nv-sat svg{width:19px; height:19px}
+#navPod .ch-div{width:18px; height:1px; margin:2px 0; background:var(--line); align-self:center}
 /* 40px of ink, 48px of thumb — the .co-x::after idiom. Smallest pod pitch is
    59.5px, so no two hit rects touch. */
 .nv-sat{touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
@@ -543,24 +542,42 @@ body.brief-mode #navPod .tp-h{display:none}   /* no camera and no undo stack in 
 /* THE ROCKER — one object, two ends, a hairline seam, never a gap: three
    near-identical circles are indistinguishable to a thumb that isn't looking,
    and a miss lands on the other half of the same control. */
-.tp-rock{display:flex; flex-direction:column; width:40px; height:84px; border-radius:20px;
+.tp-rock{display:flex; flex-direction:column; width:34px; height:72px; border-radius:17px;
   overflow:hidden; background:rgba(0,0,0,.30); box-shadow:inset 0 0 0 1px var(--line)}
 .tp-half{appearance:none; -webkit-appearance:none; border:0; margin:0; padding:0; cursor:pointer;
-  position:relative; flex:0 0 42px; width:40px; display:flex; align-items:center;
+  position:relative; flex:0 0 36px; width:34px; display:flex; align-items:center;
   justify-content:center; background:none; color:var(--accent);
   touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
   transition:background-color .12s ease}
 .tp-half + .tp-half{box-shadow:inset 0 1px 0 var(--line)}
 .tp-half::after{content:''; position:absolute; left:50%; top:50%;
-  width:56px; height:42px; transform:translate(-50%,-50%)}
+  width:50px; height:40px; transform:translate(-50%,-50%)}
 .tp-half:active{background:var(--accent-wash)}
 .tp-half:disabled{opacity:.35; pointer-events:none}
-/* THE LIVE SCOPE READOUT — the map opened with 166 of 285 sites hidden and,
-   until v1.19.0, said nothing. One writer: lySync(). */
-.nv-state{margin-top:2px; max-width:52px; text-align:center; white-space:pre-line;
-  font:800 7px/1.35 var(--mono); letter-spacing:.10em; color:var(--dim);
-  -webkit-user-select:none; user-select:none; pointer-events:none}
-.nv-state.on{color:var(--accent)}
+/* THE LAYER CHIP — the scope readout IS the control. Same glass, same
+   baseline grid and same key/value type as the time ledger it mirrors, so the
+   two top corners read as one instrument row. */
+#lyChip{
+  position:absolute; z-index:10; appearance:none; -webkit-appearance:none; border:0;
+  margin:0; cursor:pointer; text-align:left; -webkit-tap-highlight-color:transparent;
+  top:calc(env(safe-area-inset-top,0px) + 88px); left:var(--safe-l);
+  display:grid; grid-template-columns:auto auto; gap:3px 7px; align-items:baseline;
+  padding:7px 10px; border-radius:var(--r-chip); white-space:nowrap;
+}
+#lyChip .tl-k{grid-column:1 / -1}
+#lyChip:active{filter:brightness(1.25)}
+.ly-md{font:800 11px/1 var(--mono); letter-spacing:.06em; color:var(--dim)}
+.ly-ct{font:800 11px/1 var(--mono); font-variant-numeric:tabular-nums; color:var(--dim)}
+#lyChip.on .ly-md, #lyChip.on .ly-ct{color:var(--accent); text-shadow:0 0 8px rgba(var(--accent-rgb),.4)}
+body.brief-mode #lyChip{display:none}
+/* THE SAVED STAR — "go back to somewhere" belongs where "go somewhere" lives */
+.sp-star{appearance:none; -webkit-appearance:none; border:0; margin:0; padding:0; cursor:pointer;
+  position:relative; flex:none; width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:none; color:var(--faint); -webkit-tap-highlight-color:transparent}
+.sp-star::after{content:''; position:absolute; left:50%; top:50%;
+  width:48px; height:48px; transform:translate(-50%,-50%)}
+.sp-star:active, .sp-star.on{color:var(--accent)}
 /* THE GUTTER LAW — content never enters the column. Replaces every hand-tuned
    right inset, and closes the v1.18.0 defect where the z43 rail painted over
    the z40 #dossier's right edge (the Saved sheet's delete ✕ was unreachable). */
@@ -573,18 +590,15 @@ body.brief-mode #navPod .tp-h{display:none}   /* no camera and no undo stack in 
 body.brief-mode #briefStage{right:var(--gut)}
 @media(min-width:1100px){
   :root{--rail-w:78px; --rail-r:18px}
-  #navRow{gap:12px; padding:10px 8px; bottom:calc(env(safe-area-inset-bottom,0px) + 356px)}
-  #navPod{gap:10px; padding:10px 11px; bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
-  .nv-cell{gap:5px}
-  .nv-lbl{font-size:7px; color:var(--dim)}
-  .nv-sat{width:56px; height:56px;
+  :root{--rail-w:56px}
+  #navPod{gap:10px; padding:9px; bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
+  #navPod .nv-sat{width:44px; height:44px;
     background:linear-gradient(180deg, rgba(26,22,14,.94), rgba(8,7,4,.96));
     box-shadow:0 0 0 1px rgba(240,220,140,.28), inset 0 1px 0 var(--spec), var(--drop)}
-  .nv-sat::after{width:56px; height:56px}
-  .tp-rock{width:56px; height:116px; border-radius:28px}
-  .tp-half{flex:0 0 58px; width:56px}
-  .tp-half::after{width:72px; height:58px}
-  .nv-state{max-width:64px; font-size:7.5px}
+  #navPod .nv-sat::after{width:56px; height:56px}
+  .tp-rock{width:44px; height:94px; border-radius:22px}
+  .tp-half{flex:0 0 47px; width:44px}
+  .tp-half::after{width:60px; height:47px}
   #errToast{left:auto; right:var(--gut); max-width:520px}
 }
 /* v1.14.0 — the FAB label: CONTROLS in the map room, TO MAP in the brief. */
@@ -661,7 +675,7 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch
 .ch-tool.off .ch-lbl{opacity:.55}
 .ch-div{flex:none; width:1px; height:20px; background:rgba(242,228,188,.28); margin:4px 4px 0; align-self:flex-start}
 #briefDock{display:none}
-/* v1.18.0 THE RAIL, brief side: same panel grammar as the map's #navRow —
+/* v1.18.0 THE RAIL, brief side: same panel grammar as the map's #navPod —
    one vertical pill on the right edge, always live. The bottom band frees up. */
 body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:2px;
   position:absolute; z-index:43;
@@ -1449,6 +1463,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
          spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
   <span class="sp-kbd" aria-hidden="true">⌘K</span>
+  <button class="sp-star" type="button" data-svdoor="1" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Saved views"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
 </div>
 <div id="searchResults" class="glass" role="listbox" aria-label="Search results"></div>
 <section id="appMenu" class="glass card" hidden aria-label="Menu"></section>
@@ -1463,28 +1478,16 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 <!-- v1.14.0 (design 3a): every satellite wears its name — micro-labels under the
      circles on desktop, one labeled dock strip on phones. The Brief satellite is
      retired: the mode seg is the room door now (FAB hold stays the shortcut). -->
-<!-- v1.19.0 THE DOORS (owner: "a brand new plan for save and especially the
-     layers sections"). The rail keeps only the two cells that OPEN a surface;
-     the four controls the owner circled moved to #navPod below. The LAYERS
-     cell wears the app's first honest scope readout: the map opens with 166
-     of 285 sites hidden and, until now, said nothing about it. -->
-<div id="navRow" role="toolbar" aria-orientation="vertical" aria-label="Map panels">
-<div class="nv-cell"><button id="navSat-saved" class="nv-sat glass" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Saved views"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button><span class="nv-lbl">SAVED</span></div>
-<div class="nv-cell"><button id="navSat-layers" class="nv-sat glass" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Layers"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"></path><path d="M3 13l9 5 9-5"></path><path d="M3 17l9 5 9-5"></path></svg></button><span class="nv-lbl">LAYERS</span><span class="nv-state" id="lyState" aria-hidden="true">BASES
-119</span></div>
-</div>
-
-<!-- v1.19.0 THE POD (owner, verbatim: "zoom in/zoom out & 'undo'/'x' should be
-     their own navigation buttons. Redesign that has them easily accessible and
-     discrete for use but out of the way"). All four left the rail for the
-     bottom thumb band — 94-261px from the thumb, down from 449-630. Order is
-     consequence order: the reset sits farthest, UNDO between it and the
-     rocker, so a slip off zoom lands on the recovery and never on the reset. -->
+<!-- v1.20.0 THE SLIM POD (owner: "control buttons can be much skinnier").
+     The labels go: ✕, the undo arrow and ± are universal glyphs, and they were
+     the only thing forcing the 60px width. 34px of ink in a 42px strip, still
+     48px of hit area each. The doors left this column entirely — see #lyChip
+     (top-left, beside the ledger) and the ★ in the search pill. -->
 <div id="navPod" role="toolbar" aria-orientation="vertical" aria-label="Camera and history">
-<div class="nv-cell"><button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear the map"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button><span class="nv-lbl">CLEAR</span></div>
+<button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear the map"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
 <span class="ch-div" aria-hidden="true"></span>
-<div class="nv-cell tp-h"><button id="navSat-back" class="nv-sat glass" type="button" aria-label="Undo one step"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button><span class="nv-lbl">UNDO</span></div>
-<div class="nv-cell tp-h"><span class="tp-rock"><button id="navSat-zoomin" class="tp-half" type="button" aria-label="Zoom in — hold to keep zooming"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><button id="navSat-zoomout" class="tp-half" type="button" aria-label="Zoom out — hold to keep zooming"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button></span><span class="nv-lbl">ZOOM</span></div>
+<button id="navSat-back" class="nv-sat glass tp-h" type="button" aria-label="Undo one step"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+<span class="tp-rock tp-h"><button id="navSat-zoomin" class="tp-half" type="button" aria-label="Zoom in — hold to keep zooming"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><button id="navSat-zoomout" class="tp-half" type="button" aria-label="Zoom out — hold to keep zooming"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button></span>
 </div>
 
 <nav id="navDock" aria-label="Navigation">
@@ -1554,8 +1557,26 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      sheet). Persists in Brief (the old clocks vanished there — fixed). -->
 <button id="timeLedger" class="glass" type="button" aria-label="Time ledger — tap to pick the base time zone"></button>
 
+<!-- v1.20.0 THE LAYER CHIP (owner: "saved and layers should not be side buttons
+     anymore — figure out a better way to have them integrated"). The scope
+     readout had to live somewhere permanent anyway, so it becomes the control:
+     a status chip in the free top-left corner, mirroring the time ledger on the
+     right. It always says what the map is showing, and tapping it opens the
+     Layers pane. -->
+<button id="lyChip" class="glass" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Layers — tap to change what the map shows"><span class="tl-k">LAYERS</span><span class="ly-md" id="lyState">BASES</span><span class="ly-ct" id="lyCount">119</span></button>
+
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.20.0 • THE SLIM POD & THE INTEGRATED DOORS (owner: "control buttons can
+//            be much skinnier. Also the saved and layers should not be side
+//            buttons anymore — figure out a better way to have them integrated
+//            with app"). The pod sheds its captions — ✕, the undo arrow and ±
+//            are universal — and narrows from 60px to 42px (34px of ink, still
+//            48px of thumb). #navRow is retired: LAYERS becomes #lyChip, a
+//            status chip in the free top-left corner mirroring the time ledger,
+//            which still names the scope permanently and now IS the door; SAVED
+//            becomes a ★ inside the search pill, where "go somewhere" already
+//            lives and where saved views already surface by name.
 //   v1.19.0 • THE POD & THE MODES (owner: "zoom in/zoom out & 'undo'/'x'
 //            should be their own navigation buttons … easily accessible and
 //            discrete for use but out of the way" + "a brand new plan for save
@@ -1874,7 +1895,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.19.0';
+const APP_VERSION = 'v1.20.0';
 const APP_UPDATED = '28 August 2026';
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
@@ -2900,7 +2921,7 @@ function flyToLatLon(lat, lon, zoom, onArrive){
 //      re-marking dirty from inside a draw would fight the redraw-only-when-dirty
 //      law. globeMark() fires only from _syncSelArcs (an event, not a frame).
 //   4. _gChromeZones measures the A-ORG-2 shell contract ids (#searchPill,
-//      #searchResults, #dossier, #navRow/#navPod, #timeLedger,
+//      #searchResults, #dossier, #navPod/#lyChip, #timeLedger,
 //      #verChip) instead of A-ORG-1's v22 selector list, and its no-DOM fallback is
 //      [] (A-ORG-1 fell back to its legacy v13 static zones, which describe a layout
 //      A-ORG-2 never had).
@@ -3052,8 +3073,10 @@ function lySync(){                        // the ONE writer of the scope readout
     const el=document.getElementById('lyState'); if(!el) return;
     const off=_famOffSet(), k=lyKey();
     const m=LY_MODES.filter(function(x){ return x.k===k; })[0];
-    el.textContent=(m?m.n:'CUSTOM')+'\n'+lyShown(off);     // .nv-state is white-space:pre-line
-    el.classList.toggle('on', off.size>0 || !!GlobeState._namesOff || !!GlobeState._usaceOff);
+    el.textContent=(m?m.n:'CUSTOM');
+    const ct=document.getElementById('lyCount'); if(ct) ct.textContent=lyShown(off);
+    const chip=document.getElementById('lyChip');
+    if(chip) chip.classList.toggle('on', off.size>0 || !!GlobeState._namesOff || !!GlobeState._usaceOff);
   }catch(_){}
 }
 function lyMode(k){
@@ -3333,7 +3356,7 @@ function _gChromeZones(m){
       const kx=W/cr.width, ky=H/cr.height, live=[], PAD=4;
       const sels=['#searchPill','#searchResults','#dossier','#titleBar',
                   '#timeLedger','#modeSeg','#navGlobe',
-                  '#calloutCard','#briefStage','#navRow','#navPod','#briefDock','#exportSheet'];   // v0.29.0 audit: canvas text must never ghost under glass
+                  '#calloutCard','#briefStage','#lyChip','#navPod','#briefDock','#exportSheet'];   // v0.29.0 audit: canvas text must never ghost under glass
       for(const s of sels){
         const el=document.querySelector(s); if(!el) continue;
         const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
@@ -5746,6 +5769,12 @@ function hideDossier(){
   const host=document.getElementById('dossier'); if(!host) return;
   host.hidden=true;
   host.innerHTML='';
+  // v1.20.0: the integrated doors un-light with the pane they opened —
+  // whichever way it closed (their own tap, the head ✕, or the grip).
+  try{ delete host.dataset.shTab; }catch(_){}
+  try{ const c=document.getElementById('lyChip'); if(c) c.setAttribute('aria-expanded','false');
+    const sv=document.querySelector('.sp-star');
+    if(sv){ sv.setAttribute('aria-expanded','false'); sv.classList.remove('on'); } }catch(_){}
   // v0.8.0 audit: a closed card forgets everything — the NEXT card always
   // arrives compact and peeked, even for the same org after a clear.
   _odLastId=null; _odFan=false; _odShowRec=false;
@@ -6915,10 +6944,7 @@ if(!window._odWired){
       if(vw) lyView(vw); else { const fk=_shVal(lrw,'data-fam'); if(fk) lyFam(fk); }
       _shOpen('lay'); return; }
     const lyx=e.target.closest('[data-lyclose]');
-    if(lyx){ hideDossier();
-      try{ ['navSat-layers','navSat-saved'].forEach(function(id){
-        const b=document.getElementById(id); if(b) b.setAttribute('aria-expanded','false'); }); }catch(_){}
-      return; }
+    if(lyx){ hideDossier(); return; }
     // views + briefs share every rung below; P is the record kind
     const svv=e.target.closest('[data-svsave],[data-sbsave]');
     if(svv){ _shArm=true; _shRnId=null; _sbLoadArm=-1;
@@ -7290,7 +7316,7 @@ if(!window._odWired){
     // #globeCanvas is excluded: the globe runs its own tap law (tapAtScreen),
     // and the click that trails a dot-tap must not undo the selection it made.
     if(document.body.classList.contains('brief-mode')){
-      const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navRow,#navDock,#legendPanel,#exportSheet,#appMenu,#titleBar,#timeLedger,#modeSeg,#bfArmBar,#errToast,#sbxNote');
+      const ctrl=e.target.closest('button,input,select,textarea,label,a,[role="button"],.bf-box,#globeCanvas,#dossier,#calloutCard,#searchPill,#searchResults,#navPod,#lyChip,#navDock,#exportSheet,#appMenu,#titleBar,#timeLedger,#modeSeg,#bfArmBar,#errToast,#sbxNote');
       if(!ctrl){
         const dz2=document.getElementById('dossier');
         const dirty=(_coId!=null)||(dz2&&!dz2.hidden)||GlobeState._bfFocus||GlobeState._bfAddUnder||GlobeState._bfAddArm||_bfAnnEdit||_bfRnEdit||window._bfGrpForm||_orgForm;
@@ -8116,8 +8142,9 @@ function _shOpen(tab){
   host.classList.add(kept==='full'?'dz-full':'dz-half');
   host.hidden=false; host.scrollTop=0;
   try{ _sheetFlag(); }catch(_){}                   // _svOpenSheet did NEITHER of these
-  try{ ['navSat-layers','navSat-saved'].forEach(function(id){
-    const b=document.getElementById(id); if(b) b.setAttribute('aria-expanded','true'); }); }catch(_){}
+  try{ const dr=document.getElementById('lyChip'), sv=document.querySelector('.sp-star');
+    if(dr) dr.setAttribute('aria-expanded', tab==='lay'?'true':'false');
+    if(sv){ sv.setAttribute('aria-expanded', tab==='sv'?'true':'false'); sv.classList.toggle('on', tab==='sv'); } }catch(_){}
 }
 function _svOpenSheet(){ _shOpen('sv'); }
 function svCapture(name){
@@ -9268,11 +9295,13 @@ function bootShell(){
       // v1.14.0: the Brief satellite is retired — the MODE SEG is the room door.
       var msc=e.target.closest('#modeSeg .ms-cell');
       if(msc){ try{ setMode(msc.getAttribute('data-mode')); }catch(_){} return; }
+      // v1.20.0: the doors are integrated now — the layer chip (top-left,
+      // beside the ledger) and the ★ in the search pill each toggle their pane.
       var _dz=document.getElementById('dossier');
-      if(e.target.closest('#navSat-saved')){
+      if(e.target.closest('.sp-star')){
         try{ if(_dz && !_dz.hidden && _dz.dataset.shTab==='sv') hideDossier(); else _shOpen('sv'); }catch(_){}
         return; }
-      if(e.target.closest('#navSat-layers')){
+      if(e.target.closest('#lyChip')){
         try{ if(_dz && !_dz.hidden && _dz.dataset.shTab==='lay') hideDossier(); else _shOpen('lay'); }catch(_){}
         return; }
     });

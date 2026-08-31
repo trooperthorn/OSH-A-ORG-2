@@ -789,8 +789,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(typeof global._glowDot!=='function'){ gok=false; fails++; console.log('✗ _glowDot (the shared ignited-dot recipe) is missing'); }
       // v1.18.0 THE RAILS: both rooms carry a permanent right-edge rail; the
       // map rail collapses only via nav-off; brief hides the map rail.
-      if(html.indexOf('body.nav-off #navRow')<0){ gok=false; fails++; console.log('✗ the map rail lost its nav-off collapse law (v1.18.0)'); }
-      if(html.indexOf('body.brief-mode #navRow{display:none}')<0){ gok=false; fails++; console.log('✗ brief must hide the map rail (v1.18.0)'); }
+      if(html.indexOf('body.nav-off #navPod')<0){ gok=false; fails++; console.log('✗ the pod lost its nav-off collapse law'); }
+      if(html.indexOf('body.brief-mode #navPod .tp-h{display:none}')<0){ gok=false; fails++; console.log('✗ brief must hide the pod camera controls'); }
       if(html.indexOf('body.brief-mode #briefDock{display:flex; flex-direction:column')<0){ gok=false; fails++; console.log('✗ the brief dock is not a vertical right rail (v1.18.0)'); }
       if(html.indexOf('Math.max(0.62,')>=0 || html.indexOf('Math.max(0.30,')<0){ gok=false; fails++; console.log('✗ the fit floor law drifted (v1.18.0: 0.30, never 0.62)'); }
       // v1.18.0 THE DIRECT LINE: connectors are cubic diagonals, not the old
@@ -921,32 +921,33 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(brief) did not flag the body'); }
       global.setMode('map');
       if(document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(map) did not clear the flag'); }
-      // v1.19.0 THE COLUMN — two objects, two slices. The guards are
-      // load-bearing: without them a renamed id slices to '' and every label
-      // assert below passes vacuously.
-      const nrHtml=(html.split('id="navRow"')[1]||'').split('\n</div>')[0];
-      if(!nrHtml){ ok=false; fails++; console.log('✗ #navRow slice empty (id renamed?)'); }
-      ['SAVED','LAYERS'].forEach(function(lb){
-        if(nrHtml.indexOf('>'+lb+'<')<0){ ok=false; fails++; console.log('✗ DOOR label missing: '+lb); } });
+      // v1.20.0 THE SLIM POD — one object on the edge, and the doors are gone
+      // from it: LAYERS is the top-left chip, SAVED is the ★ in the pill.
       const npHtml=(html.split('id="navPod"')[1]||'').split('\n</div>')[0];
       if(!npHtml){ ok=false; fails++; console.log('✗ #navPod slice empty (the transport pod is gone)'); }
-      ['CLEAR','UNDO','ZOOM'].forEach(function(lb){
-        if(npHtml.indexOf('>'+lb+'<')<0){ ok=false; fails++; console.log('✗ POD label missing: '+lb); } });
-      // the owner circled these four and asked for them to be their OWN buttons
-      if(nrHtml.indexOf('navSat-back')>=0 || nrHtml.indexOf('navSat-clear')>=0
-         || nrHtml.indexOf('navSat-zoomin')>=0 || nrHtml.indexOf('navSat-zoomout')>=0){
-        ok=false; fails++; console.log('✗ transport is back in the rail (retired v1.19.0)'); }
+      ['navSat-clear','navSat-back','navSat-zoomin','navSat-zoomout'].forEach(function(id){
+        if(npHtml.indexOf(id)<0){ ok=false; fails++; console.log('✗ POD control missing: '+id); } });
       if(npHtml.indexOf('tp-rock')<0 || (npHtml.match(/tp-half/g)||[]).length<2){
         ok=false; fails++; console.log('✗ the zoom rocker is not one fused object with two halves'); }
+      // skinny: the captions are what forced the width, so they must stay gone
+      if(npHtml.indexOf('nv-lbl')>=0 || html.indexOf('.nv-lbl{')>=0){
+        ok=false; fails++; console.log('✗ the pod captions are back (retired v1.20.0 — they set the width)'); }
+      // the doors are integrated, not side buttons
+      if(html.indexOf('id="lyChip"')<0 || html.indexOf('class="sp-star"')<0){
+        ok=false; fails++; console.log('✗ the integrated doors are missing (#lyChip + .sp-star)'); }
+      if(html.indexOf('id="navRow"')>=0 || html.indexOf('navSat-saved')>=0 || html.indexOf('navSat-layers')>=0){
+        ok=false; fails++; console.log('✗ the side-button door rail is back (retired v1.20.0)'); }
+      if(html.indexOf('id="lyCount"')<0){
+        ok=false; fails++; console.log('✗ the layer chip lost its live count'); }
       // retirements — a retired style is not retired until a probe guards it
       ['>ZOOM −<','>ZOOM +<','class="nv-side"','id="legendPanel"','#legendPanel{','.lg-head',
        "_disc('lg-classes'","('View '+(SAVEDV.length+1))",'#themeSwitch','dz-min'].forEach(function(nd){
-        if(html.indexOf(nd)>=0){ ok=false; fails++; console.log('✗ retired v1.19.0 but still present: '+nd); } });
+        if(html.indexOf(nd)>=0){ ok=false; fails++; console.log('✗ retired but still present: '+nd); } });
       // the scope readout has exactly ONE writer, and _famOff exactly four
       if((html.match(/GlobeState\._famOff=/g)||[]).length!==4){
         ok=false; fails++; console.log('✗ GlobeState._famOff must be assigned in exactly 4 places (readout goes stale otherwise)'); }
       if(html.indexOf('id="lyState"')<0 || html.indexOf('function lySync()')<0){
-        ok=false; fails++; console.log('✗ the LAYERS scope readout is missing'); }
+        ok=false; fails++; console.log('✗ the layer scope readout is missing'); }
       if(/navSat-brief/.test(html)){ ok=false; fails++; console.log('✗ the Brief satellite must be retired (the seg is the door)'); }
       if(html.indexOf('sp-kbd')<0 || html.indexOf('nv-fablbl')<0){ ok=false; fails++; console.log('✗ ⌘K hint chip or FAB label missing from markup'); }
       // ── v1.19.0 MODES ── LY_MODES/_FAM_DEFAULT_OFF/CLS_META are const and
