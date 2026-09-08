@@ -118,9 +118,11 @@ let fails=0;
 const timers=[]; let timerCap=400;
 def(global,'window',global);
 def(global,'document',documentStub);
+// v1.25.0: ONE stub registration the update-door probe can drive (update() resolves; installing toggles 'found')
+const SW_REG={update(){ return Promise.resolve(); }, addEventListener(){}, installing:null};
 def(global,'navigator',{userAgent:'smoke', vibrate:()=>{}, language:'en-US', languages:['en-US'],
   clipboard:{writeText:()=>Promise.resolve()},
-  serviceWorker:{register:()=>Promise.resolve({update(){},addEventListener(){}}), addEventListener(){}, controller:null} });
+  serviceWorker:{register:()=>Promise.resolve(SW_REG), addEventListener(){}, controller:null} });
 def(global,'location',{href:'https://app.test/', origin:'https://app.test', protocol:'https:', pathname:'/', search:'', hash:'', reload(){}, hostname:'app.test'});
 def(global,'history',{pushState(){},replaceState(){},back(){}});
 def(global,'localStorage',{_m:{},getItem(k){return this._m[k]??null;},setItem(k,v){this._m[k]=String(v);},removeItem(k){delete this._m[k];}});
@@ -128,7 +130,7 @@ def(global,'sessionStorage',global.localStorage);
 def(global,'matchMedia',()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}}));   // phone-first: min-width:1100px never matches
 const rafQ=[]; def(global,'requestAnimationFrame',cb=>{ if(rafQ.length<6) rafQ.push(cb); return 1; });
 def(global,'cancelAnimationFrame',()=>{});
-def(global,'setTimeout',(cb,ms)=>{ if(timers.length<timerCap) timers.push(cb); return timers.length; });
+def(global,'setTimeout',(cb,ms)=>{ if(timers.length<timerCap){ try{ cb.__ms=ms|0; }catch(_){} timers.push(cb); } return timers.length; });   // v1.25.0: the delay rides the callback so a probe can drain in fire order
 def(global,'setInterval',(cb,ms)=>{ return 999; });
 def(global,'clearTimeout',()=>{}); def(global,'clearInterval',()=>{});
 // fetch: real same-origin files from the repo (adaptation 3); anything else 404s.
@@ -1121,6 +1123,206 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       }
     }catch(e){ eok=false; fails++; console.log('✗ ECHELON probe: '+e.message); }
     if(eok) console.log('  \u2713 ECHELON: ACOM/ASCC/DRU/HQDA lead the rail \u00b7 a deep unit still names its rung \u00b7 no HERE');
+  }
+
+  // ── PROBE: v1.25.0 THE CONNECTED APP — the update path and the database door
+  //    under stress. Every fix ships its test (v0.33.1 law); every negative
+  //    source assert is scoped to CODE SHAPE and proven to fire on the shape it
+  //    bans (TESTING LAW 1) — a ban that has never fired is not known to work. ──
+  { let cok=true;
+    const bad=(m)=>{ cok=false; fails++; console.log('✗ CONNECTED: '+m); };
+    // drains the timers queued since `start` in FIRE order (shortest delay first) — the stub ignores delays, real clocks do not
+    const drainFrom=(start)=>{ let k=0; while(timers.length>start && k<60){ let bi=start; for(let i=start;i<timers.length;i++){ if((timers[i].__ms|0)<(timers[bi].__ms|0)) bi=i; } const cb=timers.splice(bi,1)[0]; k++; try{ cb(); }catch(e){ bad('timer threw: '+e.message); } } return k; };
+    try{
+      // ── the worker: source law on sw.js ──
+      const swSrc=fs.readFileSync(path.join(ROOT,'sw.js'),'utf8');
+      const laws=[
+        ["precache revalidates at the origin (cache:'no-cache')", /new Request\(a, \{ cache: 'no-cache' \}\)/],
+        ['the shell is mandatory at install', /throw new Error\('shell precache failed'\)/],
+        ['a redirected response is never stored', /res\.redirected\) return false/],
+        ['runtime backfill skips redirected responses', /res\.ok && !res\.redirected/],
+        ['navigations match the shell ignoring the query', /ignoreSearch: true/],
+        ['offline navigation falls back to the cached shell', /caches\.match\(SHELL\)/],
+        ['sw.js is never cached by the worker', /\/\\\/sw\\\.js\$\/\.test\(url\.pathname\)\) return;/],
+        ['cross-origin passthrough survives', /url\.origin !== location\.origin\) return;/],
+        ["message door: 'version'", /d\.t === 'version'/],
+        ["message door: 'refresh-shell'", /d\.t === 'refresh-shell'/],
+      ];
+      laws.forEach(function(l){ if(!l[1].test(swSrc)) bad('sw.js lost: '+l[0]); });
+      // the './index.html' twin precache is gone (a redirect there stored a poisoned entry)
+      const twin=(s)=>/'\.\/index\.html'/.test(s);
+      if(twin(swSrc)) bad("sw.js precaches './index.html' again — the redirect-poisoned twin");
+      if(!twin(swSrc+"\nconst X=['./index.html'];")) bad('the index.html twin ban is blind (never fires)');
+      // ── the page: source law ──
+      const pageLaws=[
+        ['update toast wired to the real toast', /window\.toast\|\|window\._bfToast/],
+        ['a network return kicks the update check', /window\.addEventListener\('online', kick\)/],
+        ['a network return re-registers a stranded worker', /window\.addEventListener\('online', function\(\)\{ if\(!navigator\.serviceWorker\.controller && _swTries>0\) _swGo\(\); \}\)/],
+        ['the network watch is wired', /window\.addEventListener\('online', function\(\)\{ _netUp\('online'\); \}\)/],
+        ['leaving flushes', /window\.addEventListener\('pagehide', function\(\)\{ _dbHideFlush\(\); \}\)/],
+        ['the client uses the keepalive-aware fetch', /global:\{ fetch:_dbFetch \}/],
+        ['the ⋯ menu offers Check for updates', /data-am="upd">Check for updates</],
+        ['diagnostics lead with page/worker builds', /'A-ORG-2 '\+APP_VERSION\+' · worker '/],
+      ];
+      pageLaws.forEach(function(l){ if(!l[1].test(html)) bad('index.html lost: '+l[0]); });
+      // banned shapes (scoped to code, proven to fire)
+      const bans=[
+        ['single-try basemap fetch', /const r=await fetch\(SRC\); if\(!r\.ok\) continue;/, "const r=await fetch(SRC); if(!r.ok) continue;"],
+        ['waiting on a dead #sbLib tag (the Connect hang)', /ex\.addEventListener\('load'/, "ex.addEventListener('load', f)"],
+        ['a push with no dirty flag', /_dbPushT=setTimeout\(async function\(\)\{/, "_dbPushT=setTimeout(async function(){"],
+      ];
+      bans.forEach(function(b){ if(b[1].test(html)) bad('regression shape is back: '+b[0]); if(!b[1].test(html+'\n'+b[2])) bad('ban is blind: '+b[0]); });
+
+      // ── the update doors at runtime (the sandbox skips registration, never the doors) ──
+      if(typeof global.__updCheck!=='function' || typeof global.__swReg!=='function' || typeof global.__swVerCheck!=='function' || typeof global._updCheckUI!=='function')
+        bad('update doors missing (__updCheck / __swReg / __swVerCheck / _updCheckUI)');
+      else {
+        const prevSbx=global.__SANDBOX; global.__SANDBOX=false;
+        try{
+          let r0=null; global.__updCheck().then(function(r){ r0=r; }); await flushAsync();
+          if(!r0 || r0.ok!==false) bad('__updCheck must report ok:false before any registration');
+          global.__swReg(SW_REG);
+          let r1=null, t0=timers.length; global.__updCheck().then(function(r){ r1=r; }); await flushAsync(); drainFrom(t0); await flushAsync();
+          if(!r1 || r1.ok!==true || r1.found!==false) bad('__updCheck on a current worker must be {ok:true,found:false}, got '+JSON.stringify(r1));
+          SW_REG.installing={state:'installing'};
+          let r2=null; t0=timers.length; global.__updCheck().then(function(r){ r2=r; }); await flushAsync(); drainFrom(t0); await flushAsync();
+          SW_REG.installing=null;
+          if(!r2 || r2.ok!==true || r2.found!==true) bad('__updCheck must report found:true when a worker is installing, got '+JSON.stringify(r2));
+          const upd0=SW_REG.update; SW_REG.update=function(){ return Promise.reject(new Error('boom')); };
+          let r3=null; t0=timers.length; global.__updCheck().then(function(r){ r3=r; }); await flushAsync(); drainFrom(t0); await flushAsync();
+          SW_REG.update=upd0;
+          if(!r3 || r3.ok!==false || !/boom/.test(r3.why||'')) bad('__updCheck must surface the failure reason, got '+JSON.stringify(r3));
+          // the ⋯ row + the UI door: honest copy for the latest build
+          if(typeof global._renderAppMenu==='function'){ global._renderAppMenu();
+            if((IDS['appMenu']?IDS['appMenu'].innerHTML:'').indexOf('data-am="upd"')<0) bad('⋯ menu lost the Check for updates row'); }
+          t0=timers.length;
+          if(global._updCheckUI()!==true) bad('_updCheckUI must run the check when online outside the sandbox');
+          const tA=IDS['bfToast']?IDS['bfToast'].textContent:'';
+          if(!/Checking for updates/.test(tA)) bad('_updCheckUI must say it is checking (got "'+tA+'")');
+          await flushAsync(); drainFrom(t0); await flushAsync();
+          const tB=IDS['bfToast']?IDS['bfToast'].textContent:'';
+          const VER=(html.match(/APP_VERSION\s*=\s*'([^']+)'/)||[])[1]||'';   // APP_VERSION is an eval-scoped const — read the source
+          if(!/latest build/.test(tB) || !VER || tB.indexOf(VER)<0) bad('_updCheckUI must name the latest build + version (got "'+tB+'")');
+          // the stale-build self-heal: older/equal worker → nothing; newer → ONE heal per session
+          let healed=0; const heal0=global.__swHeal; global.__swHeal=function(cb){ healed++; cb(true); };
+          global.__swVer='a-org-2-v1-0-0'; if(global.__swVerCheck()!==false || healed) bad('an OLDER worker must not trigger the heal');
+          global.__swVer='a-org-2-'+VER.replace(/\./g,'-'); if(global.__swVerCheck()!==false || healed) bad('an EQUAL worker must not trigger the heal');
+          global.__swVer='a-org-2-v99-9-9'; if(global.__swVerCheck()!==true || healed!==1) bad('a NEWER worker must heal exactly once (healed='+healed+')');
+          const tC=IDS['bfToast']?IDS['bfToast'].textContent:''; if(!/Refreshing to v99\.9\.9/.test(tC)) bad('the heal must say which build it is refreshing to (got "'+tC+'")');
+          if(global.__swVerCheck()!==false || healed!==1) bad('the heal must run once per session per worker build (healed='+healed+')');
+          global.__swHeal=heal0; global.__swVer='';
+        } finally { global.__SANDBOX=prevSbx; global.__swReg(null); }
+      }
+
+      // ── the database door at runtime ──
+      const headTags=()=>global.document.head.children.filter(c=>c && c.id==='sbLib');
+      const lastTag=()=>headTags().slice(-1)[0]||null;
+      const settleLib=async()=>{ const t=lastTag(); if(t && t.onerror) t.onerror(); await flushAsync(); };
+      await settleLib();                                        // anything an earlier probe left in flight
+      if(global.DB.conn()) bad('a connect is still in flight after the library failed');
+      global.DB._setCfg(null);
+      // D1 — the Connect hang: a failed library load must never poison the next attempt
+      const p1=global.ensureSupabase();
+      if(global.DB.lib()!==p1) bad('ensureSupabase must expose its in-flight load');
+      if(global.ensureSupabase()!==p1) bad('two callers must share ONE in-flight library load');
+      const tag1=lastTag(); if(!tag1) bad('ensureSupabase injected no #sbLib tag');
+      let v1=null; p1.then(function(v){ v1=v; }); await settleLib();
+      if(v1!==false) bad('a failed library load must resolve false (got '+v1+')');
+      if(global.DB.lib()!==null) bad('the in-flight load must clear after failure');
+      if(global.DB.state()!=='error') bad('a failed library load must say so (state '+global.DB.state()+')');
+      const p2=global.ensureSupabase();
+      if(p2===p1) bad('THE HANG: ensureSupabase returned the dead promise after a failure');
+      const tag2=lastTag(); if(!tag2 || tag2===tag1) bad('a retry must inject a FRESH #sbLib tag, not wait on the dead one');
+      let v2=null; p2.then(function(v){ v2=v; }); await settleLib();
+      if(v2!==false) bad('the retried load must settle on its own tag (got '+v2+')');
+      // D2 — one connect at a time
+      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b'});
+      const c1=global.dbConnect(), c2=global.dbConnect();
+      if(c1!==c2) bad('concurrent dbConnect calls must share the in-flight promise');
+      if(global.DB.state()!=='connecting') bad('dbConnect must report connecting at once (state '+global.DB.state()+')');
+      if(global.DB.conn()!==c1) bad('DB.conn() must expose the in-flight connect');
+      let cv=null; c1.then(function(v){ cv=v; }); await settleLib();
+      if(cv!==false) bad('a connect whose library fails must resolve false (got '+cv+')');
+      if(global.DB.conn()!==null) bad('the in-flight connect must clear after failure');
+      const c3=global.dbConnect(); if(c3===c1) bad('after a failure the next dbConnect must be a fresh attempt');
+      let cv3=null; c3.then(function(v){ cv3=v; }); await settleLib(); if(cv3!==false) bad('the fresh attempt must settle');
+      // D3 — network-class failure + auto → a network return reconnects; explicit OFF never does
+      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:1});
+      let c4=global.dbConnect(); await settleLib();                       // fails for NETWORK reasons (the library)
+      const nu=global.DB.netUp('online');
+      if(nu!=='reconnect') bad("a network return after a network failure must reconnect an auto board (got '"+nu+"')");
+      if(!global.DB.conn()) bad('the reconnect must be in flight after netUp');
+      await settleLib();
+      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:0});
+      if(global.DB.netUp('online')!==null) bad('auto:0 must never reconnect on a network return');
+      global.DB._setCfg(null);
+      if(global.DB.netUp('visible')!==null) bad('no config → a return does nothing');
+      // D4 — the save ladder on a fake client: a failed save keeps its work and retries; a return flushes + re-pulls
+      let calls=0, fails2=2, pulls=0;
+      const fake={ removeChannel(){}, channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
+        from(){ return {
+          upsert(){ calls++; return Promise.resolve(fails2-->0 ? {error:{message:'TypeError: Failed to fetch'}} : {error:null}); },
+          select(){ return { eq(){ return { maybeSingle(){ pulls++; return Promise.resolve({data:{data:{v:3,records:{},views:{list:[],mod:0},briefs:{list:[],mod:0}}}, error:null}); } }; } }; } }; } };
+      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b'}); global.DB._setDb(fake);
+      let t1=timers.length; global.DB.push();
+      if(global.DB.dirty()!==true) bad('dbPush must mark the board dirty');
+      drainFrom(t1); await flushAsync();                                  // the 700 ms flush → save #1 fails
+      if(calls!==1) bad('the debounced flush must run once (calls='+calls+')');
+      if(global.DB.dirty()!==true) bad('a FAILED save must keep the dirty flag');
+      if(global.DB.state()!=='error') bad('a failed save must say so');
+      if(!global.DB.retry().armed || global.DB.retry().n!==1) bad('a failed save must arm the retry ladder ('+JSON.stringify(global.DB.retry())+')');
+      if(!/unreachable|offline/i.test(global._dbMsgFor ? global._dbMsgFor() : (IDS['dbStatus']?IDS['dbStatus'].textContent:''))){ /* message probed below via the sheet */ }
+      drainFrom(t1); await flushAsync();                                  // ladder rung 1 → save #2 fails
+      if(calls!==2 || global.DB.dirty()!==true || global.DB.retry().n!==2) bad('the ladder must retry and stay armed (calls='+calls+', '+JSON.stringify(global.DB.retry())+')');
+      drainFrom(t1); await flushAsync();                                  // rung 2 → save #3 lands
+      if(calls!==3 || global.DB.dirty()!==false || global.DB.state()!=='live' || global.DB.retry().armed) bad('a landed save must clear dirty + ladder and go live (calls='+calls+', dirty='+global.DB.dirty()+', state='+global.DB.state()+')');
+      t1=timers.length; global.DB.push();                                  // dirty again, debounce pending
+      const sy=global.DB.netUp('online');                                  // a return flushes NOW and re-pulls the board
+      await flushAsync();
+      if(sy!=='sync') bad("a return while connected must sync (got '"+sy+"')");
+      if(calls!==4 || global.DB.dirty()!==false) bad('the return must flush the pending save at once (calls='+calls+', dirty='+global.DB.dirty()+')');
+      if(pulls!==1) bad('the return must re-pull the board once (pulls='+pulls+')');
+      if(global.DB.netUp('visible')!=='sync' || pulls!==1) bad('re-pulls are rate-limited (pulls='+pulls+')');
+      if(global.DB.hide()!==false) bad('leaving with nothing dirty flushes nothing');
+      global.DB.push(); if(global.DB.hide()!==true) bad('leaving with a pending save must flush it');
+      await flushAsync(); if(calls!==5 || global.DB.dirty()!==false) bad('the leaving flush must land (calls='+calls+')');
+      // the Database sheet says offline/unreachable in words after a network-class failure
+      fails2=1; global.DB.push(); await global.DB.flush(); await flushAsync();
+      global._dbSheet(); const sh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      if(!/unreachable right now; retrying/.test(sh)) bad('a network-class save failure must be said in words on the sheet');
+      try{ global.hideDossier(); }catch(_){}
+      global.dbDisconnect(true);
+      if(global.DB.dirty()!==false || global.DB.retry().armed) bad('disconnect must drop the dirty flag and the ladder');
+      global.DB._setCfg(null);
+      // D5 — localNewer: this device holds records the board lacks → the connect path pushes once
+      const la=global._dbApply({records:{}, views:{list:[],mod:0}, briefs:{list:[],mod:0}});
+      if(!la || la.localNewer!==true) bad('_dbApply must report localNewer when the board lacks local records');
+      const lb=global._dbApply(JSON.parse(JSON.stringify(global._dbSnapshot())));
+      if(!lb || lb.localNewer!==false) bad('_dbApply must not report localNewer for an identical board');
+      // ── the basemap ladder ──
+      if(typeof global._fetchRetry!=='function' || typeof global._basemapNetUp!=='function' || typeof global._basemapLoad!=='function') bad('basemap doors missing');
+      else {
+        const f0=global.fetch; let n=0;
+        global.fetch=function(){ n++; return n<3 ? Promise.reject(new TypeError('Failed to fetch')) : Promise.resolve({ok:true,status:200}); };
+        let fr=null, fe=null, tb=timers.length;
+        global._fetchRetry('data/x.json').then(function(r){ fr=r; }, function(e){ fe=e; });
+        await flushAsync(); drainFrom(tb); await flushAsync(); drainFrom(tb); await flushAsync();
+        if(!fr || fe || n!==3) bad('_fetchRetry must ride the ladder past two blips (n='+n+', err='+(fe&&fe.message)+')');
+        n=0; global.fetch=function(){ n++; return Promise.resolve({ok:false,status:404}); };
+        let f4=null, e4=null; tb=timers.length;
+        global._fetchRetry('data/x.json').then(function(r){ f4=r; }, function(e){ e4=e; }); await flushAsync();
+        if(f4 || !e4 || n!==1 || timers.length!==tb) bad('a 4xx must end the attempt at once, no retry (n='+n+')');
+        global.fetch=f0;
+        const bm=global.Basemap&&global.Basemap.done?global.Basemap.done():null;
+        if(!bm) bad('Basemap hook missing');
+        else if(!(bm.hi && bm.st && bm.co)) bad('the stub boot did not finish the basemap ('+JSON.stringify(bm)+') — the loaders regressed');
+        else if(global._basemapNetUp()!==false) bad('a complete basemap must make a return a no-op');
+      }
+      // ── the window listeners run clean ──
+      const nOn=(WIN_LS['online']||[]).length; if(nOn<1) bad('the network watch must listen on window online (got '+nOn+')');   // the sandbox registers no worker, so its two online kicks are source-asserted above
+      winDispatch('online', {type:'online'}); winDispatch('pagehide', {type:'pagehide'}); await flushAsync();
+    }catch(e){ cok=false; fails++; console.log('✗ CONNECTED probe: '+e.message); console.log((e.stack||'').split('\n').slice(0,3).join('\n')); }
+    if(cok) console.log('  ✓ CONNECTED: sw.js seeds from the origin, shell mandatory, no redirected/twin entries, nav fallback · update doors report current/found/failed + honest copy · self-heal once per newer worker · library load recovers after failure · one connect at a time · network return reconnects (auto only) · save ladder keeps work, return flushes + re-pulls, leaving flushes · localNewer · basemap ladder');
   }
 
   // ── PROBE: THE BOOT TOUR's light gate (v1.16.0, design 4b) — while

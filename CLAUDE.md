@@ -1728,3 +1728,66 @@ It lives here now.
 - A PANEL NOBODY CAN SEE NEVER GETS DESIGN-REVIEWED: the empty state had been
   carrying two competing filled-gold primaries. Making it visible is what
   exposed that. Expect the same wherever a surface has been hidden a while.
+
+## v1.25.0 — the connected app (owner: "fix connectivity and update issues — smooth and operational")
+- THE UPDATE PATH LAW: sw.js precaches from the ORIGIN (`cache:'no-cache'` Requests) —
+  a new worker may never seed its cache from the browser's HTTP cache, or a v+1
+  worker ships a v0 shell under a current cache name (the v0.33.1 stale-review class
+  at its root). The SHELL ('./') is MANDATORY at install: no shell → the install
+  throws, the old worker keeps control, the next check retries. A redirected
+  response is never stored under the request URL (a redirected cached response
+  fails a navigation outright — which is why the './index.html' twin is gone:
+  Cloudflare 308s it to '/'). Navigations match the shell with ignoreSearch and
+  fall back to it offline; sw.js is never cached by the worker. Smoke pins every
+  clause in source and bans the twin (self-proving negative assert).
+- THE UPDATE DOORS (head script, exist in EVERY host — only the registration skips
+  the sandbox): __updKick (check now) · __updCheck → {ok,found,why} · __swAsk/__swVer
+  (the worker names its build over a MessageChannel) · __swHeal (refresh-shell) ·
+  __swReg (harness hook). `window.toast` never existed, so every update reload
+  arrived unexplained — the controllerchange handler now toasts via _bfToast and
+  waits 1.2 s, for a blur if typing, for pointerup if mid-gesture. A network return
+  (`online`) kicks a check and re-registers a stranded worker. ⋯ menu row "Check for
+  updates" → _updCheckUI (honest copy: latest · found · failed+why · offline).
+  Diagnostics lead with `page · worker · controlled? · online? · db`.
+- STALE-BUILD SELF-HEAL: __swVerCheck compares the worker's cache version to
+  APP_VERSION; worker NEWER → refresh-shell + reload ONCE per worker build per
+  session (sessionStorage a2Healed) — never a loop. Worker older = the normal
+  pre-update state; the update path handles it.
+- THE DATABASE CONNECTIVITY LAWS: (1) ensureSupabase shares ONE in-flight load
+  (_sbLoadP), REMOVES a dead #sbLib tag before every attempt (listeners on a failed
+  tag hung Connect forever — the chip stayed busy, the button dead), and times out
+  at 20 s. (2) ONE connect at a time: dbConnect returns the in-flight promise
+  (_dbConnP) to the boot auto-connect, the chip, the sheet and the network watch.
+  (3) dbPush marks DIRTY and debounces _dbFlush; a failed flush KEEPS the flag and
+  arms the ladder (4→8→16→32→60 s cap); edits during a flight ride the next pass.
+  (4) THE NETWORK WATCH (_netUp: window online · visibilitychange · pagehide): a
+  return flushes dirty work, re-pulls the board (rate-limited 15 s — realtime
+  replays nothing a dead socket missed), reconnects a board whose last failure was
+  the NETWORK's (_dbFailNet; a bad key never retries by itself), finishes a
+  basemap that blipped, kicks the update check. Leaving flushes at once; saves
+  under 60 KB ride keepalive via the client's `global.fetch` (_dbFetch).
+  (5) `_dbApply` returns {took, localNewer}; the connect path pushes ONCE when this
+  device holds anything the board lacks or has older — offline edits reach the
+  board at connect, not at the next edit. (6) A realtime REjoin (second
+  SUBSCRIBED) resyncs. (7) Failures are said in words: _dbWhy → "paused — offline"
+  / "unreachable right now; retrying by itself" / the raw configuration error.
+- BASEMAP LADDER: _fetchRetry (1.5 s · 4 s · 10 s; a 4xx ends the attempt) under
+  every rung; _basemapLoad is the ONE door (boot + return), never two passes at
+  once; window.Basemap.done() exposes the eval-scoped flags to the harness.
+- PROOF KIT (scratchpad live/): a Cloudflare-shaped Node host (/index.html → 308,
+  ETag + max-age=600 on the shell, sw.js must-revalidate, control door to swap
+  three deploys, break the shell, or play dead) + a Playwright run through a real
+  Chromium: boot · boot-inert · precache revalidates at the origin · offline opens
+  from the cache (query string, /index.html fallback, 503 on a miss) · ⋯ check ·
+  refresh-shell · diagnostics header · deploy → found → toast → self-reload onto
+  the new build despite max-age · broken-shell deploy leaves the old worker in
+  control · recovery brings it in · online kick · typing guard. PLAYWRIGHT LESSON:
+  context.setOffline never reaches the worker's own fetches — kill the ORIGIN
+  (the host's `dead` switch) to test the worker's offline branches, or the 503
+  path reads as a 404 and passes for the wrong reason.
+- SMOKE LESSONS: `let`/`const` at the top of an indirect-eval script are NOT
+  global properties (functions are) — expose flags through a hook, never read
+  `global._flag`; the stub's setTimeout now stores the delay on the callback so a
+  probe can drain in FIRE order (a 15 s timeout queued first must not beat a
+  250 ms answer); `__SANDBOX` is true in smoke (no `top`) — flip it probe-locally,
+  never at boot.
