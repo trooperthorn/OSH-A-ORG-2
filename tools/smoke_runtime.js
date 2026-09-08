@@ -323,7 +323,19 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // never handed the map's selection (data-bfadd would be a cross-room bridge).
       if(!bs || bs.innerHTML.indexOf('data-bfsearch')<0){ fails++; console.log('✗ BRIEF empty state should offer search-to-add'); }
       if(bs && bs.innerHTML.indexOf('data-bfadd')>=0){ fails++; console.log('✗ BRIEF empty state must not carry the map selection across rooms'); }
-      else console.log('  ✓ brief mode: body flag + empty-state add action');
+      // v1.24.0: setMode minimizes the chart every time the brief opens, and
+      // body.chart-min hides every child of #briefStage except the ⌗ head. With
+      // no members the only child IS the empty state, so the guidance for the
+      // first move rendered into a collapsed stage and never reached the screen.
+      // renderBrief clears the flag while the brief is empty — assert the STATE,
+      // not just the markup, because the markup was always there.
+      else if(document.body.classList.contains('chart-min')){
+        fails++; console.log('✗ EMPTY BRIEF is minimized — the first-move guidance is hidden behind the ⌗ pill'); }
+      // one filled primary, one quiet secondary (the pair was two gold primaries
+      // for as long as nobody could see the panel)
+      else if((bs.innerHTML.match(/bf-addsel/g)||[]).length!==2 || bs.innerHTML.indexOf('bf-addsel quiet')<0){
+        fails++; console.log('✗ EMPTY BRIEF wants one filled primary + one quiet secondary'); }
+      else console.log('  ✓ brief mode: body flag + empty-state add action, expanded, one primary');
       global.setMode('map');
     } else { fails++; console.log('✗ setMode not exposed'); }
   }catch(e){ fails++; console.log('✗ SPINE probe: '+e.message); }
@@ -1069,6 +1081,46 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.selectSite(null);
     }catch(e){ ok=false; fails++; console.log('✗ console probe: '+e.message); }
     if(ok) console.log('  ✓ map console: MODE SEG switches rooms · labeled satellites (no brief sat) · callout rail + inline sub + counted tiles');
+  }
+
+  // ── THE BUILD STAMP clears the mode pill (v1.24.0). Measured on a 414x896
+  //    phone the stamp's box ran 43.0->51.5 while the pill's top edge sits at
+  //    48.0, so 3.5px of the running version was painted over by a pill carrying
+  //    z-index 22 — on every screenshot, in both rooms. Source assert: the stub
+  //    DOM parses no static markup, so this reads the stylesheet text itself. ──
+  if(!/#verTag\{[^}]*top:32px/.test(html)){
+    fails++; console.log('\u2717 the build stamp drifted back under the mode pill (v1.24.0 seated it at 32px)'); }
+  else console.log('  \u2713 build stamp seated clear of the mode pill');
+
+  // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
+  //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
+  //    slot used to read the literal word HERE, which said nothing the name
+  //    directly beneath it did not already say, while the classification itself
+  //    was dropped: _OG_CATS filters the category rungs out of the crumbs, so on
+  //    the 2-crumb cap a deep unit's card could not say whether it hung off an
+  //    ACOM or an ASCC at all. The deep case is the one that matters — keep it
+  //    in the table. ──
+  { let eok=true;
+    try{
+      if(typeof global.calloutShow!=='function'){ eok=false; fails++; console.log('✗ ECHELON: calloutShow unreachable'); }
+      else {
+        [['usawhc','ASCC'],['amc','ACOM'],['usace','DRU'],['hqda','HQDA'],
+         ['4th-infantry-division-sustainment-brigade','ASCC']].forEach(function(w){
+          global.calloutShow(w[0]);
+          const c=IDS['calloutCard']?IDS['calloutCard'].innerHTML:'';
+          const m=c.match(/<span class="co-railhere"[^>]*>([^<]*)<\/span>/);
+          if(!m){ eok=false; fails++; console.log('✗ ECHELON tag missing on '+w[0]); }
+          else if(m[1]!==w[1]){ eok=false; fails++; console.log('✗ ECHELON on '+w[0]+' reads "'+m[1]+'", want "'+w[1]+'"'); }
+          // the tag LEADS the rail: trailing it read "I CORPS > 4TH INF DIV > ASCC",
+          // which puts the classification below the division it sits above
+          if(m && /co-railchip[\s\S]*co-railhere/.test(c)){
+            eok=false; fails++; console.log('✗ ECHELON tag must lead the rail, not trail the ancestors ('+w[0]+')'); }
+          if(/>HERE</.test(c)){ eok=false; fails++; console.log('✗ the vacuous HERE crumb is back on '+w[0]); }
+        });
+        if(typeof global.calloutHide==='function') global.calloutHide();
+      }
+    }catch(e){ eok=false; fails++; console.log('✗ ECHELON probe: '+e.message); }
+    if(eok) console.log('  \u2713 ECHELON: ACOM/ASCC/DRU/HQDA lead the rail \u00b7 a deep unit still names its rung \u00b7 no HERE');
   }
 
   // ── PROBE: THE BOOT TOUR's light gate (v1.16.0, design 4b) — while

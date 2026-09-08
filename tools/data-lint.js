@@ -160,5 +160,81 @@ const byId = new Map();
   }
 }
 
+// ── 8. THE INLINE COPY (v1.24.0) ─────────────────────────────────────────────
+//      data/orgs.json is the source of truth, but the app renders an inline copy
+//      of the same array in index.html. NOTHING checked that the two agreed, so a
+//      hand-edit to either side could ship a chart that disagreed with the file
+//      the lint blesses — the lint would pass while the app drew stale structure.
+{
+  const IDXF = path.join(ROOT, 'index.html'), OFILE = path.join(ROOT, 'data', 'orgs.json');
+  if (fs.existsSync(IDXF) && fs.existsSync(OFILE)) {
+    const html = fs.readFileSync(IDXF, 'utf8');
+    const m = html.match(/var A1ORGS=window\.A1ORGS=(\[.*?\]);/s);
+    if (!m) bad('index.html carries no inline A1ORGS literal — the app has no org tree to draw');
+    else {
+      let inline = null;
+      try { inline = JSON.parse(m[1]); } catch (e) { bad('the inline A1ORGS literal is not valid JSON: ' + e.message); }
+      const src = JSON.parse(fs.readFileSync(OFILE, 'utf8')).orgs;
+      if (inline) {
+        if (JSON.stringify(inline) !== JSON.stringify(src)) {
+          const a = new Set(inline.map(o => o.id)), b = new Set(src.map(o => o.id));
+          const only = [...b].filter(x => !a.has(x)).slice(0, 4), extra = [...a].filter(x => !b.has(x)).slice(0, 4);
+          const sb = {}; src.forEach(o => sb[o.id] = o);
+          const fld = inline.filter(o => sb[o.id] && JSON.stringify(sb[o.id]) !== JSON.stringify(o)).slice(0, 4).map(o => o.id);
+          bad('the inline A1ORGS copy has drifted from data/orgs.json — the app would draw a different tree than the lint blesses'
+            + (only.length ? '\n    missing from the page: ' + only.join(' · ') : '')
+            + (extra.length ? '\n    stale in the page: ' + extra.join(' · ') : '')
+            + (fld.length ? '\n    field mismatch: ' + fld.join(' · ') : ''));
+        } else console.log('✓ inline A1ORGS copy matches data/orgs.json exactly (' + src.length + ' orgs)');
+      }
+    }
+  }
+}
+
+// ── 9. CURRENCY (v1.24.0) ────────────────────────────────────────────────────
+//      The 2026 refresh found the tree carrying headquarters the Army had already
+//      inactivated — ARNORTH and ARSOUTH survived here for months after their
+//      colors were cased, because nothing in the suite knew a command could go
+//      away. Encode the retirements so a stale re-import or a reverted edit fails
+//      loudly instead of quietly presenting a dissolved command as current.
+//
+//      Scoped to org NAMES, and each pattern is written to match the retired
+//      command ONLY: "Army Forces Command" never matches "1st Special Forces
+//      Command (Airborne)", which is a live unit. Same discipline as the source
+//      bans in smoke_runtime — match the thing, not a substring of its neighbours.
+{
+  const OFILE = path.join(ROOT, 'data', 'orgs.json');
+  if (fs.existsSync(OFILE)) {
+    const orgs = JSON.parse(fs.readFileSync(OFILE, 'utf8')).orgs;
+    const RETIRED = [
+      [/\bFORSCOM\b/i,                    'FORSCOM — merged into USAWHC, 5 Dec 2025'],
+      [/U\.?S\.? Army Forces Command/i,   'U.S. Army Forces Command — merged into USAWHC, 5 Dec 2025'],
+      [/\bTRADOC\b/i,                     'TRADOC — merged into T2COM, 1 Oct 2025'],
+      [/Training and Doctrine Command/i,  'Training and Doctrine Command — merged into T2COM, 1 Oct 2025'],
+      [/Army Futures Command/i,           'Army Futures Command — merged into T2COM, 1 Oct 2025'],
+      [/\bARNORTH\b/i,                    'ARNORTH — inactivated 15 Jul 2026, folded into USAWHC'],
+      [/U\.?S\.? Army North\b/i,          'U.S. Army North — inactivated 15 Jul 2026, folded into USAWHC'],
+      [/\bARSOUTH\b/i,                    'ARSOUTH — inactivated 29 May 2026, folded into USAWHC'],
+      [/U\.?S\.? Army South\b/i,          'U.S. Army South — inactivated 29 May 2026, folded into USAWHC'],
+      [/\bSDDC\b/i,                       'SDDC — redesignated ARTRANS, 24 Sep 2025'],
+      [/Surface Deployment and Distribution/i, 'SDDC — redesignated ARTRANS, 24 Sep 2025'],
+    ];
+    const hits = [];
+    orgs.forEach(o => RETIRED.forEach(r => { if (r[0].test(o.name)) hits.push(o.name + '  {' + o.id + '} — ' + r[1]); }));
+    if (hits.length) { bad(hits.length + ' org(s) name a command that no longer exists:'); hits.slice(0, 10).forEach(x => console.log('    ' + x)); }
+    else console.log('✓ currency: no retired command (FORSCOM · TRADOC · AFC · ARNORTH · ARSOUTH · SDDC) presented as live');
+
+    // lvl is DERIVED from the parent chain — the chart paints tier colour off it,
+    // and those colours are load-bearing semantics, so a desynced lvl mis-tiers a box.
+    const byId = new Map(orgs.map(o => [o.id, o]));
+    const off = [];
+    orgs.forEach(o => { let d = 1, cur = o, guard = 0;
+      while (cur && cur.parent && guard++ < 40) { cur = byId.get(cur.parent); if (cur) d++; }
+      if (o.lvl !== d) off.push(o.id + ' (lvl ' + o.lvl + ', chain says ' + d + ')'); });
+    if (off.length) { bad(off.length + ' org(s) whose lvl disagrees with the parent chain — tier colour would lie:'); off.slice(0, 8).forEach(x => console.log('    ' + x)); }
+    else console.log('✓ every org lvl matches its parent-chain depth');
+  }
+}
+
 console.log((fails ? 'DATA LINT FAIL' : 'DATA LINT PASS') + (warns ? ' (' + warns + ' warning' + (warns === 1 ? '' : 's') + ')' : ''));
 process.exit(fails ? 1 : 0);

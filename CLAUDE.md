@@ -1679,3 +1679,52 @@ It lives here now.
    passed all five, then took its changelog entry, then committed: the entry
    broke the probe added in the same release. Order is: edit → ship ritual →
    five tools → commit.
+
+## v1.24.0 — the 2026 refresh + the echelon (owner: "most up to date organization names and accuracy of hierarchy chart · improvements to both brief and map · continue to find the best way to present the key information")
+- THE TREE IS A CLAIM ABOUT THE PRESENT, AND CLAIMS GO STALE. Everything below
+  was verified against the Army's own announcements and AGO 2025-24 before it
+  was touched, and two things I *expected* to be wrong turned out to be right —
+  CIMT/Cadet Command/Fort Jackson really do sit under USAREC (the Dec 2025
+  accessions consolidation), and ARTRANS really is current (SDDC redesignated
+  24 Sep 2025). Verify before "fixing"; a confident edit to correct data is the
+  most expensive kind of wrong.
+- FIXED: III Armored Corps hung off USAWHC; AGO 2025-24 reassigned III Corps to
+  USAREUR-AF effective 5 Dec 2025 (with I Corps → USARPAC). Secondary reporting
+  contradicts this — one outlet headlined the opposite, and a Jan 2026 article
+  still names FORSCOM as its higher HQ months after FORSCOM ceased to exist.
+  The general order wins over both.
+- FIXED: ARNORTH (inactivated 15 Jul 2026) and ARSOUTH (29 May 2026) were still
+  presented as live commands. The headquarters are struck; their 12 standing
+  elements (TF-51, the FEMA-region DCEs, JTF-Bravo, JTF-GTMO) survive the merge
+  and reparent to USAWHC, which now shows 23 subordinates. Deleting a node the
+  owner may have saved into a brief is a real cost — the sanitize path absorbs
+  it — but presenting a dissolved command as current is the larger lie.
+- FIXED: Futures & Concepts Command was sited at the Austin T2COM HQ; it
+  activated at Fort Eustis on 12 Feb 2026, and the SITES row already said so.
+  The org row and the site row disagreed and nothing noticed.
+- UNRESOLVED, deliberately: whether USAWHC is an ACOM or an ASCC. It replaced
+  FORSCOM (an ACOM) and absorbed two ASCCs, and the sources I can reach split.
+  It stays under ASCCs, where it was, because guessing an L2 regrouping on
+  ambiguous evidence is worse than leaving a defensible placement. Flagged to
+  the owner rather than silently decided.
+- data/orgs.json is the SOURCE; index.html carries a generated copy. Edit the
+  source and regenerate the copy in the same script — never one by hand. Nothing
+  checked they agreed until this release, so the page could have drawn a tree
+  the lint had never seen.
+- THE ECHELON TAG: the card's rail ended on the literal word HERE, which said
+  nothing the name directly beneath it did not already say, while _OG_CATS
+  filtered the ACOMs/ASCCs/DRUs rungs out of the crumbs as "shells, not
+  commands" — so on the 2-crumb cap a deep unit's card could not say whether it
+  hung off an ACOM or an ASCC at all. The dead slot now carries that
+  classification. It LEADS the rail: trailing it read "I CORPS › 4TH INF DIV ›
+  ASCC", which puts the classification below the division it sits above. It is
+  a badge, not a link in the chain, and it is styled as one.
+- MINIMIZE WHAT THERE IS TO MINIMIZE. setMode adds chart-min every time the
+  brief opens (globe is the hero) and body.chart-min hides every child of
+  #briefStage except the ⌗ head. With no members the only child IS the empty
+  state, so opening an empty brief showed a bare pill over a bare globe and the
+  guidance for the first move never reached the screen. The hero law holds the
+  moment there is a chart to suppress.
+- A PANEL NOBODY CAN SEE NEVER GETS DESIGN-REVIEWED: the empty state had been
+  carrying two competing filled-gold primaries. Making it visible is what
+  exposed that. Expect the same wherever a surface has been hidden a while.
