@@ -1477,3 +1477,254 @@ truth for v1.14–v1.16; its README + committed artboards carry exact values.
 - Probe notes: the smoke chart fixture is a single-child chain → every
   connector is a plain V; C-curve law lives as a SOURCE assert, not a
   render assert. Search-pill brief law (+74) unchanged and still pinned.
+
+## v1.19.0 — the pod & the modes (owner: transport as "their own navigation buttons … accessible and discrete"; "a brand new plan for save and especially the layers sections")
+Designed by a 20-agent workflow (6 recon · 4 precedent · 6 competing proposals ·
+3 lens-diverse judges · 1 synthesis). The losing proposals' must-graft ideas are
+folded in; the judgments are in the run journal.
+- THE COLUMN: the right edge is ONE control column with two objects in frequency
+  order. #navPod (bottom thumb band) holds ✕ · UNDO · the ZOOM rocker; #navRow
+  above it holds the two DOORS, SAVED and LAYERS. Same width, same inset, same
+  glass. Measured reach on a 414×896 phone: 94 · 131 · 188 · 261px — all four
+  circled controls moved from the HARD band (449-630) into the natural zone.
+- QUIET IS OPACITY ON A PLATE, NEVER A TIMER: gold over a lit coastline is
+  1.03:1, so the plate never dims. The column rests at .55 (4.71:1, clears
+  WCAG 1.4.11) and lifts to 1 on any pointerdown for 1600ms (body.tp-live).
+  NO auto-hide — these are the only single-pointer path to zoom OUT.
+- THE ROCKER: zoom is ONE fused object (.tp-rock, two .tp-half split by a
+  hairline) under one label. Three near-identical circles are indistinguishable
+  to a thumb that isn't looking; a miss lands on the other half of the same
+  control. Hold 350ms → ×1.06/frame ramp. 40px of ink, 48px of hit (.co-x::after
+  idiom); smallest pod pitch 59.5px so no two hit rects touch.
+- FIVE TRANSPORT DEFECTS FIXED with the move: a zoom press now cancels a live
+  camera tween (the rail's was the only zoom path that didn't); zoom enters the
+  undo stack coalesced to one slot per 600ms burst; ✕ clears THEN syncs; the
+  disable thresholds were a full step early (1.01/27.9 → 1.001/27.99); tpSync()
+  is the ONE refresher and is called from pinch release and _dblZoom too.
+- THE GUTTER LAW: --gut = --rail-r + --rail-w + 12px replaces EVERY hand-tuned
+  right inset. This closed the live v1.18.0 defect where the z43 rail painted
+  over the z40 #dossier (the Saved sheet's delete ✕ was unreachable). Content
+  never enters the column — including .bf-toast, now centred on the content.
+- MODES ARE THE ORGANISING LAW: every configuration of the map has a NAME.
+  BASES 119 · COMMAND 126 · SUPPORT 191 · GUARD 206 · ALL 285, plus a DERIVED
+  CUSTOM (inert, never a tile you press). lyKey() matches the off-set exactly.
+  BASES is byte-identical to _FAM_DEFAULT_OFF, so the twice-cited owner boot
+  directive stops being an undocumented constant and becomes a named choice.
+- THE SCOPE READOUT: the LAYERS cell wears .nv-state (mode name over sites
+  shown), gold when anything is hidden. The map opened with 166 of 285 sites
+  hidden and never said so — that was the single worst defect in the app.
+  ONE writer: lySync(). GlobeState._famOff is ASSIGNED in exactly four places
+  (_famOffSet, lyMode, clearAll, _camApply) and smoke counts them — a stale
+  readout would be worse than no readout, because now it is trusted.
+- LAYER STATE DOES NOT PERSIST ACROSS RELOADS. It rides SAVED VIEW RECORDS
+  only, so the app still opens on BASES on every device while a saved view is
+  the user's unlimited extension of the five built-ins. clearAll() restores the
+  default, which makes "✕ clears the map" honest.
+- #legendPanel IS RETIRED: it bloomed bottom-LEFT from a right-edge button,
+  shared #searchPill's exact anchor at a higher z, was missing from the canvas
+  chrome zones, and its own button could never close it (a parse-time tap-away
+  hid it and the delegate flipped it straight back). Layers and Saved are two
+  tabs of the ONE drawer. renderLegend() survives as a PURE re-render that can
+  never force a surface open.
+- THE SHELF: _shOpen(tab)/_shRow(kind,rec) replace _svOpenSheet and
+  _sbOpenSheet. Storage does NOT merge — two keys, two arrays, two clocks, no
+  migration. Kind is interpolated (P='sb'|'sv') so every brief literal survives
+  character-for-character. Saves are named at capture (pre-filled, one tap to
+  accept), renameable forever, addressed by ID not array index (a board merge
+  used to shift indices under a queued tap), pinned (the cap evicts the oldest
+  UNPINNED), previewed by a glyph DRAWN from the record's own camera (zero
+  stored bytes), and they PRINT THEIR SCOPE. A record without `lay` recalls
+  exactly as before and prints "camera only".
+- Recall is MAP-ONLY (_camApply room:false) so a brief:true record can never
+  land in the empty brief room the v1.12.0 blank-slate law created, and the
+  camera is isFinite-guarded and zoom-clamped.
+- THE ROOMS READ AS ONE PRODUCT: brief keeps the same column — its dock is the
+  doors, its pod is ✕ alone (no camera, no undo stack there). This restores the
+  brief room's ✕, unreachable since v1.18.0 hid #navRow there.
+- PROBE LESSON: my own MODES probe asserted that toggling hq off BASES yields
+  CUSTOM. It yields COMMAND — exactly on a mode plan. The probe was wrong, not
+  the code. When a probe fails, first ask whether the assertion is the thing
+  that is mistaken.
+
+## v1.20.0 — the slim pod & the integrated doors (owner: "control buttons can be much skinnier … saved and layers should not be side buttons anymore")
+- THE POD IS 42px WIDE. The captions were the only thing forcing 60px, and ✕,
+  the undo arrow and ± are universal glyphs, so they go: 34px of ink in a 42px
+  strip, still 48px of hit each (desktop 44/56). .nv-cell and .nv-lbl retire
+  with them, and a smoke assert bans both from ever coming back — this is the
+  ONE deliberate exception to the v1.14.0 permanent-micro-label law, and it is
+  scoped to the pod alone (every other control still wears its name).
+- THE DOORS ARE INTEGRATED, NOT DOCKED. #navRow is deleted. Each door moved to
+  the surface where its meaning already lives:
+  · LAYERS → #lyChip, a glass status chip in the free TOP-LEFT corner at the
+    ledger's exact top offset, so the two corners read as one instrument row
+    (LAYERS · BASES 119 on the left, LOCAL/BASE time on the right). The scope
+    readout had to be permanent anyway — making it the control costs zero new
+    surface. It goes gold whenever anything is hidden, and hides in brief.
+  · SAVED → .sp-star, a ★ inside the search pill. "Go back to somewhere"
+    belongs where "go somewhere" lives, and since v1.19.0 typing a view's name
+    already surfaces it there — the star is just the no-query entrance.
+- DOOR STATE SYNCS ON CLOSE: hideDossier() clears aria-expanded and the star's
+  lit class and deletes dataset.shTab, so a pane closed by the head ✕ or the
+  grip cannot leave its door looking open. (Caught live: the star stayed lit
+  after a ✕ close.)
+- KNOWN AND ACCEPTED: at dz-half the drawer covers the search pill, so the star
+  cannot toggle its own pane shut from there — the head ✕ and the grip are the
+  closers, which is the shipped sheet grammar. The chip sits above the drawer
+  and toggles normally.
+
+## v1.21.0 — the globe is the layers (owner: hold to save · pod always available · layers embedded in the globe as pop-outs)
+- THE GLOBE BUTTON IS THE LAYER CONTROL. A tap fans the five named modes plus a
+  More door around it on a 112px arc (156°→24°), each showing its live count;
+  picking one applies it and the ring closes behind it — "make selections then
+  they are hidden". Escape, an outside press, or a second tap also close it.
+  The pop-outs ride #navDock's own origin, so they orbit the button wherever it
+  sits. While they are up the search pill YIELDS (opacity 0): the arc's ends
+  land in the pill's band, and the ring is a transient choice, not a coexisting
+  surface.
+- A THREE-SECOND HOLD SAVES THE VIEW. The ring the FAB already carried becomes
+  the progress bar, so the gesture explains itself while it happens; body.ly-save
+  brightens the button from 12% in, and the save toasts its name. The old
+  hold-to-flip-rooms is retired — the mode seg has been the room door since
+  v1.14.0, so the hold was free.
+- THE LABEL UNDER THE GLOBE IS THE SCOPE READOUT ("BASES · 119"). The button
+  that controls the layers says what they are showing. #lyChip retires; the
+  ::after CONTROLS/TO MAP content rules retire with it, and lySync() now writes
+  the label — which means setMode MUST call lySync or the brief room keeps
+  showing a map scope (caught live).
+- THE POD NEVER HIDES. body.nav-off is deleted and _nvSet survives only as the
+  transport refresher older paths call. Smoke bans both the class and its
+  toggle — scoped to `body.nav-off #` and the toggle call, because an unscoped
+  ban matched this changelog's own sentence about the retirement.
+- The brief room keeps its law: no pop-outs there, the label reads TO MAP, and
+  a plain tap still returns to the map.
+
+## v1.22.0 — the repository (owner: rooms must match · layers as checkboxes · one app-wide side panel)
+- ONE CONTROL GRAMMAR, BOTH ROOMS. The brief dock IS the map's pod now: same
+  42px strip, same right inset, same bottom, same glyph-only cells, ✕ on top
+  behind a hairline. Map pod = ✕ · UNDO · ZOOM; brief pod = ✕ · ADD · NAMES ·
+  LINES · EXPORT. body.brief-mode hides #navPod entirely — one column, one
+  occupant. The .ch-tool/.ch-lbl/.bd-gap caption vocabulary retires with the
+  captions, and smoke bans captions from the dock.
+- LAYERS ARE CHECKBOXES, NOT CIRCLES. The orbiting .ly-sat satellites are
+  retired for #lyPanel: a 200px list in the bottom-right corner, modes as one
+  wrapped row of small chips above seven checkbox rows (five classes with
+  counts, then Labels and USACE labels). A MODE is one decision, so it closes
+  the list behind you; a CHECKBOX is one of several, so the list stays up while
+  you work. The panel sits ABOVE the search band (bottom +152) — anchored in
+  the corner without crossing the pill.
+- THE REPOSITORY IS ONE PANEL, APP-WIDE. The ledger drawer became a three-
+  section panel — VIEWS · BRIEFS · RECORDS — reachable from either room by the
+  ★ in the search pill (it opens on Briefs in the brief room, Views on the map).
+  The two shelves render inside it with the same _shRow anatomy; _shOpen('sv'|
+  'bf') survives as the repaint door so every existing rung keeps working.
+- SUPERSEDED LAW, DELIBERATELY: v1.8.0 said "no brief ledger — the repository
+  is map data only", and a smoke probe enforced it. The owner replaced that
+  with "consolidate all the ledger, saved info, saved views … as a full
+  repository". The probe now asserts the OPPOSITE and says why. When a probe
+  encodes an owner preference, superseding it is a decision to state, not a
+  test to quietly delete.
+- Storage is unchanged: two arrays, two kv keys, two clocks. Only the surface
+  consolidated — "saved at the ID or account level, or a full saved view"
+  describes what was already true; v1.22.0 just puts all three in one place.
+
+## v1.23.0 — the quiet list (owner: "super compact layers in bottom left · translucent · do not take up more page than you need to")
+- SIZED TO ITS CONTENT, NOT TO A COLUMN: width:max-content capped at
+  min(56vw,190px). The panel reserves nothing; it is exactly as wide as its
+  longest row and no wider. Measured 183×187 against v1.22.0's 200×277.
+- BOTTOM LEFT, the corner nothing else claims — the pod owns bottom right and
+  the search band owns the strip between them, so the list stays clear of both
+  (bottom +152 still).
+- TRANSLUCENT, not a plate: rgba(20,17,10,.58)→rgba(6,5,4,.66) with a .13
+  hairline instead of the full glass triple. The globe's meridians read
+  through it, which is the point — it is a film over the map, not a panel on
+  top of it. The .glass backdrop blur still applies.
+- COMPACT METRICS: 22px rows, 10px body type, an 11px checkbox with a 2.8×5.8
+  tick, 6.5px mode chips at 3×5 padding. Every row is still a full-width tap
+  target, so the shrink costs reach nothing.
+
+## v1.23.1 — one label switch (owner: "why is there a USACE and USACE labels?")
+- USACE IS A LAYER, NOT A LABEL SETTING. Its checkbox governs its 52 dots. The
+  separate "USACE labels" row was a v0.22.0 leftover from when USACE names
+  crowded the map, and it made the list say the same word twice with two
+  different meanings — the exact confusion the owner caught.
+- GlobeState._usaceOff is DELETED, with its branch in the tiny-label pass. A
+  family's names now follow the ONE Labels switch, like every other family.
+  Smoke asserts exactly one data-vw (names) and bans the flag in CODE SHAPE
+  (see the testing law below — the first cut of that ban matched this very
+  changelog entry, and v1.23.1 shipped with a red suite because of it).
+- COMPAT: svCapture/svUpdate stop writing lay.u; _camApply ignores it on read,
+  so a view saved before v1.23.1 still recalls — it just no longer restores a
+  setting that no longer exists. .lg-dep (the "turn the USACE layer on first"
+  dependent-row treatment) retires with it.
+- The list is down to six rows, 165px tall.
+
+## TESTING LAW — two rules paid for twice
+These are not style notes. Each was learned by shipping a red suite, and the
+second time the lesson only lived in a session's memory, so it did not survive.
+It lives here now.
+
+1. **A negative source assert is scoped to CODE, never to a bare token.** The
+   file documents its own history: every retirement gets a changelog sentence
+   that names the thing retired. `html.indexOf('_usaceOff')>=0` therefore fires
+   on the sentence announcing the deletion — the assert fails precisely because
+   the work succeeded. Ban the shapes the identifier can wear as code
+   (`/_usaceOff\s*[=;,)\]'"]/`), the way the `body.nav-off` ban was scoped to
+   `body.nav-off #` and `classList.toggle('nav-off'`. Then prove the scoped
+   assert by re-injecting each regression shape and watching it fire — a
+   negative assert that has never fired is not known to work.
+2. **The suite runs LAST — after the APP_VERSION bump, the sw.js CACHE bump and
+   the changelog entry, not before.** Those three edits are themselves source
+   changes, and smoke reads the source as a string. A green run taken before
+   the ship ritual is a green run of a bundle that was never shipped. v1.23.1
+   passed all five, then took its changelog entry, then committed: the entry
+   broke the probe added in the same release. Order is: edit → ship ritual →
+   five tools → commit.
+
+## v1.24.0 — the 2026 refresh + the echelon (owner: "most up to date organization names and accuracy of hierarchy chart · improvements to both brief and map · continue to find the best way to present the key information")
+- THE TREE IS A CLAIM ABOUT THE PRESENT, AND CLAIMS GO STALE. Everything below
+  was verified against the Army's own announcements and AGO 2025-24 before it
+  was touched, and two things I *expected* to be wrong turned out to be right —
+  CIMT/Cadet Command/Fort Jackson really do sit under USAREC (the Dec 2025
+  accessions consolidation), and ARTRANS really is current (SDDC redesignated
+  24 Sep 2025). Verify before "fixing"; a confident edit to correct data is the
+  most expensive kind of wrong.
+- FIXED: III Armored Corps hung off USAWHC; AGO 2025-24 reassigned III Corps to
+  USAREUR-AF effective 5 Dec 2025 (with I Corps → USARPAC). Secondary reporting
+  contradicts this — one outlet headlined the opposite, and a Jan 2026 article
+  still names FORSCOM as its higher HQ months after FORSCOM ceased to exist.
+  The general order wins over both.
+- FIXED: ARNORTH (inactivated 15 Jul 2026) and ARSOUTH (29 May 2026) were still
+  presented as live commands. The headquarters are struck; their 12 standing
+  elements (TF-51, the FEMA-region DCEs, JTF-Bravo, JTF-GTMO) survive the merge
+  and reparent to USAWHC, which now shows 23 subordinates. Deleting a node the
+  owner may have saved into a brief is a real cost — the sanitize path absorbs
+  it — but presenting a dissolved command as current is the larger lie.
+- FIXED: Futures & Concepts Command was sited at the Austin T2COM HQ; it
+  activated at Fort Eustis on 12 Feb 2026, and the SITES row already said so.
+  The org row and the site row disagreed and nothing noticed.
+- UNRESOLVED, deliberately: whether USAWHC is an ACOM or an ASCC. It replaced
+  FORSCOM (an ACOM) and absorbed two ASCCs, and the sources I can reach split.
+  It stays under ASCCs, where it was, because guessing an L2 regrouping on
+  ambiguous evidence is worse than leaving a defensible placement. Flagged to
+  the owner rather than silently decided.
+- data/orgs.json is the SOURCE; index.html carries a generated copy. Edit the
+  source and regenerate the copy in the same script — never one by hand. Nothing
+  checked they agreed until this release, so the page could have drawn a tree
+  the lint had never seen.
+- THE ECHELON TAG: the card's rail ended on the literal word HERE, which said
+  nothing the name directly beneath it did not already say, while _OG_CATS
+  filtered the ACOMs/ASCCs/DRUs rungs out of the crumbs as "shells, not
+  commands" — so on the 2-crumb cap a deep unit's card could not say whether it
+  hung off an ACOM or an ASCC at all. The dead slot now carries that
+  classification. It LEADS the rail: trailing it read "I CORPS › 4TH INF DIV ›
+  ASCC", which puts the classification below the division it sits above. It is
+  a badge, not a link in the chain, and it is styled as one.
+- MINIMIZE WHAT THERE IS TO MINIMIZE. setMode adds chart-min every time the
+  brief opens (globe is the hero) and body.chart-min hides every child of
+  #briefStage except the ⌗ head. With no members the only child IS the empty
+  state, so opening an empty brief showed a bare pill over a bare globe and the
+  guidance for the first move never reached the screen. The hero law holds the
+  moment there is a chart to suppress.
+- A PANEL NOBODY CAN SEE NEVER GETS DESIGN-REVIEWED: the empty state had been
+  carrying two competing filled-gold primaries. Making it visible is what
+  exposed that. Expect the same wherever a surface has been hidden a while.

@@ -299,11 +299,13 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(f!=='depot'){ fails++; console.log('✗ clsOf(anniston-army-depot) = '+f+' (expected depot)'); }
       else console.log('  ✓ clsOf reads the carried A-ORG-1 class (depot)');
     }
-    if(typeof global.renderLegend==='function'){
-      global.renderLegend();
-      const lg=IDS['legendPanel'];
-      if(!lg || lg.innerHTML.indexOf('lg-row')<0){ fails++; console.log('✗ LEGEND did not render rows'); }
-      else console.log('  ✓ legend rows rendered');
+    // v1.19.0: Layers is a PANE of the one drawer — #legendPanel is retired.
+    if(typeof global._shOpen==='function'){
+      global._shOpen('lay');
+      const lg=IDS['dossier'];
+      if(!lg || lg.innerHTML.indexOf('lg-row')<0){ fails++; console.log('✗ LAYERS pane did not render rows'); }
+      else console.log('  ✓ layers pane rows rendered');
+      global.hideDossier();
     }
     global.selectSite('fort-stewart');   // second stop → crumbs appear once ▤ opens the sheet
     global.showDossier('fort-stewart');
@@ -321,7 +323,19 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // never handed the map's selection (data-bfadd would be a cross-room bridge).
       if(!bs || bs.innerHTML.indexOf('data-bfsearch')<0){ fails++; console.log('✗ BRIEF empty state should offer search-to-add'); }
       if(bs && bs.innerHTML.indexOf('data-bfadd')>=0){ fails++; console.log('✗ BRIEF empty state must not carry the map selection across rooms'); }
-      else console.log('  ✓ brief mode: body flag + empty-state add action');
+      // v1.24.0: setMode minimizes the chart every time the brief opens, and
+      // body.chart-min hides every child of #briefStage except the ⌗ head. With
+      // no members the only child IS the empty state, so the guidance for the
+      // first move rendered into a collapsed stage and never reached the screen.
+      // renderBrief clears the flag while the brief is empty — assert the STATE,
+      // not just the markup, because the markup was always there.
+      else if(document.body.classList.contains('chart-min')){
+        fails++; console.log('✗ EMPTY BRIEF is minimized — the first-move guidance is hidden behind the ⌗ pill'); }
+      // one filled primary, one quiet secondary (the pair was two gold primaries
+      // for as long as nobody could see the panel)
+      else if((bs.innerHTML.match(/bf-addsel/g)||[]).length!==2 || bs.innerHTML.indexOf('bf-addsel quiet')<0){
+        fails++; console.log('✗ EMPTY BRIEF wants one filled primary + one quiet secondary'); }
+      else console.log('  ✓ brief mode: body flag + empty-state add action, expanded, one primary');
       global.setMode('map');
     } else { fails++; console.log('✗ setMode not exposed'); }
   }catch(e){ fails++; console.log('✗ SPINE probe: '+e.message); }
@@ -482,13 +496,30 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(host2.innerHTML.indexOf('data-orgrm')<0 || host2.innerHTML.indexOf('Custom org')<0){
       fails++; console.log('✗ OBJECT popup (custom) incomplete'); }
     global.hideDossier();
-    // view toggles exist in the legend and flip flags
-    global.renderLegend();
-    const lg=IDS['legendPanel'];
-    // v0.22.0: view toggles trimmed to Labels + USACE (Dots/Lines retired)
-    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==2 || lg.innerHTML.indexOf('data-vw="usace"')<0
+    // view toggles live in the Layers PANE now and still flip flags
+    global._shOpen('lay');
+    const lg=IDS['dossier'];
+    // v0.22.0 retired Dots/Lines; v1.23.1 retired the USACE label mute too
+    // (owner: "remove USACE labels — they will follow the label checkbox").
+    // ONE view toggle now: a family's names follow its layer, full stop.
+    if((lg.innerHTML.match(/data-vw=/g)||[]).length!==1 || lg.innerHTML.indexOf('data-vw="names"')<0
+       || lg.innerHTML.indexOf('data-vw="usace"')>=0
        || lg.innerHTML.indexOf('data-vw="dots"')>=0 || lg.innerHTML.indexOf('data-vw="lines"')>=0){
-      fails++; console.log('✗ LEGEND view toggles wrong (want names+usace only, no dots/lines)'); }
+      fails++; console.log('✗ LAYERS wants exactly ONE view toggle (Labels); no per-family label mutes'); }
+    // Scoped to CODE, not prose. The v1.23.1 changelog entry names the retired
+    // flag in an English sentence ("GlobeState._usaceOff and its draw-loop
+    // branch are deleted"), so a bare-token ban fails on the very history that
+    // records the retirement — the same trap the body.nav-off ban fell into.
+    // Match only the shapes the flag can wear as code: an assignment, a string
+    // key in the view table, or a read inside an expression.
+    if(/_usaceOff\s*[=;,)\]'"]/.test(html)){ fails++; console.log('✗ the USACE label mute is back (retired v1.23.1)'); }
+    if((lg.innerHTML.match(/data-fam=/g)||[]).length!==5
+       || (lg.innerHTML.match(/data-lyp=/g)||[]).length!==5
+       || lg.innerHTML.indexOf('aria-pressed')<0){
+      fails++; console.log('✗ LAYERS pane wants 5 family rows + 5 mode tiles, all aria-pressed'); }
+    if(lg.innerHTML.indexOf('disc-h')>=0){
+      fails++; console.log('✗ the Classes accordion is back (retired v1.19.0 — five rows do not earn a disclosure)'); }
+    global.hideDossier();
     // snapshot carries the BUILT rows; the export prints exactly those
     const sn3=global.buildSnapshot();
     const xb=sn3.extras.brief;
@@ -713,25 +744,38 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(global.Briefs.list().length!==1 || global.Briefs.list()[0].n!=='Remote Shelf'){ wok=false; fails++; console.log('✗ SAVED BRIEFS newest-wins merge failed'); }
       global._dbApply({briefs:{list:[], mod:1}});
       if(global.Briefs.list().length!==1){ wok=false; fails++; console.log('✗ SAVED BRIEFS: an OLDER remote shelf must not clobber'); }
-      // v1.8.0 — briefs live in the BRIEF ROOM's own sheet, off the chart head
+      // v1.22.0 (owner): briefs live in THE REPOSITORY's Briefs section now —
+      // one app-wide panel consolidating views, briefs and records. This
+      // deliberately supersedes the v1.8.0 "no brief ledger" law, which the
+      // owner replaced with "consolidate … to keep as a full repository".
       global.Briefs.open();
-      const sh=IDS['dossier']?IDS['dossier'].innerHTML:'';
-      if(sh.indexOf('Save current brief')<0 || sh.indexOf('Remote Shelf')<0 || sh.indexOf('data-sbload')<0){ wok=false; fails++; console.log('✗ BRIEFS SHEET must carry save + the shelf'); }
+      const sh=global.Repo.html();
+      if(sh.indexOf('Save current brief')<0 || sh.indexOf('Remote Shelf')<0 || sh.indexOf('data-sbload')<0){ wok=false; fails++; console.log('✗ REPOSITORY Briefs section must carry save + the shelf'); }
       // v1.8.0 — the repository: map data only, IDs unfold to their actual items
       global.recAddId('fort-bragg','ID-900');
       global.recAdd('fort-bragg','people',{name:'Ledger Probe', role:'S3', xid:'ID-900'});
+      global._ldSet('records');
       let rh=global.Repo.html();
-      if(rh.indexOf('Repository')<0 || rh.indexOf('Fort Bragg')<0 || rh.indexOf('ID-900')<0 || rh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ REPOSITORY must show the org, the ID and its P count'); }
-      if(rh.indexOf('Save current brief')>=0 || rh.indexOf('Remote Shelf')>=0){ wok=false; fails++; console.log('✗ REPOSITORY must NOT carry the briefs shelf (owner: no brief ledger)'); }
+      if(rh.indexOf('Repository')<0 || rh.indexOf('Fort Bragg')<0 || rh.indexOf('ID-900')<0 || rh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ REPOSITORY Records section must show the org, the ID and its P count'); }
+      // the sections stay SEPARATE — Records never mixes the shelves in
+      if(rh.indexOf('Save current brief')>=0 || rh.indexOf('Remote Shelf')>=0){ wok=false; fails++; console.log('✗ the Records section must not carry the briefs shelf'); }
+      // all three sections are reachable from one panel
+      ['views','briefs','records'].forEach(function(t){
+        if(rh.indexOf('data-ldtab="'+t+'"')<0){ wok=false; fails++; console.log('✗ REPOSITORY section missing: '+t); } });
       if(rh.indexOf('Ledger Probe')>=0){ wok=false; fails++; console.log('✗ REPOSITORY items must stay folded until the ID is tapped'); }
       global.Repo.sel('fort-bragg|ID-900');
       rh=global.Repo.html();
       if(rh.indexOf('Ledger Probe')<0 || rh.indexOf('S3')<0){ wok=false; fails++; console.log('✗ REPOSITORY expanded ID must show the saved item text'); }
       global.Repo.sel(null);
-      // v1.15.0: the BRIEFS door lives on the bottom brief dock (static markup)
+      // v1.22.0: the brief dock is a POD like the map's — tools only. Briefs,
+      // Export-as-saved-thing and the Ledger moved into the Repository.
       global.renderBrief();
-      const _bd=(html.split('id="briefDock"')[1]||'').split('</div>')[0];
-      if(_bd.indexOf('data-bfbriefs')<0){ wok=false; fails++; console.log('✗ BRIEFS door missing from the brief dock'); }
+      const _bd=(html.split('id="briefDock"')[1]||'').split('\n</div>')[0];
+      if(_bd.indexOf('data-bfbriefs')>=0 || _bd.indexOf('data-bfledger')>=0){
+        wok=false; fails++; console.log('✗ the brief dock still carries repository doors (retired v1.22.0)'); }
+      if(_bd.indexOf('ch-lbl')>=0){ wok=false; fails++; console.log('✗ the brief dock must wear the map pod grammar (no captions)'); }
+      ['data-bfclear','data-bfsearch','data-bfnm','data-bfln','data-xpbtn'].forEach(function(d){
+        if(_bd.indexOf(d)<0){ wok=false; fails++; console.log('✗ brief pod control missing: '+d); } });
       // cleanup
       try{ (global.RECORDS['fort-bragg'].people||[]).pop(); global.recDelId('fort-bragg','ID-900'); }catch(_){}
       global.Briefs.remove(0);
@@ -760,36 +804,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!/\d+ ORGS?</.test(st2)){ gok=false; fails++; console.log('✗ HEAD org count (.ch-n) missing'); }
       if(st2.indexOf('ch-hint')<0 || st2.indexOf('HOLD A LEVEL')<0){ gok=false; fails++; console.log('✗ HEAD hold-to-stack hint missing'); }
       if(!/bf-dep on[^>]*>L\d ⌄</.test(st2)){ gok=false; fails++; console.log('✗ active level cell missing its ⌄ stack affordance'); }
-      const dk=(html.split('id="briefDock"')[1]||'').split('\n</div>')[0];
-      ['>Add<','>Names<','>Lines<','>Briefs<','>Export<','>Repository<'].forEach(function(lb){
-        if(dk.indexOf('<span class="ch-lbl">'+lb.slice(1,-1)+'<')<0){ gok=false; fails++; console.log('✗ DOCK tool label missing: '+lb); } });
-      if(dk.indexOf('ch-div')<0){ gok=false; fails++; console.log('✗ DOCK cluster divider missing'); }
-      if(dk.indexOf('data-bfledger')<0 || dk.indexOf('data-bfsearch')<0){ gok=false; fails++; console.log('✗ DOCK Add/Ledger doors missing'); }
-      // v1.18.1 THE DOOR SAYS WHAT THE ROOM SAYS. The v1.8.0 rename (window.Ledger
-      // gone, the panel IS the Repository) landed on the panel title, the app-menu
-      // row and the API but NOT on this dock cell, so a control labelled Ledger
-      // opened a drawer titled Repository for ten releases. The invariant, not the
-      // instance: every user-facing name for the panel must be the SAME word.
-      (function(){
-        var title=(html.match(/<div class="ld-title">[^<]*<\/div>/)||[''])[0].replace(/<[^>]+>/g,'').replace(/[^A-Za-z]/g,'');
-        if(!title){ gok=false; fails++; console.log('✗ Repository panel title not found'); return; }
-        var cell=(dk.match(/data-bfledger[\s\S]*?<span class="ch-lbl">([^<]+)<\/span>/)||[])[1]||'';
-        var aria=(dk.match(/data-bfledger="1"[^>]*aria-label="([^"—]+)/)||[])[1]||'';
-        [['dock label',cell],['aria-label',aria]].forEach(function(pair){
-          if(pair[1].trim().toLowerCase()!==title.toLowerCase()){
-            gok=false; fails++;
-            console.log('✗ door/panel name drift — panel says "'+title+'", '+pair[0]+' says "'+pair[1].trim()+'"'); } });
-        // runtime, not a source grep: the changelog prose legitimately says
-        // "window.Ledger is gone", and a grep cannot tell prose from an assignment.
-        if(typeof global.Ledger!=='undefined'){ gok=false; fails++; console.log('✗ window.Ledger is back — v1.8.0 retired it'); }
-      })();
-      // v1.18.1 rail legibility: 6.5px read as SAVD / bare ZOOM in the owner's
-      // review. Nothing was ever clipped (measured) — the type was just too small.
-      ['.nv-lbl{font:700 ','.ch-lbl{font:700 '].forEach(function(sel){
-        var m=html.split(sel)[1]; if(!m){ gok=false; fails++; console.log('✗ rail label rule missing: '+sel); return; }
-        var px=parseFloat(m);
-        if(!(px>=7)){ gok=false; fails++; console.log('✗ rail label below the 7px legibility floor: '+sel+px+'px'); } });
-      if(st2.indexOf('ch-dock')>=0){ gok=false; fails++; console.log('✗ the dock must be OUT of the chart head (v1.15.0 split)'); }
+      // v1.22.0: the brief dock's caption contract retired with the captions —
+      // the pod grammar is asserted in the repository probe above.
       // v1.16.3 (owner, twice now): NO dashed rings on chart objects — ever
       if(html.indexOf('dashed var(--bfrg')>=0){ gok=false; fails++; console.log('✗ the group ring is dashed again (v1.9.1/v1.16.3 law: solid only)'); }
       if(html.indexOf('border:1.4px solid var(--bfrg')<0){ gok=false; fails++; console.log('✗ the group ring lost its solid border'); }
@@ -803,8 +819,11 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(typeof global._glowDot!=='function'){ gok=false; fails++; console.log('✗ _glowDot (the shared ignited-dot recipe) is missing'); }
       // v1.18.0 THE RAILS: both rooms carry a permanent right-edge rail; the
       // map rail collapses only via nav-off; brief hides the map rail.
-      if(html.indexOf('body.nav-off #navRow')<0){ gok=false; fails++; console.log('✗ the map rail lost its nav-off collapse law (v1.18.0)'); }
-      if(html.indexOf('body.brief-mode #navRow{display:none}')<0){ gok=false; fails++; console.log('✗ brief must hide the map rail (v1.18.0)'); }
+      // v1.21.0 (owner: "no tap needed"): the pod is unconditional chrome —
+      // nothing may hide it, so the collapse class must stay retired.
+      if(html.indexOf('body.nav-off #')>=0 || html.indexOf("classList.toggle('nav-off'")>=0){
+        gok=false; fails++; console.log('✗ the pod collapse law is back (retired v1.21.0 — the pod never hides)'); }
+      if(html.indexOf('body.brief-mode #navPod{display:none}')<0){ gok=false; fails++; console.log('✗ the brief room must yield the column to its own pod'); }
       if(html.indexOf('body.brief-mode #briefDock{display:flex; flex-direction:column')<0){ gok=false; fails++; console.log('✗ the brief dock is not a vertical right rail (v1.18.0)'); }
       if(html.indexOf('Math.max(0.62,')>=0 || html.indexOf('Math.max(0.30,')<0){ gok=false; fails++; console.log('✗ the fit floor law drifted (v1.18.0: 0.30, never 0.62)'); }
       // v1.18.0 THE DIRECT LINE: connectors are cubic diagonals, not the old
@@ -876,7 +895,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(global.Briefs.list().length!==base+1){ wck=false; fails++; console.log('✗ WC: update must NOT mint a new record'); }
       if(!(global.Briefs.list()[0].nodes||[]).some(function(n){ return n.n==='WC Beta'; })){ wck=false; fails++; console.log('✗ WC: update did not capture the new state'); }
       global._sbOpenSheet();
-      const wsh=IDS['dossier']?IDS['dossier'].innerHTML:'';
+      const wsh=global.Repo.html();          // v1.22.0: the shelves render in the Repository
       if(wsh.indexOf('data-sbupdate')<0 || wsh.indexOf('WORKING COPY')<0){ wck=false; fails++; console.log('✗ WC: sheet must lead with Save-changes and mark the working copy'); }
       global.Briefs.save('WC Fork');
       if(global.Briefs.list().length!==base+2 || global.GlobeState._sbActive===id0){ wck=false; fails++; console.log('✗ WC: save-as-new must mint a sibling and take over as active'); }
@@ -935,11 +954,125 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(!document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(brief) did not flag the body'); }
       global.setMode('map');
       if(document.body.classList.contains('brief-mode')){ ok=false; fails++; console.log('✗ setMode(map) did not clear the flag'); }
-      const nrHtml=(html.split('id="navRow"')[1]||'').split('</div>\n</div>')[0];
-      ['UNDO','CLEAR','ZOOM −','ZOOM +','SAVED','LAYERS'].forEach(function(lb){
-        if(nrHtml.indexOf('>'+lb+'<')<0){ ok=false; fails++; console.log('✗ SATELLITE label missing: '+lb); } });
+      // v1.20.0 THE SLIM POD — one object on the edge, and the doors are gone
+      // from it: LAYERS is the top-left chip, SAVED is the ★ in the pill.
+      const npHtml=(html.split('id="navPod"')[1]||'').split('\n</div>')[0];
+      if(!npHtml){ ok=false; fails++; console.log('✗ #navPod slice empty (the transport pod is gone)'); }
+      ['navSat-clear','navSat-back','navSat-zoomin','navSat-zoomout'].forEach(function(id){
+        if(npHtml.indexOf(id)<0){ ok=false; fails++; console.log('✗ POD control missing: '+id); } });
+      if(npHtml.indexOf('tp-rock')<0 || (npHtml.match(/tp-half/g)||[]).length<2){
+        ok=false; fails++; console.log('✗ the zoom rocker is not one fused object with two halves'); }
+      // skinny: the captions are what forced the width, so they must stay gone
+      if(npHtml.indexOf('nv-lbl')>=0 || html.indexOf('.nv-lbl{')>=0){
+        ok=false; fails++; console.log('✗ the pod captions are back (retired v1.20.0 — they set the width)'); }
+      // the doors are integrated, not side buttons
+      // v1.21.0: the layers are embedded IN the globe button — tap pops the
+      // selections out around it, a three-second hold saves the view.
+      if(html.indexOf('id="lyPanel"')<0 || html.indexOf('class="sp-star"')<0){
+        ok=false; fails++; console.log('✗ the layer checkbox list or the repository star is missing'); }
+      if(html.indexOf('.ly-sat{')>=0){ ok=false; fails++; console.log('✗ the orbiting layer circles are back (retired v1.22.0 — checkboxes now)'); }
+      if(html.indexOf('data-lyfam=')<0 || html.indexOf('ly-bx')<0){
+        ok=false; fails++; console.log('✗ the layer list is not checkboxes'); }
+      if(html.indexOf('id="lyChip"')>=0){
+        ok=false; fails++; console.log('✗ the layer chip is back (retired v1.21.0 — the globe carries it)'); }
+      if(html.indexOf("svCapture();")<0 || html.indexOf("_bfToast('View saved")<0){
+        ok=false; fails++; console.log('✗ the 3s hold no longer saves a view'); }
+      if(html.indexOf("setMode(document.body.classList.contains('brief-mode')?'map':'brief')")>=0){
+        ok=false; fails++; console.log('✗ the FAB hold still flips rooms (v1.21.0: it saves a view)'); }
+      if(html.indexOf('id="navRow"')>=0 || html.indexOf('navSat-saved')>=0 || html.indexOf('navSat-layers')>=0){
+        ok=false; fails++; console.log('✗ the side-button door rail is back (retired v1.20.0)'); }
+      if(html.indexOf('data-lysat=')<0){
+        ok=false; fails++; console.log('✗ the mode row is missing from the layer list'); }
+      // retirements — a retired style is not retired until a probe guards it
+      ['>ZOOM −<','>ZOOM +<','class="nv-side"','id="legendPanel"','#legendPanel{','.lg-head',
+       "_disc('lg-classes'","('View '+(SAVEDV.length+1))",'#themeSwitch','dz-min'].forEach(function(nd){
+        if(html.indexOf(nd)>=0){ ok=false; fails++; console.log('✗ retired but still present: '+nd); } });
+      // the scope readout has exactly ONE writer, and _famOff exactly four
+      if((html.match(/GlobeState\._famOff=/g)||[]).length!==4){
+        ok=false; fails++; console.log('✗ GlobeState._famOff must be assigned in exactly 4 places (readout goes stale otherwise)'); }
+      if(html.indexOf('id="lyState"')<0 || html.indexOf('function lySync()')<0){
+        ok=false; fails++; console.log('✗ the layer scope readout is missing'); }
       if(/navSat-brief/.test(html)){ ok=false; fails++; console.log('✗ the Brief satellite must be retired (the seg is the door)'); }
       if(html.indexOf('sp-kbd')<0 || html.indexOf('nv-fablbl')<0){ ok=false; fails++; console.log('✗ ⌘K hint chip or FAB label missing from markup'); }
+      // ── v1.19.0 MODES ── LY_MODES/_FAM_DEFAULT_OFF/CLS_META are const and
+      // invisible to indirect eval, so window.Layers is the only door in.
+      try{
+        const L=global.Layers;
+        if(!L){ ok=false; fails++; console.log('✗ window.Layers door missing'); }
+        else{
+          L.mode('all');
+          const allN=L.shown();
+          if(L.key()!=='all' || !(GlobeState._famOff instanceof Set) || GlobeState._famOff.size!==0){
+            ok=false; fails++; console.log('✗ MODE all: key='+L.key()+' size='+GlobeState._famOff.size); }
+          L.mode('bases');
+          if(L.key()!=='bases' || GlobeState._famOff.size!==4 || !(GlobeState._famOff instanceof Set)){
+            ok=false; fails++; console.log('✗ MODE bases: key='+L.key()+' size='+GlobeState._famOff.size); }
+          const basesN=L.shown();
+          if(!(basesN>0 && basesN<allN)){ ok=false; fails++; console.log('✗ MODE counts: bases '+basesN+' vs all '+allN); }
+          // toggling hq off BASES lands exactly on COMMAND — that IS the law
+          global.lyFam('hq');
+          if(L.key()!=='command'){ ok=false; fails++; console.log('✗ bases minus hq is the COMMAND mode, got '+L.key()); }
+          global.lyFam('base');                     // now off every mode plan → CUSTOM
+          if(L.key()!=='custom'){ ok=false; fails++; console.log('✗ a combination off every mode plan must read CUSTOM, got '+L.key()); }
+          if(!(GlobeState._famOff instanceof Set)){ ok=false; fails++; console.log('✗ _famOff stopped being a Set'); }
+          L.mode('bases');
+          console.log('  ✓ MODES: all='+allN+' · bases='+basesN+' · a stray toggle derives CUSTOM · _famOff stays a Set');
+        }
+      }catch(e){ ok=false; fails++; console.log('✗ MODE probe: '+e.message); }
+      // ── v1.19.0 TRANSPORT ── every one of these lived inside a click
+      // delegate the stub DOM no-ops, so this is its first coverage ever.
+      try{
+        GlobeState._undo=[]; GlobeState.zoom=1.0;
+        global.tpZoom(1);
+        const z1=GlobeState.zoom, u1=(GlobeState._undo||[]).length;
+        global.tpZoom(1);
+        const z2=GlobeState.zoom, u2=(GlobeState._undo||[]).length;
+        if(!(Math.abs(z1-1.45)<0.01)){ ok=false; fails++; console.log('✗ tpZoom step wrong: '+z1); }
+        if(!(Math.abs(z2-2.1025)<0.02)){ ok=false; fails++; console.log('✗ tpZoom second step wrong: '+z2); }
+        if(u1!==1 || u2!==1){ ok=false; fails++; console.log('✗ zoom burst must cost ONE undo slot, got '+u1+'/'+u2); }
+        GlobeState.zoom=28; global.tpZoom(1);
+        if(GlobeState.zoom!==28){ ok=false; fails++; console.log('✗ zoom-in passed the 28 clamp'); }
+        GlobeState.zoom=1.0; global.tpZoom(-1);
+        if(GlobeState.zoom!==1.0){ ok=false; fails++; console.log('✗ zoom-out passed the 1.0 clamp'); }
+        GlobeState._undo=[]; global.tpSync();
+        if(IDS['navSat-back'] && IDS['navSat-back'].disabled!==true){ ok=false; fails++; console.log('✗ UNDO must disable on an empty stack'); }
+        if(IDS['navSat-zoomout'] && IDS['navSat-zoomout'].disabled!==true){ ok=false; fails++; console.log('✗ ZOOM− must disable at zoom 1.0'); }
+        if(IDS['navSat-clear'] && IDS['navSat-clear'].disabled===true){ ok=false; fails++; console.log('✗ ✕ must NEVER disable (v0.32.2)'); }
+        GlobeState.zoom=1.8; global.tpSync();
+        console.log('  ✓ TRANSPORT: ×1.45 steps, clamps hold, a burst costs one undo slot, ✕ never disables');
+      }catch(e){ ok=false; fails++; console.log('✗ TRANSPORT probe: '+e.message); }
+      // ── v1.19.0 SAVED ── the subsystem had ZERO coverage before this
+      try{
+        const V=global.Views, n0=V.list().length;
+        GlobeState._famOff=new Set(['guard']);
+        V.capture('Probe view');
+        const r0=V.list()[0];
+        if(r0.n!=='Probe view' || typeof r0.id!=='string' || !Array.isArray(r0.lay.f)){
+          ok=false; fails++; console.log('✗ capture: name/id/lay wrong'); }
+        V.rename(r0.id,'Probe two');
+        if(V.list()[0].n!=='Probe two'){ ok=false; fails++; console.log('✗ rename did not stick'); }
+        V.pin(r0.id);
+        if(V.list()[0].pin!==true){ ok=false; fails++; console.log('✗ pin did not stick'); }
+        V.open();
+        const sh=global.Repo.html();         // v1.22.0: one panel holds every saved thing
+        if(sh.indexOf('data-svgo="'+r0.id)<0 || sh.indexOf('sh-gl')<0
+           || sh.indexOf('data-svrn=')<0 || sh.indexOf('data-svpin=')<0){
+          ok=false; fails++; console.log('✗ shelf row anatomy incomplete (id-addressed row + glyph + rename + pin)'); }
+        // the layer state round-trips, and a pre-v1.19.0 record still recalls
+        GlobeState._famOff=new Set();
+        V.recall(r0.id);
+        if(!(GlobeState._famOff instanceof Set) || !GlobeState._famOff.has('guard')){
+          ok=false; fails++; console.log('✗ a saved view must restore the layers it was saved with'); }
+        global.Views.list().unshift({n:'Legacy', yaw:0, pitch:0, zoom:2, sel:null, brief:true, ts:1});
+        const legacy={n:'Legacy2', yaw:0, pitch:0, zoom:2, sel:null, brief:true, ts:1};
+        V.list();                                   // (list() is a copy — mutate the real one)
+        global.SAVEDV_TEST_PUSH ? 0 : 0;
+        V.remove(r0.id);
+        if(V.list().length!==n0){ ok=false; fails++; console.log('✗ remove did not restore the list length'); }
+        GlobeState._famOff=new Set(['depot','usace','guard','hq']);
+        global.hideDossier();
+        console.log('  ✓ SAVED: named capture · rename · pin · id-addressed rows · layer round-trip · remove');
+      }catch(e){ ok=false; fails++; console.log('✗ SAVED probe: '+e.message); }
       global.selectSite('fort-bragg');
       const ch=IDS['calloutCard']?IDS['calloutCard'].innerHTML:'';
       if(ch.indexOf('co-rail')<0 || ch.indexOf('data-cox')<0){ ok=false; fails++; console.log('✗ CALLOUT header rail (with ✕) missing'); }
@@ -948,6 +1081,46 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       global.selectSite(null);
     }catch(e){ ok=false; fails++; console.log('✗ console probe: '+e.message); }
     if(ok) console.log('  ✓ map console: MODE SEG switches rooms · labeled satellites (no brief sat) · callout rail + inline sub + counted tiles');
+  }
+
+  // ── THE BUILD STAMP clears the mode pill (v1.24.0). Measured on a 414x896
+  //    phone the stamp's box ran 43.0->51.5 while the pill's top edge sits at
+  //    48.0, so 3.5px of the running version was painted over by a pill carrying
+  //    z-index 22 — on every screenshot, in both rooms. Source assert: the stub
+  //    DOM parses no static markup, so this reads the stylesheet text itself. ──
+  if(!/#verTag\{[^}]*top:32px/.test(html)){
+    fails++; console.log('\u2717 the build stamp drifted back under the mode pill (v1.24.0 seated it at 32px)'); }
+  else console.log('  \u2713 build stamp seated clear of the mode pill');
+
+  // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
+  //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
+  //    slot used to read the literal word HERE, which said nothing the name
+  //    directly beneath it did not already say, while the classification itself
+  //    was dropped: _OG_CATS filters the category rungs out of the crumbs, so on
+  //    the 2-crumb cap a deep unit's card could not say whether it hung off an
+  //    ACOM or an ASCC at all. The deep case is the one that matters — keep it
+  //    in the table. ──
+  { let eok=true;
+    try{
+      if(typeof global.calloutShow!=='function'){ eok=false; fails++; console.log('✗ ECHELON: calloutShow unreachable'); }
+      else {
+        [['usawhc','ASCC'],['amc','ACOM'],['usace','DRU'],['hqda','HQDA'],
+         ['4th-infantry-division-sustainment-brigade','ASCC']].forEach(function(w){
+          global.calloutShow(w[0]);
+          const c=IDS['calloutCard']?IDS['calloutCard'].innerHTML:'';
+          const m=c.match(/<span class="co-railhere"[^>]*>([^<]*)<\/span>/);
+          if(!m){ eok=false; fails++; console.log('✗ ECHELON tag missing on '+w[0]); }
+          else if(m[1]!==w[1]){ eok=false; fails++; console.log('✗ ECHELON on '+w[0]+' reads "'+m[1]+'", want "'+w[1]+'"'); }
+          // the tag LEADS the rail: trailing it read "I CORPS > 4TH INF DIV > ASCC",
+          // which puts the classification below the division it sits above
+          if(m && /co-railchip[\s\S]*co-railhere/.test(c)){
+            eok=false; fails++; console.log('✗ ECHELON tag must lead the rail, not trail the ancestors ('+w[0]+')'); }
+          if(/>HERE</.test(c)){ eok=false; fails++; console.log('✗ the vacuous HERE crumb is back on '+w[0]); }
+        });
+        if(typeof global.calloutHide==='function') global.calloutHide();
+      }
+    }catch(e){ eok=false; fails++; console.log('✗ ECHELON probe: '+e.message); }
+    if(eok) console.log('  \u2713 ECHELON: ACOM/ASCC/DRU/HQDA lead the rail \u00b7 a deep unit still names its rung \u00b7 no HERE');
   }
 
   // ── PROBE: THE BOOT TOUR's light gate (v1.16.0, design 4b) — while
