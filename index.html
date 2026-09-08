@@ -57,27 +57,69 @@
 <script>
   // Service worker registration (PORTED from A-ORG-1's v13.13.0 auto-update
   // contract): register on load — never in a sandbox — then check for a new
-  // sw.js on load, on every return to the app, and every 20 minutes; when a new
-  // version takes control (sw.js already skipWaiting+claims) the page reloads
-  // itself once. If the user is mid-typing, the reload waits until they leave
-  // the field or background the app.
+  // sw.js on load, on every return to the app, on every network return, and
+  // every 20 minutes; when a new version takes control (sw.js already
+  // skipWaiting+claims) the page reloads itself once. If the user is mid-typing
+  // or mid-gesture, the reload waits until they are done.
+  // v1.25.0 — THE UPDATE DOORS the rest of the app uses: window.__updKick
+  // (check now) · window.__updCheck (check + report {ok,found,why}) ·
+  // window.__swAsk / __swVer (the controlling worker names its build) ·
+  // window.__swHeal (the worker re-fetches the shell — the stale-build cure).
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
-      if(window.__SANDBOX) return;
       // v1.2.1 — REGISTRATION RETRIES (the owner's stranded session, 25 Aug: ONE
       // transient sw.js fetch failure left the whole session with no update path
       // and a raw red script error). register() now retries with backoff and on
       // every return to the app; the raw error toast for sw.js is translated
       // into what it means (see the first-byte capture below the shell).
-      var _swTries=0;
+      var _swTries=0, _reg=null;
+      var _post=function(msg, cb){
+        // one round-trip to the CONTROLLING worker over a private channel; cb(null) when there is none
+        try{
+          var c=navigator.serviceWorker.controller;
+          if(!c || typeof MessageChannel==='undefined'){ cb(null); return; }
+          var mc=new MessageChannel(), done=false;
+          var fin=function(d){ if(done) return; done=true; try{ mc.port1.close(); }catch(_){} cb(d); };
+          mc.port1.onmessage=function(ev){ fin((ev&&ev.data)||null); };
+          setTimeout(function(){ fin(null); }, 4000);
+          c.postMessage(msg, [mc.port2]);
+        }catch(_){ cb(null); }
+      };
+      window.__swAsk=function(){
+        _post({t:'version'}, function(d){
+          if(d && d.t==='version'){ window.__swVer=String(d.cache||'');
+            try{ if(typeof window.__swVerCheck==='function') window.__swVerCheck(); }catch(_){} }
+        });
+      };
+      window.__swHeal=function(cb){ _post({t:'refresh-shell'}, function(d){ try{ cb(!!(d && d.ok)); }catch(_){} }); };
+      var kick=function(){ try{ var p=_reg&&_reg.update(); if(p&&p.catch) p.catch(function(){}); }catch(_){ } };
+      window.__updKick=kick;
+      window.__updCheck=function(){
+        // resolves {ok, found, why}: found = a NEW worker started installing (the
+        // controllerchange below finishes the job with a reload); never rejects
+        return new Promise(function(res){
+          if(!_reg){ res({ok:false, found:false, why:(window.__SANDBOX?'updates are off in the preview sandbox':'update service not registered yet')}); return; }
+          var done=false, found=false, fin=function(r){ if(done) return; done=true; res(r); };
+          try{ _reg.addEventListener('updatefound', function(){ found=true; }, {once:true}); }catch(_){}
+          try{
+            _reg.update().then(function(){ setTimeout(function(){ fin({ok:true, found:found||!!_reg.installing}); }, 250); },
+              function(e){ fin({ok:false, found:false, why:String((e&&e.message)||e||'update failed')}); });
+          }catch(e){ fin({ok:false, found:false, why:String((e&&e.message)||e||'update failed')}); }
+          setTimeout(function(){ fin({ok:false, found:found, why:'timed out'}); }, 15000);
+        });
+      };
+      window.__swReg=function(r){ if(arguments.length) _reg=r; return _reg; };   // harness hook: smoke drives the check with a stub registration
+      if(window.__SANDBOX) return;                    // preview hosts: the doors exist, nothing registers
       var _swGo=function(){
         navigator.serviceWorker.register('sw.js').then(function(reg){
-          var kick=function(){ try{ reg.update(); }catch(_){ } };
+          _reg=reg;
           setTimeout(kick, 6000);
           setInterval(kick, 20*60*1000);
           document.addEventListener('visibilitychange', function(){
             if(document.visibilityState==='visible') kick();
           });
+          window.addEventListener('online', kick);         // v1.25.0: a network return is an update check too
+          window.__swAsk();
         }).catch(function(){
           // v1.2.2 — SELF-DIAGNOSIS (owner's dump showed 5 straight failures on
           // ONE origin file): probe sw.js ourselves once and put the HTTP status
@@ -101,19 +143,29 @@
       document.addEventListener('visibilitychange', function(){
         if(document.visibilityState==='visible' && !navigator.serviceWorker.controller && _swTries>0) _swGo();
       });
+      window.addEventListener('online', function(){ if(!navigator.serviceWorker.controller && _swTries>0) _swGo(); });   // v1.25.0: the network came back — so does the update path
       var hadCtrl=!!navigator.serviceWorker.controller;
       navigator.serviceWorker.addEventListener('controllerchange', function(){
-        if(!hadCtrl){ hadCtrl=true; return; }          // first install claiming — not an update
+        if(!hadCtrl){ hadCtrl=true; try{ window.__swAsk(); }catch(_){} return; }   // first install claiming — not an update
         if(window.__updReloading) return; window.__updReloading=true;
         var go=function(){ try{ location.reload(); }catch(_){ } };
-        try{ if(typeof window.toast==='function') window.toast('Updating to the latest version…'); }catch(_){}
+        // v1.25.0: window.toast never existed, so every update reload arrived
+        // unexplained — _bfToast is the app's toast; the reload waits for it.
+        try{ var say=window.toast||window._bfToast; if(typeof say==='function') say('Updating to the latest version…'); }catch(_){}
         var ae=document.activeElement;
         var typing=!!(ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)));
+        var gesturing=!!(document.body && document.body.classList && document.body.classList.contains('gesturing'));
         if(typing){
           var done=false, fin=function(){ if(done) return; done=true; go(); };
           document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='hidden') fin(); }, {once:true});
           ae.addEventListener('blur', function(){ setTimeout(fin, 400); }, {once:true});
-        } else setTimeout(go, 650);
+        } else if(gesturing){
+          // mid-drag: let the finger lift first — a reload under a gesture reads as a crash
+          var done2=false, fin2=function(){ if(done2) return; done2=true; setTimeout(go, 500); };
+          window.addEventListener('pointerup', fin2, {once:true});
+          window.addEventListener('pointercancel', fin2, {once:true});
+          setTimeout(fin2, 6000);                          // a stranded gesture never blocks an update
+        } else setTimeout(go, 1200);
       });
     });
   }
@@ -1610,6 +1662,36 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.25.0 • THE CONNECTED APP (owner: "fix connectivity and update issues —
+//            ensure everything is smooth and operational"). THE UPDATE PATH:
+//            sw.js precaches with cache:'no-cache' (a new build seeds from the
+//            ORIGIN, never the browser's HTTP cache — the v0.33.1 stale-review
+//            class at its root); the shell is MANDATORY at install (no shell →
+//            the old worker stays in control and the next check retries);
+//            redirected responses are never stored; navigations fall back to
+//            the cached shell (query strings, deep links and offline opens land
+//            on the app, not a blank 503); sw.js is never cached by the worker;
+//            a message door names the worker's build and re-fetches the shell.
+//            The page: window.toast never existed, so every update reload
+//            arrived unexplained — it now toasts and waits for a finger to
+//            lift; a network return kicks an update check and re-registers a
+//            stranded worker; the ⋯ menu gained "Check for updates" with an
+//            honest answer; diagnostics lead with page/worker builds, online
+//            and database state; a worker NEWER than its page heals itself
+//            (refresh-shell + one reload per session, never a loop).
+//            THE DATABASE: ensureSupabase hung Connect forever after one failed
+//            CDN load (listeners on a dead tag) — every attempt replaces the
+//            tag, with a 20 s timeout; ONE connect at a time (boot, chip, sheet
+//            and network return share the promise); a failed save keeps its
+//            DIRTY flag and retries on a 4→60 s ladder and on every return;
+//            edits made offline reach the board at connect (localNewer), not at
+//            the next edit; a return re-pulls the board (realtime replays
+//            nothing) and reconnects a board that failed for NETWORK reasons
+//            only; a realtime rejoin resyncs; leaving flushes at once (small
+//            saves ride keepalive); offline and unreachable are said in words.
+//            THE BASEMAP: each rung retries 1.5/4/10 s and finishes on return —
+//            a blip no longer costs the session its borders. Smoke probes for
+//            every door, with the negative asserts proven to fire (testing law).
 //   v1.24.0 • THE 2026 REFRESH + THE ECHELON (owner: "general updates,
 //            improvements, most up to date organization names and accuracy of
 //            hierarchy chart. Improvements to both brief and map. Continue to
@@ -2008,8 +2090,32 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   v0.1.0–v1.4.2 history lives in `git log` and CLAUDE.md's law sections;
 //   66 KB of comment history was crowding the 900 KB single-file budget.)
 
-const APP_VERSION = 'v1.24.0';
-const APP_UPDATED = '28 August 2026';
+const APP_VERSION = 'v1.25.0';
+const APP_UPDATED = '8 September 2026';
+// v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
+// the controlling worker names its build (window.__swVer, asked at boot and
+// on every controller change). If the worker is NEWER than this page, the
+// cached shell is stale — ask the worker to re-fetch the shell from the
+// origin and reload ONCE per worker build per session (never a loop). A
+// worker OLDER than the page is the normal pre-update state: the update
+// path above reloads it in its own time.
+window.__swVerCheck=function(){
+  try{
+    var w=String(window.__swVer||''); var m=/-v(\d+)-(\d+)-(\d+)$/.exec(w); if(!m) return false;
+    var p=/^v(\d+)\.(\d+)\.(\d+)$/.exec(APP_VERSION); if(!p) return false;
+    var d=(+m[1]-+p[1])||(+m[2]-+p[2])||(+m[3]-+p[3]);
+    if(d<=0) return false;
+    try{ if(sessionStorage.getItem('a2Healed')===w) return false; sessionStorage.setItem('a2Healed', w); }catch(_){}
+    if(typeof window.__swHeal!=='function') return false;
+    window.__swHeal(function(ok){
+      if(!ok) return;
+      try{ _bfToast('Refreshing to '+w.replace(/^a-org-2-v/,'v').replace(/-/g,'.')); }catch(_){}
+      setTimeout(function(){ try{ location.reload(); }catch(_){} }, 900);
+    });
+    return true;
+  }catch(_){ return false; }
+};
+try{ if(window.__swVer) window.__swVerCheck(); }catch(_){}
 // v0.33.1 — REVIEW TRUTH (owner reviewed a stale SW-cached build and judged a
 // fix "not fixed"): the running version announces itself ONCE when it first
 // boots, so the reviewer always knows which build they are looking at. The
@@ -4224,6 +4330,39 @@ function siteHitTest(x, y){
      loadGlobeCoastlinesHi(); loadStateBorders(); loadCountryBorders();
    ============================================================================ */
 
+// v1.25.0 — A BASEMAP FETCH THAT BLIPS NO LONGER COSTS THE SESSION ITS BORDERS
+// (owner: "connectivity issues"). Each rung retries on a short ladder
+// (1.5 s · 4 s · 10 s) for network-class failures and 5xx; a 4xx is a
+// definite answer and ends the attempt at once. Whatever is still missing
+// when the network or the app returns is fetched then (_basemapNetUp), and
+// _basemapLoad is the ONE door the boot and the return share — it never runs
+// two passes at once. Every loader stays idempotent on its own flag.
+let _bmBusy=false;
+async function _fetchRetry(src, tries){
+  const n=tries||3, waits=[1500,4000,10000]; let last=null;
+  for(let i=0;i<n;i++){
+    try{
+      const r=await fetch(src);
+      if(r && r.ok) return r;
+      last=new Error('HTTP '+(r&&r.status));
+      if(r && r.status>=400 && r.status<500) break;         // not found / forbidden: no retry
+    }catch(e){ last=e; }
+    if(i<n-1) await new Promise(function(res){ setTimeout(res, waits[i]||10000); });
+  }
+  throw last||new Error('fetch failed');
+}
+async function _basemapLoad(){
+  if(_bmBusy) return false; _bmBusy=true;
+  try{ await Promise.all([loadGlobeCoastlinesHi(), loadStateBorders(), loadCountryBorders()]); }catch(_){}
+  _bmBusy=false;
+  return true;
+}
+function _basemapNetUp(){
+  if(_globeLoadedHi && _statesLoaded && _countriesLoaded) return false;   // nothing missing
+  _basemapLoad();
+  return true;
+}
+try{ window.Basemap={ load:_basemapLoad, netUp:_basemapNetUp, done:function(){ return {hi:_globeLoadedHi, st:_statesLoaded, co:_countriesLoaded}; } }; }catch(_){}   // harness hook (the flags are eval-scoped lets)
 async function loadGlobeCoastlinesHi(){
   if(_globeLoadedHi) return;
   // A-ORG-1 v8.9.1 lineage: the real coastlines ship WITH the app (data/,
@@ -4235,7 +4374,7 @@ async function loadGlobeCoastlinesHi(){
   ];
   for(const SRC of SOURCES){
     try{
-      const r=await fetch(SRC); if(!r.ok) continue;
+      const r=await _fetchRetry(SRC); if(!r||!r.ok) continue;   // v1.25.0: a blip retries, a 4xx does not
       const topo=await r.json();
       const rings=decodeTopoLand(topo);
       if(rings && rings.length>20){
@@ -4258,7 +4397,7 @@ async function loadStateBorders(){
   ];
   for(const SRC of SOURCES){
     try{
-      const r=await fetch(SRC); if(!r.ok) continue;
+      const r=await _fetchRetry(SRC); if(!r||!r.ok) continue;   // v1.25.0: a blip retries, a 4xx does not
       const topo=await r.json();
       // us-atlas ships two variants: states-10m.json is UNPROJECTED lon/lat, while the -albers-
       // file is pre-projected to a 975x610 canvas. Auto-detect: decode raw first — if the
@@ -4438,7 +4577,7 @@ async function loadCountryBorders(){
   ];
   for(const SRC of SOURCES){
     try{
-      const r=await fetch(SRC); if(!r.ok) continue;
+      const r=await _fetchRetry(SRC); if(!r||!r.ok) continue;   // v1.25.0: a blip retries, a 4xx does not
       const topo=await r.json();
       // interior borders ONLY (no coast retrace). v0.33.0: every arc the USA
       // polygon touches is dropped — its coarse US-Canada/US-Mexico lines drew
@@ -8611,6 +8750,13 @@ try{ window.Records={ add:recAdd, update:recUpdate, remove:recRemove, of:recordO
    zone); the database is the source of truth whenever connected. ═══ */
 let _db=null, _dbCh=null, _dbCfg=null, _dbState='off', _dbMsg='Not connected';
 let _dbPushT=null;
+// v1.25.0 — CONNECTIVITY STATE, the session's nervous system (nothing here
+// persists): one in-flight connect (_dbConnP) and one in-flight library load
+// (_sbLoadP) that every caller shares; a DIRTY flag that survives a failed
+// save; the retry ladder; the resync clock; whether the last failure was the
+// NETWORK's (retried by itself on return) or the configuration's (never).
+let _dbConnP=null, _sbLoadP=null, _dbDirty=false, _dbPushBusy=false, _dbRetryT=null, _dbRetryN=0;
+let _dbSyncT=0, _dbSubN=0, _dbFailNet=false, _dbUnloading=false;
 const _dbClientId=Math.random().toString(36).slice(2)+Date.now().toString(36);
 const DB_TABLE='a2_records';
 function _dbSetState(st, msg){
@@ -8626,22 +8772,51 @@ function _dbCfgSave(cfg){
   _dbCfg=cfg;
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'dbcfg', v:cfg}); } }catch(_){}
 }
+function _dbIsNet(e){
+  // a network-class failure (offline, unreachable, CDN blocked, timed out) — the
+  // kind a network return should retry by itself; anything else is configuration
+  try{ if(typeof navigator!=='undefined' && navigator.onLine===false) return true; }catch(_){}
+  const m=String((e&&e.message)||e||'');
+  return /failed to fetch|networkerror|load failed|network request failed|fetch failed|timed out|timeout|offline|unreachable|ECONN|ENOTFOUND/i.test(m);
+}
+function _dbWhy(what, e){
+  const m=String((e&&e.message)||e||'');
+  try{ if(typeof navigator!=='undefined' && navigator.onLine===false) return what+' paused — offline; it resumes by itself when the network returns.'; }catch(_){}
+  if(_dbIsNet(e)) return what+' failed — the database is unreachable right now; retrying by itself.';
+  return what+' failed: '+m;
+}
 function ensureSupabase(){
-  return new Promise(function(res){
-    if(window.supabase && window.supabase.createClient) return res(true);
-    var ex=document.getElementById('sbLib');
-    if(ex){
-      ex.addEventListener('load', function(){ res(!!(window.supabase&&window.supabase.createClient)); }, {once:true});
-      ex.addEventListener('error', function(){ res(false); }, {once:true});
-      return;
-    }
-    var sc=document.createElement('script');
-    sc.id='sbLib'; sc.crossOrigin='anonymous';
-    sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7';   // dead-lint allowlisted: injected on MANUAL Connect only
-    sc.onload=function(){ res(!!(window.supabase&&window.supabase.createClient)); };
-    sc.onerror=function(){ _dbSetState('error','Database library failed to load (offline or CDN blocked) — the app is unaffected.'); res(false); };
-    document.head.appendChild(sc);
+  if(window.supabase && window.supabase.createClient) return Promise.resolve(true);
+  if(_sbLoadP) return _sbLoadP;                        // one load in flight — every caller shares it
+  _sbLoadP=new Promise(function(res){
+    let settled=false, tt=null;
+    const done=function(ok){
+      if(settled) return; settled=true; _sbLoadP=null;
+      try{ clearTimeout(tt); }catch(_){}
+      if(!ok){ try{ const d=document.getElementById('sbLib'); if(d){ if(d.parentNode) d.parentNode.removeChild(d); else d.remove(); } }catch(_){} }
+      res(ok);
+    };
+    // v1.25.0 — a tag left by a FAILED load is inert: its load/error events have
+    // already fired, so waiting on it hung Connect forever (the chip stayed busy,
+    // the button dead). Every attempt removes the old tag and injects a fresh one.
+    try{ const ex=document.getElementById('sbLib'); if(ex){ if(ex.parentNode) ex.parentNode.removeChild(ex); else ex.remove(); } }catch(_){}
+    tt=setTimeout(function(){ _dbSetState('error','Database library timed out — slow or filtered network; Connect retries by itself when the network returns.'); done(false); }, 20000);
+    try{
+      const sc=document.createElement('script');
+      sc.id='sbLib'; sc.crossOrigin='anonymous';
+      sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7';   // dead-lint allowlisted: injected on MANUAL Connect only
+      sc.onload=function(){ done(!!(window.supabase&&window.supabase.createClient)); };
+      sc.onerror=function(){ _dbSetState('error','Database library failed to load (offline or CDN blocked) — the app is unaffected; Connect retries by itself when the network returns.'); done(false); };
+      document.head.appendChild(sc);
+    }catch(e){ done(false); }
   });
+  return _sbLoadP;
+}
+function _dbFetch(input, init){
+  // v1.25.0 — the one fetch the client uses: while the page is going away a
+  // small save rides keepalive, so the tab may close under it and it still lands
+  try{ if(_dbUnloading && init && typeof init.body==='string' && init.body.length<60000) init.keepalive=true; }catch(_){}
+  return fetch(input, init);
 }
 function _dbSnapshot(){
   // v1.2.0 — the board carries the whole working set: records, the brief
@@ -8653,10 +8828,18 @@ function _dbSnapshot(){
     briefs:{list:SAVEDB, mod:_sbMod}};
 }
 function _dbApply(data){
-  if(!data) return;
-  let took=0;
-  Object.keys(data.records||{}).forEach(function(k){
-    const r2=data.records[k]; if(!r2||!r2.id) return;
+  if(!data) return {took:0, localNewer:false};
+  let took=0, localNewer=false;
+  const rr=data.records||{};
+  // v1.25.0 — does THIS device hold anything the board lacks or has older (edits
+  // made offline)? The connect path pushes ONCE if so, instead of waiting for the
+  // next edit to carry them — the gap that made offline work look lost.
+  try{ Object.keys(RECORDS).forEach(function(k){ const lr=RECORDS[k], r2=rr[k];
+    if(lr && lr.id && (!r2 || (lr.mod||0)>(r2.mod||0))) localNewer=true; }); }catch(_){}
+  if(data.views && (_svMod||0)>(data.views.mod||0)) localNewer=true;
+  if(data.briefs && (_sbMod||0)>(data.briefs.mod||0)) localNewer=true;
+  Object.keys(rr).forEach(function(k){
+    const r2=rr[k]; if(!r2||!r2.id) return;
     if(!r2.ids) r2.ids=[];
     const loc=RECORDS[k];
     if(!loc || (r2.mod||0)>=(loc.mod||0)){       // newest record wins, per record
@@ -8688,6 +8871,7 @@ function _dbApply(data){
     // v1.8.0: an open repository re-reads whatever the merge brought in
     try{ const lp=document.getElementById('ledger'); if(lp && lp.classList.contains('on')) _ledgerRender(); }catch(_){}
   }
+  return {took:took, localNewer:localNewer};
 }
 // ── v1.2.0 THE RECONNECT CHIP — settings exist but this session is offline:
 // one tap goes live. The law holds — NOTHING foreign loads until the tap.
@@ -8712,39 +8896,73 @@ function _dbChipShow(){
     setTimeout(function(){ try{ if(!el.disabled) el.remove(); }catch(_){} }, 25000);   // quiet exit; it returns next boot
   }catch(_){}
 }
+// ── v1.25.0 THE SAVE PATH: dbPush marks the board DIRTY and debounces one
+// flush (700 ms). A flush that fails keeps the dirty flag — nothing is ever
+// dropped — and arms a ladder (4 s → 8 → 16 → 32 → 60 s cap) that retries until
+// it lands; a network or app return flushes at once. Edits that arrive while a
+// flush is in flight ride the next one. IndexedDB holds everything meanwhile.
 function dbPush(){
   if(!_db || !_dbCfg) return;                     // not connected: IndexedDB cache only
+  _dbDirty=true;
   clearTimeout(_dbPushT);
-  _dbPushT=setTimeout(async function(){
-    try{
-      const { error }=await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
-        updated_at:new Date().toISOString(), updated_by:_dbClientId });
-      if(error) _dbSetState('error','Save to database failed: '+error.message);
-      else _dbSetState('live','Database live — saved '+new Date().toLocaleTimeString());
-    }catch(e){ _dbSetState('error','Save error: '+(e&&e.message||e)); }
-  }, 700);
+  _dbPushT=setTimeout(function(){ _dbFlush(); }, 700);
+}
+async function _dbFlush(){
+  clearTimeout(_dbPushT); _dbPushT=null;
+  if(!_db || !_dbCfg || !_dbDirty || _dbPushBusy) return false;
+  _dbPushBusy=true; _dbDirty=false;
+  let ok=false;
+  try{
+    const { error }=await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
+      updated_at:new Date().toISOString(), updated_by:_dbClientId });
+    if(error) throw error;
+    ok=true;
+  }catch(e){
+    _dbDirty=true;                                // the work stays queued — the ladder and the next return carry it
+    _dbFailNet=_dbIsNet(e);
+    _dbSetState('error', _dbWhy('Save', e));
+  }
+  _dbPushBusy=false;
+  if(ok){
+    _dbRetryN=0; clearTimeout(_dbRetryT); _dbRetryT=null;
+    if(_db) _dbSetState('live','Database live — saved '+new Date().toLocaleTimeString());
+    if(_dbDirty && _db) dbPush();                 // edits landed mid-flight → one more pass
+  } else _dbRetryArm();
+  return ok;
+}
+function _dbRetryArm(){
+  if(!_db || !_dbCfg || !_dbDirty) return 0;
+  clearTimeout(_dbRetryT);
+  const wait=Math.min(60000, 4000*Math.pow(2, Math.min(_dbRetryN++, 4)));
+  _dbRetryT=setTimeout(function(){ _dbRetryT=null; if(_dbDirty) _dbFlush(); }, wait);
+  return wait;
 }
 async function dbPullOnce(){
+  if(!_db || !_dbCfg) return false;
   try{
     const { data, error }=await _db.from(DB_TABLE).select('data,updated_by').eq('id',_dbCfg.board).maybeSingle();
-    if(error){ _dbSetState('error','Load failed: '+error.message+' — is the '+DB_TABLE+' table created?'); return false; }
-    if(data && data.data) _dbApply(data.data);
-    else await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
+    if(error){ _dbFailNet=false; _dbSetState('error','Load failed: '+error.message+' — is the '+DB_TABLE+' table created?'); return false; }
+    _dbSyncT=Date.now();
+    if(data && data.data) return _dbApply(data.data)||{took:0, localNewer:false};
+    await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
       updated_at:new Date().toISOString(), updated_by:_dbClientId });   // first device seeds the board
-    return true;
-  }catch(e){ _dbSetState('error','Load error: '+(e&&e.message||e)); return false; }
+    return {took:0, localNewer:false};
+  }catch(e){ _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Load', e)); return false; }
 }
-async function dbConnect(){
+async function _dbConnectRun(){
   const cfg=_dbCfg;
   if(!cfg || !cfg.url || !cfg.key){ _dbSetState('off','Not configured — enter the project URL and key.'); return false; }
+  try{ if(typeof navigator!=='undefined' && navigator.onLine===false){
+    _dbFailNet=true; _dbSetState('error','Offline — the database connects by itself when the network returns.'); return false; } }catch(_){}
   _dbSetState('connecting','Connecting…');
   const ok=await ensureSupabase();
-  if(!ok) return false;
+  if(!ok){ _dbFailNet=true; return false; }       // ensureSupabase already said why
   try{
     dbDisconnect(true);
-    _db=window.supabase.createClient(cfg.url, cfg.key, { realtime:{ params:{ eventsPerSecond:5 } } });
+    _db=window.supabase.createClient(cfg.url, cfg.key, { realtime:{ params:{ eventsPerSecond:5 } }, global:{ fetch:_dbFetch } });
     const pulled=await dbPullOnce();
     if(!pulled){ _db=null; return false; }
+    _dbSubN=0;
     _dbCh=_db.channel('a2-'+cfg.board)
       .on('postgres_changes', { event:'*', schema:'public', table:DB_TABLE, filter:'id=eq.'+cfg.board }, function(payload){
         const row=payload.new||{};
@@ -8752,16 +8970,32 @@ async function dbConnect(){
         if(row.data) _dbApply(row.data);
       })
       .subscribe(function(status){
-        if(status==='SUBSCRIBED') _dbSetState('live','Database live — records save off-device and mirror your other devices.');
-        else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT') _dbSetState('error','Realtime channel error — saves still reach the database; live mirroring may lag.');
+        if(status==='SUBSCRIBED'){
+          _dbSetState('live','Database live — records save off-device and mirror your other devices.');
+          // v1.25.0: a REjoin (the socket died and came back) catches up on what
+          // the gap hid — realtime never replays missed changes
+          if(_dbSubN++>0){ try{ _dbSyncT=0; _dbNetUp('rejoin'); }catch(_){} }
+        }
+        else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT') _dbSetState('error','Realtime channel error — saves still reach the database; live mirroring may lag, and the channel reconnects by itself.');
       });
     _dbSetState('live','Connected — records now live in your database.');
+    _dbFailNet=false;
     // v1.11.0 (owner: "don't want to connect every time") — the FIRST
     // successful connect turns auto-reconnect on; the sheet toggle can turn
     // it off, and that explicit choice is never overridden here.
     if(_dbCfg && _dbCfg.auto==null){ _dbCfg.auto=1; _dbCfgSave(_dbCfg); }
+    // v1.25.0 — edits made while offline reach the board NOW, not at the next edit
+    if(pulled && pulled.localNewer){ _dbDirty=true; _dbFlush(); }
     return true;
-  }catch(e){ _dbSetState('error','Connect failed: '+(e&&e.message||e)); _db=null; return false; }
+  }catch(e){ _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Connect', e)); _db=null; return false; }
+}
+function dbConnect(){
+  // v1.25.0 — ONE connect at a time: the boot auto-connect, the chip, the sheet
+  // button and a network return may all ask; they share the in-flight promise
+  if(_dbConnP) return _dbConnP;
+  _dbConnP=_dbConnectRun().then(function(ok){ _dbConnP=null; return ok; },
+    function(e){ _dbConnP=null; _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Connect', e)); _db=null; return false; });
+  return _dbConnP;
 }
 // v1.11.0 AUTO-RECONNECT — the boot-inert law, amended by its owner: the app
 // still boots with zero foreign code, but once a board has connected and the
@@ -8780,10 +9014,51 @@ function _dbAutoBoot(){
 function dbDisconnect(silent){
   try{ if(_dbCh && _db) _db.removeChannel(_dbCh); }catch(_){}
   _dbCh=null; _db=null;
+  clearTimeout(_dbPushT); _dbPushT=null; clearTimeout(_dbRetryT); _dbRetryT=null; _dbRetryN=0;
+  _dbDirty=false; _dbSubN=0;                      // unsent edits stay in IndexedDB; the next connect's pull+push carries them
   if(!silent) _dbSetState('off','Disconnected — new records stay on this device until you reconnect.');
 }
-try{ window.DB={ connect:dbConnect, disconnect:dbDisconnect, push:dbPush, state:function(){ return _dbState; },
-  chip:_dbChipShow, _setCfg:function(c){ _dbCfg=c; } }; }catch(_){}   // chip/_setCfg: harness hooks (smoke drives the boot chip)
+// ── v1.25.0 THE NETWORK WATCH — one listener set, three consumers. A RETURN
+// (network back · app foregrounded · realtime rejoined) flushes unsent edits,
+// re-pulls the board (a dead socket replays nothing), reconnects a board that
+// failed for NETWORK reasons only, finishes a basemap that blipped, and asks
+// the worker for an update. LEAVING (hidden · pagehide) flushes a pending save
+// at once — small saves ride keepalive so the tab may close under them.
+function _dbNetUp(why){
+  try{
+    if(_db && _dbCfg){
+      if(_dbDirty) _dbFlush();                                      // offline edits go first
+      const now=Date.now();
+      if(now-_dbSyncT>15000){ _dbSyncT=now; dbPullOnce(); }         // catch up on what the gap hid (rate-limited)
+      return 'sync';
+    }
+    if(!_db && !_dbConnP && _dbCfg && _dbCfg.url && _dbCfg.auto && _dbFailNet){ _dbAutoBoot(); return 'reconnect'; }
+  }catch(_){}
+  return null;
+}
+function _dbHideFlush(){
+  try{
+    if(!_db || !_dbDirty) return false;
+    _dbUnloading=true; setTimeout(function(){ _dbUnloading=false; }, 5000);
+    _dbFlush();
+    return true;
+  }catch(_){ return false; }
+}
+function _netUp(why){
+  let r=null;
+  try{ r=_dbNetUp(why); }catch(_){}
+  try{ if(typeof _basemapNetUp==='function') _basemapNetUp(); }catch(_){}
+  try{ if(why==='online' && typeof window.__updKick==='function') window.__updKick(); }catch(_){}
+  return r;
+}
+try{ window.addEventListener('online', function(){ _netUp('online'); }); }catch(_){}
+try{ window.addEventListener('pagehide', function(){ _dbHideFlush(); }); }catch(_){}
+try{ document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState==='visible') _netUp('visible'); else _dbHideFlush(); }); }catch(_){}
+try{ window.DB={ connect:dbConnect, disconnect:dbDisconnect, push:dbPush, flush:_dbFlush, state:function(){ return _dbState; },
+  dirty:function(){ return _dbDirty; }, netUp:_netUp, hide:_dbHideFlush, lib:function(){ return _sbLoadP; }, conn:function(){ return _dbConnP; },
+  retry:function(){ return {n:_dbRetryN, armed:!!_dbRetryT}; },
+  chip:_dbChipShow, _setCfg:function(c){ _dbCfg=c; }, _setDb:function(d){ _db=d; } }; }catch(_){}   // chip/_setCfg/_setDb: harness hooks (smoke drives the boot chip + the save ladder)
 // ── the connect sheet (⋯ menu → Database). URL + key + board, Connect,
 // status, and a fold-away first-time setup note with the exact SQL.
 function _dbSheet(){
@@ -9392,9 +9667,7 @@ function bootShell(){
     try{ if(typeof setupGlobeInteraction==='function') setupGlobeInteraction(cv); }catch(_){}
     try{ if(typeof smoothFallbackOnce==='function') smoothFallbackOnce(); }catch(_){}
     try{ if(typeof startGlobeLoop==='function') startGlobeLoop(cv); }catch(_){}
-    try{ if(typeof loadGlobeCoastlinesHi==='function') loadGlobeCoastlinesHi(); }catch(_){}
-    try{ if(typeof loadStateBorders==='function') loadStateBorders(); }catch(_){}
-    try{ if(typeof loadCountryBorders==='function') loadCountryBorders(); }catch(_){}
+    try{ if(typeof _basemapLoad==='function') _basemapLoad(); }catch(_){}   // v1.25.0: ONE door for the three loaders — retries inside, finishes on return
     try{ if(typeof _rdbOpen==='function') _rdbOpen(); }catch(_){}
     try{ if(typeof globeMark==='function') globeMark(); else GlobeState.dirty=true; }catch(_){}
   }
@@ -9545,6 +9818,7 @@ function bootShell(){
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
         +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
+        +'<button class="am-row" type="button" data-am="upd">Check for updates</button>'
         // v1.0.0 — ABOUT: what this is + data provenance, for users who aren't the owner
         +'<div class="am-about">A-ORG-2 maps the U.S. Army — every installation and command chain on one globe, with a brief room for building and presenting your own org diagrams. Unclassified; assembled from public sources (DVIDS, army.mil).</div>'
         +'<div class="am-row am-ver">'+((typeof SITES!=='undefined'&&SITES)?SITES.length:0)+' installations · '
@@ -9603,6 +9877,8 @@ function bootShell(){
           else _bfToast('Connect once first — auto-connect remembers it from there');
         }catch(_){}
         try{ _dbSheet(); }catch(_){} return; }
+      var upd=e.target.closest('[data-am="upd"]');
+      if(upd){ var mU=document.getElementById('appMenu'); if(mU) mU.hidden=true; try{ window._updCheckUI&&_updCheckUI(); }catch(_){} return; }
       var bk=e.target.closest('[data-am="backup"]');
       if(bk){ try{ recBackup(); }catch(_){} var m2=document.getElementById('appMenu'); if(m2) m2.hidden=true; return; }
       var rst=e.target.closest('[data-am="restore"]');
@@ -9654,9 +9930,33 @@ function bootShell(){
   // the ring buffer + capture spine are untouched).
   window._diagDump=function(){
     const L=window.__errLog||[];
+    // v1.25.0 — the dump leads with the state that explains most field reports:
+    // page build · worker build · controlled? · online? · database state
+    let hd='';
+    try{ hd='A-ORG-2 '+APP_VERSION+' · worker '+(window.__swVer||'none')+' · '+((navigator.serviceWorker&&navigator.serviceWorker.controller)?'controlled':'uncontrolled')
+      +' · '+(navigator.onLine===false?'OFFLINE':'online')+' · db '+(typeof _dbState!=='undefined'?_dbState:'?')+'\n'; }catch(_){}
     const txt=L.length? L.map(function(e){ return '['+e.k+'] '+e.m+'\n  @ '+(e.s||'inline')+':'+e.l+':'+e.c+(e.st?('\n  '+e.st.split('\n').slice(0,3).join(' | ')):''); }).join('\n\n') : 'No errors captured this session.';
-    try{ prompt('Diagnostics — last '+L.length+' error(s). Copy below:', txt.slice(0,900)); }
-    catch(_){ alert(txt.slice(0,900)); }
+    try{ prompt('Diagnostics — last '+L.length+' error(s). Copy below:', (hd+txt).slice(0,900)); }
+    catch(_){ alert((hd+txt).slice(0,900)); }
+  };
+  // v1.25.0 — CHECK FOR UPDATES (⋯ menu row): the same check the app runs by
+  // itself, on demand, with an honest answer — latest · found (the reload
+  // follows by itself) · failed (and why) · offline (it runs on return).
+  window._updCheckUI=function(){
+    try{
+      if(navigator.onLine===false){ _bfToast('Offline — the update check runs by itself when the network returns'); return false; }
+      if(window.__SANDBOX){ _bfToast('Updates are off in the preview sandbox — this is '+APP_VERSION); return false; }
+      if(typeof window.__updCheck!=='function'){ _bfToast('Update service is still starting — try again in a moment'); return false; }
+      _bfToast('Checking for updates…');
+      window.__updCheck().then(function(r){
+        try{
+          if(!r || !r.ok) _bfToast('Update check failed'+((r&&r.why)?(' — '+r.why):'')+' · running '+APP_VERSION);
+          else if(r.found) _bfToast('Update found — installing; the app reloads itself in a moment');
+          else _bfToast('You are on the latest build — '+APP_VERSION);
+        }catch(_){}
+      });
+      return true;
+    }catch(_){ return false; }
   };
 
   // Sandbox banner (PORT of A-ORG-1 ~L22198): preview hosts announce themselves
