@@ -1791,3 +1791,30 @@ It lives here now.
   probe can drain in FIRE order (a 15 s timeout queued first must not beat a
   250 ms answer); `__SANDBOX` is true in smoke (no `top`) — flip it probe-locally,
   never at boot.
+
+## v1.25.1 — the prune + an honest byte ledger
+- CURRENT ERA now means v1.22.0+, when the repository and matching pods replaced
+  the earlier shelves and docks. Older changelog entries remain in git history
+  and the law sections above. Only that history is trimmed; comments beside live
+  code continue to explain the rules. index.html: 899,862 → 874,590 bytes, freeing
+  25,272 bytes and growing headroom from 21,738 to 47,010 against the 921,600-byte
+  gate. The 90% warning still applies: this buys room, not an unlimited budget.
+- REMOVE THE WHOLE RETIRED SURFACE: the v1.22.0 dock rebuild left both
+  data-bfledger and data-bfbriefs click routes with no markup. Both go together.
+  The live search-star, Repository sections and shelf APIs remain the doors.
+  Smoke guards the actual closest-selector call shapes, checks the dock anchor,
+  proves both bans fire, and permits retirement names in changelog prose.
+- THE BYTE LEDGER MUST PARTITION THE FILE. Its raw style-tag regex also counted
+  export-template styles inside scripts, reporting negative markup. Reuse the
+  real shell style spans already isolated from script bodies; embedded export
+  CSS belongs to its enclosing script. Negative markup now fails dead-lint.
+  Restoring the original calculation must trip that check.
+- Review boundary: the five Node tools are runnable here; the cloud browser
+  rejected the local preview with ERR_BLOCKED_BY_CLIENT. Browser boot/visual
+  sanity remains outstanding, so this release is submitted as a draft PR.
+  The single-family basemap is still the separately offered architectural option;
+  this prune does not decide that direction or the outstanding data-policy holds.
+- The one-shot `.github/workflows/prune-release.yml` staged on main never ran:
+  its unindented heredoc broke YAML parsing. This completed prune removes that
+  superseded workflow, as its own final step intended. The normal five-tool
+  app-checks workflow remains the CI gate; no bot pushes a competing release.
