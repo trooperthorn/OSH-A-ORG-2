@@ -773,11 +773,22 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // Export-as-saved-thing and the Ledger moved into the Repository.
       global.renderBrief();
       const _bd=(html.split('id="briefDock"')[1]||'').split('\n</div>')[0];
+      if(!_bd || _bd.indexOf('data-bfclear')<0){ wok=false; fails++; console.log('✗ brief dock source anchor missing — retirement checks would pass vacuously'); }
       if(_bd.indexOf('data-bfbriefs')>=0 || _bd.indexOf('data-bfledger')>=0){
         wok=false; fails++; console.log('✗ the brief dock still carries repository doors (retired v1.22.0)'); }
       if(_bd.indexOf('ch-lbl')>=0){ wok=false; fails++; console.log('✗ the brief dock must wear the map pod grammar (no captions)'); }
       ['data-bfclear','data-bfsearch','data-bfnm','data-bfln','data-xpbtn'].forEach(function(d){
         if(_bd.indexOf(d)<0){ wok=false; fails++; console.log('✗ brief pod control missing: '+d); } });
+      // v1.25.1: both old dock doors lost their markup in v1.22.0. Match
+      // executable selector calls, never their names in the release history.
+      const retiredDockRoute=s=>/\.closest\s*\(\s*['"]\[data-bf(?:ledger|briefs)\]['"]\s*\)/.test(s);
+      if(retiredDockRoute(html)){ wok=false; fails++; console.log('✗ retired brief dock click route is back'); }
+      ['ledger','briefs'].forEach(function(name){
+        if(!retiredDockRoute(html+"\ne.target.closest('[data-bf"+name+"]');")){
+          wok=false; fails++; console.log('✗ retired dock route guard is blind: '+name); }
+      });
+      if(retiredDockRoute('// Removed data-bfledger and data-bfbriefs from the dock.')){
+        wok=false; fails++; console.log('✗ retired dock route guard matches prose'); }
       // cleanup
       try{ (global.RECORDS['fort-bragg'].people||[]).pop(); global.recDelId('fort-bragg','ID-900'); }catch(_){}
       global.Briefs.remove(0);

@@ -3,6 +3,14 @@
 **For an assistant picking this project up cold (written for ChatGPT).**
 Prepared 9 September 2026 against `v1.25.0` (commit `a1d496e`).
 
+**v1.25.1 status, 9 September 2026:** the prune described in §10 is implemented:
+`index.html` is 874,590 bytes, with 47,010 bytes of headroom (94.9% of the gate).
+The changelog now starts at v1.22.0; both orphan dock handlers are removed;
+the byte ledger no longer double-counts export-template CSS. See the appended
+v1.25.1 section in `CLAUDE.md` for the rules and verification boundary. This is a
+draft PR pending browser boot/visual sanity. The remaining text and line numbers
+below are the original v1.25.0 engineering snapshot, not updated measurements.
+
 You are inheriting a mature, opinionated single-file web app. It has shipped 109
 commits and ~60 releases. Almost every rule below exists because breaking it
 already cost a release. Read §1 and §11 before you write a line of code.

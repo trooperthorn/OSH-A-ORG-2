@@ -128,9 +128,12 @@ if (deadFns.length) {
   const BUDGET = 900 * 1024;
   const bytes = Buffer.byteLength(src, 'utf8');
   const sum = (re) => { let t = 0, m; while ((m = re.exec(src))) t += Buffer.byteLength(m[0], 'utf8'); return t; };
-  const styleB  = sum(/<style>[\s\S]*?<\/style>/g);
+  // Export templates contain <style> strings inside scripts. Reuse the real
+  // shell spans found above: counting those strings again made markup negative.
+  const styleB  = styleBlocks.reduce((t, m) => t + Buffer.byteLength(m[0], 'utf8'), 0);
   const scriptB = sum(/<script[^>]*>[\s\S]*?<\/script>/g);
   const otherB  = bytes - styleB - scriptB;
+  if (otherB < 0) bad('size ledger overlaps: embedded export styles must count inside scripts only');
   const pad = n => n.toLocaleString('en-US').padStart(9);
   const pct = (bytes / BUDGET * 100).toFixed(1);
   console.log('  size ledger (bytes):');
