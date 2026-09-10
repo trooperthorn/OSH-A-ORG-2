@@ -1818,3 +1818,40 @@ It lives here now.
   its unindented heredoc broke YAML parsing. This completed prune removes that
   superseded workflow, as its own final step intended. The normal five-tool
   app-checks workflow remains the CI gate; no bot pushes a competing release.
+
+## v1.26.0 — navigation and the record workspace (owner: "Please apply these enhancements")
+- The 10 September source assessment is now implemented. This owner instruction
+  supersedes the older tiny layer rows, overlapping pod targets, six record tabs,
+  and mandatory repeat intro. The explicit skip-intro preference is presentation
+  state only: blank-slate selection and the working brief still start clean.
+- The right control column remains slim: independent 48px phone / 56px desktop
+  targets, unclipped zoom halves, a 44px Map/Brief switch, and 44px Layers rows.
+  Saved names and controls the Repository; drawer Close and map Reset differ.
+- One drawer: Overview / Records. Records belong to an INSTALLATION, with one
+  selected tracking ID (or Unfiled) and optional descriptive ID title. Contacts,
+  Notes, Links and Technical details filter that context. Organization association
+  is optional and explicitly chosen; never infer ownership from the selected org.
+- Storage stays v1, keyed by site. Additive metadata: item rid/created/updated,
+  contact email/phone/org/primary, note pinned, optional orgId, idMeta[xid].title.
+  Legacy identities are deterministic; canonical field ordering avoids false
+  conflicts after JSONB reorders keys. Existing unknown item fields survive edits.
+  No Army data or database schema changes. Backups preserve the complete shape.
+- Drafts survive navigation within the session, keyed to their original site,
+  context, kind and item. Invalid/stale edits retain the draft. Delete Undo restores
+  by item ID without overwriting newer records; removing an ID still keeps items.
+- One search reads current records, IDs and saved briefs as well as existing
+  geography/org/view results. RecordUI.open selects the exact item in the shared
+  drawer without editing the brief. Shelf confirmations resolve stable IDs after
+  reorder and keep the explicit replace-working-brief confirmation.
+- Local status requires an IndexedDB transaction completion (or accepted read).
+  Cloud status requires a successful upload/remote read for that revision and
+  connection. Uploads use immutable snapshots; failed saves stay queued. Receipt
+  callbacks cannot certify newer edits or a different board. The existing
+  installation-level last-write-wins sync model remains unchanged.
+- PDF/HTML/JSON accept an installation, ID and record-kind filter in the existing
+  export chooser. Render ONLY Snapshot data, including friendly titles and optional
+  organization labels. Default API calls stay compatible; exports deep-copy data.
+- Four focused UX checks run inside smoke_runtime.js, retaining the five-tool CI
+  gate. Node checks cover source geometry and behavior with DOM/storage stubs;
+  they do not certify real touch hit testing, iPhone keyboard layout, print layout,
+  or live two-device sync. See docs/UX-ENHANCEMENTS.md for the remaining browser gate.

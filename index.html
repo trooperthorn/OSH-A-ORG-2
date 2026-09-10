@@ -370,14 +370,14 @@ body{
   top:calc(env(safe-area-inset-top,0px) + 48px);   /* v1.16.3: 4px up — brief space */
   display:flex; gap:2px; padding:3px; border-radius:var(--r-pill)}
 .ms-cell{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  padding:6px 14px; border-radius:999px; background:none; color:var(--dim);
-  font:800 9.5px/1 var(--body); letter-spacing:.12em; -webkit-tap-highlight-color:transparent}
+  min-width:72px; min-height:44px; padding:8px 14px; border-radius:999px; background:none; color:var(--dim);
+  font:800 12px/1 var(--body); letter-spacing:.12em; -webkit-tap-highlight-color:transparent}
 body:not(.brief-mode) .ms-cell[data-mode="map"],
 body.brief-mode .ms-cell[data-mode="brief"]{background:#F5D76E; color:#141006}
 .ms-cell:active{transform:scale(.96)}
 @media(min-width:1100px){
   #modeSeg{top:calc(env(safe-area-inset-top,0px) + 50px)}
-  .ms-cell{padding:6px 16px; font-size:10px}
+  .ms-cell{padding:8px 16px; font-size:13px}
 }
 
 /* v0.34.0 — BOOT TITLE. The veil is transparent glass over the REAL spinning
@@ -431,6 +431,8 @@ body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
   position:absolute; z-index:45; right:var(--safe-r);
   top:calc(env(safe-area-inset-top,0px) + 54px);
   width:min(78vw,260px); padding:6px; border-radius:var(--r-card);
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 72px);
+  overflow-y:auto; overscroll-behavior:contain;
 }
 .am-row{
   display:block; width:100%; border:0; background:none; margin:0; cursor:pointer; text-align:left;
@@ -578,7 +580,7 @@ body.gesturing #calloutCard{opacity:.22; transition:opacity .2s ease}
   opacity:.55; pointer-events:auto;
   transition:opacity .18s ease, transform .18s ease;
 }
-#navPod{gap:8px; padding:7px 4px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+#navPod{gap:14px; padding:7px 4px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
 body.tp-live #navPod{opacity:1}
 /* v1.21.0 (owner: "keep navigation controls bottom right and they can still
    be available, no tap needed"): the pod no longer collapses. The FAB's tap
@@ -588,33 +590,34 @@ body.brief-mode #navPod{display:none}   /* v1.22.0: the brief dock IS the pod th
 #navPod .nv-sat{width:34px; height:34px}
 #navPod .nv-sat svg{width:19px; height:19px}
 #navPod .ch-div{width:18px; height:1px; margin:2px 0; background:var(--line); align-self:center}
-/* 40px of ink, 48px of thumb — the .co-x::after idiom. Smallest pod pitch is
-   59.5px, so no two hit rects touch. */
+/* Small glyphs, independent 48px targets: the 34px cells have a 14px gap.
+   Pseudo targets stay inside the screen and never clip at the rocker. */
 .nv-sat{touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
 .nv-sat::after{content:''; position:absolute; left:50%; top:50%;
   width:48px; height:48px; transform:translate(-50%,-50%)}
 /* THE ROCKER — one object, two ends, a hairline seam, never a gap: three
    near-identical circles are indistinguishable to a thumb that isn't looking,
    and a miss lands on the other half of the same control. */
-.tp-rock{display:flex; flex-direction:column; width:34px; height:72px; border-radius:17px;
-  overflow:hidden; background:rgba(0,0,0,.30); box-shadow:inset 0 0 0 1px var(--line)}
+.tp-rock{display:flex; flex-direction:column; width:34px; height:96px; border-radius:17px;
+  overflow:visible; background:rgba(0,0,0,.30); box-shadow:inset 0 0 0 1px var(--line)}
 .tp-half{appearance:none; -webkit-appearance:none; border:0; margin:0; padding:0; cursor:pointer;
-  position:relative; flex:0 0 36px; width:34px; display:flex; align-items:center;
+  position:relative; flex:0 0 48px; width:34px; display:flex; align-items:center;
   justify-content:center; background:none; color:var(--accent);
   touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
   transition:background-color .12s ease}
 .tp-half + .tp-half{box-shadow:inset 0 1px 0 var(--line)}
+.tp-half:first-child{border-radius:17px 17px 0 0}
+.tp-half:last-child{border-radius:0 0 17px 17px}
 .tp-half::after{content:''; position:absolute; left:50%; top:50%;
-  width:50px; height:40px; transform:translate(-50%,-50%)}
+  width:48px; height:48px; transform:translate(-50%,-50%)}
 .tp-half:active{background:var(--accent-wash)}
 .tp-half:disabled{opacity:.35; pointer-events:none}
-/* THE SAVED STAR — "go back to somewhere" belongs where "go somewhere" lives */
+/* Saved items live beside search; the named folder opens the Repository. */
 .sp-star{appearance:none; -webkit-appearance:none; border:0; margin:0; padding:0; cursor:pointer;
-  position:relative; flex:none; width:30px; height:30px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
+  position:relative; flex:none; min-width:48px; height:44px; border-radius:12px;
+  display:flex; flex-direction:column; gap:3px; align-items:center; justify-content:center;
   background:none; color:var(--faint); -webkit-tap-highlight-color:transparent}
-.sp-star::after{content:''; position:absolute; left:50%; top:50%;
-  width:48px; height:48px; transform:translate(-50%,-50%)}
+.sp-star span{font:700 10px/1 var(--body)}
 .sp-star:active, .sp-star.on{color:var(--accent)}
 /* THE GUTTER LAW — content never enters the column. Replaces every hand-tuned
    right inset, and closes the v1.18.0 defect where the z43 rail painted over
@@ -627,16 +630,15 @@ body.brief-mode #navPod{display:none}   /* v1.22.0: the brief dock IS the pod th
 #errToast{right:var(--gut)}
 body.brief-mode #briefStage{right:var(--gut)}
 @media(min-width:1100px){
-  :root{--rail-w:78px; --rail-r:18px}
-  :root{--rail-w:56px}
-  #navPod{gap:10px; padding:9px; bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
+  :root{--rail-w:56px; --rail-r:18px}
+  #navPod{gap:12px; padding:6px; bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
   #navPod .nv-sat{width:44px; height:44px;
     background:linear-gradient(180deg, rgba(26,22,14,.94), rgba(8,7,4,.96));
     box-shadow:0 0 0 1px rgba(240,220,140,.28), inset 0 1px 0 var(--spec), var(--drop)}
-  #navPod .nv-sat::after{width:56px; height:56px}
-  .tp-rock{width:44px; height:94px; border-radius:22px}
-  .tp-half{flex:0 0 47px; width:44px}
-  .tp-half::after{width:60px; height:47px}
+  #navPod .nv-sat::after, #briefDock .nv-sat::after{width:56px; height:56px}
+  .tp-rock{width:44px; height:112px; border-radius:22px}
+  .tp-half{flex:0 0 56px; width:44px}
+  .tp-half::after{width:56px; height:56px}
   #errToast{left:auto; right:var(--gut); max-width:520px}
 }
 /* v1.14.0 — the FAB label: CONTROLS in the map room, TO MAP in the brief. */
@@ -657,24 +659,27 @@ body.ly-on .nv-fablbl{color:var(--accent)}
   left:var(--safe-l);
   bottom:calc(env(safe-area-inset-bottom,0px) + 152px);   /* clear of the search band */
   width:max-content; max-width:min(56vw,190px);
+  max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 258px);
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 258px);
+  overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
   padding:4px 5px 5px; border-radius:11px;
   background:linear-gradient(180deg, rgba(20,17,10,.58), rgba(6,5,4,.66));
   box-shadow:0 0 0 1px rgba(240,220,140,.13), var(--drop);
-  opacity:0; transform:translateY(6px) scale(.97); pointer-events:none;
-  transition:opacity .16s ease, transform .18s cubic-bezier(.22,1,.36,1);
+  opacity:0; pointer-events:none;
+  transition:opacity .16s ease;
 }
 #lyPanel[hidden]{display:none}
-body.ly-on #lyPanel{opacity:1; transform:none; pointer-events:auto}
-.ly-modes{display:flex; flex-wrap:wrap; gap:2px; padding:0 1px 4px}
+body.ly-on #lyPanel{opacity:1; pointer-events:auto}
+.ly-modes{display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:0 1px 4px}
 .ly-md{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
-  flex:0 1 auto; padding:3px 5px; border-radius:5px; background:rgba(0,0,0,.3);
-  font:800 6.5px/1 var(--mono); letter-spacing:.04em; color:var(--faint); text-transform:uppercase;
+  min-width:44px; min-height:44px; padding:6px 5px; border-radius:5px; background:rgba(0,0,0,.3);
+  font:800 10px/1 var(--mono); letter-spacing:.04em; color:var(--dim); text-transform:uppercase;
   white-space:nowrap}
 .ly-md.on{background:var(--accent-wash); color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
 .ly-cb{appearance:none; -webkit-appearance:none; border:0; margin:0; cursor:pointer;
   display:flex; align-items:center; gap:6px; width:100%; padding:3px 4px; border-radius:6px;
-  background:none; color:var(--text); font:600 10px/1.15 var(--body); text-align:left;
-  min-height:22px}
+  background:none; color:var(--text); font:600 12px/1.15 var(--body); text-align:left;
+  min-height:44px}
 .ly-cb:active{background:var(--accent-wash)}
 .ly-bx{flex:none; width:11px; height:11px; border-radius:3px; position:relative;
   box-shadow:inset 0 0 0 1.2px rgba(240,220,140,.42)}
@@ -683,7 +688,7 @@ body.ly-on #lyPanel{opacity:1; transform:none; pointer-events:auto}
   width:2.8px; height:5.8px; border:solid #141006; border-width:0 1.6px 1.6px 0; transform:rotate(42deg)}
 .ly-cb .ly-nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .ly-cb:not(.on) .ly-nm{color:var(--faint)}
-.ly-cb .ly-n{flex:none; margin-left:8px; font:700 8px/1 var(--mono); color:var(--faint)}
+.ly-cb .ly-n{flex:none; margin-left:8px; font:700 10px/1 var(--mono); color:var(--faint)}
 .ly-sep{height:1px; margin:3px 4px; background:rgba(240,220,140,.13)}
 body.ly-on #navGlobe{box-shadow:0 0 0 2px var(--accent), 0 0 26px rgba(245,215,110,.4), inset 0 1px 0 var(--spec)}
 /* the save-hold paints the ring the FAB already carries */
@@ -704,18 +709,18 @@ body.brief-mode #briefStage{
   left:6px; right:var(--gut);   /* v1.19.0: the gutter token owns the edge */
   /* v1.16.3 (owner: "maximize space — push top up and bottom down"): the
      console hugs the seg (+84) and may run down to the lowered search pill */
-  top:calc(env(safe-area-inset-top,0px) + 84px);
+  top:calc(env(safe-area-inset-top,0px) + 106px);
   width:auto;
-  max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 218px);
-  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 218px);
+  max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 240px);
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 240px);
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   padding:6px 6px 10px; border-radius:18px;
   background:radial-gradient(ellipse 95% 100% at 50% 30%, rgba(6,5,4,.85) 60%, rgba(6,5,4,0) 100%);
 }
 @media(min-width:1100px){ body.brief-mode #briefStage{
   left:0; right:0; margin:0 auto;   /* centered WITHOUT a transform — the stage scrolls */
-  top:calc(env(safe-area-inset-top,0px) + 84px);
-  width:min(880px,72vw); max-height:72vh; padding:8px 14px 14px; border-radius:24px;
+  top:calc(env(safe-area-inset-top,0px) + 108px);
+  width:min(880px,72vw); max-height:min(72vh,calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 242px)); padding:8px 14px 14px; border-radius:24px;
   background:radial-gradient(ellipse 90% 100% at 50% 30%, rgba(6,5,4,.82) 55%, rgba(6,5,4,0) 100%);
 } }
 body.brief-mode.chart-min #briefStage{
@@ -753,7 +758,7 @@ body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch
 #briefDock{display:none}
 /* v1.18.0 THE RAIL, brief side: same panel grammar as the map's #navPod —
    one vertical pill on the right edge, always live. The bottom band frees up. */
-body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:8px;
+body.brief-mode #briefDock{display:flex; flex-direction:column; align-items:center; gap:14px;
   position:absolute; z-index:43;
   right:var(--rail-r); left:auto; top:auto; bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
   transform:none; padding:7px 4px; border-radius:20px;
@@ -775,7 +780,7 @@ body.sheet-open #briefDock{opacity:0; pointer-events:none; transition:opacity .1
   body.brief-mode #searchResults{bottom:calc(env(safe-area-inset-bottom,0px) + 126px)}
 }
 @media(min-width:1100px){
-  body.brief-mode #briefDock{bottom:calc(env(safe-area-inset-bottom,0px) + 20px); gap:10px; padding:9px}
+  body.brief-mode #briefDock{bottom:calc(env(safe-area-inset-bottom,0px) + 20px); gap:12px; padding:6px}
   #briefDock .nv-sat{width:44px; height:44px}
 }
 /* v1.15.0 — the chart-to-globe leader */
@@ -823,9 +828,7 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
 .ld-cts{display:flex; gap:6px}
 .ld-ct{font-size:10.5px; font-weight:800; color:var(--dim, var(--faint)); letter-spacing:.02em}
 .ld-items{margin:0 0 6px 14px; padding:2px 0 4px 10px; border-left:2px solid var(--accent-wash)}
-.ld-it{display:flex; gap:8px; align-items:baseline; padding:3px 0}
-.ld-itk{flex:0 0 14px; font-size:10px; font-weight:900; color:var(--faint)}
-.ld-itx{flex:1; min-width:0; font-size:12px; color:var(--text); overflow-wrap:anywhere}
+
 .sb-arm{color:var(--accent-deep, var(--accent))}
 /* v1.7.0 — ASSET INVENTORY rows in the object sheets */
 .bf-invl{display:flex; flex-direction:column}
@@ -1042,9 +1045,9 @@ body.brief-mode #globeCanvas{opacity:.78}
   position:absolute; z-index:10; appearance:none; -webkit-appearance:none; border:0;
   margin:0; cursor:pointer; text-align:left; -webkit-tap-highlight-color:transparent;
   /* phone (design 2a phone mock): compact chip BELOW the centered seg */
-  top:calc(env(safe-area-inset-top,0px) + 88px); right:var(--safe-r);
+  top:calc(env(safe-area-inset-top,0px) + 106px); right:var(--safe-r);
   display:grid; grid-template-columns:auto auto auto; gap:3px 7px; align-items:baseline;
-  padding:7px 10px; border-radius:var(--r-chip); white-space:nowrap;
+  min-height:44px; padding:7px 10px; border-radius:var(--r-chip); white-space:nowrap;
 }
 #timeLedger:empty{display:none}
 #timeLedger:active{filter:brightness(1.25)}
@@ -1218,6 +1221,12 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focu
 #exportSheet{position:absolute; z-index:40; right:var(--safe-r);
   bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
   width:min(86vw,320px); padding:6px}
+#exportSheet{max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 160px);overflow-y:auto;overscroll-behavior:contain}
+#xpRecordOptions{padding:8px 10px;font:500 12px/1.4 var(--body)}
+#xpRecordOptions summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--accent)}
+#xpRecordOptions label{display:block;margin:5px 0}
+#xpRecordOptions .xp-check{min-height:44px;display:flex;align-items:center;gap:8px}
+#xpRecordOptions select{font-size:16px;margin-top:4px}
 .xp-head{font:800 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
   color:var(--faint); padding:8px 10px 6px}
 .xp-row{display:block; width:100%; border:none; background:none; cursor:pointer; text-align:left;
@@ -1257,17 +1266,36 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 }
 .rc-add:active{background:var(--accent-wash)}
 .rc-note{font:500 11px/1.4 var(--body); color:var(--dim); padding:2px 2px 8px}
-/* v1.1.0 THE ID REGISTRY — chips on rows, the ID pane, the form's ID box */
-.rc-xid{flex:none; align-self:flex-start; font:800 8.5px/1 var(--mono); letter-spacing:.06em;
-  color:var(--accent); padding:3px 6px; border-radius:6px; box-shadow:inset 0 0 0 1px var(--accent)}
-.rc-idrow{align-items:center}
-.rc-idrow .rc-idbtn{appearance:none;-webkit-appearance:none; border:0; background:none; margin:0; padding:0;
-  cursor:pointer; text-align:left; color:var(--accent); font:800 12.5px/1.3 var(--mono); letter-spacing:.05em}
-.rc-idrow.on{box-shadow:inset 0 0 0 1.4px var(--accent)}
-.rc-idit{margin-left:14px; opacity:.92}
-.rc-sublab{font:700 9px/1 var(--mono); letter-spacing:.12em; color:var(--faint);
-  text-transform:uppercase; padding:4px 2px 0}
-.rc-idsel{appearance:none;-webkit-appearance:none}
+/* Record cards and entry keep the existing drawer and phone-first rhythm. */
+.rc-workspace{padding-top:14px;min-width:0}
+.rc-scope{font:700 13px/1.5 var(--body);color:var(--text);margin-bottom:5px}
+.rc-workspace .rc-note{font-size:12px;line-height:1.5}
+.rc-label{display:block;font:700 12px/1.5 var(--body);color:var(--dim);margin:6px 0 2px}
+.rc-workspace .rc-in{font-size:16px;min-height:48px}
+.rc-workspace textarea.rc-in{min-height:150px;padding:12px;resize:vertical;line-height:1.5}
+.rc-in:focus-visible,.rc-action:focus-visible,.rc-notebody summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.rc-idmanager{padding:12px;margin:8px 0 12px;border:1px solid var(--line);border-radius:12px}
+.rc-filters,.rc-actions{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.rc-action{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--accent);font:700 12px/1.3 var(--body);text-decoration:none;cursor:pointer;box-sizing:border-box;transition:transform .16s ease}
+.rc-action:active{transform:scale(.96)}
+.rc-action.on{background:var(--accent-wash);border-color:var(--accent)}
+.rc-card{padding:14px;margin:10px 0;border:1px solid var(--line);border-radius:14px;background:var(--panel-2);overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.rc-title{font:700 16px/1.4 var(--body);color:var(--text);margin:3px 0}
+.rc-body{font:500 13px/1.5 var(--body);color:var(--dim);white-space:pre-wrap;margin:5px 0}
+.rc-meta{font:500 11px/1.5 var(--body);color:var(--dim);margin:3px 0}
+.rc-notebody{font:500 14px/1.55 var(--body);color:var(--text)}
+.rc-notebody summary{cursor:pointer;min-height:44px;white-space:pre-wrap;padding:4px 0}
+.rc-notebody>div{white-space:pre-wrap;padding:8px 0}
+.rc-notebody[open] summary{color:var(--accent)}
+.rc-check{display:flex;align-items:center;gap:10px;min-height:44px;font:600 13px/1.4 var(--body);color:var(--text)}
+.rc-check input{width:22px;height:22px;accent-color:var(--accent)}
+.rc-entry .rc-btns{flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.rc-error,.rc-danger{color:var(--danger)}
+.rc-error{font:600 13px/1.5 var(--body);padding:8px;border:1px solid var(--danger);border-radius:8px}
+.rc-undobar{display:flex;align-items:center;justify-content:space-between;gap:10px;font:600 13px/1.4 var(--body);color:var(--text);padding:8px 0}
+#dossier.rc-keyboard{top:var(--rc-visible-top);bottom:var(--rc-visible-bottom);max-height:none;padding-bottom:14px}
+#dossier.rc-keyboard::after{height:12px}
+.rc-keyboard .rc-entry .rc-btns{position:sticky;bottom:0;background:var(--panel-2);padding:8px 0;border-radius:10px}
 /* the database door — status line states */
 .db-status{font:600 11px/1.4 var(--body); color:var(--dim); padding:6px 2px}
 .db-status.db-live{color:var(--accent)}
@@ -1478,7 +1506,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      must never land under another control (re-verify law, gestures journey) */
   /* v1.18.0 (owner): the overview stays on the LEFT — the right edge belongs
      to the nav rail, so the card never covers it */
-  left:var(--safe-l) !important; right:var(--gut); top:calc(env(safe-area-inset-top,0px) + 136px) !important;
+  left:var(--safe-l) !important; right:var(--gut); top:calc(env(safe-area-inset-top,0px) + 158px) !important;
   width:auto; max-height:42vh; max-height:42dvh; overflow-y:auto;
   -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
 }
@@ -1535,9 +1563,9 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 <!-- v1.14.0 MODE SEG (design handoff 3a): the room switch, always visible,
      centered under the wordmark. Tap = setMode; the FAB hold stays a shortcut.
      Active cell is pure CSS off body.brief-mode — no JS state to drift. -->
-<div id="modeSeg" class="glass" role="tablist" aria-label="Room">
-  <button type="button" class="ms-cell" data-mode="map" role="tab">MAP</button>
-  <button type="button" class="ms-cell" data-mode="brief" role="tab">BRIEF</button>
+<div id="modeSeg" class="glass" role="group" aria-label="Switch room">
+  <button type="button" class="ms-cell" data-mode="map" aria-pressed="true">MAP</button>
+  <button type="button" class="ms-cell" data-mode="brief" aria-pressed="false">BRIEF</button>
 </div>
 
 <!-- v0.34.0 BOOT TITLE (owner: "brief intro... spinning globe, A-ORG-2 in big
@@ -1554,7 +1582,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <input id="searchInput" type="search" autocomplete="off" autocapitalize="off"
          spellcheck="false" placeholder="Search bases + units" aria-label="Search bases and units">
   <span class="sp-kbd" aria-hidden="true">⌘K</span>
-  <button class="sp-star" type="button" data-svdoor="1" aria-haspopup="dialog" aria-expanded="false" aria-controls="dossier" aria-label="Saved views"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1-5.5-2.9-5.5 2.9 1-6.1L3 9.5l6.3-.9L12 3z"></path></svg></button>
+  <button class="sp-star" type="button" data-svdoor="1" aria-haspopup="dialog" aria-expanded="false" aria-controls="ledger" aria-label="Saved — Repository: views, briefs and records"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7V5h7l2 2h9v13H3z"></path></svg><span>Saved</span></button>
 </div>
 <div id="searchResults" class="glass" role="listbox" aria-label="Search results"></div>
 <section id="appMenu" class="glass card" hidden aria-label="Menu"></section>
@@ -1575,7 +1603,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      48px of hit area each. The doors left this column entirely — see #lyChip
      (top-left, beside the ledger) and the ★ in the search pill. -->
 <div id="navPod" role="toolbar" aria-orientation="vertical" aria-label="Camera and history">
-<button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Clear the map"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<button id="navSat-clear" class="nv-sat glass" type="button" aria-label="Reset map view and layers"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6M4 10a8 8 0 1 1 1 8"></path></svg></button>
 <span class="ch-div" aria-hidden="true"></span>
 <button id="navSat-back" class="nv-sat glass tp-h" type="button" aria-label="Undo one step"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
 <span class="tp-rock tp-h"><button id="navSat-zoomin" class="tp-half" type="button" aria-label="Zoom in — hold to keep zooming"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button><button id="navSat-zoomout" class="tp-half" type="button" aria-label="Zoom out — hold to keep zooming"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button></span>
@@ -1609,7 +1637,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
      glyph-only cells, ✕ on top behind a hairline. BRIEFS · EXPORT · LEDGER
      left this strip for the Repository — they are saved things, not tools. -->
 <div id="briefDock" class="ch-dock" aria-label="Brief tools">
-  <button class="nv-sat glass" type="button" data-bfclear="1" aria-label="Clear the brief"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <button class="nv-sat glass" type="button" data-bfclear="1" aria-label="Reset brief view — keep diagram"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6M4 10a8 8 0 1 1 1 8"></path></svg></button>
   <span class="ch-div" aria-hidden="true"></span>
   <button class="nv-sat glass" type="button" data-bfsearch="1" aria-label="Add an organization or US state"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
   <button class="nv-sat glass bf-vw" type="button" data-bfnm="1" aria-label="Names on the globe"><span class="bd-aa">Aa</span></button>
@@ -1662,6 +1690,13 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.26.0 • THE RECORD WORKSPACE: independent touch targets, clearer Saved
+//            and Map/Brief controls, scrollable Layers; Overview/Records with
+//            one tracking-ID context, structured contacts, multiline notes,
+//            actionable links, stable item IDs, drafts, validation and Undo.
+//            Search opens exact records and safely confirms saved briefs.
+//            Selected record exports consume snapshots; local/cloud status
+//            acknowledges actual writes. Skip-intro is an explicit preference.
 //   v1.25.1 • THE PRUNE: retain the v1.22.0+ repository/pod era here;
 //            older release history remains in git log and CLAUDE.md. Remove
 //            the orphan data-bfledger and data-bfbriefs click routes from the
@@ -1759,8 +1794,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.21.0) remain in git log and CLAUDE.md.
 //   v1.25.1 retention: the current repository/pod era begins at v1.22.0.
 
-const APP_VERSION = 'v1.25.1';
-const APP_UPDATED = '9 September 2026';
+const APP_VERSION = 'v1.26.0';
+const APP_UPDATED = '10 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
 // on every controller change). If the worker is NEWER than this page, the
@@ -4514,6 +4549,51 @@ function _searchEntries(){
 
 function buildSearchIndex(){ _srSrc=null; return _searchEntries(); }
 
+// User records are read afresh with every query; the shared organization index
+// also feeds the Brief builder, so saved content never enters that static list.
+function _srUserEntries(){
+  const out=[], kinds={people:'contact',notes:'note',links:'link',specs:'detail'};
+  const push=function(e,fields){
+    e.baseF=_srFold(e.base); e.unitF=''; e.stF='';
+    e.fieldsF=fields.map(_srFold).filter(Boolean);
+    e.allF=_srFold(fields.join(' ')+' '+e.sub); out.push(e);
+  };
+  const records=(window.Records && typeof window.Records.all==='function')?window.Records.all():{};
+  Object.keys(records).forEach(function(sid){
+    const r=records[sid]; if(!r) return;
+    const site=(typeof siteById==='function')?siteById(sid):null, place=site?site.base:sid;
+    const labels=r.idMeta||{};
+    (r.ids||[]).forEach(function(xid){
+      const title=(labels[xid]||{}).title||'';
+      push({id:'rc:'+encodeURIComponent(JSON.stringify([sid,'',xid])),kind:'id',
+        base:xid+(title?' · '+title:''),sub:place+' · Installation records'},[xid,title]);
+    });
+    Object.keys(kinds).forEach(function(kind){
+      (r[kind]||[]).forEach(function(it){
+        if(!it || !it.rid) return;
+        const fields=kind==='people'?[it.name,it.role,it.email,it.phone,it.org,it.section]
+          :kind==='notes'?[it.text]:kind==='links'?[it.label,it.title,it.url]:[it.label,it.value];
+        const name=kind==='people'?it.name:kind==='notes'?String(it.text||'').replace(/\s+/g,' ').slice(0,100)
+          :kind==='links'?(it.label||it.title||it.url):it.label;
+        const title=(labels[it.xid]||{}).title||'';
+        push({id:'rc:'+encodeURIComponent(JSON.stringify([sid,it.rid,it.xid||''])),kind:kinds[kind],
+          base:name||'Untitled '+kinds[kind],sub:place+' · '+(it.xid?(it.xid+(title?' · '+title:'')):'Unfiled')
+            +(kind==='people'&&it.role?' · '+it.role:'')},fields);
+      });
+    });
+  });
+  // Keep object references for legacy saves lacking IDs. A result cannot point
+  // at a different save if the shelf is reordered before the user taps it.
+  [['view',typeof SAVEDV!=='undefined'?SAVEDV:[]],['brief',typeof SAVEDB!=='undefined'?SAVEDB:[]]]
+    .forEach(function(pair){ pair[1].forEach(function(v,i){
+      if(!v) return;
+      const kind=pair[0];
+      push({id:kind+':'+(v.id?'id:'+encodeURIComponent(v.id):'legacy:'+i),kind:kind,saved:v,
+        base:v.n||'Untitled '+kind,sub:kind==='view'?_shScope(v):((v.nodes||[]).length+' objects · Saved brief')},[v.n]);
+    }); });
+  return out;
+}
+
 // ---- Results (PORT of sfsResults + _usRun's v22.3.1 ranking; deviations 2-3) ---
 // Returns {list:[entry,entry], total:N, q:foldedQuery}. list is the TOP TWO.
 function sfsResults(q){
@@ -4524,9 +4604,17 @@ function sfsResults(q){
   // matches beat unit matches; shorter names win ties.
   const tk=new RegExp('(^|[\\s(\\-\\/])'+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
   const hits=[];
-  for(const e of _searchEntries()){
+  for(const e of _searchEntries().concat(_srUserEntries())){
     let s2=0;
-    if(e.baseF===q) s2=100;
+    if(e.fieldsF){
+      // An exact tracking code, contact address or saved title is deliberate;
+      // partial personal-content hits stay below a direct place/org name hit.
+      for(const f of e.fieldsF){
+        s2=Math.max(s2, f===q?120:f.indexOf(q)===0?76:tk.test(f)?56:f.indexOf(q)>=0?10:0);
+      }
+      if(!s2 && e.allF.indexOf(q)>=0) s2=8;
+    }
+    else if(e.baseF===q) s2=100;
     else if(e.baseF.indexOf(q)===0) s2=80;
     else if(tk.test(e.baseF)) s2=60;
     else if(e.unitF && e.unitF===q) s2=50;
@@ -4550,7 +4638,7 @@ function sfsResults(q){
 
 // ---- Render (PORT of sfsRender — rows via innerHTML <button data-sfs>) ---------
 // res = {list,total,q} from sfsResults, or null/'' query → dropdown folds shut.
-let _sfsHi=0;   // keyboard highlight over the (at most two) rows — deviation 5
+let _sfsHi=0, _sfsShown=[];   // the same six rows support keyboard and pointer selection
 
 function _srFuse(){
   const dd=document.getElementById('searchResults');
@@ -4566,6 +4654,7 @@ function sfsRender(res){
 function _sfsPaint(res){
   const dd=document.getElementById('searchResults'); if(!dd) return;
   _sfsHi=0;
+  _sfsShown=res&&res.list?res.list:[];
   if(!res || !res.q || res.q.length<2){ dd.innerHTML=''; return; }
   // v21.5.1 flow law (ported): zero results never dead-end SILENTLY. There is no
   // second search to escape to (deviation 1) — say so, plainly.
@@ -4581,10 +4670,11 @@ function _sfsPaint(res){
   // total (audit #21 stands); when more exist beyond the cap it says "closest".
   const count = shown===1 ? '1 match'
     : (res.total>shown ? 'closest '+shown+' shown' : shown+' matches');
-  dd.innerHTML=_svSearchRows(res.q)+res.list.map(function(e,i){
+  dd.innerHTML=res.list.map(function(e,i){
     const isOrg=String(e.id).slice(0,3)==='og:';
     const isSt=!!bfStateName(e.id);
-    const tag=isSt?'<span class="sr-tag sr-tag-state">STATE</span>'
+    const tag=e.kind?'<span class="sr-tag sr-tag-view">'+_srEsc(e.kind.toUpperCase())+'</span>'
+      :isSt?'<span class="sr-tag sr-tag-state">STATE</span>'
       :(isOrg?'<span class="sr-tag sr-tag-org">ORG</span>':'<span class="sr-tag sr-tag-site">SITE</span>');   // full literals for dead-lint
     return '<button type="button" class="sr-row'+(i===_sfsHi?' hi':'')+'" role="option"'
       +' aria-selected="'+(i===_sfsHi?'true':'false')+'" data-sfs="'+_srEscA(e.id)+'">'
@@ -4593,21 +4683,9 @@ function _sfsPaint(res){
   }).join('')+'<div class="sr-count">'+_srEsc(count)+'</div>';
 }
 
-// v1.19.0 ZERO-DOOR RECALL — typing a saved view's name ranks it above the raw
-// site. Prepended into the paint, never into _searchEntries(), so the index
-// keeps its exact-length contract.
-function _svSearchRows(q){
-  try{
-    const s2=String(q||'').trim().toLowerCase(); if(s2.length<2) return '';
-    const hits=SAVEDV.filter(function(v){ return v && String(v.n||'').toLowerCase().indexOf(s2)>=0; }).slice(0,2);
-    if(!hits.length) return '';
-    return '<div class="sr-count">SAVED</div>'+hits.map(function(v){
-      return '<button type="button" class="sr-row" role="option" aria-selected="false"'
-        +' data-svgo="'+_srEscA(_shId(v,_svSave))+'">'
-        +'<span class="sr-tag sr-tag-view">VIEW</span>'
-        +'<b>'+_srEsc(v.n||'')+'</b><span class="sr-sub">'+_srEsc(_shScope(v))+'</span></button>';
-    }).join('');
-  }catch(_){ return ''; }
+function _srRefresh(){
+  const input=_sfsField(), dd=document.getElementById('searchResults');
+  if(input && dd && dd.innerHTML && input.value.trim().length>=2) sfsRender(sfsResults(input.value));
 }
 
 // ---- THE select (mission contract; deviation 6 — m5 lazy-follows sel) ----------
@@ -4615,6 +4693,24 @@ function _svSearchRows(q){
 // SAME rails as every other pick — trail crumb, SELECT-clock auto-fill, brief
 // re-render. The inline body below is only the boot-order fallback (s4 absent).
 function searchSelect(id){
+  if(String(id).slice(0,3)==='rc:'){
+    try{ const v=JSON.parse(decodeURIComponent(id.slice(3)));
+      if(Array.isArray(v) && window.RecordUI) window.RecordUI.open(v[0],v[1]||null,v[2]||null);
+    }catch(_){} return;
+  }
+  const saved=_sfsShown.find(function(e){ return e.id===id && e.saved; });
+  if(saved){
+    const arr=saved.kind==='brief'?SAVEDB:SAVEDV;
+    const pos=arr.findIndex(function(v){ return saved.saved.id?v&&v.id===saved.saved.id:v===saved.saved; });
+    if(pos<0){ try{ _bfToast('That save changed. Search again.'); }catch(_){} return; }
+    if(saved.kind==='view') svRecall(pos);
+    else{
+      // Reuse the Repository's two-tap replacement gate; search never loads or
+      // saves a diagram. The next explicit Load confirms the replacement.
+      _sbLoadArm=_shId(arr[pos],_sbSave); _shOpen('bf');
+    }
+    return;
+  }
   _lyEnsure(id);   // v1.19.0: never hand back a result the layers then hide
   // v0.24.0 — a US STATE pick. In the brief room it becomes a highlighted node;
   // on the map it is only a place to look at (the rooms never cross-write).
@@ -4680,6 +4776,7 @@ function searchSelect(id){
 if(!window.__coSearchFold){ window.__coSearchFold=true;
   document.addEventListener('focusin', function(e){
     if(!e.target || e.target.id!=='searchInput') return;
+    _srRefresh();                              // a retained query reflects edits made since it lost focus
     if(document.body.classList.contains('brief-mode')) return;
     try{ if(_coId!=null) calloutHide(); }catch(_){}
   });
@@ -4743,15 +4840,6 @@ document.addEventListener('keydown', function(e){
 
 document.addEventListener('click', function(e){
   if(!e.target.closest) return;
-  // v1.19.0: a saved view in the results recalls straight from the pill —
-  // zero doors between "I know its name" and being back there.
-  const sv=e.target.closest('#searchResults [data-svgo]');
-  if(sv){
-    try{ svRecall(sv.getAttribute('data-svgo')); }catch(_){}
-    const i0=_sfsField(); if(i0){ i0.value=''; try{ i0.blur(); }catch(_){} }
-    sfsRender(null);
-    return;
-  }
   const sb=e.target.closest('#searchResults [data-sfs]');
   if(sb){                                                // ported (~L22845): tap = pick
     searchSelect(sb.getAttribute('data-sfs'));
@@ -4934,7 +5022,7 @@ function _srInjectCSS(){
 
 // ---- Escaping (PORT of esc ~L14030 / _escA ~L14129 — renamed, s3 dev-8 rule) ---
 function _odEsc(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
-function _odEscA(v){ return String(v).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function _odEscA(v){ return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
 // ---- THE SINGLE BRAIN (mission contract) ---------------------------------------
 // Every selection path lands here: m3 tap → tapAtScreen → selectSite; search rows
@@ -5031,7 +5119,7 @@ function tpUndo(){
   if(st) _camApply(st,{room:true}); else tpSync();
   tpLive();
 }
-function tpClear(){ try{ clearAll(); }catch(_){} tpSync(); tpLive(); }
+function tpClear(){ try{ clearAll(); if(!document.body.classList.contains('brief-mode')) _bfToast('Map reset — camera, selection and layers'); }catch(_){} tpSync(); tpLive(); }
 function _tpStop(e){
   if(_tpId==null || (e && e.pointerId!=null && e.pointerId!==_tpId)) return;
   _tpId=null; _tpDir=0;
@@ -5048,7 +5136,8 @@ function _tpWire(){
   try{
     [['navSat-zoomin',1],['navSat-zoomout',-1]].forEach(function(pair){
       const b=document.getElementById(pair[0]); if(!b || !b.addEventListener) return;
-      // pointer-driven ONLY — a click branch too would double-fire tap and ramp
+      // Pointer taps already act on down; only keyboard/assistive clicks act here.
+      b.addEventListener('click', function(e){ if(e.detail===0 && !b.disabled) tpZoom(pair[1],false); });
       b.addEventListener('pointerdown', function(e){
         if(_tpId!=null || b.disabled) return;
         _tpId=(e&&e.pointerId!=null)?e.pointerId:1; _tpDir=pair[1];
@@ -5120,6 +5209,7 @@ function setMode(m){
 
   const brief=(m==='brief');
   document.body.classList.toggle('brief-mode', brief);
+  try{ document.querySelectorAll('#modeSeg [data-mode]').forEach(function(b){ b.setAttribute('aria-pressed', String((b.getAttribute('data-mode')==='brief')===brief)); }); }catch(_){}
   try{ lySync(); }catch(_){}          // v1.21.0: the globe's label follows the room
   // the globe picture is the hero (owner law): the chart supplement arrives
   // MINIMIZED every time brief opens — one tap on ⌗ CHART expands it
@@ -5706,7 +5796,7 @@ function showDossier(id){
   const s=(typeof siteById==='function') ? siteById(id) : null;
   if(!s){ hideDossier(); return; }
   // a NEW org resets the pop-out state — the card always arrives compact
-  if(id!==_odLastId){ _odLastId=id; _odFan=false; _odShowRec=false; _odTab='ov'; _rcForm=null; }
+  if(id!==_odLastId){ _odLastId=id; _odFan=false; _odShowRec=false; _odTab='ov'; _rcResume(id); }
   _odInjectCSS();                                  // order-safe if a select lands before 'load'
   const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1]||'peek';
   host.innerHTML=_odRender(s);
@@ -5714,6 +5804,7 @@ function showDossier(id){
   host.classList.add('dz-'+_kept);                 // selection keeps the current detent; first open peeks
   host.classList.toggle('fan-open', _odFan);
   host.hidden=false;
+  try{_rcFit();}catch(_){}
   try{ host.setAttribute('aria-label', s.base+' — dossier'); }catch(_){}
   host.scrollTop=0;                                // deviation 7: whole card into view
   _odStageClearSync(true);
@@ -5730,13 +5821,13 @@ function _sheetFlag(){
 function hideDossier(){
   const host=document.getElementById('dossier'); if(!host) return;
   host.hidden=true;
+  host.classList.remove('rc-keyboard');
   host.innerHTML='';
   // v1.20.0: the integrated doors un-light with the pane they opened —
   // whichever way it closed (their own tap, the head ✕, or the grip).
   try{ delete host.dataset.shTab; }catch(_){}
   try{ const c=document.getElementById('lyChip'); if(c) c.setAttribute('aria-expanded','false');
-    const sv=document.querySelector('.sp-star');
-    if(sv){ sv.setAttribute('aria-expanded','false'); sv.classList.remove('on'); } }catch(_){}
+    const ld=document.getElementById('ledger'); _repoDoorSync(!!(ld && ld.classList.contains('on'))); }catch(_){}
   // v0.8.0 audit: a closed card forgets everything — the NEXT card always
   // arrives compact and peeked, even for the same org after a clear.
   _odLastId=null; _odFan=false; _odShowRec=false;
@@ -5754,14 +5845,17 @@ let _odTab='ov';
 let _odFan=false;        // ⊕ pop-out rail open?
 let _odShowRec=false;    // ▤ detail/records area expanded?
 let _odLastId=null;      // the org the card state belongs to
-let _rcForm=null;                                   // {kind, idx|null} — one open form at a time
+let _rcForm=null;                                   // one visible editor; session drafts retain their stable identity
 const RC_KINDS={
-  people:{ n:'People', f1:'Name', f2:'Role / section', k1:'name', k2:'role' },
-  specs:{  n:'Specs',  f1:'Label', f2:'Value',          k1:'label', k2:'value' },
+  people:{ n:'Contacts', f1:'Name', f2:'Role / section', k1:'name', k2:'role' },
+  specs:{  n:'Technical details',  f1:'Label', f2:'Value',          k1:'label', k2:'value' },
   notes:{  n:'Notes',  f1:'Note',  f2:null,             k1:'text',  k2:null },
   links:{  n:'Links',  f1:'Label', f2:'URL',            k1:'label', k2:'url' },
 };
-function _odSetTab(t){ _odTab=t; _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); }
+function _odSetTab(t){
+  const id=GlobeState.sel; _odTab=(t==='ov')?'ov':'records';
+  if(id){ const c=_rcContext(id); if(RC_KINDS[t]) c.filter=t; if(t==='xid') c.manage=true; _rcResume(id); _rcRefresh(); }
+}
 // harness hook (smoke drives the compact card's pop-out state; not UI surface)
 try{ window._odUI={ fan:function(v){ _odFan=!!v; }, rec:function(v){ _odShowRec=!!v; },
   form:function(kind){ _rcForm=kind?{kind:kind, idx:null}:null; } }; }catch(_){}   // form: harness drives the add-form (v1.1.0 ID box probe)
@@ -5807,28 +5901,16 @@ function _odRender(s){
     +'<span class="od-sp"></span>'
     +'<button class="od-ico'+(_odShowRec?' on':'')+'" type="button" data-odrec="1" aria-label="Details and records"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></button>'
     +'<button class="od-ico" id="exportBtn" type="button" aria-label="Export"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>'
-    +'<button class="od-ico od-ico-x" type="button" data-odclose="1" aria-label="Clear selection">✕</button>'
+    +'<button class="od-ico od-ico-x" type="button" data-odclose="1" aria-label="Close details">✕</button>'
     +'</div>';
 
   if(!_odShowRec) return h;
 
-  // ── the hidden detail (▤): Overview + the four record kinds ──
-  const rec=(typeof recordOf==='function')?recordOf(s.id):null;
-  const cnt=function(k){ return rec?rec[k].length:0; };
-  if(_odTab!=='ov' && _odTab!=='xid' && !RC_KINDS[_odTab]) _odTab='ov';
-  // v1.1.0 — ID between Overview and People (owner: "this will be used to tag
-  // all the People, Specs, Notes and Links")
-  const idsN=(rec&&rec.ids)?rec.ids.length:0;
-  h+='<div class="od-tabs">'
-    +'<button type="button" class="od-tab'+(_odTab==='ov'?' on':'')+'" data-odtab="ov">Overview</button>'
-    +'<button type="button" class="od-tab'+(_odTab==='xid'?' on':'')+'" data-odtab="xid">ID'+(idsN?(' · '+idsN):'')+'</button>'
-    +Object.keys(RC_KINDS).map(function(k){
-      const c=cnt(k);
-      return '<button type="button" class="od-tab'+(_odTab===k?' on':'')+'" data-odtab="'+k+'">'+RC_KINDS[k].n+(c?(' · '+c):'')+'</button>';
-    }).join('')
-    +'</div>';
-  if(_odTab==='xid') return h+_rcIdPane(s.id);
-  if(_odTab!=='ov') return h+_rcRender(s.id, _odTab);
+  const rec=recordOf(s.id), total=rec?recCount(s.id):0;
+  h+='<div class="od-tabs" role="tablist" aria-label="Installation details">'
+    +'<button type="button" role="tab" aria-selected="'+(_odTab==='ov')+'" class="od-tab'+(_odTab==='ov'?' on':'')+'" data-odtab="ov">Overview</button>'
+    +'<button type="button" role="tab" aria-selected="'+(_odTab!=='ov')+'" class="od-tab'+(_odTab!=='ov'?' on':'')+'" data-odtab="records">Records'+(total?' · '+total:'')+'</button></div>';
+  if(_odTab!=='ov') return h+_rcRender(s.id);
 
   // STATIONED HERE — every org the A-ORG-1 tree puts at this site. v0.29.0
   // (audit #3): when an ORG drives the sheet, the chain of command leads and this
@@ -6163,7 +6245,7 @@ function _coPlace(){
     if(!a || a.back){ c.style.opacity='0'; c.style.pointerEvents='none'; return; }  // far hemisphere: hide, returns on rotate (a dead id self-hides in _coRender)
     c.style.opacity=''; c.style.pointerEvents='auto';
     const vw=window.innerWidth||390, vh=window.innerHeight||844;
-    const topSafe=112, botSafe=vh-168;
+    const topSafe=106, botSafe=vh-168;
     const drill=c.querySelector('.co-drill');
     if(drill) drill.style.maxHeight='';
     let w=c.offsetWidth||236, hgt=c.offsetHeight||110;
@@ -6739,111 +6821,199 @@ if(!window.__bfSubWired){ window.__bfSubWired=true;
   });
 }
 
-// ── v1.1.0 THE ID PANE — the registry between Overview and People. Every ID
-// lists what files under it; deleting an ID untags, never deletes. The pane
-// says where this data LIVES (database when connected, this device until then).
-let _rcIdSel=null;                                    // ID expanded in the pane
+// One record workspace, addressed by installation + tracking ID + stable item ID.
+const _rcContexts=Object.create(null), _rcDrafts=Object.create(null);
+let _rcUndo=null;
+function _rcContext(id){ return _rcContexts[id]||(_rcContexts[id]={xid:'',filter:'all',manage:false}); }
+function _rcTitle(r,x){ return r&&r.idMeta&&r.idMeta[x]&&r.idMeta[x].title||''; }
+function _rcLabel(id,x){ const t=_rcTitle(recordOf(id),x); return x?(x+(t?' · '+t:'')):'Unfiled'; }
+function _rcRefresh(){
+  const h=document.getElementById('dossier'), top=h?h.scrollTop:0;
+  if(GlobeState.sel) showDossier(GlobeState.sel);
+  if(h) h.scrollTop=top;
+  try{ _ledgerPaint(); _srRefresh(); }catch(_){}
+}
+function _rcResume(id){
+  const c=_rcContext(id);
+  _rcForm=Object.values(_rcDrafts).find(function(f){ return f.sid===id && f.context===c.xid && (c.filter==='all'||c.filter===f.kind); })||null;
+}
+function _rcStart(kind,rid){
+  const sid=GlobeState.sel; if(!sid||!RC_KINDS[kind]) return;
+  const c=_rcContext(sid), r=recordOf(sid), it=rid&&r&&(r[kind]||[]).find(function(x){ return x.rid===rid; });
+  if(rid&&!it) return;
+  const key=JSON.stringify([sid,c.xid,kind,rid||'']);
+  _rcForm=_rcDrafts[key]||(_rcDrafts[key]={key:key,sid:sid,context:c.xid,kind:kind,rid:rid||'',
+    item:it?JSON.parse(JSON.stringify(it)):{xid:c.xid},original:it?_recFingerprint(it):'',error:''});
+}
+function recordURL(value){
+  let s=String(value||'').trim(); if(!s||/[\u0000-\u0020\u007f]/.test(s)) return '';
+  if(!/^[a-z][a-z\d+.-]*:/i.test(s)) s='https://'+s;
+  try{ const u=new URL(s); return /^https?:$/.test(u.protocol)&&u.hostname&&!u.username&&!u.password?u.href:''; }catch(_){ return ''; }
+}
+function recordCopy(value){
+  if(!navigator.clipboard||!navigator.clipboard.writeText){ _bfToast('Copy unavailable in this browser'); return; }
+  navigator.clipboard.writeText(String(value||'')).then(function(){ _bfToast('Copied'); },function(){ _bfToast('Copy unavailable — select the text'); });
+}
+function _rcActions(kind,it){
+  const e=_odEscA; let h='';
+  if(kind==='links'){ const u=recordURL(it.url); if(u) h+='<a class="rc-action" href="'+e(u)+'" target="_blank" rel="noopener noreferrer">Open link</a>'; }
+  if(kind==='people'){
+    const mail=String(it.email||'').trim(), phone=String(it.phone||'').replace(/[^+\d,;*#]/g,'');
+    if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) h+='<a class="rc-action" href="mailto:'+e(encodeURIComponent(mail))+'">Email</a>';
+    if(/\d/.test(phone)) h+='<a class="rc-action" href="tel:'+e(phone)+'">Call</a>';
+  }
+  const copy=kind==='people'?[it.name,it.role,it.org,it.email,it.phone].filter(Boolean).join('\n'):kind==='links'?recordURL(it.url):kind==='notes'?it.text:it.value;
+  if(copy) h+='<button type="button" class="rc-action" data-rccopy="'+e(copy)+'">Copy</button>';
+  return h;
+}
+function _rcCard(id,kind,it){
+  const e=_odEsc,a=_odEscA,K=RC_KINDS[kind]; let h='<article class="rc-card" data-rcrid="'+a(it.rid)+'">';
+  h+='<div class="rc-meta">'+K.n+(it.primary?' · Primary':'')+(it.pinned?' · Pinned':'')+'</div>';
+  if(kind==='notes') h+='<details class="rc-notebody"><summary>'+e((it.text||'').slice(0,150))+((it.text||'').length>150?'…':'')+'</summary><div>'+e(it.text||'')+'</div></details>';
+  else h+='<div class="rc-title">'+e(it[K.k1]||'')+'</div>';
+  const sub=kind==='people'?[it.role,it.org,it.email,it.phone].filter(Boolean).join(' · '):kind==='specs'?it.value:kind==='links'?it.url:'';
+  if(sub) h+='<div class="rc-body">'+e(sub)+'</div>';
+  const og=it.orgId&&((typeof orgOf==='function'&&orgOf(it.orgId))||(typeof orgById==='function'&&orgById(it.orgId)));
+  h+='<div class="rc-meta">'+e(_rcLabel(id,it.xid||''))+' · '+(og?e(og.name):it.orgId?'Organization reference: '+e(it.orgId):'Installation-wide')+'</div>';
+  if(it.updated) h+='<div class="rc-meta">Updated '+e(new Date(it.updated).toLocaleDateString())+(it.created&&it.created!==it.updated?' · Created '+e(new Date(it.created).toLocaleDateString()):'')+'</div>';
+  return h+'<div class="rc-actions">'+_rcActions(kind,it)+'<button type="button" class="rc-action" data-rcedit="'+a(it.rid)+'" data-rckind="'+kind+'">Edit</button></div></article>';
+}
+function _rcOptions(id,cur,allowNew){
+  return '<option value=""'+(!cur?' selected':'')+'>Unfiled</option>'+recIds(id).map(function(x){ return '<option value="'+_odEscA(x)+'"'+(cur===x?' selected':'')+'>'+_odEsc(_rcLabel(id,x))+'</option>'; }).join('')
+    +(allowNew?'<option value="\u0001NEW"'+(cur==='\u0001NEW'?' selected':'')+'>NEW — creates '+_odEsc(_recNextId(id))+'</option>':'');
+}
 function _rcIdPane(id){
-  const esc=_odEsc, escA=_odEscA;
-  const ids=recIds(id); const s0=siteById(id);
-  let h='<div class="rc-note">Tracking IDs'+(s0?(' for '+esc(s0.base)):'')+' — people, specs, notes and links all file under one. '
-    +(( typeof _dbState!=='undefined' && _dbState==='live')?'Database connected — this data lives off-device.':'Connect the database (hold the A-ORG-2 mark → Database) so this data lives off-device.')+'</div>';
-  ids.forEach(function(x){
-    const n=recIdCount(id,x); const open=(_rcIdSel===x);
-    h+='<div class="rc-row rc-idrow'+(open?' on':'')+'">'
-      +'<button type="button" class="rc-top rc-idbtn" data-rcidsel="'+escA(x)+'">'+esc(x)+'</button>'
-      +'<span class="rc-sub">'+n+' item'+(n===1?'':'s')+'</span>'
-      +'<button type="button" class="od-ico rc-dots" data-rciddel="'+escA(x)+'" aria-label="Remove '+escA(x)+' (items keep their data, lose the tag)">✕</button>'
-      +'</div>';
-    if(open){
-      const r=recordOf(id)||{};
-      Object.keys(RC_KINDS).forEach(function(k){
-        (r[k]||[]).forEach(function(it){
-          if(it.xid!==x) return;
-          const K=RC_KINDS[k];
-          h+='<div class="rc-row rc-idit"><span class="rc-top">'+esc(it[K.k1]||'')+'</span>'
-            +'<span class="rc-sub">'+RC_KINDS[k].n+(K.k2&&it[K.k2]?(' · '+esc(it[K.k2])):'')+'</span></div>';
-        });
-      });
-      if(!n) h+='<div class="rc-note rc-idit">Nothing filed under '+esc(x)+' yet — new records offer it in their ID box.</div>';
-    }
+  const c=_rcContext(id), a=_odEscA;
+  return '<div class="rc-idmanager"><label class="rc-label" for="rcIdNew">Tracking code (blank creates the next ID)</label>'
+    +'<input class="rc-in" id="rcIdNew" type="text" maxlength="24" autocomplete="off" value="'+a(c.idCode||'')+'">'
+    +'<label class="rc-label" for="rcIdTitle">Descriptive title (optional)</label><input class="rc-in" id="rcIdTitle" type="text" maxlength="80" value="'+a(c.idTitle||'')+'">'
+    +'<div class="rc-btns"><button class="rc-save" type="button" data-rcidadd="1">Create ID</button>'
+    +(c.xid?'<button class="rc-cancel" type="button" data-rcidtitle="1">Rename title</button>':'')+'</div>'
+    +(c.xid?'<button class="rc-action rc-danger" type="button" data-rciddel="'+a(c.xid)+'">'+(c.delArm===c.xid?'Confirm remove ID — keep all items':'Remove selected ID (keeps items)')+'</button>':'')+'</div>';
+}
+function _rcRender(id){
+  const c=_rcContext(id),r=recordOf(id),e=_odEsc;
+  if(c.xid&&recIds(id).indexOf(c.xid)<0){ c.xid=''; _rcResume(id); }
+  if(_rcForm&&!_rcForm.sid){ const k=_rcForm.kind; _rcStart(k); }
+  const form=_rcForm&&_rcForm.sid===id&&_rcForm.context===c.xid&&(c.filter==='all'||c.filter===_rcForm.kind)?_rcForm:null;
+  let h='<section class="rc-workspace" aria-label="Installation records"><div class="rc-scope">Installation records · '+e(_lgSiteName(id))+'</div>'
+    +'<div class="rc-note">Shared by organizations at this installation. An organization association is optional and chosen per item.</div>'
+    +'<label class="rc-label" for="rcContextId">Tracking ID</label><select class="rc-in" id="rcContextId">'+_rcOptions(id,c.xid,false)+'</select>'
+    +'<button type="button" class="rc-action" data-rcmanage="1" aria-expanded="'+!!c.manage+'">'+(c.manage?'Close ID settings':'Create or manage IDs')+'</button>';
+  if(c.manage) h+=_rcIdPane(id);
+  h+='<div class="rc-filters" role="group" aria-label="Record type">'+['all','people','notes','links','specs'].map(function(k){
+    const n=k==='all'?Object.keys(RC_KINDS).reduce(function(n,k){return n+(r?r[k].filter(function(it){return (it.xid||'')===c.xid;}).length:0);},0):r?r[k].filter(function(it){return (it.xid||'')===c.xid;}).length:0;
+    return '<button type="button" class="rc-action'+(c.filter===k?' on':'')+'" aria-pressed="'+(c.filter===k)+'" data-rcfilter="'+k+'">'+(k==='all'?'All':RC_KINDS[k].n)+' · '+n+'</button>';
+  }).join('')+'</div>';
+  h+=recordSaveStatus(id);
+  if(_rcUndo&&_rcUndo.id===id) h+='<div class="rc-undobar" role="status">Record deleted <button class="rc-action" type="button" data-rcundo="1">Undo</button></div>';
+  if(form) h+=_rcFormHTML(form.kind,form.item,form.rid);
+  else if(c.addMenu) h+='<div class="rc-filters" aria-label="Choose record type">'+Object.keys(RC_KINDS).map(function(k){return '<button class="rc-action" type="button" data-rcadd="'+k+'">'+RC_KINDS[k].n+'</button>';}).join('')+'</div>';
+  else h+='<button class="rc-add" type="button" data-rcadd="'+(c.filter==='all'?'choose':c.filter)+'">+ Add record</button>';
+  let n=0;
+  Object.keys(RC_KINDS).forEach(function(k){
+    if(c.filter!=='all'&&c.filter!==k) return;
+    (r?r[k]:[]).filter(function(it){return (it.xid||'')===c.xid;}).slice().sort(function(a,b){return Number(!!b.pinned||!!b.primary)-Number(!!a.pinned||!!a.primary);}).forEach(function(it){
+      n++; if(!form||form.rid!==it.rid) h+=_rcCard(id,k,it);
+    });
   });
-  if(!ids.length) h+='<div class="rc-note">No IDs yet. Add one below — or just save any record: it creates its ID on the spot.</div>';
-  h+='<div class="rc-form"><input class="rc-in" id="rcIdNew" type="text" maxlength="24" placeholder="Enter an ID — or type NEW" autocomplete="off" autocapitalize="characters">'
-    +'<div class="rc-btns"><span class="od-sp"></span>'
-    +'<button class="rc-save" type="button" data-rcidadd="1">Add ID</button></div></div>';
-  return h;
+  if(!n&&!form) h+='<div class="rc-note">Nothing filed under '+e(_rcLabel(id,c.xid))+' in this view yet.</div>';
+  return h+'</section>';
 }
-function _rcRender(id, kind){
-  const K=RC_KINDS[kind]; const rec=recordOf(id); const items=rec?rec[kind]:[];
-  let h='';
-  items.forEach(function(it, i){
-    if(_rcForm && _rcForm.kind===kind && _rcForm.idx===i){ h+=_rcFormHTML(kind, it, i); return; }
-    let top='', sub='';
-    if(kind==='people'){ top=it.name||''; sub=it.role||''; }
-    else if(kind==='specs'){ top=it.label||''; sub=it.value||''; }
-    else if(kind==='notes'){ top=it.text||''; sub=it.ts?new Date(it.ts).toLocaleDateString():''; }
-    else { top=it.label||''; sub=it.url||''; }
-    h+='<div class="rc-row">'
-      +(kind==='links'&&it.url?('<a class="rc-top" href="'+_odEscA(it.url)+'" target="_blank" rel="noopener">'+_odEsc(top)+'</a>'):('<span class="rc-top">'+_odEsc(top)+'</span>'))
-      +(it.xid?('<span class="rc-xid">'+_odEsc(it.xid)+'</span>'):'')
-      +(sub?('<span class="rc-sub">'+_odEsc(sub)+'</span>'):'')
-      +'<button class="od-ico rc-dots" type="button" data-rcedit="'+i+'" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>'
-      +'</div>';
-  });
-  if(!items.length && !_rcForm){
-    // v0.30.0 (audit #26): an empty tab explains itself — these are YOUR records
-    const s0=siteById(id);
-    h+='<div class="rc-note">Your '+String(K.n||kind).toLowerCase()+' records'+(s0?(' for '+_odEsc(s0.base)):'')+' \u2014 nothing added yet.</div>';
+function _rcFormHTML(kind,it,rid){
+  const f=_rcForm,K=RC_KINDS[kind],sid=GlobeState.sel,a=_odEscA,e=_odEsc; it=it||{};
+  const field=function(key,label,type){
+    const fid=key===K.k1?'rcF1':key===K.k2?'rcF2':'rcF_'+key;
+    return '<label class="rc-label" for="'+fid+'">'+label+'</label>'+(type==='textarea'?'<textarea class="rc-in" id="'+fid+'" data-rcfield="'+key+'" rows="5">'+e(it[key]||'')+'</textarea>':'<input class="rc-in" id="'+fid+'" data-rcfield="'+key+'" type="'+(type||'text')+'" value="'+a(it[key]||'')+'"'+(key===K.k1?' required':'')+(kind==='specs'&&key==='label'?' list="rcSpecLabels"':'')+'>');
+  };
+  let h='<div class="rc-form rc-entry"><div class="rc-title">'+(rid?'Edit ':'New ')+K.n.toLowerCase()+'</div>';
+  h+=field(K.k1,K.f1+' (required)',kind==='notes'?'textarea':'text'); if(K.k2) h+=field(K.k2,K.f2,kind==='links'?'url':'text');
+  if(kind==='people') h+=field('email','Email (optional)','email')+field('phone','Phone (optional)','tel')+field('org','Organization / section (optional)')+'<label class="rc-check"><input type="checkbox" id="rcF_primary" data-rcfield="primary"'+(it.primary?' checked':'')+'> Primary contact for this ID</label>';
+  if(kind==='notes') h+='<label class="rc-check"><input type="checkbox" id="rcF_pinned" data-rcfield="pinned"'+(it.pinned?' checked':'')+'> Pin this note</label>';
+  if(kind==='specs') h+='<datalist id="rcSpecLabels"><option value="Environment"><option value="Product"><option value="Version"><option value="Renewal"></datalist>';
+  const hosted=(typeof ogAtSite==='function'?ogAtSite(sid):[]).slice();
+  if(it.orgId&&!hosted.some(function(o){return o.id===it.orgId;})) hosted.push({id:it.orgId,name:'Saved organization · '+it.orgId});
+  h+='<label class="rc-label" for="rcForg">Organization association (optional)</label><select class="rc-in" id="rcForg" data-rcfield="orgId"><option value="">Installation-wide</option>'+hosted.map(function(o){return '<option value="'+a(o.id)+'"'+(o.id===it.orgId?' selected':'')+'>'+e(o.name)+'</option>';}).join('')+'</select>'
+    +'<label class="rc-label" for="rcFid">Files under ID</label><select class="rc-in rc-idsel" id="rcFid" data-rcfield="xid">'+_rcOptions(sid,it.xid||'',true)+'</select>'
+    +'<div class="rc-note" id="rcDestination">Destination: '+e(_lgSiteName(sid))+' → '+e(it.xid==='\u0001NEW'?'New tracking ID':_rcLabel(sid,it.xid||''))+'</div>';
+  if(f&&f.error) h+='<div class="rc-error" id="rcError" role="alert">'+e(f.error)+'</div>';
+  return h+'<div class="rc-btns">'+(rid?'<button class="rc-del" type="button" data-rcdel="'+a(rid)+'">Delete</button>':'')+'<span class="od-sp"></span><button class="rc-cancel" type="button" data-rccancel="1">Discard</button><button class="rc-save" type="button" data-rcsave="1">Save</button></div></div>';
+}
+function _rcFit(){
+  const h=document.getElementById('dossier'),v=window.visualViewport;if(!h||!v)return;
+  const active=!h.hidden&&_odShowRec&&_odTab==='records'&&_rcForm&&_rcForm.sid===GlobeState.sel;
+  const lift=Math.max(0,window.innerHeight-v.height-v.offsetTop),on=!!active&&lift>80;
+  h.classList.toggle('rc-keyboard',on);
+  if(on){h.style.setProperty('--rc-visible-top',(v.offsetTop+8)+'px');h.style.setProperty('--rc-visible-bottom',(lift+8)+'px');}
+}
+try{if(window.visualViewport){window.visualViewport.addEventListener('resize',_rcFit);window.visualViewport.addEventListener('scroll',_rcFit);}}catch(_){}
+function _rcReadForm(){
+  if(!_rcForm) return; const K=RC_KINDS[_rcForm.kind];
+  const fields=[[K.k1,'rcF1'],[K.k2,'rcF2'],['xid','rcFid'],['orgId','rcForg']];
+  if(_rcForm.kind==='people') ['email','phone','org','primary'].forEach(function(k){fields.push([k,'rcF_'+k]);});
+  if(_rcForm.kind==='notes') fields.push(['pinned','rcF_pinned']);
+  fields.forEach(function(p){ if(!p[0]) return; const el=document.getElementById(p[1]); if(el) _rcForm.item[p[0]]=(p[0]==='primary'||p[0]==='pinned')?!!el.checked:el.value; });
+}
+function _rcCommit(){
+  const id=GlobeState.sel,f=_rcForm; if(!id||!f||f.sid!==id) return;
+  _rcReadForm(); const K=RC_KINDS[f.kind],item=JSON.parse(JSON.stringify(f.item));
+  Object.keys(item).forEach(function(k){ if(typeof item[k]==='string') item[k]=item[k].trim(); });
+  const fail=function(msg){ f.error=msg; _rcRefresh(); try{document.getElementById('rcError').scrollIntoView({block:'nearest'});}catch(_){} };
+  if(!item[K.k1]) return fail('Enter '+K.f1.toLowerCase()+' before saving. Your draft is kept.');
+  if(f.kind==='links'){ const u=recordURL(item.url); if(!u) return fail('Enter a valid http or https web address.'); item.url=u; }
+  if(item.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.email)) return fail('Check the email address, or leave it empty.');
+  const r=recordOf(id),idx=f.rid&&r?r[f.kind].findIndex(function(it){return it.rid===f.rid;}):-1;
+  if(f.rid&&(idx<0||_recFingerprint(r[f.kind][idx])!==f.original)) return fail('This record changed or was removed while you edited. Copy your draft, discard it, and reopen the latest record.');
+  let xv=item.xid||'';
+  if(xv==='\u0001NEW') xv=recAddId(id); else if(xv&&recIds(id).indexOf(xv)<0) xv=recAddId(id,xv);
+  item.xid=xv; window._rcLastXid=xv;
+  if(f.rid) recUpdate(id,f.kind,idx,item); else recAdd(id,f.kind,item);
+  // Only an explicit primary choice replaces the prior primary within this tracking ID.
+  if(f.kind==='people'&&item.primary){ const rr=recordOf(id),saved=f.rid||rr.people[rr.people.length-1].rid;
+    rr.people.forEach(function(p,i){if(p.rid!==saved&&p.xid===xv&&p.primary) recUpdate(id,'people',i,{primary:false});}); }
+  delete _rcDrafts[f.key]; _rcForm=null; const c=_rcContext(id); c.xid=xv;c.addMenu=false; _rcResume(id); _rcRefresh();
+}
+function _rcDelete(rid){
+  const id=GlobeState.sel,f=_rcForm,r=recordOf(id); if(!f||!r) return;
+  const idx=r[f.kind].findIndex(function(it){return it.rid===rid;}); if(idx<0) return;
+  if(_recFingerprint(r[f.kind][idx])!==f.original){ f.error='This record changed. Reopen the latest record before deleting.';_rcRefresh();return; }
+  _rcUndo={id:id,kind:f.kind,item:JSON.parse(JSON.stringify(r[f.kind][idx])),idx:idx};
+  recRemove(id,f.kind,idx); delete _rcDrafts[f.key]; _rcForm=null; _rcRefresh();
+}
+function _rcUndoDelete(){
+  const u=_rcUndo;if(!u) return;const r=recordOf(u.id);if(!r) return;
+  if(!r[u.kind].some(function(it){return it.rid===u.item.rid;})){
+    if(u.item.xid&&recIds(u.id).indexOf(u.item.xid)<0) recAddId(u.id,u.item.xid);
+    if(u.kind==='people'&&u.item.primary&&r.people.some(function(it){return it.primary&&it.xid===u.item.xid;}))u.item.primary=false;
+    r[u.kind].splice(Math.min(u.idx,r[u.kind].length),0,u.item);_recSave(u.id);
   }
-  if(_rcForm && _rcForm.kind===kind && _rcForm.idx==null) h+=_rcFormHTML(kind, null, null);
-  else h+='<button class="rc-add" type="button" data-rcadd="'+kind+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg> Add</button>';
-  return h;
+  _rcUndo=null;_rcRefresh();
 }
-function _rcFormHTML(kind, it, idx){
-  const K=RC_KINDS[kind];
-  // v1.1.0 — every record files under an ID (owner law): the form offers the
-  // existing IDs, NEW (creates the next one), or No ID. Last choice sticks.
-  const sid=GlobeState.sel, ids=sid?recIds(sid):[];
-  let cur=it?(it.xid||''):((window._rcLastXid&&ids.indexOf(window._rcLastXid)>=0)?window._rcLastXid:null);
-  if(cur===null && !ids.length) cur='NEW';
-  if(cur===null) cur='NEW';
-  let idSel='<div class="rc-sublab">Files under ID</div><select class="rc-in rc-idsel" id="rcFid">'
-    +ids.map(function(x){ return '<option value="'+_odEscA(x)+'"'+(cur===x?' selected':'')+'>'+_odEsc(x)+'</option>'; }).join('')
-    +'<option value="NEW"'+(cur==='NEW'?' selected':'')+'>NEW — creates '+_odEsc(sid?_recNextId(sid):'ID-001')+'</option>'
-    +'<option value=""'+(cur===''?' selected':'')+'>No ID</option>'
-    +'</select>';
-  return '<div class="rc-form">'
-    +'<input class="rc-in" id="rcF1" type="text" placeholder="'+_odEscA(K.f1)+'" value="'+_odEscA(it?(it[K.k1]||''):'')+'">'
-    +(K.f2?('<input class="rc-in" id="rcF2" type="text" placeholder="'+_odEscA(K.f2)+'" value="'+_odEscA(it?(it[K.k2]||''):'')+'">'):'')
-    +idSel
-    +'<div class="rc-btns">'
-    +(idx!=null?('<button class="rc-del" type="button" data-rcdel="'+idx+'">Delete</button>'):'')
-    +'<span class="od-sp"></span>'
-    +'<button class="rc-cancel" type="button" data-rccancel="1">Cancel</button>'
-    +'<button class="rc-save" type="button" data-rcsave="'+(idx==null?'':idx)+'">Save</button>'
-    +'</div></div>';
+function _rcOpen(id,rid,xid){
+  if(!siteById(id)) return false;
+  const r=recordOf(id);let hit=null;
+  if(rid&&r) Object.keys(RC_KINDS).some(function(k){const it=r[k].find(function(it){return it.rid===rid;});if(it) hit={kind:k,it:it};return !!it;});
+  if(rid&&!hit){_bfToast('Record no longer available');return false;}
+  const orgId=hit&&hit.it.orgId;
+  const hosted=typeof ogAtSite==='function'?ogAtSite(id):[];
+  _ledgerClose();setMode('map');selectSite(id,{orgId:orgId&&hosted.some(function(o){return o.id===orgId;})?orgId:null});showDossier(id);
+  const c=_rcContext(id);c.xid=hit?hit.it.xid||'':xid==null?c.xid:xid;c.filter=hit?hit.kind:'all';
+  _odShowRec=true;_odTab='records';if(hit)_rcStart(hit.kind,hit.it.rid);else _rcResume(id);
+  const h=document.getElementById('dossier');if(h){h.classList.remove('dz-peek','dz-half');h.classList.add('dz-full');}
+  _rcRefresh();return true;
 }
-function _rcCommit(idx){
-  const id=GlobeState.sel; if(!id||!_rcForm) return;
-  const K=RC_KINDS[_rcForm.kind];
-  const f1=document.getElementById('rcF1'), f2=document.getElementById('rcF2');
-  const v1=(f1&&f1.value||'').trim(), v2=(f2&&f2.value||'').trim();
-  if(!v1){ _rcForm=null; showDossier(id); return; }   // empty first field = never save a blank row
-  const item={}; item[K.k1]=v1; if(K.k2) item[K.k2]=v2;
-  // v1.1.0 — the ID association (existing · NEW · none); a typed-new value
-  // funnels through recAddId so the registry always knows every tag in use
-  const fid=document.getElementById('rcFid');
-  if(fid){
-    let xv=fid.value;
-    if(xv==='NEW') xv=recAddId(id);
-    else if(xv && recIds(id).indexOf(xv)<0) xv=recAddId(id, xv);
-    item.xid=xv||'';
-    window._rcLastXid=xv||'';
-  }
-  if(idx==null||idx==='') recAdd(id,_rcForm.kind,item); else recUpdate(id,_rcForm.kind,parseInt(idx,10),item);
-  _rcForm=null; showDossier(id);
-}
+try{window.recordURL=recordURL;window.recordCopy=recordCopy;window.RecordUI={open:_rcOpen};}catch(_){}
+document.addEventListener('input',function(e){
+  const t=e.target;if(!t) return;
+  if(t.getAttribute&&t.getAttribute('data-rcfield')&&_rcForm) _rcForm.item[t.getAttribute('data-rcfield')]=t.type==='checkbox'?!!t.checked:t.value;
+  if(GlobeState.sel&&(t.id==='rcIdNew'||t.id==='rcIdTitle')) _rcContext(GlobeState.sel)[t.id==='rcIdNew'?'idCode':'idTitle']=t.value;
+});
+document.addEventListener('change',function(e){
+  const t=e.target;if(!t) return;
+  if(t.id==='rcContextId'&&GlobeState.sel){const c=_rcContext(GlobeState.sel);c.xid=t.value;c.delArm=null;c.idTitle=_rcTitle(recordOf(GlobeState.sel),c.xid);_rcResume(GlobeState.sel);_rcRefresh();}
+  else if(t.getAttribute&&t.getAttribute('data-rcfield')&&_rcForm) _rcForm.item[t.getAttribute('data-rcfield')]=t.type==='checkbox'?!!t.checked:t.value;
+  if(t.id==='rcFid'&&_rcForm){const d=document.getElementById('rcDestination');if(d)d.textContent='Destination: '+_lgSiteName(_rcForm.sid)+' → '+(t.value==='\u0001NEW'?'New tracking ID':_rcLabel(_rcForm.sid,t.value));}
+});
 
 // ---- (v0.3.0) the clear/fit pills retired with the control law: ✕ lives in the
 // sheet header, frame lives on the rail. Kept as a no-op so the two call sites
@@ -6874,35 +7044,27 @@ if(!window._odWired){
         if(hst && hst.classList.contains('dz-peek')){ hst.classList.remove('dz-peek'); hst.classList.add('dz-half'); }
       }
       if(GlobeState.sel) showDossier(GlobeState.sel); return; }
+    const rf=e.target.closest('[data-rcfilter]');
+    if(rf&&GlobeState.sel){ _rcContext(GlobeState.sel).filter=rf.getAttribute('data-rcfilter'); _rcResume(GlobeState.sel); _rcRefresh(); return; }
+    const rm=e.target.closest('[data-rcmanage]');
+    if(rm&&GlobeState.sel){ const c=_rcContext(GlobeState.sel);c.manage=!c.manage;c.idTitle=_rcTitle(recordOf(GlobeState.sel),c.xid);_rcRefresh();return; }
+    const cp=e.target.closest('[data-rccopy]');
+    if(cp){recordCopy(cp.getAttribute('data-rccopy'));return;}
+    if(e.target.closest('[data-rcundo]')){_rcUndoDelete();return;}
     const ra=e.target.closest('[data-rcadd]');
-    if(ra){ _rcForm={kind:ra.getAttribute('data-rcadd'), idx:null}; if(GlobeState.sel) showDossier(GlobeState.sel);
-      try{ const f=document.getElementById('rcF1'); f&&f.focus(); }catch(_){} return; }
+    if(ra&&GlobeState.sel){const k=ra.getAttribute('data-rcadd');if(k==='choose')_rcContext(GlobeState.sel).addMenu=true;else _rcStart(k);_rcRefresh();try{const f=document.getElementById('rcF1');if(f&&k!=='choose')f.focus();}catch(_){}return;}
     const re=e.target.closest('[data-rcedit]');
-    if(re){ _rcForm={kind:_odTab, idx:parseInt(re.getAttribute('data-rcedit'),10)}; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
-    const rs=e.target.closest('[data-rcsave]');
-    if(rs){ _rcCommit(rs.getAttribute('data-rcsave')); return; }
-    const rc0=e.target.closest('[data-rccancel]');
-    if(rc0){ _rcForm=null; if(GlobeState.sel) showDossier(GlobeState.sel); return; }
-    const rd=e.target.closest('[data-rcdel]');
-    if(rd){ const id=GlobeState.sel; if(id){ recRemove(id,_odTab,parseInt(rd.getAttribute('data-rcdel'),10)); _rcForm=null; showDossier(id); } return; }
-    // ---- v1.1.0 THE ID REGISTRY (the ID tab's own three moves) ----
-    const xa=e.target.closest('[data-rcidadd]');
-    if(xa){ const id=GlobeState.sel; if(id){
-        const f=document.getElementById('rcIdNew');
-        const made=recAddId(id, f?f.value:'');
-        window._rcLastXid=made; _rcIdSel=made;
-        showDossier(id);
-      } return; }
-    const xs=e.target.closest('[data-rcidsel]');
-    if(xs){ const x=xs.getAttribute('data-rcidsel'); _rcIdSel=(_rcIdSel===x)?null:x;
-      if(GlobeState.sel) showDossier(GlobeState.sel); return; }
+    if(re){ _rcStart(re.getAttribute('data-rckind'),re.getAttribute('data-rcedit')); _rcRefresh();return;}
+    if(e.target.closest('[data-rcsave]')){_rcCommit();return;}
+    if(e.target.closest('[data-rccancel]')){if(_rcForm) delete _rcDrafts[_rcForm.key];_rcForm=null;_rcRefresh();return;}
+    const rd=e.target.closest('[data-rcdel]');if(rd){_rcDelete(rd.getAttribute('data-rcdel'));return;}
+    const xa=e.target.closest('[data-rcidadd]'),xt=e.target.closest('[data-rcidtitle]');
+    if((xa||xt)&&GlobeState.sel){const id=GlobeState.sel,c=_rcContext(id),f=document.getElementById('rcIdNew'),t=document.getElementById('rcIdTitle');
+      const x=xt?c.xid:recAddId(id,f?f.value:'');if(x){recTitleId(id,x,t?t.value:'');c.xid=x;c.idCode='';c.idTitle=_rcTitle(recordOf(id),x);c.manage=false;_rcResume(id);_rcRefresh();}return;}
     const xd=e.target.closest('[data-rciddel]');
-    if(xd){ const id=GlobeState.sel; if(id){
-        recDelId(id, xd.getAttribute('data-rciddel'));
-        if(_rcIdSel===xd.getAttribute('data-rciddel')) _rcIdSel=null;
-        try{ _bfToast('ID removed — its items kept their data, lost the tag'); }catch(_){}
-        showDossier(id);
-      } return; }
+    if(xd&&GlobeState.sel){const id=GlobeState.sel,c=_rcContext(id),x=xd.getAttribute('data-rciddel');
+      if(c.delArm!==x){c.delArm=x;_rcRefresh();return;}
+      recDelId(id,x);c.xid='';c.delArm=null;c.idTitle='';_rcResume(id);_bfToast('ID removed — all items kept as unfiled');_rcRefresh();return;}
     // ── v1.19.0 THE SHELF RUNGS — one set, kind read from the open tab ──
     const _shTab=function(){ const h=document.getElementById('dossier');
       return (h && h.dataset && h.dataset.shTab) || 'sv'; };
@@ -6976,14 +7138,15 @@ if(!window._odWired){
       if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); return; }
     // ---- BRIEFS: the LOAD arm is KEPT — loading destroys unsaved work ----
     const bsl=e.target.closest('[data-sbload]');
-    if(bsl){ const i2=parseInt(_shVal(bsl,'data-sbload'),10);
-      if(_sbLoadArm!==i2){ _sbLoadArm=i2; _shOpen('bf'); return; }
+    if(bsl){ const id=_shVal(bsl,'data-sbload'), i2=_shFind('bf',id);
+      if(i2<0){ _sbLoadArm=-1; _shOpen('bf'); return; }
+      if(_sbLoadArm!==id){ _sbLoadArm=id; _shOpen('bf'); return; }
       _sbLoadArm=-1;
       if(sbLoad(i2)){ hideDossier(); try{ _bfToast('Brief loaded'); }catch(_){} }
       return; }
     const bsr2=e.target.closest('[data-sbrm]');
-    if(bsr2){ const i3=parseInt(_shVal(bsr2,'data-sbrm'),10);
-      const rid=(SAVEDB[i3]&&SAVEDB[i3].id)||String(i3);
+    if(bsr2){ const rid=_shVal(bsr2,'data-sbrm'), i3=_shFind('bf',rid);
+      if(i3<0){ _shRmArm=null; _shOpen('bf'); return; }
       if(_shRmArm!==rid){ _shRmArm=rid; _shOpen('bf'); return; }
       sbRemove(i3); _shRmArm=null; _sbLoadArm=-1; _shOpen('bf'); return; }
     const bsx2=e.target.closest('[data-sbclose]');
@@ -7421,37 +7584,109 @@ function _odInjectCSS(){
 let RECORDS=Object.create(null);
 let _rdb=null;
 
-function _recBlank(id){ return {v:1, id:id, people:[], specs:[], notes:[], links:[], ids:[], mod:0}; }
-function recordOf(id){ return RECORDS[id]||null; }
+function _recBlank(id){ return {v:1,id:id,people:[],specs:[],notes:[],links:[],ids:[],idMeta:{},mod:0}; }
+function _recFingerprint(value){
+  return JSON.stringify(value,function(k,v){if(v&&typeof v==='object'&&!Array.isArray(v)){const out=Object.create(null);Object.keys(v).sort().forEach(function(k){out[k]=v[k];});return out;}return v;});
+}
+function _recNormalize(r){
+  if(!r||typeof r!=='object') return null;
+  if(!Array.isArray(r.ids)) r.ids=[];
+  r.ids=r.ids.filter(function(x,i,a){return typeof x==='string'&&x&&a.indexOf(x)===i;});
+  if(!r.idMeta||typeof r.idMeta!=='object'||Array.isArray(r.idMeta)) r.idMeta={};
+  const seen=Object.create(null);
+  ['people','specs','notes','links'].forEach(function(k){
+    if(!Array.isArray(r[k])) r[k]=[];
+    r[k]=r[k].filter(function(it){return it&&typeof it==='object';});
+    r[k].forEach(function(it,i){
+      if(!it.rid||seen[it.rid]){
+        const text=_recFingerprint([r.id,k,i,it]);let hash=2166136261;
+        for(let j=0;j<text.length;j++) hash=Math.imul(hash^text.charCodeAt(j),16777619);
+        it.rid='legacy-'+(hash>>>0).toString(36)+'-'+i;
+      }
+      seen[it.rid]=true;
+      if(!Number.isFinite(it.created)) it.created=Number(it.ts)||Number(r.mod)||0;
+      if(!Number.isFinite(it.updated)) it.updated=it.created;
+      if(typeof it.xid!=='string') it.xid='';
+      if(it.xid&&r.ids.indexOf(it.xid)<0) r.ids.push(it.xid);
+    });
+  });
+  return r;
+}
+function recordOf(id){ return _recNormalize(RECORDS[id])||null; }
+function recAll(){ Object.keys(RECORDS).forEach(function(id){recordOf(id);});return RECORDS; }
+function _recIndex(r,kind,index){ return typeof index==='string'?r[kind].findIndex(function(it){return it.rid===index;}):index; }
+function _recRid(){ return 'r-'+(typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)); }
 function recCount(id){
-  const r=RECORDS[id]; if(!r) return 0;
+  const r=recordOf(id); if(!r) return 0;
   return (r.people.length+r.specs.length+r.notes.length+r.links.length);
+}
+// v1.26.0: acknowledge storage only after its transaction commits. Each
+// revision has its own receipt; an older callback cannot certify a newer edit.
+let _recReceipts=Object.create(null), _recCloud=Object.create(null);
+function _recPersist(r){
+  const id=r.id, ticket={mod:r.mod||0,state:_rdb?'saving':'memory'};
+  _recReceipts[id]=ticket;
+  const done=function(state){ if(_recReceipts[id]!==ticket) return; ticket.state=state; _recStatusPaint(); };
+  try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite');
+    tx.oncomplete=function(){ done('saved'); };
+    tx.onerror=tx.onabort=function(){ done('error'); };
+    tx.objectStore('records').put(r);
+  } }catch(_){ done('error'); }
+  _recStatusPaint();
 }
 function _recSave(id){
   const r=RECORDS[id]; if(!r) return;
-  r.mod=Date.now();
-  try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite'); tx.objectStore('records').put(r); } }catch(_){}
-  try{ dbPush(); }catch(_){}                          // v1.1.0: the database is the source of truth when connected
+  r.mod=Math.max(Date.now(),(r.mod||0)+1);
+  _recPersist(r);
+  try{ dbPush(); }catch(_){}
+  try{ _srRefresh(); }catch(_){}
 }
+function _recStatusText(id){
+  const r=RECORDS[id], receipt=_recReceipts[id], cloud=_recCloud[id];
+  if(!r) return 'No saved records yet';
+  const local=receipt?receipt.state:(_rdb?'unknown':'memory');
+  let text=local==='saved'?'Saved on this device':local==='saving'?'Saving on this device…':local==='error'?'Device save failed — keep this page open':local==='unknown'?'Device save not yet confirmed':'Session only — device storage unavailable';
+  if(cloud && cloud.mod===(r.mod||0)) text+=' · Synced '+new Date(cloud.at).toLocaleTimeString();
+  else if(typeof _db!=='undefined' && _db) text+=' · Sync pending';
+  else text+=' · Not synced this session';
+  return text;
+}
+function recordSaveStatus(id){
+  return '<div class="rc-note" data-rec-status="'+_odEscA(id)+'" role="status" aria-live="polite">'+_odEsc(_recStatusText(id))+'</div>';
+}
+function _recStatusPaint(){
+  try{ document.querySelectorAll('[data-rec-status]').forEach(function(el){ el.textContent=_recStatusText(el.getAttribute('data-rec-status')); }); }catch(_){}
+}
+function _recCloudAck(records){
+  const at=Date.now(); Object.keys(records||{}).forEach(function(id){ const r=records[id]; if(r && (!_recCloud[id] || (r.mod||0)>=_recCloud[id].mod)) _recCloud[id]={mod:r.mod||0,at:at}; });
+  _recStatusPaint();
+}
+function _recLoaded(r){ if(r&&r.id) _recReceipts[r.id]={mod:r.mod||0,state:'saved'}; }
+try{ window.recordSaveStatus=recordSaveStatus; window.recordSaveText=_recStatusText; }catch(_){}
+
 function recAdd(id, kind, item){
+  if(!RC_KINDS[kind]||!item||typeof item!=='object') return;
   if(!RECORDS[id]) RECORDS[id]=_recBlank(id);
-  if(kind==='notes' && item && !item.ts) item.ts=Date.now();
-  RECORDS[id][kind].push(item); _recSave(id);
+  const r=recordOf(id),now=Date.now(),saved=Object.assign({},item,{rid:_recRid(),created:now,updated:now});
+  if(kind==='notes'&&!saved.ts) saved.ts=now;
+  r[kind].push(saved); _recNormalize(r); _recSave(id); return saved.rid;
 }
 function recUpdate(id, kind, idx, item){
-  const r=RECORDS[id]; if(!r||!r[kind]||!r[kind][idx]) return;
-  if(kind==='notes' && r[kind][idx].ts && !item.ts) item.ts=r[kind][idx].ts;
-  r[kind][idx]=item; _recSave(id);
+  const r=recordOf(id); if(!r||!RC_KINDS[kind]||!item) return;
+  idx=_recIndex(r,kind,idx);const old=r[kind][idx];if(!old) return;
+  r[kind][idx]=Object.assign({},old,item,{rid:old.rid,created:old.created,updated:Date.now()});
+  _recNormalize(r);_recSave(id); return old.rid;
 }
 function recRemove(id, kind, idx){
-  const r=RECORDS[id]; if(!r||!r[kind]) return;
+  const r=recordOf(id); if(!r||!RC_KINDS[kind]) return;
+  idx=_recIndex(r,kind,idx);if(!Number.isInteger(idx)||idx<0||idx>=r[kind].length) return;
   r[kind].splice(idx,1); _recSave(id);
 }
 // ---- v1.1.0 THE ID REGISTRY — owner law: every person, spec, note and link
 // files under a tracking ID ("enter the ID or type NEW"). IDs live on the
 // record (r.ids) so they ride _recSave, the database push, every backup and
 // every export with zero extra plumbing. Items carry item.xid.
-function recIds(id){ const r=RECORDS[id]; return (r&&r.ids)||[]; }
+function recIds(id){ const r=recordOf(id); return (r&&r.ids)||[]; }
 function _recNextId(id){
   let mx=0;
   recIds(id).forEach(function(x){ const m=/^ID-(\d+)$/.exec(x); if(m) mx=Math.max(mx,parseInt(m[1],10)); });
@@ -7467,12 +7702,17 @@ function recAddId(id, label){
   r.ids.push(label); _recSave(id);
   return label;
 }
+function recTitleId(id,label,title){
+  const r=recordOf(id); if(!r||r.ids.indexOf(label)<0) return;
+  Object.defineProperty(r.idMeta,label,{value:{title:String(title||'').trim().slice(0,80)},writable:true,enumerable:true,configurable:true});_recSave(id);
+}
 function recDelId(id, label){
-  const r=RECORDS[id]; if(!r||!r.ids) return;
+  const r=recordOf(id); if(!r||!r.ids) return;
   const i=r.ids.indexOf(label); if(i<0) return;
-  r.ids.splice(i,1);
+  r.ids.splice(i,1);delete r.idMeta[label];
   // items survive — they just lose the tag (deleting an ID never deletes data)
-  ['people','specs','notes','links'].forEach(function(k){ (r[k]||[]).forEach(function(it){ if(it.xid===label) it.xid=''; }); });
+  ['people','specs','notes','links'].forEach(function(k){ (r[k]||[]).forEach(function(it){ if(it.xid===label){it.xid='';it.updated=Date.now();} }); });
+  Object.values(_rcDrafts).forEach(function(f){if(f.sid===id&&f.item.xid===label){f.item.xid='';f.context='';}});
   _recSave(id);
 }
 function recIdCount(id, label){
@@ -7496,7 +7736,8 @@ function _rdbOpen(){
         const tx=_rdb.transaction('records','readonly');
         const all=tx.objectStore('records').getAll();
         all.onsuccess=function(){
-          (all.result||[]).forEach(function(r){ if(r&&r.id){ if(!r.ids) r.ids=[]; RECORDS[r.id]=r; } });   // v1.1.0: pre-ID records gain the registry
+          (all.result||[]).forEach(function(r){ if(r&&r.id&&(!RECORDS[r.id]||(RECORDS[r.id].mod||0)<=(r.mod||0))){ RECORDS[r.id]=_recNormalize(r); _recLoaded(r); } });
+          _recStatusPaint(); try{ _srRefresh(); }catch(_){}
           // a selection made before the load finished re-renders with its records
           try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
         };
@@ -7979,8 +8220,8 @@ function _shList(kind){ return kind==='bf'?SAVEDB:SAVEDV; }
 function _shFind(kind,id){
   const A=_shList(kind);
   for(let i=0;i<A.length;i++){ if(A[i] && String(A[i].id)===String(id)) return i; }
-  const n=parseInt(id,10);                         // legacy record, id not yet minted
-  return (isFinite(n) && A[n])?n:-1;
+  const n=/^\d+$/.test(String(id))?parseInt(id,10):NaN;   // legacy slot only, never a missing stable ID
+  return (isFinite(n) && A[n] && !A[n].id)?n:-1;
 }
 // a pin is a real guarantee: the cap evicts the oldest UNPINNED record
 function _shTrim(A){
@@ -8029,7 +8270,7 @@ function _shRow(kind,r,P,i){
       +'<button class="rc-cancel" type="button" data-'+P+'rnx="1">Cancel</button>'
       +'<button class="rc-save" type="button" data-'+P+'rngo="'+id+'">Save</button></div></div></div>';
   }
-  const armed=(kind==='bf' && _sbLoadArm===i);
+  const armed=(kind==='bf' && _sbLoadArm===id);
   const rmArm=(_shRmArm===id);
   const isAct=!!(r.id && r.id===(kind==='bf'?GlobeState._sbActive:GlobeState._svActive));
   const sub = (kind==='bf')
@@ -8037,14 +8278,14 @@ function _shRow(kind,r,P,i){
     : ((isAct?'WORKING VIEW · ':'')+_shScope(r)+' · z'+(+r.zoom||0).toFixed(1)+' · '+new Date(r.ts||0).toLocaleDateString());
   return '<div class="rc-row sh-row">'+_shGlyph(kind,r)
     +'<span class="sh-txt">'
-      +'<button class="rc-top sv-go'+(armed?' sb-arm':'')+'" type="button" data-'+P+(kind==='bf'?'load':'go')+'="'+(kind==='bf'?i:id)+'">'
+      +'<button class="rc-top sv-go'+(armed?' sb-arm':'')+'" type="button" data-'+P+(kind==='bf'?'load':'go')+'="'+id+'">'
         +esc(r.n||'')+(armed?' — replace current?':'')+'</button>'
       +'<span class="rc-sub">'+sub+'</span>'
     +'</span>'
     +'<span class="sh-acts">'
       +'<button class="od-ico sh-pn'+(r.pin?' on':'')+'" type="button" data-'+P+'pin="'+id+'" aria-pressed="'+(r.pin?'true':'false')+'" aria-label="'+(r.pin?'Unpin':'Pin')+'">★</button>'
       +'<button class="od-ico sh-rn" type="button" data-'+P+'rn="'+id+'" aria-label="Rename">✎</button>'
-      +'<button class="od-ico rc-dots'+(rmArm?' sb-arm':'')+'" type="button" data-'+P+'rm="'+(kind==='bf'?i:id)+'" aria-label="Delete">'
+      +'<button class="od-ico rc-dots'+(rmArm?' sb-arm':'')+'" type="button" data-'+P+'rm="'+id+'" aria-label="Delete">'
         +(rmArm?'delete?':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>')
       +'</button>'
     +'</span></div>';
@@ -8102,7 +8343,7 @@ function _shOpen(tab){
     _ldTab=(tab==='bf')?'briefs':'views';
     try{ _ledgerPaint(); }catch(_){}
     try{ const l=document.getElementById('ledger');
-      if(l && !l.classList.contains('on')) Repo.open(); }catch(_){}
+      if(!l || !l.classList.contains('on')) Repo.open(); }catch(_){}
     return;
   }
   const host=document.getElementById('dossier'); if(!host) return;
@@ -8271,21 +8512,14 @@ function _lgSiteName(id){
 }
 function _ldCounts(c){
   return '<span class="ld-cts">'
-    +'<span class="ld-ct" title="People">P'+c.people+'</span>'
-    +'<span class="ld-ct" title="Specs">S'+c.specs+'</span>'
+    +'<span class="ld-ct" title="Contacts">P'+c.people+'</span>'
+    +'<span class="ld-ct" title="Technical details">S'+c.specs+'</span>'
     +'<span class="ld-ct" title="Notes">N'+c.notes+'</span>'
     +'<span class="ld-ct" title="Links">L'+c.links+'</span></span>';
 }
 // one saved item, rendered by its kind's own grammar (RC_KINDS fields)
-function _ldItem(kind, it){
-  const esc=_odEsc;
-  let tx='';
-  if(kind==='people')      tx=esc(it.name||'')+(it.role?(' — '+esc(it.role)):'');
-  else if(kind==='specs')  tx=esc(it.label||'')+(it.value?(': '+esc(it.value)):'');
-  else if(kind==='notes')  tx=esc(it.text||'');
-  else                     tx=esc(it.label||it.url||'')+((it.url&&it.label)?(' · '+esc(it.url)):'');
-  const K={people:'P',specs:'S',notes:'N',links:'L'}[kind];
-  return '<div class="ld-it"><span class="ld-itk">'+K+'</span><span class="ld-itx">'+(tx||'—')+'</span></div>';
+function _ldItem(kind,it,id){
+  return _rcCard(id,kind,it).replace('data-rcedit=', 'data-ldsite="'+_odEscA(id)+'" data-ldedit=');
 }
 // ═══ v1.22.0 THE REPOSITORY (owner: "a side panel pop out app wide that
 // consolidates all the ledger, saved info, saved views to keep as a full
@@ -8312,20 +8546,21 @@ function _ledgerHTML(){
   h+=_ldTabs();
   if(_ldTab==='views') return h+'<div class="ld-pane">'+_shPaneShelf('sv','sv')+'</div>';
   if(_ldTab==='briefs') return h+'<div class="ld-pane">'+_shPaneShelf('bf','sb')+'</div>';
-  h+='<div class="ld-sub ld-pad">Everything entered on the map — every ID and the People, Specs, Notes and Links filed under it. Tap an ID to read its items; tap an installation to open it on the map.</div>';
+  h+='<div class="ld-sub ld-pad">Installation records — contacts, notes, links and technical details. Open an ID to read, act or edit in the same record workspace.</div>';
   let any=false;
   Object.keys(RECORDS).sort(function(a,b){ return _lgSiteName(a).localeCompare(_lgSiteName(b)); }).forEach(function(id){
-    const r=RECORDS[id]; if(!r) return;
+    const r=recordOf(id); if(!r) return;
     const tot=recCount(id), ids=(r.ids||[]);
     if(!tot && !ids.length) return;
     any=true;
     h+='<div class="ld-org"><button class="ld-orgbtn" type="button" data-ldgo="'+escA(id)+'">'+esc(_lgSiteName(id))+'</button><span class="ld-tot">'+tot+' item'+(tot===1?'':'s')+'</span></div>';
+    h+=recordSaveStatus(id);
     const KINDS=['people','specs','notes','links'];
     const rowsFor=function(match){                 // match=null → untagged items
       let out='';
       KINDS.forEach(function(kk){ (r[kk]||[]).forEach(function(it){
         const keep=(match==null)?(!it.xid):(it.xid===match);
-        if(keep) out+=_ldItem(kk, it);
+        if(keep) out+=_ldItem(kk, it, id);
       }); });
       return out;
     };
@@ -8333,21 +8568,19 @@ function _ledgerHTML(){
       const c={people:0,specs:0,notes:0,links:0};
       KINDS.forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(it.xid===lb) c[kk]++; }); });
       const key=id+'|'+lb, open=(_ldSel===key);
-      h+='<button type="button" class="ld-idrow'+(open?' on':'')+'" data-ldsel="'+escA(key)+'"><span class="ld-id">'+esc(lb)+'</span>'+_ldCounts(c)+'</button>';
-      if(open) h+='<div class="ld-items">'+(rowsFor(lb)||'<div class="ld-sub">Nothing filed under this ID yet.</div>')+'</div>';
+      h+='<button type="button" class="ld-idrow'+(open?' on':'')+'" data-ldsel="'+escA(key)+'"><span class="ld-id">'+esc(_rcLabel(id,lb))+'</span>'+_ldCounts(c)+'</button>';
+      if(open) h+='<div class="ld-items">'+(rowsFor(lb)||'<div class="ld-sub">Nothing filed under this ID yet.</div>')+'<button class="rc-add" type="button" data-ldadd="'+escA(id)+'" data-ldxid="'+escA(lb)+'">+ Add record</button></div>';
     });
     const un={people:0,specs:0,notes:0,links:0}; let unN=0;
     KINDS.forEach(function(kk){ (r[kk]||[]).forEach(function(it){ if(!it.xid){ un[kk]++; unN++; } }); });
     if(unN){
       const key=id+'|~', open=(_ldSel===key);
       h+='<button type="button" class="ld-idrow'+(open?' on':'')+'" data-ldsel="'+escA(key)+'"><span class="ld-id ld-untag">untagged</span>'+_ldCounts(un)+'</button>';
-      if(open) h+='<div class="ld-items">'+rowsFor(null)+'</div>';
+      if(open) h+='<div class="ld-items">'+rowsFor(null)+'<button class="rc-add" type="button" data-ldadd="'+escA(id)+'" data-ldxid="">+ Add record</button></div>';
     }
   });
-  if(!any) h+='<div class="ld-sub ld-pad">Nothing logged yet. Open an installation on the map and use its ID tab — People, Specs, Notes and Links land here as you tag them.</div>';
-  h+='<div class="ld-sub ld-pad">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
-    ?'Database LIVE — everything above mirrors your other devices.'
-    :'Connect the database (hold the A-ORG-2 mark → Database) to mirror this across devices.')+'</div>';
+  if(!any) h+='<div class="ld-sub ld-pad">Nothing logged yet. Open installation details, choose Records, and add a contact, note, link or technical detail.</div>';
+  h+='<div class="ld-sub ld-pad">Connect the database from the app menu to sync records across devices.</div>';
   return h;
 }
 function _ledgerEl(){
@@ -8355,6 +8588,7 @@ function _ledgerEl(){
   if(!el){
     el=document.createElement('aside');
     el.id='ledger';
+    el.setAttribute('role','dialog'); el.setAttribute('aria-label','Repository');
     el.innerHTML='<div class="ld-scrim" data-ldclose="1"></div><div class="ld-panel glass"></div>';
     document.body.appendChild(el);
     el.addEventListener('click', _ledgerTap);
@@ -8368,16 +8602,23 @@ function _ledgerRender(){
 function _ledgerOpen(){
   const el=_ledgerEl(); _ldSel=null; _ledgerRender();
   try{ requestAnimationFrame(function(){ el.classList.add('on'); }); }catch(_){ el.classList.add('on'); }
+  _repoDoorSync(true);
 }
-function _ledgerClose(){ const el=document.getElementById('ledger'); if(el) el.classList.remove('on'); }
+function _ledgerClose(){ const el=document.getElementById('ledger'); if(el) el.classList.remove('on'); _repoDoorSync(false); }
+function _repoDoorSync(open){
+  try{ const b=document.querySelector('.sp-star'); if(b){ b.setAttribute('aria-expanded',String(open)); b.classList.toggle('on',open); } }catch(_){}
+}
 function _ledgerTap(e){
   const t=e.target; if(!t||!t.closest) return;
   if(t.closest('[data-ldclose]')){ _ledgerClose(); return; }
   const sl=t.closest('[data-ldsel]');
   if(sl){ const k=sl.getAttribute('data-ldsel'); _ldSel=(_ldSel===k)?null:k; _ledgerRender(); return; }
+  const ed=t.closest('[data-ldedit]');
+  if(ed){ _rcOpen(ed.getAttribute('data-ldsite'),ed.getAttribute('data-ldedit')); return; }
+  const ad=t.closest('[data-ldadd]');
+  if(ad){ const id=ad.getAttribute('data-ldadd'); if(_rcOpen(id,null,ad.getAttribute('data-ldxid'))){_rcContext(id).addMenu=true;_rcRefresh();} return; }
   const go=t.closest('[data-ldgo]');
-  if(go){ const id=go.getAttribute('data-ldgo'); _ledgerClose();
-    try{ setMode('map'); if(siteById(id)) selectSite(id); }catch(_){} return; }
+  if(go){ _rcOpen(go.getAttribute('data-ldgo')); return; }
 }
 function _ledgerPaint(){
   try{ const b=document.querySelector('#ledger .ld-panel'); if(b) b.innerHTML=_ledgerHTML(); }catch(_){}
@@ -8386,7 +8627,7 @@ try{ window._ledgerPaint=_ledgerPaint; }catch(_){}
 try{ window.Repo={ open:_ledgerOpen, close:_ledgerClose, html:_ledgerHTML,
   sel:function(k){ _ldSel=k; } }; }catch(_){}       // sel: harness hook — _ldSel is a closure var, unreachable otherwise
 function recBackup(){
-  const out={v:1, app:'A-ORG-2', generated:new Date().toISOString(), records:RECORDS};
+  const out={v:1, app:'A-ORG-2', generated:new Date().toISOString(), records:recAll()};
   _xpDownload('a-org-2-records-'+_xpStamp()+'.json','application/json',JSON.stringify(out,null,1));
 }
 function recRestore(obj){
@@ -8395,13 +8636,13 @@ function recRestore(obj){
   for(const id in obj.records){
     const r=obj.records[id];
     if(!r || r.v!==1 || !Array.isArray(r.people)) continue;
-    RECORDS[id]=r; _recSave(id); n++;
+    const restored=JSON.parse(JSON.stringify(r));restored.id=id;RECORDS[id]=_recNormalize(restored); _recSave(id); n++;
   }
   try{ if(GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
   return n;
 }
 try{ window.Records={ add:recAdd, update:recUpdate, remove:recRemove, of:recordOf, count:recCount, backup:recBackup, restore:recRestore,
-  ids:recIds, addId:recAddId, delId:recDelId, idCount:recIdCount }; }catch(_){}
+  ids:recIds, addId:recAddId, delId:recDelId, idCount:recIdCount, titleId:recTitleId, all:recAll }; }catch(_){}
 
 /* ═══ v1.1.0 THE DATABASE DOOR — the inception concept, finally built.
    Records (People · Specs · Notes · Links · the ID registry) live in the
@@ -8425,6 +8666,7 @@ const _dbClientId=Math.random().toString(36).slice(2)+Date.now().toString(36);
 const DB_TABLE='a2_records';
 function _dbSetState(st, msg){
   _dbState=st; _dbMsg=msg||'';
+  _recStatusPaint();
   try{ const el=document.getElementById('dbStatus');
     if(el){ el.textContent=_dbMsg;
       el.className='db-status '+(st==='live'?'db-live':(st==='error'?'db-error':(st==='connecting'?'db-connecting':'db-off'))); } }catch(_){}
@@ -8507,8 +8749,8 @@ function _dbApply(data){
     if(!r2.ids) r2.ids=[];
     const loc=RECORDS[k];
     if(!loc || (r2.mod||0)>=(loc.mod||0)){       // newest record wins, per record
-      RECORDS[k]=r2; took++;
-      try{ if(_rdb){ const tx=_rdb.transaction('records','readwrite'); tx.objectStore('records').put(r2); } }catch(_){}
+      RECORDS[k]=typeof _recNormalize==='function'?_recNormalize(r2):r2; took++;
+      _recCloudAck({[k]:RECORDS[k]}); _recPersist(RECORDS[k]);
     }
   });
   // v1.12.0 — an incoming WORKING-brief blob (older app versions still send
@@ -8529,6 +8771,7 @@ function _dbApply(data){
     took++;
   }
   if(took){
+    try{ _srRefresh(); }catch(_){}
     try{ const dz=document.getElementById('dossier');
       if(dz && !dz.hidden && dz.dataset.shTab) _shOpen(dz.dataset.shTab);   // v1.19.0: keep the open pane
       else if(dz && !dz.hidden && GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
@@ -8568,6 +8811,7 @@ function _dbChipShow(){
 function dbPush(){
   if(!_db || !_dbCfg) return;                     // not connected: IndexedDB cache only
   _dbDirty=true;
+  _recStatusPaint();
   clearTimeout(_dbPushT);
   _dbPushT=setTimeout(function(){ _dbFlush(); }, 700);
 }
@@ -8575,18 +8819,20 @@ async function _dbFlush(){
   clearTimeout(_dbPushT); _dbPushT=null;
   if(!_db || !_dbCfg || !_dbDirty || _dbPushBusy) return false;
   _dbPushBusy=true; _dbDirty=false;
-  let ok=false;
+  let ok=false, stale=false;
+  const snapshot=JSON.parse(JSON.stringify(_dbSnapshot())), client=_db, board=_dbCfg.board;
   try{
-    const { error }=await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
+    const { error }=await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:snapshot,
       updated_at:new Date().toISOString(), updated_by:_dbClientId });
-    if(error) throw error;
-    ok=true;
+    if(_db!==client || !_dbCfg || _dbCfg.board!==board) stale=true;
+    else { if(error) throw error; _recCloudAck(snapshot.records); ok=true; }
   }catch(e){
-    _dbDirty=true;                                // the work stays queued — the ladder and the next return carry it
-    _dbFailNet=_dbIsNet(e);
-    _dbSetState('error', _dbWhy('Save', e));
+    if(_db!==client || !_dbCfg || _dbCfg.board!==board) stale=true;
+    else { _dbDirty=true;                         // failed work stays queued
+      _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Save', e)); }
   }
   _dbPushBusy=false;
+  if(stale){ if(_dbDirty && _db) dbPush(); return false; }
   if(ok){
     _dbRetryN=0; clearTimeout(_dbRetryT); _dbRetryT=null;
     if(_db) _dbSetState('live','Database live — saved '+new Date().toLocaleTimeString());
@@ -8603,15 +8849,22 @@ function _dbRetryArm(){
 }
 async function dbPullOnce(){
   if(!_db || !_dbCfg) return false;
+  const client=_db, board=_dbCfg.board;
+  const current=function(){ return _db===client && _dbCfg && _dbCfg.board===board; };
   try{
-    const { data, error }=await _db.from(DB_TABLE).select('data,updated_by').eq('id',_dbCfg.board).maybeSingle();
+    const { data, error }=await client.from(DB_TABLE).select('data,updated_by').eq('id',board).maybeSingle();
+    if(!current()) return false;
     if(error){ _dbFailNet=false; _dbSetState('error','Load failed: '+error.message+' — is the '+DB_TABLE+' table created?'); return false; }
     _dbSyncT=Date.now();
     if(data && data.data) return _dbApply(data.data)||{took:0, localNewer:false};
-    await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:_dbSnapshot(),
-      updated_at:new Date().toISOString(), updated_by:_dbClientId });   // first device seeds the board
+    const initial=JSON.parse(JSON.stringify(_dbSnapshot()));
+    const seed=await client.from(DB_TABLE).upsert({ id:board, data:initial,
+      updated_at:new Date().toISOString(), updated_by:_dbClientId });
+    if(!current()) return false;
+    if(seed.error) throw seed.error;
+    _recCloudAck(initial.records);   // first-device seeding must acknowledge errors too
     return {took:0, localNewer:false};
-  }catch(e){ _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Load', e)); return false; }
+  }catch(e){ if(current()){ _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Load', e)); } return false; }
 }
 async function _dbConnectRun(){
   const cfg=_dbCfg;
@@ -8677,7 +8930,8 @@ function _dbAutoBoot(){
 }
 function dbDisconnect(silent){
   try{ if(_dbCh && _db) _db.removeChannel(_dbCh); }catch(_){}
-  _dbCh=null; _db=null;
+  _dbCh=null; _db=null; _recCloud=Object.create(null);
+  _recStatusPaint();
   clearTimeout(_dbPushT); _dbPushT=null; clearTimeout(_dbRetryT); _dbRetryT=null; _dbRetryN=0;
   _dbDirty=false; _dbSubN=0;                      // unsent edits stay in IndexedDB; the next connect's pull+push carries them
   if(!silent) _dbSetState('off','Disconnected — new records stay on this device until you reconnect.');
@@ -8775,7 +9029,7 @@ function _dbSheet(){
    ========================================================================= */
 
 // scope: 'auto' (selection family if selected, else everything visible-eligible)
-function buildSnapshot(scope){
+function buildSnapshot(scope, recordFilter){
   scope=scope||'auto';
   const sel=GlobeState.sel?siteById(GlobeState.sel):null;
   const off=_famOffSet();
@@ -8794,6 +9048,13 @@ function buildSnapshot(scope){
   let img=null;
   try{ const cv=document.getElementById('globeCanvas'); if(cv&&cv.toDataURL) img=cv.toDataURL('image/png'); }catch(_){}
   const cam=(function(){ try{ return {zoom:GlobeState.zoom, yaw:GlobeState.yaw, pitch:GlobeState.pitch}; }catch(_){ return {}; } })();
+  const records=_xpRecordSnapshot(rows,recordFilter), recordNames={}, recordOrgNames={};
+  Object.keys(records).forEach(function(id){
+    const st=siteById(id); recordNames[id]=st?st.base:id;
+    ['people','specs','notes','links'].forEach(function(k){ (records[id][k]||[]).forEach(function(it){
+      if(it.orgId){ const o=orgOf(it.orgId)||orgById(it.orgId); recordOrgNames[it.orgId]=o?o.name:it.orgId; }
+    }); });
+  });
   return {
     meta:{ app:'A-ORG-2', version:(typeof APP_VERSION!=='undefined'?APP_VERSION:''),
            generated:new Date().toISOString(),
@@ -8819,13 +9080,97 @@ function buildSnapshot(scope){
         }) };
     })():null),
       orgs:((typeof ORGS!=='undefined'&&ORGS.length)?JSON.parse(JSON.stringify(ORGS)):null),   // custom subordinates ride too (v0.7.0)
-      records:(function(){                     // the datastore rides every export
-      const out={}; if(typeof recordOf==='function') rows.forEach(function(r){ const rec=recordOf(r.id); if(rec && recCount(r.id)) out[r.id]=rec; });
-      return out; })() },
+      records:records,
+      recordFilter:recordFilter?JSON.parse(JSON.stringify(recordFilter)):null,
+      recordNames:recordNames, recordOrgNames:recordOrgNames },
     image:img,
   };
 }
 try{ window.buildSnapshot=buildSnapshot; window._xpDossierBody=_xpDossierBody; }catch(_){}
+
+// v1.26.0: record export is an explicit choice. Filtering works on copies;
+// a PDF/HTML/JSON export can never edit the live filing context or its data.
+function _xpRecordSnapshot(rows,filter){
+  const out={}; if(filter && filter.none) return out;
+  const ids=filter&&filter.siteId?[filter.siteId]:rows.map(function(r){ return r.id; });
+  ids.forEach(function(id){
+    const src=recordOf(id); if(!src || !recCount(id)) return;
+    const r=JSON.parse(JSON.stringify(src));
+    ['people','specs','notes','links'].forEach(function(k){
+      r[k]=(r[k]||[]).filter(function(it){ return (!filter||!filter.kinds||filter.kinds.indexOf(k)>=0) && (!filter||filter.xid==null||(it.xid||'')===filter.xid); });
+    });
+    if(filter && filter.xid!=null){
+      r.ids=(r.ids||[]).filter(function(x){ return x===filter.xid; });
+      if(r.idMeta){ const meta=Object.create(null); if(Object.prototype.hasOwnProperty.call(r.idMeta,filter.xid)) meta[filter.xid]=r.idMeta[filter.xid]; r.idMeta=meta; }
+    }
+    if(['people','specs','notes','links'].some(function(k){ return r[k].length; })) out[id]=r;
+  });
+  return out;
+}
+function _xpRecordChoices(){
+  const p=document.getElementById('exportSheet'); if(!p) return;
+  let el=document.getElementById('xpRecordOptions');
+  if(!el){ el=document.createElement('details'); el.id='xpRecordOptions'; p.appendChild(el); }
+  const selected=GlobeState.sel;
+  let h='<summary>Record sections for PDF, HTML and JSON</summary><label>Installation<select id="xpRecordSite" class="rc-in">'
+    +'<option value="auto">Records in current scope</option><option value="none">No records</option>';
+  Object.keys(RECORDS).filter(function(id){return recCount(id)>0;}).forEach(function(id){
+    const st=siteById(id); h+='<option value="site:'+_odEscA(id)+'">'+_odEsc(st?st.base:id)+'</option>';
+  });
+  h+='</select></label><label>Tracking ID<select id="xpRecordId" class="rc-in"><option value="all">All IDs</option></select></label>';
+  [['people','Contacts'],['notes','Notes'],['links','Links'],['specs','Technical details']].forEach(function(k){
+    h+='<label class="xp-check"><input type="checkbox" data-xpkind="'+k[0]+'" checked> '+k[1]+'</label>';
+  });
+  el.innerHTML=h;
+  // Do not inherit a stale filter from a previous export or another room.
+  const st=document.getElementById('xpRecordSite'); if(st && selected && recCount(selected)>0) st.value='site:'+selected;
+  _xpRecordIds();
+}
+function _xpRecordIds(){
+  const st=document.getElementById('xpRecordSite'), el=document.getElementById('xpRecordId'); if(!st||!el) return;
+  const id=st.value.indexOf('site:')===0?st.value.slice(5):null, r=id?recordOf(id):null;
+  el.innerHTML='<option value="all">All IDs</option>'+((r&&r.ids)||[]).map(function(x){
+    const m=r.idMeta&&r.idMeta[x], title=m&&(m.title||m.label)||'';
+    return '<option value="id:'+_odEscA(encodeURIComponent(x))+'">'+_odEsc(x+(title?' — '+title:''))+'</option>';
+  }).join('')+'<option value="id:">Unfiled</option>';
+  el.disabled=!id; el.value='all';
+}
+function _xpReadFilter(){
+  const st=document.getElementById('xpRecordSite'); if(!st) return undefined;
+  const el=document.getElementById('xpRecordId'), val=el&&!el.disabled?el.value:'all';
+  return {none:st.value==='none',siteId:st.value.indexOf('site:')===0?st.value.slice(5):null,
+    xid:val.indexOf('id:')===0?decodeURIComponent(val.slice(3)):null,
+    kinds:Array.from(document.querySelectorAll('[data-xpkind]:checked')).map(function(e){ return e.getAttribute('data-xpkind'); })};
+}
+function _xpRecordBody(sn){
+  const esc=_odEsc, ex=sn.extras||{}, recs=ex.records||{}, names=ex.recordNames||{}, orgNames=ex.recordOrgNames||{};
+  let h='';
+  const ids=ex.recordFilter?Object.keys(recs):(sn.selection&&recs[sn.selection.id]?[sn.selection.id]:[]);
+  ids.forEach(function(id){ const R=recs[id];
+    h+='<h2>Records — '+esc(names[id]||id)+'</h2>';
+    const context=function(it){
+      const m=R.idMeta&&R.idMeta[it.xid], title=m&&(m.title||m.label)||'';
+      return '<div class="record-meta">'+esc(it.xid?it.xid+(title?' — '+title:''):'Unfiled')+' · '+esc(it.orgId?(orgNames[it.orgId]||it.orgId):'Installation-wide')+'</div>';
+    };
+    [['people','Contacts'],['notes','Notes'],['links','Links'],['specs','Technical details']].forEach(function(pair){
+      const kind=pair[0], A=R[kind]||[]; if(!A.length) return;
+      h+='<h3>'+pair[1]+' ('+A.length+')</h3>';
+      A.forEach(function(it){
+        let body='';
+        if(kind==='people') body='<b>'+esc(it.name||'')+(it.primary?' · Primary contact':'')+'</b><div>'+esc([it.role,it.org||it.organization].filter(Boolean).join(' · '))+'</div><div>'+esc([it.email,it.phone].filter(Boolean).join(' · '))+'</div>';
+        else if(kind==='notes') body=(it.pinned?'<b>Pinned note</b>':'')+'<div class="record-note">'+esc(it.text||'')+'</div>';
+        else if(kind==='links'){
+          const url=typeof recordURL==='function'?recordURL(it.url||''):'';
+          body='<b>'+esc(it.label||'Link')+'</b><div>'+(url?'<a href="'+_odEscA(url)+'" rel="noopener">'+esc(url)+'</a>':esc(it.url||''))+'</div>';
+        } else body='<b>'+esc(it.label||'')+'</b><div class="record-note">'+esc(it.value||'')+'</div>';
+        const when=it.updated||it.ts||it.created;
+        h+='<section class="record-item">'+body+context(it)+(when?'<div class="record-meta">Updated '+esc(new Date(when).toLocaleString())+'</div>':'')+'</section>';
+      });
+    });
+  });
+  return h;
+}
+try{ window._xpRecordSnapshot=_xpRecordSnapshot; window._xpRecordBody=_xpRecordBody; }catch(_){}
 
 // ---- shared download helper (app context — a real user gesture each time) -----
 function _xpDownload(name, mime, data){
@@ -8897,30 +9242,7 @@ function _xpDossierBody(sn){
       h+='</table>';
     });
   }
-  const recs=(sn.extras&&sn.extras.records)||{};
-  if(sn.selection && recs[sn.selection.id]){
-    const R=recs[sn.selection.id];
-    if(R.people.length){
-      h+='<h2>People ('+R.people.length+')</h2><table><tr><th>Name</th><th>Role</th></tr>';
-      R.people.forEach(function(p){ h+='<tr><td>'+(p.xid?('['+esc(p.xid)+'] '):'')+esc(p.name||'')+'</td><td>'+esc(p.role||'')+'</td></tr>'; });
-      h+='</table>';
-    }
-    if(R.specs.length){
-      h+='<h2>Technical specs ('+R.specs.length+')</h2><table><tr><th>Label</th><th>Value</th></tr>';
-      R.specs.forEach(function(x){ h+='<tr><td>'+(x.xid?('['+esc(x.xid)+'] '):'')+esc(x.label||'')+'</td><td>'+esc(x.value||'')+'</td></tr>'; });
-      h+='</table>';
-    }
-    if(R.notes.length){
-      h+='<h2>Notes ('+R.notes.length+')</h2><table><tr><th>Date</th><th>Note</th></tr>';
-      R.notes.forEach(function(x){ h+='<tr><td>'+esc(x.ts?new Date(x.ts).toLocaleDateString():'')+'</td><td>'+(x.xid?('['+esc(x.xid)+'] '):'')+esc(x.text||'')+'</td></tr>'; });
-      h+='</table>';
-    }
-    if(R.links.length){
-      h+='<h2>Links ('+R.links.length+')</h2><table><tr><th>Label</th><th>URL</th></tr>';
-      R.links.forEach(function(x){ h+='<tr><td>'+(x.xid?('['+esc(x.xid)+'] '):'')+esc(x.label||'')+'</td><td>'+esc(x.url||'')+'</td></tr>'; });
-      h+='</table>';
-    }
-  }
+  h+=_xpRecordBody(sn);
   h+='<h2>All sites in scope</h2><table><tr><th>Base</th><th>Unit</th><th>Loc</th><th>Class</th><th>Reports to</th><th>Records</th></tr>';
   sn.sites.forEach(function(r){
     const rc=(sn.extras&&sn.extras.records&&sn.extras.records[r.id])?(sn.extras.records[r.id].people.length+sn.extras.records[r.id].specs.length+sn.extras.records[r.id].notes.length+sn.extras.records[r.id].links.length):0;
@@ -8936,11 +9258,12 @@ const _XP_CSS='body{font:13px/1.45 -apple-system,system-ui,Segoe UI,sans-serif;c
   +'img.map{width:100%;max-width:680px;border-radius:10px;border:1px solid #C9D4DE;margin:6px 0 4px}'
   +'table{border-collapse:collapse;width:100%;margin:4px 0}th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#53687A}'
   +'th,td{padding:4px 8px;border-bottom:1px solid #E2E9EF;font-size:12px}tr:nth-child(even) td{background:#F5F8FA}'
+  +'.record-item{break-inside:avoid;border-bottom:1px solid #E2E9EF;padding:8px 0}.record-note{white-space:pre-wrap;overflow-wrap:anywhere}.record-meta{font-size:10px;color:#53687A;margin-top:4px}h3{font-size:13px;margin:12px 0 4px}'
   +'@media print{body{margin:8mm}img.map{max-width:100%}}';
 
 // ---- ② PDF — the proven print-popup idiom (system print → Save as PDF) ---------
-function exportPDF(){
-  const sn=buildSnapshot();
+function exportPDF(recordFilter){
+  const sn=buildSnapshot(undefined,recordFilter);
   const w=window.open('','_blank'); if(!w){ try{ _errToast('pop-up blocked — allow pop-ups to export PDF'); }catch(_){} return; }
   w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+_odEsc(sn.meta.title)+'</title>'
     +'<style>'+_XP_CSS+'</style></head><body>'+_xpDossierBody(sn)
@@ -8949,8 +9272,8 @@ function exportPDF(){
 }
 
 // ---- ③ HTML dossier — one self-contained shareable file, data embedded ---------
-function exportHTML(){
-  const sn=buildSnapshot();
+function exportHTML(recordFilter){
+  const sn=buildSnapshot(undefined,recordFilter);
   const doc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     +'<title>'+_odEsc(sn.meta.title)+'</title><style>'+_XP_CSS+'</style></head><body>'
     +_xpDossierBody(sn)
@@ -8960,24 +9283,26 @@ function exportHTML(){
 }
 
 // ---- ④ JSON — the snapshot itself -----------------------------------------------
-function exportJSON(){
-  const sn=buildSnapshot();
+function exportJSON(recordFilter){
+  const sn=buildSnapshot(undefined,recordFilter);
   _xpDownload('a-org-2-'+_xpSlug(sn)+'-'+_xpStamp()+'.json','application/json',JSON.stringify(sn,null,1));
 }
 
 // ---- sheet wiring (same one-delegate idiom) -------------------------------------
 if(!window.__xpWired){ window.__xpWired=true;
+  document.addEventListener('change',function(e){ if(e.target&&e.target.id==='xpRecordSite') _xpRecordIds(); });
   document.addEventListener('click', function(e){
     if(!e.target||!e.target.closest) return;
     if(e.target.closest('#exportBtn') || e.target.closest('[data-xpbtn]')){
-      const p=document.getElementById('exportSheet'); if(p) p.hidden=!p.hidden; return; }
+      const p=document.getElementById('exportSheet'); if(p){ if(p.hidden) _xpRecordChoices(); p.hidden=!p.hidden; } return; }
     const r=e.target.closest('.xp-row');
     if(r){
       const k=r.getAttribute('data-xp');
       const p=document.getElementById('exportSheet'); if(p) p.hidden=true;
       try{
-        if(k==='png') exportPNG(); else if(k==='pdf') exportPDF();
-        else if(k==='html') exportHTML(); else if(k==='json') exportJSON();
+        const filter=_xpReadFilter();
+        if(k==='png') exportPNG(); else if(k==='pdf') exportPDF(filter);
+        else if(k==='html') exportHTML(filter); else if(k==='json') exportJSON(filter);
       }catch(err){ try{ _errToast('export failed: '+err.message); }catch(_){} }
       return; }
     const p=document.getElementById('exportSheet');
@@ -9481,6 +9806,7 @@ function bootShell(){
         +'<button class="am-row" type="button" data-am="repo">Repository — IDs &amp; saved map data</button>'
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
         +'<button class="am-row" type="button" data-am="restore">Restore records</button>'
+        +'<button class="am-row" type="button" data-am="intro" role="checkbox" aria-checked="'+_introSkip()+'">Skip intro · '+(_introSkip()?'On':'Off')+'</button>'
         +'<button class="am-row" type="button" data-am="diag">Diagnostics</button>'
         +'<button class="am-row" type="button" data-am="upd">Check for updates</button>'
         // v1.0.0 — ABOUT: what this is + data provenance, for users who aren't the owner
@@ -9510,6 +9836,10 @@ function bootShell(){
     }
     document.addEventListener('click', function(e){
       if(!e.target||!e.target.closest) return;
+      if(e.target.closest('[data-am="intro"]')){
+        var skip=!_introSkip(); _introSkip(skip); _renderAppMenu();
+        if(_introSkip()!==skip) try{ _bfToast('Preference could not be saved on this device'); }catch(_){}
+        return; }
       var d=e.target.closest('[data-am="diag"]');
       if(d){ try{ window._diagDump&&_diagDump(); }catch(_){} var m=document.getElementById('appMenu'); if(m) m.hidden=true; return; }
       var dbm=e.target.closest('[data-am="db"]');
@@ -9728,12 +10058,15 @@ function _bootPaint(ctx, m){
   }
   ctx.restore();
 }
+function _introSkip(value){
+  try{ if(value!=null) localStorage.setItem('a2SkipIntro',value?'1':'0'); return localStorage.getItem('a2SkipIntro')==='1'; }catch(_){ return false; }
+}
 (function(){
   try{
     var veil=document.getElementById('introVeil');
     if(!veil || !veil.classList || typeof requestAnimationFrame!=='function') return;   // stub DOM (harness) → no intro
     var rm=false; try{ rm=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(_){}
-    if(rm || window.__SANDBOX){ try{ veil.remove(); }catch(_){} return; }
+    if(rm || window.__SANDBOX || _introSkip()){ try{ veil.remove(); }catch(_){} return; }
     var vv=veil.querySelector('.in-ver'); if(vv) vv.textContent=APP_VERSION;
     var mark=veil.querySelector('.in-mark');
     document.body.classList.add('intro');
