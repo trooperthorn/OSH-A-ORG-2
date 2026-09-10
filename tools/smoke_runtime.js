@@ -28,6 +28,13 @@
 const fs=require('fs');
 const path=require('path');
 const ROOT=path.join(__dirname,'..');
+// Run the focused UX regressions in isolated VMs before this harness installs
+// browser stubs. These remain part of the existing five-tool CI gate.
+if(fs.existsSync(path.join(ROOT,'index.html'))){
+  for(const probe of ['ux-navigation-check.js','ux-records-check.js','ux-search-check.js','ux-persistence-check.js']){
+    require('child_process').execFileSync(process.execPath,[path.join(__dirname,probe)],{stdio:'inherit'});
+  }
+}
 
 // ---- target: index.html, else assemble shell + modules (integration order) ----
 const MODULES=['m1-geom.js','m2-render.js','m3-input.js','m4-camera.js','m5-markers.js',
@@ -353,8 +360,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     global._odUI.rec(true);                 // then the detail area opens (v0.8.0)
     global._odSetTab('people');
     const host=IDS['dossier'];
-    if(host.innerHTML.indexOf('Mercer')<0 || host.innerHTML.indexOf('People · 1')<0){ fails++; console.log('✗ RECORDS tab did not render the person'); }
-    else console.log('  ✓ records: add + tab render behind ▤ (People · 1, row present)');
+    if(host.innerHTML.indexOf('Mercer')<0 || host.innerHTML.indexOf('Contacts · 1')<0){ fails++; console.log('✗ RECORDS tab did not render the person'); }
+    else console.log('  ✓ records: add + tab render behind ▤ (Contacts · 1, row present)');
     global._odSetTab('ov');
     global._odUI.rec(false);
     const sn2=global.buildSnapshot();
@@ -363,7 +370,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     else console.log('  ✓ records ride the snapshot (extras.records)');
     if(typeof global._xpDossierBody==='function'){
       const body=global._xpDossierBody(sn2);
-      if(body.indexOf('Mercer')<0 || body.indexOf('Technical specs')<0){ fails++; console.log('✗ EXPORT body missing record sections'); }
+      if(body.indexOf('Mercer')<0 || body.indexOf('Technical details')<0){ fails++; console.log('✗ EXPORT body missing record sections'); }
       else console.log('  ✓ records flow into the export dossier body');
     }
   }catch(e){ fails++; console.log('✗ RECORDS probe: '+e.message); }
@@ -381,11 +388,11 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     // items tag with xid; counts see them; deleting an ID untags, never deletes
     global.Records.add('fort-bragg','notes',{text:'Tagged note', xid:'TF-EAGLE'});
     if(global.Records.idCount('fort-bragg','TF-EAGLE')!==1){ ok=false; fails++; console.log('✗ ID: idCount missed the tagged note'); }
-    // the ID tab renders between Overview and People, pane + form select present
+    // Two top-level tabs; tracking-ID settings and filters live inside Records.
     global.showDossier('fort-bragg'); global._odUI.rec(true); global._odSetTab('xid');
     const dzh=IDS['dossier'].innerHTML;
-    const iTab=dzh.indexOf('data-odtab="xid"'), iPpl=dzh.indexOf('data-odtab="people"'), iOv=dzh.indexOf('data-odtab="ov"');
-    if(!(iOv>=0 && iTab>iOv && iPpl>iTab)){ ok=false; fails++; console.log('✗ ID tab not between Overview and People'); }
+    const iTab=dzh.indexOf('data-odtab="records"'), iPpl=dzh.indexOf('data-rcfilter="people"'), iOv=dzh.indexOf('data-odtab="ov"');
+    if(!(iOv>=0 && iTab>iOv && iPpl>iTab) || dzh.indexOf('data-odtab="xid"')>=0){ ok=false; fails++; console.log('✗ Records workspace must nest ID context and filters under Overview/Records navigation'); }
     if(dzh.indexOf('rcIdNew')<0 || dzh.indexOf('TF-EAGLE')<0){ ok=false; fails++; console.log('✗ ID pane missing add row / IDs'); }
     global._odSetTab('people'); global._odUI.form('people'); global.showDossier('fort-bragg');
     const dzf=IDS['dossier'].innerHTML;
@@ -981,8 +988,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // the doors are integrated, not side buttons
       // v1.21.0: the layers are embedded IN the globe button — tap pops the
       // selections out around it, a three-second hold saves the view.
-      if(html.indexOf('id="lyPanel"')<0 || html.indexOf('class="sp-star"')<0){
-        ok=false; fails++; console.log('✗ the layer checkbox list or the repository star is missing'); }
+      // The owner approved the assessment's named folder entrance: preserve its
+      // existing door contract while replacing the ambiguous saved-view star.
+      if(html.indexOf('id="lyPanel"')<0 || !/class="sp-star"[^>]*aria-controls="ledger"[^>]*aria-label="Saved — Repository:/.test(html)){
+        ok=false; fails++; console.log('✗ the layer checkbox list or named Repository door is missing'); }
       if(html.indexOf('.ly-sat{')>=0){ ok=false; fails++; console.log('✗ the orbiting layer circles are back (retired v1.22.0 — checkboxes now)'); }
       if(html.indexOf('data-lyfam=')<0 || html.indexOf('ly-bx')<0){
         ok=false; fails++; console.log('✗ the layer list is not checkboxes'); }
