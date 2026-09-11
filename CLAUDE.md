@@ -1855,3 +1855,32 @@ It lives here now.
   gate. Node checks cover source geometry and behavior with DOM/storage stubs;
   they do not certify real touch hit testing, iPhone keyboard layout, print layout,
   or live two-device sync. See docs/UX-ENHANCEMENTS.md for the remaining browser gate.
+
+## v1.27.0 — the Brief workspace (owner: progressive detail on desktop and iOS)
+- The owner's request supersedes the old minimized-on-entry chart, 30% whole-tree
+  fit, tiny abbreviated chips and hold-only stacking controls. Brief now opens
+  expanded, with bounded readable cards and one native scroll surface. Map code
+  and the Army datasets retain their existing behavior and contents.
+- Auto shows 1/2/3/4 levels from the focused branch at 85/95/135/175% zoom.
+  Location and context indicators appear from 135%; full notes/assets/editing stay
+  in the shared object sheet. Manual 1–4 levels are relative to focus. Actual stored
+  tiers still determine colors and stacking. No automatic membership expansion.
+- Focus prunes unrelated chart branches; Overview, Back, and a native branch
+  selector preserve navigation, including levels deeper than L4. Counts include
+  hidden descendants. Zoom keeps the same world point under the pointer/viewport.
+- Add item works at the root or under a parent, with Organizations, States, RSN,
+  ECCSP categories and persistent batch selection across filters. All 12 existing
+  BF_PLACES presets remain anchored to their original sites. One global search
+  finds them in Brief; Map results remain separate. Renaming keeps preset types.
+- A successful batch reveals its destination at default Auto scale. The existing
+  object sheet adds collapsed Location context from the saved node/preset only;
+  never invent contact or operational data. Brief forms use the keyboard viewport
+  helper; user-entered values, storage shapes and snapshot exports remain intact.
+- Unscaled 44px controls, native touch scrolling, pinch/modifier-wheel zoom,
+  background mouse panning, keyboard navigation, explicit Layout and full screen.
+  Full screen yields to editing/export sheets and exits when global search opens.
+- The five-tool gate includes brief-scale-check.js and brief-support-check.js.
+  These execute shipped functions with controlled DOM/storage geometry, not real
+  browser rendering. The cloud browser URL policy blocked the local preview;
+  desktop/iOS rendering and touch/keyboard checks remain the manual release gate
+  in docs/BRIEF-UX-v1.27.md. Submit as a draft until that gate is reviewed.
