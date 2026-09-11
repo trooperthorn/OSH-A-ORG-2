@@ -738,10 +738,6 @@ body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
    head is CHART-SCOPED only — the file tools moved to the bottom brief dock. */
 .ch-mk{flex:none; font-size:13px; color:var(--dim); padding:0 2px}
 .ch-n{flex:none; font:700 9px/1 var(--mono); letter-spacing:.1em; color:var(--faint)}
-.ch-hint{flex:none; font:700 6.5px/1.4 var(--mono); letter-spacing:.08em; color:#6E6650;
-  display:none; text-transform:uppercase}
-@media(min-width:1100px){ .ch-hint{display:inline-block} }
-body.chart-min .ch-head .bf-seg, body.chart-min .bf-clearfoc, body.chart-min .ch-hint{display:none}
 /* v1.5.1 — brief-only view toggles: ON = accent; OFF = dimmed hollow. */
 .ch-head .bf-vw{color:var(--accent)}
 /* v1.12.1 THE DOCK MATERIAL · v1.15.0 (design 2b): the dock is its own bottom
@@ -845,29 +841,26 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
    pitch), every box lit from within — tier-tint fill, glowing tier-color
    ring, pale tier text — and one SVG net carries echelon hairlines, rounded-
    elbow connectors, the focused chain's glow pass and its junction beads. */
-.bf-wrap{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  max-height:52vh; padding:4px 2px 8px}
-.bf-tree{position:relative; margin:0 auto}
-.bf-net{position:absolute; inset:0; pointer-events:none}
-.bf-elbl{position:absolute; font:700 8px/1 var(--mono); letter-spacing:.14em;
-  color:#6E6650; pointer-events:none; -webkit-user-select:none; user-select:none}
+.bf-wrap{overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  flex:1;min-height:100px;padding:8px 2px 12px;touch-action:pan-x pan-y;scrollbar-color:#685734 #100d08}
+.bf-tree{position:relative;margin:0 auto}
+.bf-net{position:absolute;inset:0;pointer-events:none}
+.bf-elbl{position:absolute;font:700 10px/1 var(--mono);color:#978769;pointer-events:none;user-select:none}
 .bf-elbl.lit{color:var(--accent)}
-.bf-vseg{align-items:center}
-.bf-vlab{font:700 8px/1 var(--mono); letter-spacing:.14em; color:var(--faint); padding:0 5px 0 8px}
-.bf-box{position:absolute; transform:translateX(-50%); cursor:pointer; -webkit-tap-highlight-color:transparent;
-  height:22px; box-sizing:border-box; padding:0 10px; border-radius:7px; white-space:nowrap;
-  display:inline-flex; align-items:center; justify-content:center;
-  background:var(--bfbg,rgba(255,255,255,.12)); color:var(--bftx,#FFFFFF);
-  box-shadow:0 0 0 1.4px var(--bfrg,#FFFFFF), 0 0 9px var(--bfgl,rgba(255,255,255,.3));
-  transition:transform .22s cubic-bezier(.32,1.4,.45,1), box-shadow .22s ease, opacity .18s ease;
-  will-change:transform}
-@media(min-width:1100px){ .bf-box{height:24px; padding:0 12px;
-  box-shadow:0 0 0 1.5px var(--bfrg,#FFFFFF), 0 0 10px var(--bfgl,rgba(255,255,255,.3))} }
-.bf-box:active{transform:translateX(-50%) scale(.96)}
-/* v1.10.0 — a box that just joined the diagram springs in (FLIP enter state) */
-.bf-box.bf-enter{opacity:0; transform:translateX(-50%) scale(.85)}
-.bf-nm{font:900 9px/1 var(--body); letter-spacing:.01em}
-@media(min-width:1100px){ .bf-nm{font-size:10px} }
+.bf-vseg{align-items:center;flex-wrap:wrap}
+.bf-vlab{font:700 10px/1 var(--mono);color:var(--dim);padding:0 5px}
+.bf-box{position:absolute;transform:translateX(-50%);appearance:none;border:0;cursor:pointer;
+  box-sizing:border-box;padding:12px 14px;border-radius:12px;white-space:normal;text-align:left;
+  display:flex;flex-direction:column;justify-content:center;gap:5px;overflow:hidden;
+  background:color-mix(in srgb,var(--bfrg,#FFFFFF) 9%,#100e09);color:var(--bftx,#FFFFFF);
+  box-shadow:0 0 0 1px var(--bfrg,#FFFFFF),0 3px 9px rgba(0,0,0,.28);
+  transition:transform .22s cubic-bezier(.32,1.4,.45,1),box-shadow .22s ease,opacity .18s ease}
+.bf-box:active{transform:translateX(-50%) scale(.98)}
+.bf-box.bf-enter{opacity:0;transform:translateX(-50%) scale(.92)}
+.bf-nm{font:800 14px/1.3 var(--body);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;flex-shrink:0}
+.bf-meta{font:600 10px/1.2 var(--mono);opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;flex-shrink:0}
+.bf-location{font:500 12px/1.25 var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;flex-shrink:0}
+@media(min-width:1100px){.bf-nm{font-size:15px}.bf-box:hover{box-shadow:0 0 0 2px var(--bfrg,#FFFFFF),0 4px 14px rgba(0,0,0,.4)}}
 /* tier light (design 5a): ring = tier color · fill = 13% tint · text = pale tint */
 .bf-t1{--bfrg:#FFFFFF; --bfbg:rgba(255,255,255,.12); --bftx:#FFFFFF; --bfgl:rgba(255,255,255,.3)}
 .bf-t2{--bfrg:#6FC7E8; --bfbg:rgba(111,199,232,.13); --bftx:#BFE9FA; --bfgl:rgba(111,199,232,.3)}
@@ -881,37 +874,11 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
    The v1.9.1 law stands: dashed reads as edit-mode chrome; never again.) */
 .bf-box.bf-grp{box-shadow:0 0 9px var(--bfgl,rgba(255,255,255,.3)); border:1.4px solid var(--bfrg,#FFFFFF)}
 /* the fold caret sits under its box and carries the hidden count */
-/* v0.26.0 — the per-object ops: ＋ add subordinates · ✎ edit. Small and quiet so
-   the box stays minimal, but always reachable without opening anything first. */
-/* v1.11.0 (owner: "the + and pencil take up so much space — leave them off,
-   appear on hover"): the ops are an OVERLAY now — boxes stay compact, and on
-   a hover-capable screen the chips fade in over the box's lower half while
-   the station line steps back. Touch flows lose nothing: tapping the box
-   opens its sheet, which leads with the same two actions. */
-.bf-ops{display:flex; gap:8px; align-items:center; justify-content:center;
-  position:absolute; inset:0; margin:0;
-  opacity:0; pointer-events:none; transition:opacity .16s ease}
-@media(hover:hover){
-  .bf-box:hover .bf-ops{opacity:1; pointer-events:auto}
-  .bf-box:hover .bf-nm{opacity:.14}
-}
-.bf-nm{transition:opacity .16s ease}
-.bf-op{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0; padding:0;
-  width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
-  background:color-mix(in srgb, var(--bftx,#FFFFFF) 14%, transparent); color:var(--bftx,#FFFFFF);
-  font:700 12px/1 var(--body);
-  transition:transform .16s cubic-bezier(.34,1.56,.64,1), background .16s ease}
-.bf-op:active{transform:scale(.86); background:color-mix(in srgb, var(--bftx,#FFFFFF) 24%, transparent)}
-@media(hover:hover){ .bf-op:hover{background:color-mix(in srgb, var(--bftx,#FFFFFF) 22%, transparent)} }
-@media(hover:hover){ .bf-box.bf-dim:hover .bf-ops{opacity:.5} }   /* dimmed boxes cap their ops — and only under a pointer */
 /* the fold caret hangs just under its box on the plot */
-.bf-caret{appearance:none;-webkit-appearance:none; border:0; cursor:pointer; margin:0;
-  position:absolute; transform:translateX(-50%); z-index:2;
-  padding:1px 7px; border-radius:999px; background:#141006; color:var(--dim);
-  box-shadow:0 0 0 1px var(--line); font:800 8px/1.4 var(--mono); letter-spacing:.04em;
-  transition:transform .16s cubic-bezier(.34,1.56,.64,1), color .16s ease, box-shadow .16s ease}
-.bf-caret:active{transform:translateX(-50%) scale(.9)}
-.bf-caret.on{color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+.bf-caret{appearance:none;border:1px solid var(--line);cursor:pointer;position:absolute;transform:translateX(-50%);z-index:2;
+  min-width:80px;min-height:52px;padding:7px 12px;border-radius:12px;background:#141006;color:var(--dim);font:700 12px/1 var(--body)}
+.bf-caret:active{transform:translateX(-50%) scale(.96)}
+.bf-caret.on{color:var(--accent);border-color:var(--accent)}
 /* v1.9.1 micro-motion — every chart control answers the finger (iOS grammar) */
 .bf-dep,.bf-zb,.bf-zpct{transition:transform .15s cubic-bezier(.34,1.56,.64,1), background .15s ease, color .15s ease}
 .bf-dep:active,.bf-zb:active,.bf-zpct:active{transform:scale(.9)}
@@ -930,11 +897,12 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
 .bf-pickck{flex:none; width:19px; height:19px; border-radius:6px; display:flex; align-items:center;
   justify-content:center; box-shadow:inset 0 0 0 1.4px var(--line); color:var(--accent); font:800 12px/1 var(--body)}
 .bf-pickrow.on .bf-pickck{box-shadow:inset 0 0 0 1.4px var(--accent)}
-.bf-picknm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  font:700 12.5px/1.25 var(--body); color:var(--text)}
-.bf-picksub{flex:none; max-width:38%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  font:500 10px/1.2 var(--body); color:var(--dim)}
-#dossier .bf-picklist{max-height:46vh}
+.bf-picktext{flex:1; min-width:0}
+.bf-picknm{display:block; overflow-wrap:anywhere; font:700 13px/1.35 var(--body); color:var(--text)}
+.bf-picksub{display:block; margin-top:3px; font:500 11px/1.3 var(--body); color:var(--dim)}
+.bf-picklabel{display:block; margin-top:12px; font:600 12px/1.3 var(--body); color:var(--dim)}
+#dossier .bf-picklist{max-height:none; overflow:visible}
+#bfPickQ,#bfPickKind{font-size:16px; min-height:44px}
 /* v1.0.4 — sticky is the PICKER's contract only (its commit button must stay
    reachable over a long list). On every other sheet the acts row flows with
    the content: a sticky, see-through row over sheet text read as a second
@@ -981,9 +949,6 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
 .bf-seg .bf-zpct{min-width:46px; text-align:center}
 .bf-seg .bf-zb{font-size:12px; color:var(--accent); padding:5px 8px}
 .bf-seg .bf-vlab{color:rgba(242,228,188,.5)}
-.bf-clearfoc{appearance:none;-webkit-appearance:none; border:0; cursor:pointer;
-  padding:6px 10px; border-radius:999px; background:#141006; box-shadow:0 1px 2px rgba(20,14,4,.28);
-  color:var(--accent); font:700 9.5px/1 var(--mono); letter-spacing:.04em}
 /* v1.13.0 — the hold-a-level STACK popover */
 #bfStackPop{position:absolute; z-index:6}
 #bfStackPop .bf-sp{appearance:none;-webkit-appearance:none; border:0; cursor:pointer;
@@ -991,6 +956,39 @@ body.gesturing #bfLeader, body.gesturing #briefDock{opacity:.22; transition:opac
   padding:10px 14px; border-radius:999px;
   box-shadow:0 6px 18px rgba(20,14,4,.4), 0 0 0 1px rgba(242,228,188,.22)}
 #bfStackPop .bf-sp.on{background:var(--accent); color:#141006}
+/* v1.27.0: a bounded work surface; one scrolling diagram and unscaled controls. */
+body.brief-mode #briefStage{display:flex;flex-direction:column;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 240px);
+  overflow:hidden;background:rgba(10,8,5,.94);border:1px solid var(--line);padding:8px;border-radius:16px}
+body.brief-mode.chart-min #briefStage{height:auto;display:block;background:none;border:0}
+.ch-head{flex:none;cursor:default;gap:6px;letter-spacing:0;margin:0 0 8px}
+.bf-headtoggle,.bf-command,.bf-primary,.bf-crumb,.bf-jump{appearance:none;border:1px solid var(--line);border-radius:10px;min-height:44px;padding:8px 11px;
+  background:#171209;color:var(--text);font:700 12px/1.25 var(--body);cursor:pointer}
+.bf-headtoggle{display:flex;align-items:center;gap:7px;border:0;background:none;padding:6px;min-width:44px;flex:1;text-align:left}
+.bf-headtoggle .ch-n{display:none}
+.bf-primary{background:var(--accent);border-color:var(--accent);color:#141006}
+.bf-context{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;flex:none;align-items:center}
+.bf-jump{flex:1;min-width:0;width:130px;font-size:16px}
+.bf-crumb{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--accent)}
+.bf-controls{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;flex:none;flex-wrap:wrap}
+.bf-layout{position:relative;flex:none;margin-left:auto}
+.bf-layout>summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;padding:0 11px;font:700 12px/1 var(--body);color:var(--text)}
+.bf-layout>summary::after{content:' ▾';margin-left:5px}
+.bf-layoutpanel{position:absolute;right:0;top:100%;z-index:8;box-sizing:border-box;width:min(248px,calc(100vw - var(--gut) - 32px));padding:10px;border:1px solid var(--line);border-radius:12px;background:#141006;box-shadow:var(--drop)}
+#briefStage .bf-seg{padding:0;gap:1px;border-radius:10px}
+#briefStage .bf-dep,#briefStage .bf-zb,#briefStage .bf-zpct{min-width:44px;min-height:44px;padding:6px;font-size:12px}
+#briefStage .bf-zpct{min-width:58px}
+#briefStage .bf-foot{flex:none;align-items:center;justify-content:space-between;padding-top:6px;gap:6px}
+#briefStage .bf-foot .bf-act{min-height:44px;font-size:12px}
+.bf-guide{font:500 11px/1.4 var(--body);color:var(--dim)}
+.bf-layoutpanel .bf-guide{display:block;margin:10px 0 4px}
+.bf-layoutpanel .bf-vseg{display:flex;flex-wrap:wrap}
+body.chart-min .ch-head>:not(.bf-headtoggle){display:none}
+#briefStage :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(min-width:1100px){body.brief-mode #briefStage{left:18px;right:var(--gut);width:auto;margin:0;max-height:none;padding:12px 16px}
+  .bf-context{flex-wrap:nowrap}.bf-jump{flex:0 1 330px}.bf-guide{font-size:12px}.bf-headtoggle .ch-n{display:inline}}
+body.brief-mode.brief-wide:not(.chart-min) #briefStage{position:fixed;inset:calc(env(safe-area-inset-top,0px) + 8px) 8px calc(env(safe-area-inset-bottom,0px) + 8px);height:auto;max-height:none;width:auto;z-index:49}
+body.brief-mode.brief-wide #dossier,body.brief-mode.brief-wide #exportSheet{z-index:52}
+@media(max-height:600px){body.brief-mode #briefStage{overflow-y:auto}.bf-wrap{flex:none;height:220px}}
 /* v0.13.0 THE HAND-BUILT BRIEF: echelon depth control · per-HQ group eyes */
 .bf-depth{display:flex; gap:4px; padding:5px 0 7px}
 .bf-dep{appearance:none; -webkit-appearance:none; border:0; cursor:pointer; margin:0;
@@ -1690,6 +1688,10 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.27.0 • THE BRIEF WORKSPACE: RSN/ECCSP categories and location details;
+//            readable cards, branch navigation, progressive zoom depth,
+//            native touch scrolling, accessible layout and full screen.
+//            Detail sheets preserve notes, assets and edits on demand.
 //   v1.26.0 • THE RECORD WORKSPACE: independent touch targets, clearer Saved
 //            and Map/Brief controls, scrollable Layers; Overview/Records with
 //            one tracking-ID context, structured contacts, multiline notes,
@@ -1794,8 +1796,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.21.0) remain in git log and CLAUDE.md.
 //   v1.25.1 retention: the current repository/pod era begins at v1.22.0.
 
-const APP_VERSION = 'v1.26.0';
-const APP_UPDATED = '10 September 2026';
+const APP_VERSION = 'v1.27.0';
+const APP_UPDATED = '11 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
 // on every controller change). If the worker is NEWER than this page, the
@@ -3624,6 +3626,7 @@ function _bfFanShort(lbls){
 // against the gold basemap and the black globe, and against each other.
 const BF_STAR={rsn:'#6FE3FF', eccsp:'#FF7BD9'};
 function _bfStarKind(n){
+  const stable=n&&n.kind==='custom'&&/^px:.*-(rsn|eccsp)$/.exec(n.id||'');if(stable)return stable[1];
   if(!n || (n.kind||n.t)!=='custom') return null;
   const s=String(n.name||n.n||'');
   if(/\sRSN$/.test(s)) return 'rsn';
@@ -3649,9 +3652,10 @@ function _briefChainMap(opts){
   if(typeof BRIEF==='undefined' || !BRIEF.nodes || !BRIEF.nodes.length) return out;
   const all=!!(opts&&opts.all);
   const hid=new Set(BRIEF.hide||[]);
-  const depth=all?4:(GlobeState._bfDepth||4);
+  let depth=all?4:_bfSceneDepth();
   const byK={}; BRIEF.nodes.forEach(function(n){ byK[n.k]=n; });
   const lvlOf=function(k){ let l=1,c=byK[k]?byK[k].p:null,g=0; while(c!=null&&byK[c]&&++g<60){ l++; c=byK[c].p; } return l; };
+  if(!all&&byK[GlobeState._bfFocus])depth+=lvlOf(GlobeState._bfFocus)-1;
   const rootOf=function(k){ let c=k,g=0; while(byK[c]&&byK[c].p!=null&&byK[byK[c].p]&&++g<60){ c=byK[c].p; } return c; };
   const tierN={1:0,2:0,3:0,4:0};
   BRIEF.nodes.forEach(function(nd){
@@ -4594,6 +4598,17 @@ function _srUserEntries(){
   return out;
 }
 
+// Brief presets join the live results only in their own room. Never cache them
+// in the Map index: a retained query must reflect a room switch immediately.
+function _srBriefEntries(){
+  if(!document.body.classList.contains('brief-mode') || typeof BF_PLACES==='undefined') return [];
+  return BF_PLACES.map(function(p){
+    const hs=siteById(p.site), sub=hs?hs.base:'';
+    return {id:p.k,base:p.n,sub:sub+' · Brief location',kind:p.k.endsWith('-eccsp')?'eccsp':'rsn',
+      baseF:_srFold(p.n),unitF:'',stF:'',allF:_srFold(p.n+' '+sub)};
+  });
+}
+
 // ---- Results (PORT of sfsResults + _usRun's v22.3.1 ranking; deviations 2-3) ---
 // Returns {list:[entry,entry], total:N, q:foldedQuery}. list is the TOP TWO.
 function sfsResults(q){
@@ -4604,7 +4619,7 @@ function sfsResults(q){
   // matches beat unit matches; shorter names win ties.
   const tk=new RegExp('(^|[\\s(\\-\\/])'+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
   const hits=[];
-  for(const e of _searchEntries().concat(_srUserEntries())){
+  for(const e of _searchEntries().concat(_srUserEntries(),_srBriefEntries())){
     let s2=0;
     if(e.fieldsF){
       // An exact tracking code, contact address or saved title is deliberate;
@@ -4711,6 +4726,17 @@ function searchSelect(id){
     }
     return;
   }
+  if(String(id).slice(0,3)==='px:'){
+    if(!document.body.classList.contains('brief-mode')) return;
+    const p=bfPlaceOf(id); if(!p) return;
+    if(!bfNode(id)){
+      if(!bfAddMany([id],_bfTakeParent(null))) return;
+      _bfToast(p.n+' added to the brief');
+    }
+    if(typeof _bfExplore==='function') _bfExplore(id);
+    _bfObjSheet(id);
+    return;
+  }
   _lyEnsure(id);   // v1.19.0: never hand back a result the layers then hide
   // v0.24.0 — a US STATE pick. In the brief room it becomes a highlighted node;
   // on the map it is only a place to look at (the rooms never cross-write).
@@ -4776,6 +4802,10 @@ function searchSelect(id){
 if(!window.__coSearchFold){ window.__coSearchFold=true;
   document.addEventListener('focusin', function(e){
     if(!e.target || e.target.id!=='searchInput') return;
+    if(document.body.classList.contains('brief-wide')){
+      document.body.classList.remove('brief-wide');
+      if(document.body.classList.contains('brief-mode')) renderBrief();
+    }
     _srRefresh();                              // a retained query reflects edits made since it lost focus
     if(document.body.classList.contains('brief-mode')) return;
     try{ if(_coId!=null) calloutHide(); }catch(_){}
@@ -5208,12 +5238,13 @@ function setMode(m){
   try{ lyRing(false); }catch(_){}     // v1.21.0: the pop-outs never cross rooms
 
   const brief=(m==='brief');
+  document.body.classList.remove('brief-wide');
   document.body.classList.toggle('brief-mode', brief);
   try{ document.querySelectorAll('#modeSeg [data-mode]').forEach(function(b){ b.setAttribute('aria-pressed', String((b.getAttribute('data-mode')==='brief')===brief)); }); }catch(_){}
   try{ lySync(); }catch(_){}          // v1.21.0: the globe's label follows the room
-  // the globe picture is the hero (owner law): the chart supplement arrives
-  // MINIMIZED every time brief opens — one tap on ⌗ CHART expands it
-  if(brief) document.body.classList.add('chart-min');
+  // v1.27.0: the working brief opens expanded at readable scale.
+  if(brief) document.body.classList.remove('chart-min');
+  try{ GlobeState.__bfC=null; GlobeState._bfFocus=null; }catch(_){}
   if(brief) renderBrief();
   // v1.15.0 (design 2b): the search pill speaks the room's language, the brief
   // dock mirrors the view flags, and the leader clears when the room changes.
@@ -5227,7 +5258,6 @@ function setMode(m){
     // tapped (chain dot or chart chip); map restores the selection card.
     if(host){ if(brief){ hideDossier(); } else if(GlobeState.sel) showDossier(GlobeState.sel); else hideDossier(); }
   }catch(_){}
-  try{ GlobeState.__bfC=null; GlobeState._bfFocus=null; }catch(_){}
   try{ calloutHide(); }catch(_){}
   try{ if(typeof globeMark==='function') globeMark(); }catch(_){}
 }
@@ -5242,7 +5272,7 @@ try{ window.setMode=setMode; }catch(_){}
 // v0.7.0: the CHART CARD — the tree SUPPLEMENTS the globe picture. Compact chips
 // only (owner law: minimal on the object, everything in the popup); minimize (⌗)
 // collapses the card to its tab. Chips open the object popup.
-function renderBrief(){
+function renderBrief(view){
   // v1.15.0 — THE ILLUMINATED CONSOLE (design 5a). The ul/li rail tree and the
   // 124×48 matte card are RETIRED: the chart is one absolutely-positioned plot.
   // Boxes hug their content on a fixed grid (48px level pitch desktop / 40
@@ -5252,53 +5282,46 @@ function renderBrief(){
   // data-* contract (bfobj/bfaddkids/bfedit/bffold/bfdepth/bfzoom/chmin/
   // bffocusclear/bfsearch/bfgrpnew) is unchanged.
   const el=document.getElementById('briefStage'); if(!el) return;
+  view=view||_bfViewCapture();
   const _flip=_bfFlipCapture(el);                  // v1.10.0 FLUID CHART: remember where every box IS
   const esc=_odEsc, escA=_odEscA;
   const memN=(BRIEF.nodes||[]).length;
-  // v1.13.0 (owner: "create a lot of space — drop the crossed-out text, move
-  // the controls up"): the chart/orgs title text is GONE; the chain map and
-  // view state compute FIRST so the L1-L4 and ZOOM tracks live IN the head
-  // row, dark like the dock. STACK's track is gone too — hold a level cell
-  // for the stack popover (_bfStackPop).
-  let C=null, dep=4, hid=null, fold=null, foc=null, branch=null, lineage={}, zpc='Fit', _deep=false;
+  // Keep layout state relative to the selected branch; stored tiers stay intact.
+  let C=memN?_briefChainMap({all:true}):{nodes:{},order:[]};
+  const fold=GlobeState._bfFold||(GlobeState._bfFold={});
+  const foc=C.nodes[GlobeState._bfFocus]?GlobeState._bfFocus:null;
+  if(!foc) GlobeState._bfFocus=null;
+  const startLevel=foc?C.nodes[foc].lvl:1;
+  const levels=_bfSceneDepth(), dep=startLevel+levels-1;
+  const branch=foc?new Set():null, lineage={};
+  const children=Object.create(null);
+  C.order.forEach(function(k){const p=C.nodes[k].parent;(children[p]||(children[p]=[])).push(k);});
+  if(foc){ const q=[foc];while(q.length){const k=q.pop();branch.add(k);(children[k]||[]).forEach(function(c){q.push(c);});} }
+  const crumbs=[];let ancestor=foc&&C.nodes[foc].parent;
+  while(ancestor&&C.nodes[ancestor]&&crumbs.length<60){crumbs.unshift(ancestor);ancestor=C.nodes[ancestor].parent;}
+  const z=GlobeState._bfZoom||1, detail=z>=1.35;
+  let h='<div class="ch-head"><button type="button" class="bf-headtoggle" data-chmin="1" aria-label="Minimize or expand Brief" aria-expanded="'+!document.body.classList.contains('chart-min')+'"><span class="ch-mk">⌗</span><span class="ch-n">Brief · '+memN+' items</span></button>'
+    +'<button type="button" class="bf-primary" data-bfaddkids="">+ Add item</button>'
+    +'<button type="button" class="bf-command" data-bfshelf="1">Save / open</button></div>';
   if(memN){
-    C=_briefChainMap({all:true});
-    dep=GlobeState._bfDepth||4;
-    hid=new Set(BRIEF.hide||[]);
-    fold=GlobeState._bfFold||(GlobeState._bfFold={});
-    foc=(GlobeState._bfFocus && C.nodes[GlobeState._bfFocus])?GlobeState._bfFocus:null;
-    if(GlobeState._bfFocus && !foc) GlobeState._bfFocus=null;
-    if(foc){
-      branch=new Set(); let c=foc,g=0;
-      while(c!=null && g++<60){ branch.add(c); const pn=C.nodes[c]; c=pn?pn.parent:null; if(c) lineage[c]=1; }
-      const q=[foc]; while(q.length){ const cur=q.shift(); C.order.forEach(function(k){ if(C.nodes[k].parent===cur && !branch.has(k)){ branch.add(k); q.push(k); } }); }
-    }
-    zpc=GlobeState._bfZoom?(Math.round(GlobeState._bfZoom*100)+'%'):'Fit';
-    _deep=C.order.some(function(k){ return C.nodes[k].lvl>1; });   // v0.29.0 audit #24
+    h+='<div class="bf-context"><button type="button" class="bf-command" data-bffocusclear="1">Overview</button>'
+      +crumbs.slice(-1).map(function(k){return '<button type="button" class="bf-crumb" data-bfbranch="'+escA(k)+'" aria-label="Back to '+escA(C.nodes[k].name)+'" title="'+escA(C.nodes[k].name)+'">Back</button>';}).join('')
+      +'<select class="bf-jump" aria-label="Jump to a branch" data-bfjump="1"><option value="">All roots</option>'
+      +C.order.map(function(k){return '<option value="'+escA(k)+'"'+(k===foc?' selected':'')+'>L'+C.nodes[k].lvl+' · '+esc(C.nodes[k].name)+'</option>';}).join('')+'</select>'
+      +'</div>';
+    h+='<div class="bf-controls"><span class="bf-seg bf-zseg"><span class="bf-vlab">ZOOM</span>'
+      +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Zoom out">−</button>'
+      +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Reset to readable scale">'+Math.round(z*100)+'%</button>'
+      +'<button type="button" class="bf-zb" data-bfzoom="+" aria-label="Zoom in">+</button></span>'
+      +'<details class="bf-layout"><summary>Layout</summary><div class="bf-layoutpanel"><div class="bf-seg bf-vseg">'
+      +'<button type="button" class="bf-dep'+(!GlobeState._bfManualDepth?' on':'')+'" data-bfauto="1" aria-pressed="'+!GlobeState._bfManualDepth+'">Auto</button>'
+      +[1,2,3,4].map(function(n){return '<button type="button" class="bf-dep'+(GlobeState._bfManualDepth&&levels===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+!!(GlobeState._bfManualDepth&&levels===n)+'" title="Show '+n+' levels from this branch">'+n+'</button>';}).join('')+'</div>'
+      +'<span class="bf-guide">Stack actual tier</span><div class="bf-seg">'+[2,3,4].map(function(n){return '<button type="button" class="bf-dep'+((BRIEF.vert||[]).indexOf(n)>=0?' on':'')+'" data-bfvert="'+n+'" aria-pressed="'+((BRIEF.vert||[]).indexOf(n)>=0)+'">L'+n+'</button>';}).join('')+'</div><button type="button" class="bf-command" data-bfwide="1">'+(document.body.classList.contains('brief-wide')?'Exit full screen':'Full screen')+'</button></div></details></div>';
   }
-  // the head is a DIV (real <button> tracks live inside it now — buttons
-  // cannot nest); data-chmin + role button keep the tap contract.
-  // v1.15.0 (design 2b): the head is CHART-SCOPED — ⌗, the org count, the
-  // L1-L4 track (⌄ on the active cell + the hold-to-stack hint), ZOOM. The
-  // file tools live in the bottom #briefDock now.
-  let h='<div class="ch-head" data-chmin="1" role="button" tabindex="0" aria-label="Minimize or expand the chart">'
-    +'<span class="ch-mk">⌗</span>'
-    +(memN?('<span class="ch-n">'+memN+' ORG'+(memN===1?'':'S')+'</span>'):'')
-    +((memN&&_deep)?('<span class="bf-seg bf-vseg">'+[1,2,3,4].map(function(n){
-        return '<button type="button" class="bf-dep'+(dep===n?' on':'')+'" data-bfdepth="'+n+'" aria-pressed="'+(dep===n?'true':'false')+'" title="Show '+n+' level'+(n===1?'':'s')+' — hold to stack">L'+n+(dep===n?' ⌄':'')+'</button>';
-      }).join('')+'</span>'
-      +'<span class="ch-hint">HOLD A LEVEL<br>TO STACK IT</span>'):'')
-    +(memN?('<span class="bf-seg bf-zseg"><span class="bf-vlab">ZOOM</span>'
-      +'<button type="button" class="bf-zb" data-bfzoom="-" aria-label="Smaller">−</button>'
-      +'<button type="button" class="bf-zpct" data-bfzoom="0" title="Back to fit">'+zpc+'</button>'
-      +'<button type="button" class="bf-zb" data-bfzoom="+" aria-label="Bigger">+</button>'
-    +'</span>'):'')
-    +((memN&&foc)?'<button type="button" class="bf-clearfoc" data-bffocusclear="1">Show all ✕</button>':'')
-    +'</div>';
   if(!memN){
     h+='<div class="bf-empty"><b>The brief is empty</b>'
-      +'<span>Search an organization or a US state below to place it on the diagram.</span>'
-      +'<button type="button" class="bf-addsel" data-bfsearch="1">Search to add</button>'
+      +'<span>Add organizations, states, RSNs or ECCSPs. Build one branch at a time.</span>'
+      +'<button type="button" class="bf-addsel" data-bfsearch="1">Search organizations</button>'
       // v1.0.3 — a build can START from a group scaffold; v1.0.4: the name form
       // lives in the SHEET (the inline foot form fought the keyboard and lost)
       +'<button type="button" class="bf-addsel quiet" data-bfgrpnew="">⊞ Start with a group</button>'
@@ -5306,25 +5329,16 @@ function renderBrief(){
     try{ document.body.classList.remove('chart-min'); }catch(_){}
     el.innerHTML=h; try{ _bdSync(); }catch(_){} return;
   }
-  // ── THE LAYOUT (v1.15.0): content-hugging boxes on the fixed grid. Widths
-  // come from a shared measuring canvas (the harness stub's fixed 40 is fine —
-  // geometry stays deterministic). Stacked levels flatten into one column
+  // Bounded readable cards; stacked levels flatten into one column
   // directly under the parent's center on a single straight spine.
   let desk=true; try{ desk=!(window.matchMedia && matchMedia('(max-width:1099px)').matches); }catch(_){}
-  const BH=desk?24:22, PITCH=desk?48:40, SPITCH=desk?32:30, GAP=28, GUT=24, PADT=4, FS=desk?10:9;
-  const kidsOf=function(k){ return C.order.filter(function(x){ return C.nodes[x].parent===k; }); };
-  const descN=function(k){ let n=0; const q=kidsOf(k); while(q.length){ n++; kidsOf(q.shift()).forEach(function(c){ q.push(c); }); } return n; };
+  const BH=detail?120:84, PITCH=BH+68, SPITCH=BH+62, GAP=28, GUT=24, PADT=8;
+  const kidsOf=function(k){ return children[k]||[]; };
+  const descN=function(k){ let n=0; const q=kidsOf(k).slice(); while(q.length){ n++; kidsOf(q.shift()).forEach(function(c){ q.push(c); }); } return n; };
   const stacked=function(l){ return (BRIEF.vert||[]).indexOf(Math.min(4,l))>=0; };
   const visKids=function(k,lvl){ if(lvl>=dep || fold[k]) return []; return kidsOf(k); };
-  let meas=null;
-  try{ const mcv=window.__bfMeasCv||(window.__bfMeasCv=document.createElement('canvas'));
-    meas=mcv.getContext('2d'); if(meas) meas.font='900 '+FS+"px 'Segoe UI',system-ui,sans-serif"; }catch(_){}
   const TXT={}, BW={}, SW={};
-  const boxW=function(k){ if(BW[k]) return BW[k];
-    const n=C.nodes[k]; const t=(n.kind==='custom')?n.name:_bfAbbr(n.name);
-    TXT[k]=t; let w=0; try{ w=meas?meas.measureText(t).width:0; }catch(_){}
-    if(!w || !isFinite(w)) w=t.length*FS*0.62;
-    return (BW[k]=Math.max(44, Math.round(w)+(desk?24:20))); };
+  const boxW=function(k){TXT[k]=C.nodes[k].name;return BW[k]=desk?240:208;};
   const colW=function(k,lvl){ let w=boxW(k); visKids(k,lvl).forEach(function(c){ w=Math.max(w, colW(c,lvl+1)); }); return w; };
   const subW=function(k,lvl){
     const bw=boxW(k);
@@ -5363,12 +5377,12 @@ function renderBrief(){
     kids.forEach(function(c){ edges.push({p:k,c:c}); });
     return cx;
   };
-  const roots=C.order.filter(function(k){ return C.nodes[k].lvl===1; });
-  roots.forEach(function(r){ subW(r,1); });
+  const roots=foc?[foc]:C.order.filter(function(k){ return C.nodes[k].lvl===1; });
+  roots.forEach(function(r){ subW(r,startLevel); });
   let X=GUT;
-  roots.forEach(function(r,i){ if(i) X+=40; place(r,1,X,PADT); X+=SW[r]; });
+  roots.forEach(function(r,i){ if(i) X+=40; place(r,startLevel,X,PADT); X+=SW[r]; });
   const W=Math.max(Math.round(X+12), 180);
-  const H=Math.round(maxY+14);
+  const H=Math.round(maxY+64);
   // ── THE NET: hairlines under each horizontal band, rounded-elbow connectors,
   // the lit chain (glow + crisp passes) with gold junction beads, dim strokes
   // off-chain. One SVG, coordinates straight from the layout.
@@ -5422,32 +5436,24 @@ function renderBrief(){
     const col=n.color||'';
     let vars='';
     if(col){ const t2=_bfTint(col); vars='--bfrg:'+col+';--bfbg:'+t2.bg+';--bftx:'+t2.tx+';--bfgl:'+t2.gl+';'; }
-    boxes+='<div class="bf-box '+tcls+grp+dim+isFoc+'" style="left:'+P.cx+'px;top:'+P.y+'px;'+vars+'" data-bfobj="'+escA(k)+'" role="button" tabindex="0" title="'+escA(n.name)+'">'
-      +'<span class="bf-nm">'+esc(TXT[k]||n.name)+'</span>'
-      +'<span class="bf-ops">'
-        +'<button type="button" class="bf-op" data-bfaddkids="'+escA(k)+'" aria-label="Add subordinates under '+escA(n.name)+'" title="Add subordinates">+</button>'
-        +'<button type="button" class="bf-op" data-bfedit="'+escA(k)+'" aria-label="Edit '+escA(n.name)+'" title="Edit">'
-          +'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5l5 5"></path><path d="M4 20l1-4.5L16 4.5a1.6 1.6 0 0 1 2.3 0l1.2 1.2a1.6 1.6 0 0 1 0 2.3L8.5 19 4 20z"></path></svg>'
-        +'</button>'
-      +'</span></div>';
-    const realKids=kidsOf(k);
-    if(realKids.length && P.lvl<dep){
-      const folded=!!fold[k];
-      boxes+='<button type="button" class="bf-caret'+(folded?' on':'')+'" style="left:'+P.cx+'px;top:'+(P.y+BH+2)+'px" data-bffold="'+escA(k)+'" aria-expanded="'+(folded?'false':'true')+'" aria-label="'+(folded?'Expand':'Collapse')+' branch">'
-        +(folded?('+'+descN(k)):'▾')+'</button>';
+    const childCount=descN(k), realKids=kidsOf(k), nd=bfNode(k);
+    const preset=bfPlaceOf(k), meta=((preset?(/eccsp$/.test(preset.k)?'eccsp':'rsn'):_bfStarKind(n))||((n.kind==='custom'&&!n.pinned)?'Group':n.kind==='state'?'State':n.pinned?'Place':'Organization')).toUpperCase();
+    let location=n.bs||'';
+    if(n.kind==='org'){const site=siteById(ogEffSite(n.ref)||'');if(site)location=site.base;}
+    boxes+='<button type="button" class="bf-box '+tcls+grp+dim+isFoc+'" style="left:'+P.cx+'px;top:'+P.y+'px;width:'+BW[k]+'px;height:'+BH+'px;'+vars+'" data-bfobj="'+escA(k)+'" aria-label="Open '+escA(n.name)+'" title="'+escA(n.name)+'">'
+      +'<span class="bf-nm">'+esc(TXT[k]||n.name)+'</span><span class="bf-meta">'+(foc===k?'Details / edit ↗':meta+(childCount?' · '+childCount+' below':''))+'</span>'
+      +(detail?'<span class="bf-location">'+esc(location||'No location assigned')+'</span><span class="bf-meta">'+(nd&&nd.tx?'Note available':'')+(nd&&nd.inv&&nd.inv.length?' · '+nd.inv.length+' assets':'')+'</span>':'')+'</button>';
+    if(realKids.length){
+      const folded=!!fold[k], limited=P.lvl>=dep;
+      boxes+='<button type="button" class="bf-caret'+(folded||limited?' on':'')+'" style="left:'+P.cx+'px;top:'+(P.y+BH+4)+'px" '+(limited?'data-bfbranch':'data-bffold')+'="'+escA(k)+'" aria-expanded="'+!(folded||limited)+'" aria-label="'+(limited?'Explore':folded?'Expand':'Collapse')+' '+escA(n.name)+' branch">'
+        +(limited?childCount+' below →':folded?'+'+childCount+' below':'− Fold')+'</button>';
     }
   });
-  const zst=GlobeState._bfZoom?('zoom:'+GlobeState._bfZoom+';'):'';
-  h+='<div class="bf-wrap"><div class="bf-tree" style="width:'+W+'px;height:'+H+'px;'+zst+'">'
-    +net+lbls+boxes+'</div></div>';
-  // v1.0.3 — the foot offers BOTH build moves: a real org (search) or a GROUP
-  // (an owner-named filler node that shapes the hierarchy). v1.0.4: the name
-  // form opens in the SHEET (_bfGroupSheet) — the inline foot form collapsed
-  // under the phone keyboard in the owner's recording. Never bring it back.
-  h+='<div class="bf-foot"><button type="button" class="bf-act in" data-bfsearch="1">⊕ Add organization</button>'
-    +'<button type="button" class="bf-act" data-bfgrpnew="">⊞ New group</button></div>';
+  h+='<div class="bf-wrap" tabindex="0" role="region" aria-label="Brief diagram — scroll to pan, pinch or use zoom controls"><div class="bf-tree" style="width:'+W+'px;height:'+H+'px;zoom:'+z+';">'+net+lbls+boxes+'</div></div>';
+  h+='<div class="bf-foot"><span class="bf-guide">'+Object.keys(POS).length+' of '+memN+' items · '+(GlobeState._bfManualDepth?levels+' levels':'Auto detail')+' · scroll to pan</span><button type="button" class="bf-act" data-bfgrpnew="'+escA(foc||'')+'">+ Group</button></div>';
+  GlobeState.__bfLayout={nodes:POS,bh:BH,focus:foc};
   el.innerHTML=h;
-  try{ _bfFit(); }catch(_){}
+  try{ _bfFit(view); _bfChartWire(el); }catch(_){}
   try{ _bdSync(); }catch(_){}
   try{ if(window._bfLeaderTrack) _bfLeaderTrack(); }catch(_){}
   _bfFlipPlay(el, _flip);                          // v1.10.0: …then glide everything to where it now BELONGS
@@ -5575,27 +5581,70 @@ function _bfFlipPlay(el, old){
     });
   }catch(_){}
 }
-// v0.25.0 SIZING — "Fit" measures the built tree and shrinks it until it fits the
-// pane (never enlarges past 1). A manual ± pins the zoom and Fit releases it.
-function _bfFit(){
-  const wrap=document.querySelector('#briefStage .bf-wrap');
-  const tree=wrap?wrap.querySelector('.bf-tree'):null;
-  if(!wrap || !tree) return;
-  if(GlobeState._bfZoom){ _bfCenter(wrap,tree); return; }   // manual zoom wins
-  tree.style.zoom='';
-  const avail=wrap.clientWidth||1, natural=tree.scrollWidth||1;
-  // v1.18.0 (owner: "fit is stuck at 62%"): the readability floor CLAMPED wide
-  // charts at 0.62 and they overflowed into pan — Fit now really fits, with a
-  // deep floor only against microscopic type.
-  const fit=Math.max(0.30, Math.min(1, (avail-4)/natural));
-  if(fit<0.999) tree.style.zoom=fit;
-  GlobeState.__bfFitPct=fit;
-  const pct=document.querySelector('#briefStage .bf-zpct');
-  if(pct) pct.textContent=(fit<0.999)?('Fit '+Math.round(fit*100)+'%'):'Fit';
-  _bfCenter(wrap,tree);
+// v1.27.0: semantic detail belongs to the chart, not to stored membership.
+function _bfSceneDepth(){
+  if(GlobeState._bfManualDepth)return GlobeState._bfDepth||4;
+  const z=GlobeState._bfZoom||1;return z<.95?1:z<1.35?2:z<1.75?3:4;
 }
-function _bfCenter(wrap,tree){
-  try{ wrap.scrollLeft=Math.max(0,(tree.scrollWidth*(parseFloat(tree.style.zoom)||1)-wrap.clientWidth)/2); }catch(_){}
+function _bfViewCapture(point){
+  const w=document.querySelector('#briefStage .bf-wrap'), L=GlobeState.__bfLayout;
+  if(!w||!L)return null;
+  const r=w.getBoundingClientRect(),x=point?point.x-r.left:w.clientWidth/2,y=point?point.y-r.top:w.clientHeight/2;
+  const tree=w.querySelector('.bf-tree'),z=parseFloat(tree&&tree.style.zoom)||GlobeState._bfZoom||1;let key=null,best=Infinity;
+  Object.keys(L.nodes).forEach(function(k){const p=L.nodes[k],d=Math.hypot(p.cx*z-w.scrollLeft-x,(p.y+L.bh/2)*z-w.scrollTop-y);if(d<best){best=d;key=k;}});
+  const p=L.nodes[key];return {focus:L.focus,key:key,x:x,y:y,dx:p?(w.scrollLeft+x)/z-p.cx:0,dy:p?(w.scrollTop+y)/z-p.y-L.bh/2:0,left:w.scrollLeft,top:w.scrollTop};
+}
+function _bfFit(view){
+  const w=document.querySelector('#briefStage .bf-wrap'),t=w&&w.querySelector('.bf-tree'),L=GlobeState.__bfLayout;
+  if(!w||!t||!L||!w.clientWidth||document.body.classList.contains('chart-min'))return;
+  const z=Math.max(.85,Math.min(2.2,GlobeState._bfZoom||1));GlobeState._bfZoom=z;GlobeState.__bfFitPct=z;t.style.zoom=z;
+  const p=view&&view.focus===L.focus&&L.nodes[view.key];
+  if(p){w.scrollLeft=Math.max(0,(p.cx+view.dx)*z-view.x);w.scrollTop=Math.max(0,(p.y+L.bh/2+view.dy)*z-view.y);}
+  else if(view&&view.focus===L.focus){w.scrollLeft=view.left;w.scrollTop=view.top;}
+  else {w.scrollLeft=Math.max(0,(t.scrollWidth*z-w.clientWidth)/2);w.scrollTop=0;}
+  const pct=document.querySelector('#briefStage .bf-zpct');if(pct)pct.textContent=Math.round(z*100)+'%';
+}
+function _bfZoomTo(value,point,finish){
+  const view=_bfViewCapture(point);GlobeState._bfZoom=Math.max(.85,Math.min(2.2,value));
+  if(finish){renderBrief(view);globeMark();}else _bfFit(view);
+}
+function _bfExplore(k){
+  if(k&&!bfNode(k))return;
+  GlobeState._bfFocus=k||null;GlobeState._bfManualDepth=false;GlobeState._bfZoom=1;
+  const f=GlobeState._bfFold||{};if(k)delete f[k];
+  try{calloutHide();hideDossier();renderBrief();globeMark();
+    const buttons=document.querySelectorAll('#briefStage .bf-box');const b=Array.from(buttons).find(function(b){return b.getAttribute('data-bfobj')===k;});if(b)b.focus({preventScroll:true});
+  }catch(_){}
+}
+function _bfChartWire(el){
+  if(el.__briefWired)return;el.__briefWired=true;
+  let pinch=null,drag=null,wheelTimer=null,resizeTimer=null,moved=false;
+  const wrap=function(e){return e.target&&e.target.closest&&e.target.closest('.bf-wrap');};
+  el.addEventListener('wheel',function(e){if(!wrap(e)||!(e.ctrlKey||e.metaKey))return;e.preventDefault();
+    _bfZoomTo((GlobeState._bfZoom||1)*Math.exp(-e.deltaY*.002),{x:e.clientX,y:e.clientY},false);
+    clearTimeout(wheelTimer);wheelTimer=setTimeout(function(){renderBrief();globeMark();},160);
+  },{passive:false});
+  el.addEventListener('touchstart',function(e){if(!wrap(e)||e.touches.length!==2)return;e.preventDefault();
+    pinch={distance:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),zoom:GlobeState._bfZoom||1};
+  },{passive:false});
+  el.addEventListener('touchmove',function(e){if(!pinch||e.touches.length!==2)return;e.preventDefault();
+    const a=e.touches[0],b=e.touches[1];_bfZoomTo(pinch.zoom*Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)/Math.max(1,pinch.distance),{x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2},false);
+  },{passive:false});
+  const end=function(){if(pinch){pinch=null;renderBrief();globeMark();}};el.addEventListener('touchend',end);el.addEventListener('touchcancel',end);
+  window.addEventListener('resize',function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(function(){if(document.body.classList.contains('brief-mode')&&!document.body.classList.contains('chart-min'))renderBrief();},160);});
+  el.addEventListener('pointerdown',function(e){const w=wrap(e);if(!w||e.pointerType!=='mouse'||e.button!==0||e.target.closest('button,input,select'))return;
+    drag={w:w,x:e.clientX,y:e.clientY,left:w.scrollLeft,top:w.scrollTop};moved=false;
+  });
+  window.addEventListener('pointermove',function(e){if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>5)moved=true;if(moved){e.preventDefault();drag.w.scrollLeft=drag.left-dx;drag.w.scrollTop=drag.top-dy;}});
+  window.addEventListener('pointerup',function(){drag=null;setTimeout(function(){moved=false;},0);});window.addEventListener('pointercancel',function(){drag=null;moved=false;});
+  el.addEventListener('click',function(e){if(moved&&wrap(e)){moved=false;e.preventDefault();e.stopPropagation();}},true);
+  el.addEventListener('change',function(e){if(e.target.matches('[data-bfjump]'))_bfExplore(e.target.value);});
+  el.addEventListener('keydown',function(e){if(!e.target.classList.contains('bf-wrap'))return;const w=e.target;
+    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();w.scrollLeft+=(e.key==='ArrowRight'?100:e.key==='ArrowLeft'?-100:0);w.scrollTop+=(e.key==='ArrowDown'?100:e.key==='ArrowUp'?-100:0);}
+    else if(e.key==='+'||e.key==='='||e.key==='-'){e.preventDefault();_bfZoomTo((GlobeState._bfZoom||1)*(e.key==='-'?1/1.15:1.15),null,true);}
+    else if(e.key==='Home'){e.preventDefault();_bfExplore(null);}
+    if(['+','=','-','Home'].includes(e.key)){const next=document.querySelector('#briefStage .bf-wrap');if(next)next.focus({preventScroll:true});}
+  });
 }
 // (v1.15.0: _bfBaseOf and _bfInk retired with the matte card — the leader
 // resolves host bases inline and _bfTint owns the illuminated color recipe.)
@@ -6271,7 +6320,7 @@ function _bfPickFoot(){
   const btn=document.querySelector('#dossier [data-bfpickadd]'); if(!btn) return;
   const pk=btn.getAttribute('data-bfpickadd'); const nd=bfNode(pk);
   const n=(window._bfPick||new Set()).size;
-  btn.textContent=n?('Add '+n+' under '+_bfNodeLbl(nd)):'Select organizations to add';
+  btn.textContent=n?('Add '+n+(nd?' under '+_bfNodeLbl(nd):' to the brief')):'Select objects to add';
   btn.classList.toggle('in', !!n);
   if(n) btn.removeAttribute('disabled'); else btn.setAttribute('disabled','');
   const cl=document.querySelector('#dossier [data-bfpickclear]');
@@ -6293,7 +6342,7 @@ if(!window.__bfPickWired){ window.__bfPickWired=true;
     window._bfPickQ=e.target.value||'';
     const btn=document.querySelector('#dossier [data-bfpickadd]');
     if(!btn) return;
-    const pk=btn.getAttribute('data-bfpickadd');
+    const pk=btn.getAttribute('data-bfpickadd')||null;
     const pos=e.target.selectionStart;
     try{ _bfAddSheet(pk); }catch(_){}
     const f=document.getElementById('bfPickQ');
@@ -6303,6 +6352,7 @@ if(!window.__bfPickWired){ window.__bfPickWired=true;
 if(!window.__bfMoveWired){ window.__bfMoveWired=true;
   document.addEventListener('change', function(e){
     if(!e.target || !e.target.getAttribute) return;
+    if(e.target.id==='bfPickKind'){ window._bfPickKind=e.target.value; _bfAddSheet(window._bfPickParent); return; }
     const k=e.target.getAttribute('data-bfmove'); if(!k) return;
     if(!bfMove(k, e.target.value||null)){ try{ _bfObjSheet(k); }catch(_){} return; }
     try{ _bfObjSheet(k); }catch(_){}
@@ -6399,98 +6449,69 @@ function _bfTakeParent(fallback){
 // ＋, lists that org's real subordinates first (the common case), and a search box
 // widens it to every organization and US state. Tick as many as you want, then one
 // "Add N" commits the whole set under that parent.
-function _bfAddSheet(pk){
-  const host=document.getElementById('dossier'); if(!host) return;
-  const par=bfNode(pk); if(!par) return;
-  try{ calloutHide(); }catch(_){}
-  _odInjectCSS();
-  const esc=_odEsc, escA=_odEscA;
-  const pick=window._bfPick||(window._bfPick=new Set());
-  const q=_srFold(window._bfPickQ||'');
-  // CANDIDATES: the parent's own real subordinates, then (when searching) anything else
-  let rows=[];
-  const seen={};
-  const push=function(id,name,sub,kind){
-    if(seen[id] || bfNode(id)) return;          // already on the diagram → not offered
-    seen[id]=1; rows.push({id:id, name:name, sub:sub||'', kind:kind});
+// Candidate filtering is shared by root and subordinate picking. Presets stay
+// out of the Map index; all choices require an explicit Add commit.
+function _bfPickCandidates(pk,q,kind){
+  const par=pk?bfNode(pk):null, rows=[], seen={}; q=_srFold(q||'');
+  const push=function(id,name,sub,type){
+    if(seen[id] || bfNode(id)) return;
+    seen[id]=1; rows.push({id:id,name:name,sub:sub||'',kind:type});
   };
-  if(par.t==='org' && typeof ogKids==='function'){
-    let kids=[]; try{ kids=ogKids(par.r)||[]; }catch(_){}
-    kids.forEach(function(kd){
-      if(typeof _OG_CATS!=='undefined' && _OG_CATS[kd.id]){       // a shell opens up
-        (ogKids(kd.id)||[]).forEach(function(g){ const hs=siteById(ogEffSite(g.id)||''); push(g.id,g.name,hs?hs.base:'','org'); });
-        return;
-      }
-      const hs=siteById(ogEffSite(kd.id)||''); push(kd.id,kd.name,hs?hs.base:'','org');
+  if(par && par.t==='org' && (!kind || kind==='org')){
+    (ogKids(par.r)||[]).forEach(function(k){
+      const kids=_OG_CATS[k.id]?(ogKids(k.id)||[]):[k];
+      kids.forEach(function(o){ const hs=siteById(ogEffSite(o.id)||''); push(o.id,o.name,hs?hs.base:'','org'); });
     });
   }
   const own=rows.length;
-  if(q.length>=2){
-    for(const e of _searchEntries()){
-      if(rows.length>240) break;
-      if(e.allF.indexOf(q)<0) continue;
-      const st=bfStateName(e.id);
-      if(st) push(e.id, st, 'US state', 'state');
-      else if(String(e.id).slice(0,3)==='og:') push(String(e.id).slice(3), e.base, e.sub, 'org');
-    }
-  }
-  const shown=rows.filter(function(r){ return q.length<2 ? true : (_srFold(r.name+' '+r.sub).indexOf(q)>=0); });
-  // v1.4.0 — the BRIEF-ONLY PLACES roster rides every picker: offered in full
-  // when browsing, matchable when searching; one already on the diagram drops out
-  const places=[];
   BF_PLACES.forEach(function(p){
-    if(bfNode(p.k)) return;
-    const hs=siteById(p.site);
-    places.push({id:p.k, name:p.n, sub:hs?hs.base:''});
+    const hs=siteById(p.site); push(p.k,p.n,hs?hs.base:'',p.k.endsWith('-eccsp')?'eccsp':'rsn');
   });
-  const placesShown=places.filter(function(r){ return q.length<2 ? true : (_srFold(r.name+' '+r.sub).indexOf(q)>=0); });
+  for(const e of _searchEntries()){
+    const st=bfStateName(e.id), org=String(e.id).slice(0,3)==='og:';
+    if(st) push(e.id,st,'US state / territory','state');
+    else if(org && (q.length>=2 || kind==='org' || !par)) push(e.id.slice(3),e.base,e.sub,'org');
+  }
+  return {own:own,rows:rows.filter(function(r){
+    return (!kind || r.kind===kind) && (!q || _srFold(r.name+' '+r.sub+' '+r.kind).indexOf(q)>=0);
+  })};
+}
+function _bfAddSheet(pk){
+  const host=document.getElementById('dossier'); if(!host) return;
+  pk=pk||null; const par=pk?bfNode(pk):null; if(pk && !par) return;
+  if(window._bfPickParent!==pk){ window._bfPick=new Set(); window._bfPickQ=''; window._bfPickKind=''; }
+  window._bfPickParent=pk;
+  try{ calloutHide(); }catch(_){}
+  _odInjectCSS();
+  const esc=_odEsc, escA=_odEscA, pick=window._bfPick||(window._bfPick=new Set());
+  const kind=window._bfPickKind||'', q=window._bfPickQ||'', found=_bfPickCandidates(pk,q,kind);
+  const dest=par?'under '+_bfNodeLbl(par):'to the brief';
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
-  h+='<div class="od-head od-head-slim"><div class="od-name">Add under '+esc(_bfNodeLbl(par))+'</div><span class="od-sp"></span>'
-    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
-    +'<div class="od-sub">Tick as many as you need \u2014 they all land under this organization.</div>';
-  h+='<input class="rc-in bf-pickq" id="bfPickQ" type="text" placeholder="Search all organizations and states\u2026" value="'+escA(window._bfPickQ||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
-  // v1.0.3 \u2014 or create a GROUP under this parent (v1.0.4: opens the name sheet)
-  h+='<button type="button" class="bf-act in bf-addsub" data-bfgrpnew="'+escA(pk)+'">\u229e New group under '+esc(_bfNodeLbl(par))+'\u2026</button>';
-  if(own && q.length<2) h+='<div class="bf-subhead">Its subordinates \u00b7 '+own+'</div>';
-  else if(q.length>=2) h+='<div class="bf-subhead">Matches \u00b7 '+shown.length+'</div>';
-  h+='<div class="bf-picklist">';
-  if(!shown.length && !placesShown.length){
-    h+='<div class="rc-note">'+(q.length>=2?'No matches.':'No subordinates on record \u2014 search above to add any organization or state.')+'</div>';
-  }
-  shown.slice(0,240).forEach(function(r){
+  h+='<div class="od-head od-head-slim"><div class="od-name">Add '+esc(dest)+'</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
+    +'<div class="od-sub">Choose objects, then Add. '+(par?'Each will report to this parent.':'Each starts at the top level.')+'</div>';
+  h+='<label class="bf-picklabel" for="bfPickKind">Browse</label><select class="rc-in" id="bfPickKind">'
+    +[['','All objects'],['org','Organizations'],['state','States / territories'],['rsn','RSN locations'],['eccsp','ECCSP locations']].map(function(x){
+      return '<option value="'+x[0]+'"'+(kind===x[0]?' selected':'')+'>'+x[1]+'</option>';
+    }).join('')+'</select>'
+    +'<input class="rc-in bf-pickq" id="bfPickQ" type="search" aria-label="Search brief objects" placeholder="Search organizations, states, RSN or ECCSP" value="'+escA(q)+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+  h+='<button type="button" class="bf-act bf-addsub" data-bfgrpnew="'+escA(pk||'')+'">⊞ New group…</button>';
+  h+='<div class="bf-subhead">'+(found.own&&!q&&!kind?'Direct subordinates first · ':'')+found.rows.length+' available'
+    +(found.rows.length>60?' · First 60 shown; search to narrow':'')+'</div><div class="bf-picklist">';
+  if(!found.rows.length) h+='<div class="rc-note">No available matches. Try another category or search.</div>';
+  found.rows.slice(0,60).forEach(function(r){
     const on=pick.has(r.id);
-    h+='<button type="button" class="bf-pickrow'+(on?' on':'')+'" data-bfpick="'+escA(r.id)+'">'
-      +'<span class="bf-pickck">'+(on?'\u2713':'')+'</span>'
-      +'<span class="bf-picknm">'+esc(r.name)+'</span>'
-      +(r.sub?('<span class="bf-picksub">'+esc(r.sub)+'</span>'):'')
-      +'</button>';
+    h+='<button type="button" class="bf-pickrow'+(on?' on':'')+'" data-bfpick="'+escA(r.id)+'" aria-pressed="'+on+'">'
+      +'<span class="bf-pickck" aria-hidden="true">'+(on?'✓':'')+'</span><span class="bf-picktext">'
+      +'<span class="bf-picknm">'+esc(r.name)+'</span><span class="bf-picksub">'+esc(r.sub)+'</span></span></button>';
   });
-  h+='</div>';
-  if(placesShown.length){
-    h+='<div class="bf-subhead">Brief-only locations \u00b7 '+placesShown.length+'</div>';
-    h+='<div class="bf-picklist">';
-    placesShown.forEach(function(r){
-      const on=pick.has(r.id);
-      h+='<button type="button" class="bf-pickrow'+(on?' on':'')+'" data-bfpick="'+escA(r.id)+'">'
-        +'<span class="bf-pickck">'+(on?'\u2713':'')+'</span>'
-        +'<span class="bf-picknm">'+esc(r.name)+'</span>'
-        +(r.sub?('<span class="bf-picksub">'+esc(r.sub)+'</span>'):'')
-        +'</button>';
-    });
-    h+='</div>';
-  }
-  h+='<div class="rc-row rc-acts bf-picksticky">'
-    +'<button class="bf-act bf-commit'+(pick.size?' in':'')+'" type="button" data-bfpickadd="'+escA(pk)+'"'+(pick.size?'':' disabled')+'>'
-      +(pick.size?('Add '+pick.size+' under '+esc(_bfNodeLbl(par))):'Select organizations to add')+'</button>'
-    +(pick.size?'<button class="bf-act" type="button" data-bfpickclear="1">Clear</button>':'')
-    +'</div>';
-  host.innerHTML=h;
-  // the picker is a focused task — open it FULL so the list and the commit button
-  // are both reachable without a scroll hunt behind the globe button
-  host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add('dz-full');
-  host.hidden=false; host.scrollTop=0;
-  _sheetFlag();
+  h+='</div><div class="rc-row rc-acts bf-picksticky">'
+    +'<button class="bf-act bf-commit'+(pick.size?' in':'')+'" type="button" data-bfpickadd="'+escA(pk||'')+'"'+(pick.size?'':' disabled')+'>'
+      +(pick.size?('Add '+pick.size+' '+esc(dest)):'Select objects to add')+'</button>'
+    +(pick.size?'<button class="bf-act" type="button" data-bfpickclear="1">Clear</button>':'')+'</div>';
+  host.innerHTML=h; host.setAttribute('aria-label','Add '+dest);
+  host.classList.remove('dz-peek','dz-half','dz-full'); host.classList.add('dz-full');
+  host.hidden=false; host.scrollTop=0; _sheetFlag(); _rcFit();
 }
 // v1.0.4 — THE GROUP SHEET: one small form in the dossier, the same grammar as
 // rename/note (the v1.0.3 inline foot form collapsed under the phone keyboard —
@@ -6502,7 +6523,7 @@ function _bfGroupSheet(pk){
   try{ calloutHide(); }catch(_){}
   _odInjectCSS();
   const esc=_odEsc, escA=_odEscA;
-  window._bfGrpForm={p:par?par.k:null};
+  window._bfGrpForm={p:par?par.k:null,picker:!!host.querySelector('[data-bfpickadd]')};
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">New group'+(par?(' under '+esc(_bfNodeLbl(par))):'')+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
@@ -6543,7 +6564,7 @@ function bfPlaceOf(k){ for(const p of BF_PLACES) if(p.k===k) return p; return nu
 // batch add — push every pick, then save/render ONCE (adding twenty one-at-a-time
 // would re-render and re-frame the globe twenty times)
 function bfAddMany(ids, parent){
-  if(!ids || !ids.length) return 0;
+  if(!ids || !ids.length || (parent && !bfNode(parent))) return 0;
   let n=0;
   ids.forEach(function(id){
     if(bfNode(id)) return;
@@ -6567,6 +6588,7 @@ function bfAddMany(ids, parent){
     BRIEF.nodes.push({k:id, n:o.name, p:parent||null, t:'org', r:id, c:'', sh:0, tx:''}); n++;
   });
   if(!n) return 0;
+  GlobeState._bfFocus=parent||null; GlobeState._bfManualDepth=false; GlobeState._bfZoom=1;
   _bfSave();
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
@@ -6653,13 +6675,19 @@ function _bfPlainSheet(k){
   const nd=bfNode(k); if(!nd || nd.t==='org') return false;
   try{ calloutHide(); }catch(_){}
   _odInjectCSS();
-  const esc=_odEsc, escA=_odEscA;
+  const esc=_odEsc, escA=_odEscA, preset=bfPlaceOf(k);
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">'+esc(nd.n)+'</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">\u2715</button></div>'
     +'<div class="od-sub">'+(nd.t==='state'?'US state / territory \u00b7 outlined on the globe'
-      :((nd.la!=null)?('Brief-only location \u00b7 at '+_odEsc(nd.bs||'its pinned spot'))
+      :((nd.la!=null)?((preset?(preset.k.endsWith('-eccsp')?'ECCSP':'RSN'):'Brief-only location')+' \u00b7 at '+esc(nd.bs||'its pinned spot'))
       :'Group \u00b7 a filler element on this diagram'))+'</div>';
+  if(preset){
+    let info='<div class="rc-row">Preset: '+esc(preset.n)+'</div><div class="rc-row">Anchor installation: '+esc(nd.bs||'Not recorded')+'</div>';
+    if(Number.isFinite(nd.la) && Number.isFinite(nd.lo)) info+='<div class="rc-row">Pinned position: '+nd.la.toFixed(4)+', '+nd.lo.toFixed(4)+'</div>';
+    info+='<div class="rc-note">Location uses the installation anchor. Notes and assets below belong to this brief object.</div>';
+    h+=_disc('bf-location','Location details',info,{def:false});
+  }
   // v1.9.0 identity zone: rename lives WITH the name (quiet text button),
   // not in a footer rail \u2014 identity edits sit with the identity.
   if(nd.t==='custom' && _bfRnEdit!==k) h+='<button class="bf-qt" type="button" data-bfrnedit="'+escA(k)+'">\u270e Rename</button>';
@@ -6941,7 +6969,8 @@ function _rcFormHTML(kind,it,rid){
 }
 function _rcFit(){
   const h=document.getElementById('dossier'),v=window.visualViewport;if(!h||!v)return;
-  const active=!h.hidden&&_odShowRec&&_odTab==='records'&&_rcForm&&_rcForm.sid===GlobeState.sel;
+  const active=!h.hidden&&((_odShowRec&&_odTab==='records'&&_rcForm&&_rcForm.sid===GlobeState.sel)
+    ||(document.body.classList.contains('brief-mode')&&h.querySelector('#bfPickQ,#bfGrpNm,#rcFRn,#rcF1,#bfInvQ,#ogF1')));
   const lift=Math.max(0,window.innerHeight-v.height-v.offsetTop),on=!!active&&lift>80;
   h.classList.toggle('rc-keyboard',on);
   if(on){h.style.setProperty('--rc-visible-top',(v.offsetTop+8)+'px');h.style.setProperty('--rc-visible-bottom',(lift+8)+'px');}
@@ -7201,16 +7230,16 @@ if(!window._odWired){
     if(bgn){ try{ _bfGroupSheet(bgn.getAttribute('data-bfgrpnew')||null); }catch(_){} return; }
     const bgx=e.target.closest('[data-bfgrpcancel]');
     if(bgx){ const st=window._bfGrpForm; window._bfGrpForm=null;
-      if(st && st.p){ try{ _bfAddSheet(st.p); return; }catch(_){} }   // came from the picker → back to it
+      if(st && (st.p || st.picker)){ try{ _bfAddSheet(st.p); return; }catch(_){} }   // came from the picker → back to it
       try{ hideDossier(); }catch(_){} return; }
     const bgc=e.target.closest('[data-bfgrpcreate]');
     if(bgc){ const pk2=bgc.getAttribute('data-bfgrpcreate')||null;
       const inp=document.getElementById('bfGrpNm');
       const nm=String((inp&&inp.value)||'').trim();
       if(!nm){ try{ inp&&inp.focus(); }catch(_){} return; }   // a group needs a name — no silent blanks
-      window._bfGrpForm=null;
+      const fromPicker=window._bfGrpForm&&window._bfGrpForm.picker; window._bfGrpForm=null;
       bfAddCustom(nm, pk2);                                   // _bfPush renders + reframes
-      if(pk2){ try{ _bfAddSheet(pk2); }catch(_){} }           // back to the picker — keep filling this parent
+      if(pk2 || fromPicker){ try{ _bfAddSheet(pk2); }catch(_){} }           // back to the picker — keep filling this parent
       else { try{ hideDossier(); }catch(_){} }
       try{ _bfToast('Group “'+nm.slice(0,28)+'” added'+(pk2?(' under '+_bfNodeLbl(bfNode(pk2))):'')); }catch(_){}
       return; }
@@ -7244,7 +7273,11 @@ if(!window._odWired){
       _bfObjSheet(id); return; }
     // ---- v0.7.0 object popup + chart + custom orgs ----
     const bfc=e.target.closest('[data-bffocusclear]');
-    if(bfc){ GlobeState._bfFocus=null; try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){} return; }
+    if(bfc){_bfExplore(null);return;}
+    const explore=e.target.closest('[data-bfbranch]');if(explore){_bfExplore(explore.getAttribute('data-bfbranch'));return;}
+    if(e.target.closest('[data-bfauto]')){GlobeState._bfManualDepth=false;renderBrief();globeMark();return;}
+    if(e.target.closest('[data-bfshelf]')){_shOpen('bf');return;}
+    const wide=e.target.closest('[data-bfwide]');if(wide){document.body.classList.toggle('brief-wide');wide.textContent=document.body.classList.contains('brief-wide')?'Exit full screen':'Full screen';_bfFit(_bfViewCapture());return;}
     // v0.26.0 — the object's ＋ and ✎, and the multi-select picker they drive
     const bak=e.target.closest('[data-bfaddkids]');
     if(bak){ window._bfPick=new Set(); window._bfPickQ='';
@@ -7257,30 +7290,27 @@ if(!window._odWired){
       if(s2.has(id)) s2.delete(id); else s2.add(id);
       // repaint just this row + the commit button — never re-render the whole list
       // mid-selection (it would lose the scroll position and the keyboard)
-      bpk.classList.toggle('on', s2.has(id));
+      bpk.classList.toggle('on', s2.has(id)); bpk.setAttribute('aria-pressed',String(s2.has(id)));
       const ck=bpk.querySelector('.bf-pickck'); if(ck) ck.textContent=s2.has(id)?'\u2713':'';
       try{ _bfPickFoot(); }catch(_){}
       return; }
     const bpc=e.target.closest('[data-bfpickclear]');
     if(bpc){ window._bfPick=new Set();
       document.querySelectorAll('#dossier .bf-pickrow.on').forEach(function(r){
-        r.classList.remove('on'); const c=r.querySelector('.bf-pickck'); if(c) c.textContent=''; });
+        r.classList.remove('on'); r.setAttribute('aria-pressed','false'); const c=r.querySelector('.bf-pickck'); if(c) c.textContent=''; });
       try{ _bfPickFoot(); }catch(_){} return; }
     const bpa=e.target.closest('[data-bfpickadd]');
-    if(bpa){ const pk=bpa.getAttribute('data-bfpickadd');
+    if(bpa){ const pk=bpa.getAttribute('data-bfpickadd')||null;
       const ids=Array.from(window._bfPick||[]);
       window._bfPick=new Set(); window._bfPickQ='';
       const n=bfAddMany(ids, pk);
       try{ hideDossier(); }catch(_){}
-      try{ if(n) _bfToast(n+' organization'+(n===1?'':'s')+' added under '+_bfNodeLbl(bfNode(pk))); }catch(_){}
+      try{ if(n) _bfToast(n+' object'+(n===1?'':'s')+' added'+(pk?' under '+_bfNodeLbl(bfNode(pk)):' to the brief')); }catch(_){}
       return; }
     const bo=e.target.closest('[data-bfobj]');
     if(bo){ _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null;
       const id=bo.getAttribute('data-bfobj');
-      const r=bo.getBoundingClientRect();
-      calloutShow(id, {x:r.left+r.width/2, y:r.bottom+4});
-      GlobeState._bfFocus=id;                       // v0.20.0: tapping a node FOCUSES its branch (chart + globe)
-      try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
+      if(GlobeState._bfFocus===id){_bfObjSheet(id);}else _bfExplore(id);
       return; }
     const cx0=e.target.closest('[data-cox]');
     if(cx0){ selectSite(null); return; }
@@ -7368,6 +7398,9 @@ if(!window._odWired){
     const cm=e.target.closest('[data-chmin]');
     if(cm){ if(!e.target.closest('[data-xpbtn],[data-bfzoom],[data-bfdepth],[data-bffocusclear]')){   // v1.13.0: tracks live IN the head — their taps never minimize
         document.body.classList.toggle('chart-min');
+        if(document.body.classList.contains('chart-min'))document.body.classList.remove('brief-wide');
+        cm.setAttribute('aria-expanded',String(!document.body.classList.contains('chart-min')));
+        _bfFit();
         try{ if(_coAt) calloutHide(); }catch(_){}          // chip anchors die with their chips
       } return; }
     // v0.23.0 — "Add another organization" focuses the org search (owner: build the
@@ -7383,10 +7416,9 @@ if(!window._odWired){
     // v0.25.0 — chart zoom: fit / smaller / bigger
     const bz=e.target.closest('[data-bfzoom]');
     if(bz){ const d=bz.getAttribute('data-bfzoom');
-      let z=GlobeState._bfZoom||1;
-      if(d==='0') GlobeState._bfZoom=null;
-      else { z=(d==='+')?z*1.15:z/1.15; GlobeState._bfZoom=Math.max(0.45, Math.min(2.2, z)); }
-      try{ renderBrief(); }catch(_){} return; }
+      if(d==='0'){GlobeState._bfManualDepth=false;_bfZoomTo(1,null,true);}
+      else _bfZoomTo((GlobeState._bfZoom||1)*(d==='+'?1.15:1/1.15),null,true);
+      return; }
     const bsr=e.target.closest('[data-bfsearch]');
     if(bsr){
       // v0.25.0 — an "Add subordinate" from a BOX arms that org as the parent, so the
@@ -8123,6 +8155,7 @@ function bfEye(rootId){
   try{ globeMark(); }catch(_){}
 }
 function bfDepth(n){
+  GlobeState._bfManualDepth=true;
   GlobeState._bfDepth=Math.max(1, Math.min(4, parseInt(n,10)||4));
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
@@ -9744,6 +9777,11 @@ function bootShell(){
     }, true);
     document.addEventListener('keydown', function(e){
       if(e.key!=='Escape') return;
+      const ld=document.getElementById('ledger'), xp=document.getElementById('exportSheet');
+      if(e.defaultPrevented || (document.activeElement&&document.activeElement.tagName==='SELECT') || (ld&&ld.classList.contains('on')) || (xp&&!xp.hidden)) return;
+      if(document.body.classList.contains('brief-wide')&&!document.body.classList.contains('sheet-open')){
+        document.body.classList.remove('brief-wide');renderBrief();e.preventDefault();return;
+      }
       if(document.body.classList.contains('ly-on')){ lyRing(false); return; }
       try{
         const cc=document.getElementById('calloutCard');
@@ -9751,8 +9789,9 @@ function bootShell(){
       }catch(_){}
     });
     document.addEventListener('keydown', function(e){
+      if(e.defaultPrevented) return;
       var ae=document.activeElement;
-      var typing=!!(ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable));
+      var typing=!!(ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.tagName==='SELECT'||ae.isContentEditable));
       // v1.19.0: the quiet visual treatment costs desktop users nothing
       if(!typing){
         if(e.key==='+'||e.key==='='){ tpZoom(1); return; }

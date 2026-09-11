@@ -31,7 +31,7 @@ const ROOT=path.join(__dirname,'..');
 // Run the focused UX regressions in isolated VMs before this harness installs
 // browser stubs. These remain part of the existing five-tool CI gate.
 if(fs.existsSync(path.join(ROOT,'index.html'))){
-  for(const probe of ['ux-navigation-check.js','ux-records-check.js','ux-search-check.js','ux-persistence-check.js']){
+  for(const probe of ['ux-navigation-check.js','ux-records-check.js','ux-search-check.js','ux-persistence-check.js','brief-scale-check.js','brief-support-check.js']){
     require('child_process').execFileSync(process.execPath,[path.join(__dirname,probe)],{stdio:'inherit'});
   }
 }
@@ -331,7 +331,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // v0.24.0: the rooms are severed — the empty brief points at SEARCH, it is
       // never handed the map's selection (data-bfadd would be a cross-room bridge).
       if(!bs || bs.innerHTML.indexOf('data-bfsearch')<0){ fails++; console.log('✗ BRIEF empty state should offer search-to-add'); }
-      if(bs && bs.innerHTML.indexOf('data-bfadd')>=0){ fails++; console.log('✗ BRIEF empty state must not carry the map selection across rooms'); }
+      if(bs && /data-bfadd=/.test(bs.innerHTML)){ fails++; console.log('✗ BRIEF empty state must not carry the map selection across rooms'); }
       // v1.24.0: setMode minimizes the chart every time the brief opens, and
       // body.chart-min hides every child of #briefStage except the ⌗ head. With
       // no members the only child IS the empty state, so the guidance for the
@@ -618,7 +618,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(lx(ch3,'px:utah-rsn')===lx(ch3,'px:texas-rsn')){ sok=false; fails++; console.log('✗ STACK: siblings share a column before any toggle'); }
       // v1.13.0: the STACK track is gone — holding a level cell opens the
       // popover, whose button carries the same data-bfvert contract
-      if(ch3.indexOf('data-bfvert')>=0){ sok=false; fails++; console.log('✗ STACK: the duplicate track must be gone (hold-popover only)'); }
+      if(!/class="bf-layout"/.test(ch3)||ch3.indexOf('data-bfvert="2"')<0){ sok=false; fails++; console.log('✗ STACK: Layout must expose tier stacking without a long hold'); }
       global._bfStackPop(2);
       const _pp=global.document.getElementById('bfStackPop');
       if(!_pp || String(_pp.innerHTML).indexOf('data-bfvert="2"')<0){ sok=false; fails++; console.log('✗ STACK: hold-popover missing its toggle'); }
@@ -821,9 +821,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // v1.15.0 (design 2b): the head is CHART-SCOPED — count + hint + ⌄ on the
       // active level; the file tools live on the bottom #briefDock (static
       // markup, so those labels are asserted against the SOURCE).
-      if(!/\d+ ORGS?</.test(st2)){ gok=false; fails++; console.log('✗ HEAD org count (.ch-n) missing'); }
-      if(st2.indexOf('ch-hint')<0 || st2.indexOf('HOLD A LEVEL')<0){ gok=false; fails++; console.log('✗ HEAD hold-to-stack hint missing'); }
-      if(!/bf-dep on[^>]*>L\d ⌄</.test(st2)){ gok=false; fails++; console.log('✗ active level cell missing its ⌄ stack affordance'); }
+      if(!/\d+ items</.test(st2)){ gok=false; fails++; console.log('✗ HEAD item count missing'); }
+      if(st2.indexOf('data-bfauto')<0 || st2.indexOf('data-bfjump')<0){ gok=false; fails++; console.log('✗ HEAD automatic detail and branch navigation missing'); }
+      if(!/class="bf-headtoggle"[^>]*data-chmin="1"/.test(st2)){ gok=false; fails++; console.log('✗ minimize must have its own native button'); }
       // v1.22.0: the brief dock's caption contract retired with the captions —
       // the pod grammar is asserted in the repository probe above.
       // v1.16.3 (owner, twice now): NO dashed rings on chart objects — ever
@@ -845,7 +845,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         gok=false; fails++; console.log('✗ the pod collapse law is back (retired v1.21.0 — the pod never hides)'); }
       if(html.indexOf('body.brief-mode #navPod{display:none}')<0){ gok=false; fails++; console.log('✗ the brief room must yield the column to its own pod'); }
       if(html.indexOf('body.brief-mode #briefDock{display:flex; flex-direction:column')<0){ gok=false; fails++; console.log('✗ the brief dock is not a vertical right rail (v1.18.0)'); }
-      if(html.indexOf('Math.max(0.62,')>=0 || html.indexOf('Math.max(0.30,')<0){ gok=false; fails++; console.log('✗ the fit floor law drifted (v1.18.0: 0.30, never 0.62)'); }
+      if(!/Math\.max\(\.85,Math\.min\(2\.2,/.test(html) || /Math\.max\(0\.30,/.test(html)){ gok=false; fails++; console.log('✗ Brief must preserve readable scale and reveal detail progressively'); }
       // v1.18.0 THE DIRECT LINE: connectors are cubic diagonals, not the old
       // junction-rail elbows. (This probe's fixture is a single-child chain —
       // centers align, every path is a plain V — so pin the LAW in source:
