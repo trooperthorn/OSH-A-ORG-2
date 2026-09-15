@@ -67,10 +67,13 @@ function fixture(source, width = 390) {
   c.document.activeElement = c.document.body;
   vm.createContext(c);
   const names = ['_odEsc', '_odEscA', '_briefChainMap', '_bfStarKind', '_bfTint', 'bfNode', 'bfPlaceOf', 'bfStack',
-    '_bfSceneDepth', '_bfViewCapture', '_bfFit', '_bfZoomTo', '_bfExplore', '_bfChartWire', 'renderBrief'];
+    '_bfSceneDepth', '_bfViewCapture', '_bfFit', '_bfZoomTo', '_bfExplore', '_bfChartWire', 'renderBrief',
+    // v1.29.0 — the back spine rides _bfExplore/bfDepth, so the sandbox needs it
+    '_bfNavPush', 'bfBack'];
   const places = source.match(/const BF_PLACES=\[[\s\S]*?\n\];/);
   assert.ok(places, 'shipped brief-place roster missing');
-  vm.runInContext(places[0] + '\n' + names.map(name => sourceFunction(source, name)).join('\n'), c);
+  // v1.29.0: _bfHist is module state the spine functions close over
+  vm.runInContext('var _bfHist=[];\n' + places[0] + '\n' + names.map(name => sourceFunction(source, name)).join('\n'), c);
   function fire(name, fields = {}, windowEvent = false) {
     const event = Object.assign({ target: wrapper, prevented: false, defaultPrevented: false, stopped: false,
       preventDefault() { this.prevented = true; this.defaultPrevented = true; }, stopPropagation() { this.stopped = true; } }, fields);

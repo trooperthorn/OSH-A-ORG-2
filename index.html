@@ -988,6 +988,43 @@ body.chart-min .ch-head>:not(.bf-headtoggle){display:none}
   .bf-context{flex-wrap:nowrap}.bf-jump{flex:0 1 330px}.bf-guide{font-size:12px}.bf-headtoggle .ch-n{display:inline}}
 body.brief-mode.brief-wide:not(.chart-min) #briefStage{position:fixed;inset:calc(env(safe-area-inset-top,0px) + 8px) 8px calc(env(safe-area-inset-bottom,0px) + 8px);height:auto;max-height:none;width:auto;z-index:49}
 body.brief-mode.brief-wide #dossier,body.brief-mode.brief-wide #exportSheet{z-index:52}
+
+/* ═══ v1.29.0 THE PODIUM & PRESENT — the brief on a stage ═══
+   body.present rides ON brief-wide (the fixed-inset chart) and strips every
+   working-canvas affordance: head, context row, zoom/Layout, foot, carets,
+   meta captions, search, docks, clocks, the wordmark band. What remains is
+   the chart — tier-lit boxes, connectors, the globe leader — scaled to FILL
+   by the stage fit in _bfFit. The audience never sees an edit control. */
+body.present #titleBar,body.present #modeSeg,body.present #timeLedger,
+body.present #searchPill,body.present #navDock,body.present #briefDock,
+body.present .ch-head,body.present .bf-context,body.present .bf-controls,
+body.present .bf-foot,body.present .bf-caret,body.present .bf-location,
+body.present .bf-box .bf-meta,body.present #coachRow{display:none!important}
+body.present #briefStage{inset:0;border-radius:0;box-shadow:none;border:0}
+/* the stage centers its scene: flex parent + margin:auto child gives safe
+   centering — a scene smaller than the stage floats to the middle of both
+   axes, a larger one keeps every edge reachable by scroll (auto margins
+   never clip scrollable overflow, unlike naive flex centering). With the
+   meta captions stripped the name is the box, so it centers too. */
+body.present .bf-wrap{display:flex}
+body.present .bf-tree{margin:auto}
+body.present .bf-box{justify-content:center}
+#podium{position:fixed;z-index:60;left:50%;transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:flex;gap:6px;padding:7px;border-radius:999px;
+  opacity:.38;transition:opacity .25s ease}
+#podium:hover,#podium:focus-within{opacity:1}
+#podium[hidden]{display:none}
+.pd-b{appearance:none;-webkit-appearance:none;border:0;cursor:pointer;
+  width:54px;height:54px;border-radius:50%;background:rgba(0,0,0,.42);
+  color:var(--text);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;-webkit-tap-highlight-color:transparent}
+.pd-b b{font:800 19px/1 var(--body)}
+.pd-b span{font:700 6.5px/1 var(--mono);letter-spacing:.12em;color:var(--faint)}
+.pd-b:active{background:var(--accent-wash)}
+.pd-end b{color:var(--danger)}
+.bd-play{font:700 15px/1 var(--body)}
+@media(min-width:1100px){ .pd-b{width:62px;height:62px} .pd-b b{font-size:22px} .pd-b span{font-size:7px} }
 @media(max-height:600px){body.brief-mode #briefStage{overflow-y:auto}.bf-wrap{flex:none;height:220px}}
 /* v0.13.0 THE HAND-BUILT BRIEF: echelon depth control · per-HQ group eyes */
 .bf-depth{display:flex; gap:4px; padding:5px 0 7px}
@@ -1637,10 +1674,27 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 <div id="briefDock" class="ch-dock" aria-label="Brief tools">
   <button class="nv-sat glass" type="button" data-bfclear="1" aria-label="Reset brief view — keep diagram"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6M4 10a8 8 0 1 1 1 8"></path></svg></button>
   <span class="ch-div" aria-hidden="true"></span>
+  <button class="nv-sat glass" type="button" data-bfpresent="1" aria-label="Present — clean full-screen briefing view (P)"><b class="bd-play">▶</b></button>
   <button class="nv-sat glass" type="button" data-bfsearch="1" aria-label="Add an organization or US state"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
   <button class="nv-sat glass bf-vw" type="button" data-bfnm="1" aria-label="Names on the globe"><span class="bd-aa">Aa</span></button>
   <button class="nv-sat glass bf-vw" type="button" data-bfln="1" aria-label="Connecting lines"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 18c4.5-1 4.5-6.5 8.5-8.5C16 8.2 17.8 8 19 8"></path><circle cx="5" cy="18" r="1.9" fill="currentColor" stroke="none"></circle><circle cx="19" cy="8" r="1.9" fill="currentColor" stroke="none"></circle></svg></button>
   <button class="nv-sat glass" type="button" data-xpbtn="1" aria-label="Export"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"></path><path d="M7 9l5-5 5 5"></path><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path></svg></button>
+</div>
+
+<!-- v1.29.0 THE PODIUM (owner: presenting to a large senior audience — "missing
+     back button; navigational controls logically needed are embedded in other
+     options"). Six presenter controls, bottom center, visible ONLY in Present:
+     BACK walks the real navigation history (the spine below), TOP shows the
+     whole chart, L−/L+ step the detail depth, FIT re-fills the stage, END
+     leaves. Quiet at rest (.38 opacity) so the audience sees the chart, not
+     the controls; keyboard twins: ←/Backspace · O/Home · ↑/↓ · F · Esc. -->
+<div id="podium" role="toolbar" aria-label="Presentation controls" hidden>
+  <button class="pd-b glass" type="button" data-bfpodium="back" aria-label="Back (Left arrow)"><b>‹</b><span>BACK</span></button>
+  <button class="pd-b glass" type="button" data-bfpodium="home" aria-label="Whole chart (O)"><b>⌂</b><span>TOP</span></button>
+  <button class="pd-b glass" type="button" data-bfpodium="dep-" aria-label="Fewer levels (Up arrow)"><b>L−</b><span>LESS</span></button>
+  <button class="pd-b glass" type="button" data-bfpodium="dep+" aria-label="More levels (Down arrow)"><b>L+</b><span>MORE</span></button>
+  <button class="pd-b glass" type="button" data-bfpodium="fit" aria-label="Refit to screen (F)"><b>⛶</b><span>FIT</span></button>
+  <button class="pd-b pd-end glass" type="button" data-bfpodium="end" aria-label="End presentation (Esc)"><b>✕</b><span>END</span></button>
 </div>
 
 <!-- v1.15.0 CHART-TO-GLOBE LEADER (design 5a): a dotted curve from the focused
@@ -1688,6 +1742,24 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.29.0 • THE PODIUM & PRESENT (owner: presenting to a large audience of
+//            senior Army personnel — "clunky, doesn't always display the best,
+//            missing back button, navigational controls embedded in other
+//            options"). PRESENT (dock ▶ or P) puts the brief on a stage:
+//            body.present rides brief-wide, strips every working affordance
+//            (head, context row, zoom/Layout, foot, carets, meta captions,
+//            search, docks, clocks, title band) and the STAGE FIT scales the
+//            scene to FILL — both axes, centered, floor .6 / cap 3.4 (the
+//            working canvas keeps .85–2.2). THE PODIUM: six presenter controls
+//            bottom center — BACK · TOP · L− · L+ · FIT · END — quiet at .38
+//            until touched, with keyboard twins ←/Backspace · O/Home · ↑ ↓ ·
+//            F · Esc · P. THE BACK SPINE: every focus/depth move pushes the
+//            state it leaves; bfBack restores it; the hardware/browser back
+//            button walks the same spine (popstate sentinel), so a phone
+//            back-press steps the brief instead of exiting the app, falling
+//            through to the map only when the spine is dry. A fresh focus now
+//            centers on the FOCUSED node (a phone used to clip the branch's
+//            left box); on stage a focused box tap never opens the edit sheet.
 //   v1.28.1 • THE AUGUST REALIGNMENT (owner: "III Corps reports to USAWHC
 //            currently but app shows USAREUR"). Confirmed: SecArmy Driscoll
 //            ordered III Armored Corps from USAREUR-AF to Western Hemisphere
@@ -1792,7 +1864,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v1.28.1';
+const APP_VERSION = 'v1.29.0';
 const APP_UPDATED = '15 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -5261,6 +5333,7 @@ function setMode(m){
   try{ lySync(); }catch(_){}          // v1.21.0: the globe's label follows the room
   // v1.27.0: the working brief opens expanded at readable scale.
   if(brief) document.body.classList.remove('chart-min');
+  try{ if(brief){ _bfHist=[]; _bfHistArm(); } else if(typeof bfPresent==='function') bfPresent(false); }catch(_){}   // v1.29.0
   try{ GlobeState.__bfC=null; GlobeState._bfFocus=null; }catch(_){}
   if(brief) renderBrief();
   // v1.15.0 (design 2b): the search pill speaks the room's language, the brief
@@ -5614,20 +5687,130 @@ function _bfViewCapture(point){
 function _bfFit(view){
   const w=document.querySelector('#briefStage .bf-wrap'),t=w&&w.querySelector('.bf-tree'),L=GlobeState.__bfLayout;
   if(!w||!t||!L||!w.clientWidth||document.body.classList.contains('chart-min'))return;
-  const z=Math.max(.85,Math.min(2.2,GlobeState._bfZoom||1));GlobeState._bfZoom=z;GlobeState.__bfFitPct=z;t.style.zoom=z;
+  const pres=document.body.classList.contains('present');
+  const tw=parseFloat(t.style.width)||t.scrollWidth||1, th=parseFloat(t.style.height)||t.scrollHeight||1;
+  let z;
+  if(pres&&GlobeState.__bfPresFit){
+    // v1.29.0 THE STAGE FIT — the whole scene, both axes, scaled to FILL and
+    // centered like a wall chart. Cap 3.4 so three boxes do not become
+    // billboards; floor .6 so a wide formation still lands on one screen. A
+    // manual pinch/wheel clears the flag (below) and then holds until FIT.
+    z=Math.max(.6,Math.min(3.4,Math.min((w.clientWidth-56)/tw,(w.clientHeight-56)/th)));
+    GlobeState._bfZoom=z;
+  } else {
+    z=Math.max(.85,Math.min(pres?3.4:2.2,GlobeState._bfZoom||1));GlobeState._bfZoom=z;
+  }
+  GlobeState.__bfFitPct=z;t.style.zoom=z;
   const p=view&&view.focus===L.focus&&L.nodes[view.key];
   if(p){w.scrollLeft=Math.max(0,(p.cx+view.dx)*z-view.x);w.scrollTop=Math.max(0,(p.y+L.bh/2+view.dy)*z-view.y);}
   else if(view&&view.focus===L.focus){w.scrollLeft=view.left;w.scrollTop=view.top;}
-  else {w.scrollLeft=Math.max(0,(t.scrollWidth*z-w.clientWidth)/2);w.scrollTop=0;}
+  else {
+    // fresh scene: center on the FOCUSED node when there is one — centering
+    // the whole tree pushed the focused branch off-screen on a phone.
+    const f=L.focus&&L.nodes[L.focus];
+    const cx=f?f.cx:tw/2;
+    w.scrollLeft=Math.max(0,cx*z-w.clientWidth/2);
+    w.scrollTop=pres?Math.max(0,(th*z-w.clientHeight)/2):0;
+  }
   const pct=document.querySelector('#briefStage .bf-zpct');if(pct)pct.textContent=Math.round(z*100)+'%';
 }
 function _bfZoomTo(value,point,finish){
-  const view=_bfViewCapture(point);GlobeState._bfZoom=Math.max(.85,Math.min(2.2,value));
+  GlobeState.__bfPresFit=0;   // v1.29.0: a deliberate zoom overrides the stage fit
+  const view=_bfViewCapture(point);
+  GlobeState._bfZoom=Math.max(.85,Math.min(document.body.classList.contains('present')?3.4:2.2,value));
   if(finish){renderBrief(view);globeMark();}else _bfFit(view);
 }
+// ═══ v1.29.0 THE BACK SPINE ═══ every focus/depth move pushes the state it
+// LEAVES, and bfBack restores it — a real history, not parent-of-focus. The
+// hardware/browser back button walks the same spine (popstate below), so a
+// presenter's phone back-press steps the brief instead of exiting the app.
+let _bfHist=[];
+function _bfNavPush(){
+  const st={foc:GlobeState._bfFocus||null,
+            dep:GlobeState._bfManualDepth?(GlobeState._bfDepth||4):0,
+            z:GlobeState._bfZoom||1};
+  const last=_bfHist[_bfHist.length-1];
+  if(!last||last.foc!==st.foc||last.dep!==st.dep) _bfHist.push(st);
+  if(_bfHist.length>60)_bfHist.shift();
+}
+function bfBack(){
+  const st=_bfHist.pop();
+  if(st){
+    GlobeState._bfFocus=(st.foc&&bfNode(st.foc))?st.foc:null;
+    GlobeState._bfManualDepth=!!st.dep; if(st.dep)GlobeState._bfDepth=st.dep;
+    GlobeState._bfZoom=st.z||1;
+    try{renderBrief();globeMark();}catch(_){} return true;
+  }
+  if(GlobeState._bfFocus){                 // spine dry but focused: back = the
+    GlobeState._bfFocus=null;              // whole chart, WITHOUT a push (or
+    GlobeState._bfManualDepth=false;       // back/back would ping-pong)
+    GlobeState._bfZoom=1;
+    try{renderBrief();globeMark();}catch(_){} return true;
+  }
+  return false;
+}
+try{ window.bfBack=bfBack; window._bfHist=_bfHist; }catch(_){}
+// ═══ PRESENT — the stage posture. Rides brief-wide; the fit does the rest. ═══
+function bfPresent(on){
+  const b=document.body;
+  if(!!on===b.classList.contains('present')) return;
+  if(on){
+    GlobeState.__bfWasWide=b.classList.contains('brief-wide');
+    b.classList.add('present','brief-wide');
+    GlobeState.__bfPresFit=1;
+    try{calloutHide();hideDossier();}catch(_){}
+    _bfHistArm();
+  } else {
+    b.classList.remove('present');
+    if(!GlobeState.__bfWasWide) b.classList.remove('brief-wide');
+    GlobeState.__bfPresFit=0; GlobeState._bfZoom=1;
+  }
+  const pd=document.getElementById('podium'); if(pd) pd.hidden=!on;
+  try{renderBrief();globeMark();}catch(_){}
+}
+try{ window.bfPresent=bfPresent; }catch(_){}
+// hardware/browser back: one sentinel entry is armed per brief visit; each
+// pop walks the spine and re-arms, so back never leaves mid-brief. When the
+// spine is dry and nothing is focused, back returns to the map; the next
+// back is the browser's own.
+let _bfPopArmed=false;
+function _bfHistArm(){
+  if(_bfPopArmed) return; _bfPopArmed=true;
+  try{ history.pushState({a2bf:1},''); }catch(_){}
+}
+try{
+  window.addEventListener('popstate',function(){
+    const b=document.body;
+    if(!b.classList.contains('brief-mode')){ _bfPopArmed=false; return; }
+    if(bfBack()){ try{ history.pushState({a2bf:1},''); }catch(_){} return; }
+    if(b.classList.contains('present')){ bfPresent(false); try{ history.pushState({a2bf:1},''); }catch(_){} return; }
+    _bfPopArmed=false; try{ setMode('map'); }catch(_){}
+  });
+}catch(_){}
+// the podium's keyboard twins — document-level, brief-room scoped, form-safe
+try{
+  if(!window.__bfKeysWired){ window.__bfKeysWired=true;
+    document.addEventListener('keydown',function(e){
+      const b=document.body; if(!b.classList||!b.classList.contains('brief-mode')) return;
+      const t=e.target;
+      if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable)) return;
+      const pres=b.classList.contains('present');
+      if((e.key==='p'||e.key==='P')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){ e.preventDefault(); bfPresent(!pres); return; }
+      if(!pres) return;
+      if(e.key==='Escape'){ e.preventDefault(); bfPresent(false); }
+      else if(e.key==='ArrowLeft'||e.key==='Backspace'){ e.preventDefault(); bfBack(); }
+      else if(e.key==='o'||e.key==='O'||e.key==='Home'){ e.preventDefault(); _bfExplore(null); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); bfDepth((GlobeState._bfManualDepth?(GlobeState._bfDepth||4):_bfSceneDepth())-1); }
+      else if(e.key==='ArrowDown'){ e.preventDefault(); bfDepth((GlobeState._bfManualDepth?(GlobeState._bfDepth||4):_bfSceneDepth())+1); }
+      else if(e.key==='f'||e.key==='F'){ e.preventDefault(); GlobeState.__bfPresFit=1; try{renderBrief();globeMark();}catch(_){} }
+    },true);
+  }
+}catch(_){}
 function _bfExplore(k){
   if(k&&!bfNode(k))return;
+  if((GlobeState._bfFocus||null)!==(k||null)) _bfNavPush();   // v1.29.0: the spine remembers where you were
   GlobeState._bfFocus=k||null;GlobeState._bfManualDepth=false;GlobeState._bfZoom=1;
+  if(document.body.classList.contains('present')) GlobeState.__bfPresFit=1;
   const f=GlobeState._bfFold||{};if(k)delete f[k];
   try{calloutHide();hideDossier();renderBrief();globeMark();
     const buttons=document.querySelectorAll('#briefStage .bf-box');const b=Array.from(buttons).find(function(b){return b.getAttribute('data-bfobj')===k;});if(b)b.focus({preventScroll:true});
@@ -7289,6 +7472,17 @@ if(!window._odWired){
       if(nd && Array.isArray(nd.inv) && ix>=0 && ix<nd.inv.length){ nd.inv.splice(ix,1); _bfSave(); }
       _bfObjSheet(id); return; }
     // ---- v0.7.0 object popup + chart + custom orgs ----
+    // v1.29.0 — the podium and the Present cell
+    const pod=e.target.closest('[data-bfpodium]');
+    if(pod){ const a=pod.getAttribute('data-bfpodium');
+      if(a==='back') bfBack();
+      else if(a==='home') _bfExplore(null);
+      else if(a==='dep-'||a==='dep+') bfDepth((GlobeState._bfManualDepth?(GlobeState._bfDepth||4):_bfSceneDepth())+(a==='dep+'?1:-1));
+      else if(a==='fit'){ GlobeState.__bfPresFit=1; try{renderBrief();globeMark();}catch(_){} }
+      else if(a==='end') bfPresent(false);
+      return; }
+    const prs=e.target.closest('[data-bfpresent]');
+    if(prs){ bfPresent(!document.body.classList.contains('present')); return; }
     const bfc=e.target.closest('[data-bffocusclear]');
     if(bfc){_bfExplore(null);return;}
     const explore=e.target.closest('[data-bfbranch]');if(explore){_bfExplore(explore.getAttribute('data-bfbranch'));return;}
@@ -7327,7 +7521,7 @@ if(!window._odWired){
     const bo=e.target.closest('[data-bfobj]');
     if(bo){ _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null;
       const id=bo.getAttribute('data-bfobj');
-      if(GlobeState._bfFocus===id){_bfObjSheet(id);}else _bfExplore(id);
+      if(GlobeState._bfFocus===id){ if(!document.body.classList.contains('present')) _bfObjSheet(id); }else _bfExplore(id);
       return; }
     const cx0=e.target.closest('[data-cox]');
     if(cx0){ selectSite(null); return; }
@@ -8172,8 +8366,10 @@ function bfEye(rootId){
   try{ globeMark(); }catch(_){}
 }
 function bfDepth(n){
+  const _v=Math.max(1, Math.min(4, parseInt(n,10)||4));
+  if(!(GlobeState._bfManualDepth&&(GlobeState._bfDepth||4)===_v)) _bfNavPush();   // v1.29.0
   GlobeState._bfManualDepth=true;
-  GlobeState._bfDepth=Math.max(1, Math.min(4, parseInt(n,10)||4));
+  GlobeState._bfDepth=_v;
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
 }

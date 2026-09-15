@@ -1935,3 +1935,38 @@ It lives here now.
   root asccs→drus (the 780th MI branch sits under INSCOM here), CSL root
   drus→acoms (a relic of the War College's DRU era). ZERO exception rows
   remain — the slim literal is pure {id,name,parent,site?} again.
+
+## v1.29.0 — the podium & present (owner: an extremely important brief to senior Army leaders)
+- THE ROOM HAS TWO POSTURES NOW. The brief room is a BUILDER (head, context
+  row, zoom, Layout, foot — all as v1.26/v1.27 left them) until PRESENT (dock
+  ▶, or P) puts it on a STAGE: brief-wide + body.present, working chrome
+  stripped by one selector list, scene scaled to fill and centered. The
+  audience sees tier-lit boxes, connectors and the globe leader — never an
+  edit control. A focused box tap on stage does NOT open the edit sheet.
+- THE STAGE FIT vs THE SCALE LAW: v1.27's law (floor .85, cap 2.2, no .30
+  crush) still governs the working canvas; the stage alone may scale .6–3.4,
+  and the smoke probe now pins the conditional shape so neither cap drifts.
+  Measured: a 7-org brief presents at 224% overview / 319% focused at 1080p —
+  readable from the back of a room; the same brief works at 15px otherwise.
+- CENTERING THAT CANNOT CLIP: flex wrap + margin:auto tree — a small scene
+  floats to center, a large one keeps every edge scroll-reachable (naive flex
+  centering clips the start edge; auto margins never do).
+- THE BACK SPINE is a real history (_bfHist): _bfExplore and bfDepth push the
+  state they LEAVE, bfBack restores it. Dry-but-focused back clears to
+  overview WITHOUT pushing — push there and back/back ping-pongs forever.
+  Dry-and-unfocused back returns false so callers can fall through.
+- HARDWARE BACK IS THE SAME SPINE: one popstate sentinel armed per brief
+  visit; each pop walks bfBack and re-arms; when the spine is dry the next
+  back leaves the brief for the map, and only the one after that leaves the
+  app. "Missing back button" on a phone PWA meant THIS as much as any
+  on-screen control.
+- A FRESH FOCUS CENTERS ON THE FOCUSED NODE. The old fit centered the whole
+  tree, which pushed a focused branch's left box clean off a phone screen
+  (the owner's clipped-82nd screenshot). The builder keeps top anchor; only
+  the stage centers vertically.
+- brief-scale-check's sandbox extracts named functions; new module state a
+  function closes over (_bfHist) must be DECLARED in the fixture prelude and
+  new spine functions added to its name list — the sandbox mirrors the
+  module's real dependency set or it fails on code that runs fine live.
+- Byte delta: +11,745 over v1.28.1 (883,408 · 95.9% of the gate). Paid from
+  the v1.28.0 prune's 50.7 KB; 38.2 KB of headroom remains.

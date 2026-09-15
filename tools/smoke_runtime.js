@@ -845,7 +845,12 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         gok=false; fails++; console.log('✗ the pod collapse law is back (retired v1.21.0 — the pod never hides)'); }
       if(html.indexOf('body.brief-mode #navPod{display:none}')<0){ gok=false; fails++; console.log('✗ the brief room must yield the column to its own pod'); }
       if(html.indexOf('body.brief-mode #briefDock{display:flex; flex-direction:column')<0){ gok=false; fails++; console.log('✗ the brief dock is not a vertical right rail (v1.18.0)'); }
-      if(!/Math\.max\(\.85,Math\.min\(2\.2,/.test(html) || /Math\.max\(0\.30,/.test(html)){ gok=false; fails++; console.log('✗ Brief must preserve readable scale and reveal detail progressively'); }
+      // v1.29.0 amends the v1.27 scale law: the WORKING canvas keeps floor .85 /
+      // cap 2.2, and only body.present may scale to 3.4 (the stage fit). The
+      // assert now pins the present-conditional shape so neither the builder
+      // cap nor the .85 floor can silently widen.
+      if(!/Math\.max\(\.85,Math\.min\((?:pres|document\.body\.classList\.contains\('present'\))\?3\.4:2\.2,/.test(html)
+         || /Math\.max\(0\.30,/.test(html)){ gok=false; fails++; console.log('✗ Brief must preserve readable scale and reveal detail progressively (builder .85–2.2; 3.4 only on the present stage)'); }
       // v1.18.0 THE DIRECT LINE: connectors are cubic diagonals, not the old
       // junction-rail elbows. (This probe's fixture is a single-child chain —
       // centers align, every path is a plain V — so pin the LAW in source:
@@ -1113,6 +1118,46 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
   if(!/#verTag\{[^}]*top:32px/.test(html)){
     fails++; console.log('\u2717 the build stamp drifted back under the mode pill (v1.24.0 seated it at 32px)'); }
   else console.log('  \u2713 build stamp seated clear of the mode pill');
+
+  // ── PROBE: THE PODIUM & PRESENT (v1.29.0) — a real back history for the
+  //    brief (explore pushes the state it leaves; back restores it; a dry back
+  //    with focus clears to overview WITHOUT pushing, so back never
+  //    ping-pongs; a dry unfocused back reports false so hardware-back can
+  //    fall through to the map). Present rides brief-wide, strips the working
+  //    chrome, and shows the six-control podium. The podium element is static
+  //    markup, which this stub never parses — its visibility is asserted in
+  //    the live proof; here the SOURCE carries the law. ──
+  { let pok=true;
+    try{
+      global.setMode('brief');
+      global.Brief.add('usawhc'); global.Brief.add('xviii-airborne-corps'); global.Brief.add('82nd-airborne-division');
+      global.renderBrief();
+      global._bfExplore('xviii-airborne-corps');
+      global._bfExplore('82nd-airborne-division');
+      if(global.GlobeState._bfFocus!=='82nd-airborne-division'){pok=false;fails++;console.log('✗ SPINE: explore did not focus');}
+      global.bfBack();
+      if(global.GlobeState._bfFocus!=='xviii-airborne-corps'){pok=false;fails++;console.log('✗ SPINE: back did not restore the previous focus');}
+      global.bfBack();
+      if(global.GlobeState._bfFocus!==null){pok=false;fails++;console.log('✗ SPINE: second back did not return to overview');}
+      if(global.bfBack()!==false){pok=false;fails++;console.log('✗ SPINE: a dry unfocused back must report false (hardware-back falls through to the map)');}
+      global._bfExplore('usawhc'); global._bfHist.length=0;
+      global.bfBack();
+      if(global.GlobeState._bfFocus!==null){pok=false;fails++;console.log('✗ SPINE: dry-but-focused back must clear to overview');}
+      if(global._bfHist.length!==0){pok=false;fails++;console.log('✗ SPINE: the dry-clear must NOT push (back/back would ping-pong)');}
+      global.bfPresent(true);
+      const bcl=global.document.body.classList;
+      if(!bcl.contains('present')||!bcl.contains('brief-wide')){pok=false;fails++;console.log('✗ PRESENT: stage classes missing');}
+      global.bfPresent(false);
+      if(bcl.contains('present')||bcl.contains('brief-wide')){pok=false;fails++;console.log('✗ PRESENT: exit left stage classes behind');}
+      global.setMode('map');
+    }catch(e){pok=false;fails++;console.log('✗ PODIUM probe: '+e.message);}
+    if(html.indexOf('body.present #searchPill')<0 || html.indexOf('body.present .bf-caret')<0 || html.indexOf('body.present #briefDock')<0){
+      pok=false; fails++; console.log('✗ PRESENT css must strip the working chrome (search pill, carets, dock)'); }
+    ['back','home','dep-','dep+','fit','end'].forEach(function(a){
+      if(html.indexOf('data-bfpodium="'+a+'"')<0){ pok=false; fails++; console.log('✗ PODIUM is missing its '+a+' control'); } });
+    if(html.indexOf('data-bfpresent="1"')<0){ pok=false; fails++; console.log('✗ the dock has no Present door'); }
+    if(pok) console.log('  \u2713 PODIUM & PRESENT: spine push/pop/dry-clear/false \u00b7 stage classes on+off \u00b7 chrome stripped \u00b7 six controls \u00b7 dock door');
+  }
 
   // ── PROBE: THE DERIVED SPINE (v1.28.0) — the inline A1ORGS literal ships
   //    {id,name,parent,site?} and a boot shim rebuilds lvl/root from the parent
