@@ -2,7 +2,7 @@
 
 **Generated file — do not hand-edit.** Regenerate with `node tools/codemap.js`.
 
-Index of `index.html` at **v1.29.0** — 883,408 bytes, 10,415 lines, 342 top-level functions.
+Index of `index.html` at **v1.30.0** — 886,957 bytes, 10,468 lines, 343 top-level functions.
 
 Line numbers move every release. Confirm by searching the banner or the
 `function name(` text, not by trusting the number.
@@ -14,23 +14,23 @@ is the starting point for any prune.
 
 | Section | Lines | Size |
 |---|---|---|
-| DATA: A1ORGS literal (inline copy of data/orgs.json) | 1967–2021 | 187.4 KB |
-| s4-dossier | 5002–7816 | 180.3 KB |
-| s7-records | 7817–9265 | 78.8 KB |
+| DATA: A1ORGS literal (inline copy of data/orgs.json) | 1979–2033 | 187.4 KB |
+| s4-dossier | 5014–7855 | 182.2 KB |
+| s7-records | 7856–9318 | 79.5 KB |
 | <style> — all CSS | 173–1272 | 71.2 KB |
-| m5-markers | 2865–4066 | 65.2 KB |
-| DATA: SITES literal (inline copy of data/sites.json) | 1960–1966 | 49.0 KB |
-| s5-clocks | 9559–10415 | 46.6 KB |
-| s3-search | 4454–5001 | 28.9 KB |
-| m2-render | 2166–2449 | 24.7 KB |
-| m6-mapdata | 4067–4453 | 19.8 KB |
-| s6-export | 9266–9558 | 18.7 KB |
-| m3-input | 2450–2716 | 16.1 KB |
-| CHANGELOG (in-file release ledger) | 1744–1959 | 14.5 KB |
+| m5-markers | 2877–4078 | 65.2 KB |
+| DATA: SITES literal (inline copy of data/sites.json) | 1972–1978 | 49.0 KB |
+| s5-clocks | 9612–10468 | 46.6 KB |
+| s3-search | 4466–5013 | 28.9 KB |
+| m2-render | 2178–2461 | 24.7 KB |
+| m6-mapdata | 4079–4465 | 19.8 KB |
+| s6-export | 9319–9611 | 18.7 KB |
+| m3-input | 2462–2728 | 16.1 KB |
+| CHANGELOG (in-file release ledger) | 1744–1971 | 15.4 KB |
 | <body> — markup | 1582–1742 | 13.0 KB |
 | THE ANCHORED CALLOUT (v0.9.0): identity at the pin, depth in the sheet | 1407–1562 | 10.8 KB |
-| m4-camera | 2717–2864 | 9.8 KB |
-| m1-geom | 2022–2165 | 7.5 KB |
+| m4-camera | 2729–2876 | 9.8 KB |
+| m1-geom | 2034–2177 | 7.5 KB |
 | <script> — the application | 57–172 | 7.5 KB |
 | v0.4.0 DATASTORE — sheet tabs · record rows · one add/edit form | 1273–1377 | 7.4 KB |
 | <script> — the application | 16–56 | 2.2 KB |
@@ -50,436 +50,437 @@ is the starting point for any prune.
 | 1582 | <body> — markup | boundary |
 | 1743 | <script> — the application | boundary |
 | 1744 | CHANGELOG (in-file release ledger) | prose |
-| 1960 | DATA: SITES literal (inline copy of data/sites.json) | data |
-| 1967 | DATA: A1ORGS literal (inline copy of data/orgs.json) | data |
-| 2022 | m1-geom | module |
-| 2166 | m2-render | module |
-| 2450 | m3-input | module |
-| 2717 | m4-camera | module |
-| 2865 | m5-markers | module |
-| 4067 | m6-mapdata | module |
-| 4454 | s3-search | module |
-| 5002 | s4-dossier | module |
-| 7817 | s7-records | module |
-| 9266 | s6-export | module |
-| 9559 | s5-clocks | module |
+| 1972 | DATA: SITES literal (inline copy of data/sites.json) | data |
+| 1979 | DATA: A1ORGS literal (inline copy of data/orgs.json) | data |
+| 2034 | m1-geom | module |
+| 2178 | m2-render | module |
+| 2462 | m3-input | module |
+| 2729 | m4-camera | module |
+| 2877 | m5-markers | module |
+| 4079 | m6-mapdata | module |
+| 4466 | s3-search | module |
+| 5014 | s4-dossier | module |
+| 7856 | s7-records | module |
+| 9319 | s6-export | module |
+| 9612 | s5-clocks | module |
 
 ## Functions by section
 
 ### 1744 · CHANGELOG (in-file release ledger)
 
-- `1867` **APP_VERSION**
-- `1868` **APP_UPDATED**
+- `1879` **APP_VERSION**
+- `1880` **APP_UPDATED**
 
-### 1960 · DATA: SITES literal (inline copy of data/sites.json)
+### 1972 · DATA: SITES literal (inline copy of data/sites.json)
 
-- `1960` **SITES**
+- `1972` **SITES**
 
-### 1967 · DATA: A1ORGS literal (inline copy of data/orgs.json)
+### 1979 · DATA: A1ORGS literal (inline copy of data/orgs.json)
 
-- `1967` **A1ORGS**
-- `1990` `_ogBuild()`
-- `2003` `orgOf(id)`
-- `2004` `ogKids(id)`
-- `2005` `ogEffSite(id)`
-- `2006` `ogAtSite(siteId)`
-- `2008` `ogPrimary(siteId)`
-- `2013` `ogChainUp(id)`
+- `1979` **A1ORGS**
+- `2002` `_ogBuild()`
+- `2015` `orgOf(id)`
+- `2016` `ogKids(id)`
+- `2017` `ogEffSite(id)`
+- `2018` `ogAtSite(siteId)`
+- `2020` `ogPrimary(siteId)`
+- `2025` `ogChainUp(id)`
 
-### 2022 · m1-geom
+### 2034 · m1-geom
 
-- `2071` `_qMul(a,b)`
-- `2081` `_qNorm(q)`
-- `2083` `_qFromAxisAngle(ax,ay,az,ang)`
-- `2087` `lonLatToVec(lon, lat)`
-- `2095` `_setGlobeRot(rotLon, rotLat)`
-- `2108` `_projectLonLat(lon, lat, m)`
-- `2119` `_projectVec(v, m)`
-- `2132` `_visibleLonLat(lon, lat, tol)`
-- `2142` `globeMetrics(cv)`
-- `2154` `_ringXYZ(ring)`
+- `2083` `_qMul(a,b)`
+- `2093` `_qNorm(q)`
+- `2095` `_qFromAxisAngle(ax,ay,az,ang)`
+- `2099` `lonLatToVec(lon, lat)`
+- `2107` `_setGlobeRot(rotLon, rotLat)`
+- `2120` `_projectLonLat(lon, lat, m)`
+- `2131` `_projectVec(v, m)`
+- `2144` `_visibleLonLat(lon, lat, tol)`
+- `2154` `globeMetrics(cv)`
+- `2166` `_ringXYZ(ring)`
 
-### 2166 · m2-render
+### 2178 · m2-render
 
-- `2219` **GLOBE_FALLBACK_RINGS**
-- `2220` **GLOBE_RINGS**
-- `2222` **GLOBE_STATE_RINGS**
-- `2223` **GLOBE_SHORE_RINGS**
-- `2227` **US_STATES**
-- `2254` **GLOBE_STATE_SHAPES**
-- `2257` **GLOBE_COUNTRY_RINGS**
-- `2265` `startGlobeLoop(cv)`
-- `2298` `drawGlobe(cv, ctx)`
-- `2369` `latRing(lat)`
-- `2371` `lonRing(lon)`
-- `2373` `drawGlobePath(ctx,m,ring,fill)`
-- `2424` `_smoothRing(r, iters)`
-- `2440` `smoothFallbackOnce()`
+- `2231` **GLOBE_FALLBACK_RINGS**
+- `2232` **GLOBE_RINGS**
+- `2234` **GLOBE_STATE_RINGS**
+- `2235` **GLOBE_SHORE_RINGS**
+- `2239` **US_STATES**
+- `2266` **GLOBE_STATE_SHAPES**
+- `2269` **GLOBE_COUNTRY_RINGS**
+- `2277` `startGlobeLoop(cv)`
+- `2310` `drawGlobe(cv, ctx)`
+- `2381` `latRing(lat)`
+- `2383` `lonRing(lon)`
+- `2385` `drawGlobePath(ctx,m,ring,fill)`
+- `2436` `_smoothRing(r, iters)`
+- `2452` `smoothFallbackOnce()`
 
-### 2450 · m3-input
+### 2462 · m3-input
 
-- `2514` `globeMark()`
-- `2518` `_rebuildGlobeQ()`
-- `2527` `_faceLonLatAngles(lon,lat)`
-- `2535` `setupGlobeInteraction(cv)`
-- `2707` `globeGlideStep(dt)`
+- `2526` `globeMark()`
+- `2530` `_rebuildGlobeQ()`
+- `2539` `_faceLonLatAngles(lon,lat)`
+- `2547` `setupGlobeInteraction(cv)`
+- `2719` `globeGlideStep(dt)`
 
-### 2717 · m4-camera
+### 2729 · m4-camera
 
-- `2813` `cameraCancel()`
-- `2826` `flyToLatLon(lat, lon, zoom, onArrive)`
+- `2825` `cameraCancel()`
+- `2838` `flyToLatLon(lat, lon, zoom, onArrive)`
 
-### 2865 · m5-markers
+### 2877 · m5-markers
 
-- `2971` `_sitesArr()`
-- `2975` `_siteIndex()`
-- `2989` `siteById(id)`
-- `3000` **CLS_META**
-- `3007` `clsOf(id)`
-- `3021` `_disc(id, title, bodyHtml, opts)`
-- `3046` `_famOffSet()`
-- `3059` **LY_MODES**
-- `3066` `lyCounts()`
-- `3071` `lyShown(off)`
-- `3072` `lyModeN(m)`
-- `3073` `lyKey()`
-- `3080` `lySync()`
-- `3095` `_lyRingPaint()`
-- `3124` `lyRing(open)`
-- `3134` `lyMode(k)`
-- `3139` `lyFam(k)`
-- `3143` `lyView(v)`
-- `3151` `_lyEnsure(id)`
-- `3163` `_shPaneLay()`
-- `3202` `renderLegend()`
-- `3216` `_cssRGB(c, fb)`
-- `3227` `_mTok()`
-- `3254` `_syncSelArcs(selId)`
-- `3323` `_selSyncCheck()`
-- `3335` `drawSubtleArcs(ctx, m, arcs, rgb, width, alpha, arrow, dash)`
-- `3373` `drawGlobeLinks(ctx, m)`
-- `3398` `_gChromeZones(m)`
-- `3424` `_placeGlobeLabel(ctx, sx, sy, w, m, rects, opts)`
-- `3451` `drawGlobeMarkers(ctx, m)`
-- `3650` `_glowDot(ctx, x, y, fd, k)`
-- `3665` **BF_STREAMS**
-- `3680` `_bfNodeLbl(nd)`
-- `3681` `_bfAbbr(name)`
-- `3697` `_bfFanShort(lbls)`
-- `3716` **BF_STAR**
-- `3717` `_bfStarKind(n)`
-- `3732` `_bfParentOf(id)`
-- `3739` `_briefChainMap(opts)`
-- `3794` `drawBriefStates(ctx, m, labels)`
-- `3888` `_hexTrip(hex)`
-- `3894` `drawBriefArcs(ctx, m)`
-- `3914` `drawBriefNodes(ctx, m)`
-- `4035` `drawMarkersHook(ctx, m)`
-- `4058` `siteHitTest(x, y)`
+- `2983` `_sitesArr()`
+- `2987` `_siteIndex()`
+- `3001` `siteById(id)`
+- `3012` **CLS_META**
+- `3019` `clsOf(id)`
+- `3033` `_disc(id, title, bodyHtml, opts)`
+- `3058` `_famOffSet()`
+- `3071` **LY_MODES**
+- `3078` `lyCounts()`
+- `3083` `lyShown(off)`
+- `3084` `lyModeN(m)`
+- `3085` `lyKey()`
+- `3092` `lySync()`
+- `3107` `_lyRingPaint()`
+- `3136` `lyRing(open)`
+- `3146` `lyMode(k)`
+- `3151` `lyFam(k)`
+- `3155` `lyView(v)`
+- `3163` `_lyEnsure(id)`
+- `3175` `_shPaneLay()`
+- `3214` `renderLegend()`
+- `3228` `_cssRGB(c, fb)`
+- `3239` `_mTok()`
+- `3266` `_syncSelArcs(selId)`
+- `3335` `_selSyncCheck()`
+- `3347` `drawSubtleArcs(ctx, m, arcs, rgb, width, alpha, arrow, dash)`
+- `3385` `drawGlobeLinks(ctx, m)`
+- `3410` `_gChromeZones(m)`
+- `3436` `_placeGlobeLabel(ctx, sx, sy, w, m, rects, opts)`
+- `3463` `drawGlobeMarkers(ctx, m)`
+- `3662` `_glowDot(ctx, x, y, fd, k)`
+- `3677` **BF_STREAMS**
+- `3692` `_bfNodeLbl(nd)`
+- `3693` `_bfAbbr(name)`
+- `3709` `_bfFanShort(lbls)`
+- `3728` **BF_STAR**
+- `3729` `_bfStarKind(n)`
+- `3744` `_bfParentOf(id)`
+- `3751` `_briefChainMap(opts)`
+- `3806` `drawBriefStates(ctx, m, labels)`
+- `3900` `_hexTrip(hex)`
+- `3906` `drawBriefArcs(ctx, m)`
+- `3926` `drawBriefNodes(ctx, m)`
+- `4047` `drawMarkersHook(ctx, m)`
+- `4070` `siteHitTest(x, y)`
 
-### 4067 · m6-mapdata
+### 4079 · m6-mapdata
 
-- `4138` `_fetchRetry(src, tries)`
-- `4151` `_basemapLoad()`
-- `4157` `_basemapNetUp()`
-- `4163` `loadGlobeCoastlinesHi()`
-- `4190` `loadStateBorders()`
-- `4221` `_albersUsaInvert(x, y)`
-- `4240` `_ringsLookGeographic(rings)`
-- `4263` `_topoInteriorMesh(topo, objName, projInvert, exclGeom)`
-- `4308` `_topoSingleUse(topo, objName, projInvert)`
-- `4332` `_shoreHarvest()`
-- `4370` `loadCountryBorders()`
-- `4394` `_decodeTopoLonLat(topo, objName)`
-- `4408` `decodeTopoLand(topo)`
-- `4434` `_namedStateShapes(topo, geographic)`
+- `4150` `_fetchRetry(src, tries)`
+- `4163` `_basemapLoad()`
+- `4169` `_basemapNetUp()`
+- `4175` `loadGlobeCoastlinesHi()`
+- `4202` `loadStateBorders()`
+- `4233` `_albersUsaInvert(x, y)`
+- `4252` `_ringsLookGeographic(rings)`
+- `4275` `_topoInteriorMesh(topo, objName, projInvert, exclGeom)`
+- `4320` `_topoSingleUse(topo, objName, projInvert)`
+- `4344` `_shoreHarvest()`
+- `4382` `loadCountryBorders()`
+- `4406` `_decodeTopoLonLat(topo, objName)`
+- `4420` `decodeTopoLand(topo)`
+- `4446` `_namedStateShapes(topo, geographic)`
 
-### 4454 · s3-search
+### 4466 · s3-search
 
-- `4580` `_srEsc(s)`
-- `4581` `_srEscA(v)`
-- `4584` `_srFold(s)`
-- `4594` `_searchEntries()`
-- `4643` `buildSearchIndex()`
-- `4647` `_srUserEntries()`
-- `4692` `_srBriefEntries()`
-- `4703` `sfsResults(q)`
-- `4747` `_srFuse()`
-- `4754` `sfsRender(res)`
-- `4758` `_sfsPaint(res)`
-- `4790` `_srRefresh()`
-- `4799` `searchSelect(id)`
-- `4922` `_sfsField()`
-- `4926` `_isSearchField(t)`
-- `4974` `initSearch()`
-- `4996` `_srInjectCSS()`
+- `4592` `_srEsc(s)`
+- `4593` `_srEscA(v)`
+- `4596` `_srFold(s)`
+- `4606` `_searchEntries()`
+- `4655` `buildSearchIndex()`
+- `4659` `_srUserEntries()`
+- `4704` `_srBriefEntries()`
+- `4715` `sfsResults(q)`
+- `4759` `_srFuse()`
+- `4766` `sfsRender(res)`
+- `4770` `_sfsPaint(res)`
+- `4802` `_srRefresh()`
+- `4811` `searchSelect(id)`
+- `4934` `_sfsField()`
+- `4938` `_isSearchField(t)`
+- `4986` `initSearch()`
+- `5008` `_srInjectCSS()`
 
-### 5002 · s4-dossier
+### 5014 · s4-dossier
 
-- `5143` `_odEsc(s)`
-- `5144` `_odEscA(v)`
-- `5158` `_camSnap()`
-- `5162` `_camApply(st, o)`
-- `5184` `_undoPush()`
-- `5203` `tpLive()`
-- `5210` `tpSync()`
-- `5222` `tpZoom(dir, ramp)`
-- `5236` `tpUndo()`
-- `5241` `tpClear()`
-- `5242` `_tpStop(e)`
-- `5249` `_tpRamp()`
-- `5254` `_tpWire()`
-- `5278` `selectSite(id, o)`
-- `5326` `setMode(m)`
-- `5365` `renderBrief(view)`
-- `5553` `_bdSync()`
-- `5565` `_bfTint(hex)`
-- `5579` `_bfLeaderTrack()`
-- `5626` `_bfFlipCapture(el)`
-- `5638` `_bfFlipPlay(el, old)`
-- `5675` `_bfSceneDepth()`
-- `5679` `_bfViewCapture(point)`
-- `5687` `_bfFit(view)`
-- `5717` `_bfZoomTo(value,point,finish)`
-- `5728` `_bfNavPush()`
-- `5736` `bfBack()`
-- `5754` `bfPresent(on)`
-- `5777` `_bfHistArm()`
-- `5809` `_bfExplore(k)`
-- `5819` `_bfChartWire(el)`
-- `5855` `_trailPush(id)`
-- `5863` `_trailClear()`
-- `5874` `_flyFitChain()`
-- `5906` `_clearBand()`
-- `5926` `_bandAim(midLat, midLon, sepDeg, zMin, zMax)`
-- `5940` `_flyPair(aLat,aLon,bLat,bLon)`
-- `5958` `clearAll()`
-- `5993` `_trailRender()`
-- `6000` `tapAtScreen(x, y)`
-- `6039` `showDossier(id)`
-- `6063` `_sheetFlag()`
-- `6070` `hideDossier()`
-- `6098` **RC_KINDS**
-- `6104` `_odSetTab(t)`
-- `6113` `_odRender(s)`
-- `6234` `calloutShow(id, at)`
-- `6243` `calloutHide()`
-- `6248` `_coRefresh()`
-- `6249` `_coRender()`
-- `6459` `_coAnchor()`
-- `6478` `_coPlace()`
-- `6519` `_bfPickFoot()`
-- `6531` `_bfToast(msg)`
-- `6625` **BF_PALETTE**
-- `6631` `_bfArmHint()`
-- `6642` `_bfTakeParent(fallback)`
-- `6654` `_bfPickCandidates(pk,q,kind)`
-- `6679` `_bfAddSheet(pk)`
-- `6719` `_bfGroupSheet(pk)`
-- `6749` **BF_PLACES**
-- `6763` `bfPlaceOf(k)`
-- `6766` `bfAddMany(ids, parent)`
-- `6798` `_bfSelections(k)`
-- `6839` `_bfAddUnderBtn(k)`
-- `6848` `_bfInvHTML(k)`
-- `6873` `_bfPlainSheet(k)`
-- `6927` `_bfObjSheet(id)`
-- `7055` `_rcContext(id)`
-- `7056` `_rcTitle(r,x)`
-- `7057` `_rcLabel(id,x)`
-- `7058` `_rcRefresh()`
-- `7064` `_rcResume(id)`
-- `7068` `_rcStart(kind,rid)`
-- `7076` `recordURL(value)`
-- `7081` `recordCopy(value)`
-- `7085` `_rcActions(kind,it)`
-- `7097` `_rcCard(id,kind,it)`
-- `7109` `_rcOptions(id,cur,allowNew)`
-- `7113` `_rcIdPane(id)`
-- `7122` `_rcRender(id)`
-- `7151` `_rcFormHTML(kind,it,rid)`
-- `7170` `_rcFit()`
-- `7179` `_rcReadForm()`
-- `7186` `_rcCommit()`
-- `7205` `_rcDelete(rid)`
-- `7212` `_rcUndoDelete()`
-- `7221` `_rcOpen(id,rid,xid)`
-- `7250` `_odStageClearSync(on)`
-- `7723` `initDossier()`
-- `7737` `_odInjectCSS()`
+- `5155` `_odEsc(s)`
+- `5156` `_odEscA(v)`
+- `5170` `_camSnap()`
+- `5174` `_camApply(st, o)`
+- `5196` `_undoPush()`
+- `5215` `tpLive()`
+- `5222` `tpSync()`
+- `5234` `tpZoom(dir, ramp)`
+- `5248` `tpUndo()`
+- `5253` `tpClear()`
+- `5254` `_tpStop(e)`
+- `5261` `_tpRamp()`
+- `5266` `_tpWire()`
+- `5290` `selectSite(id, o)`
+- `5338` `setMode(m)`
+- `5377` `renderBrief(view)`
+- `5565` `_bdSync()`
+- `5577` `_bfTint(hex)`
+- `5591` `_bfLeaderTrack()`
+- `5638` `_bfFlipCapture(el)`
+- `5650` `_bfFlipPlay(el, old)`
+- `5687` `_bfSceneDepth()`
+- `5691` `_bfViewCapture(point)`
+- `5699` `_bfFit(view)`
+- `5729` `_bfZoomTo(value,point,finish)`
+- `5740` `_bfNavPush()`
+- `5748` `bfBack()`
+- `5766` `bfPresent(on)`
+- `5789` `_bfHistArm()`
+- `5821` `_bfExplore(k)`
+- `5831` `_bfChartWire(el)`
+- `5867` `_trailPush(id)`
+- `5875` `_trailClear()`
+- `5886` `_flyFitChain()`
+- `5918` `_clearBand()`
+- `5938` `_bandAim(midLat, midLon, sepDeg, zMin, zMax)`
+- `5952` `_flyPair(aLat,aLon,bLat,bLon)`
+- `5970` `clearAll()`
+- `6005` `_trailRender()`
+- `6012` `tapAtScreen(x, y)`
+- `6051` `showDossier(id)`
+- `6075` `_sheetFlag()`
+- `6082` `hideDossier()`
+- `6110` **RC_KINDS**
+- `6116` `_odSetTab(t)`
+- `6125` `_odRender(s)`
+- `6246` `calloutShow(id, at)`
+- `6255` `calloutHide()`
+- `6260` `_coRefresh()`
+- `6261` `_coRender()`
+- `6471` `_coAnchor()`
+- `6490` `_coPlace()`
+- `6531` `_bfPickFoot()`
+- `6543` `_bfToast(msg)`
+- `6637` **BF_PALETTE**
+- `6643` `_bfArmHint()`
+- `6654` `_bfTakeParent(fallback)`
+- `6666` `_bfPickCandidates(pk,q,kind)`
+- `6691` `_bfAddSheet(pk)`
+- `6738` `_bfGroupSheet(pk)`
+- `6768` **BF_PLACES**
+- `6782` `bfPlaceOf(k)`
+- `6785` `bfAddMany(ids, parent)`
+- `6817` `_bfSelections(k)`
+- `6866` `_bfAddUnderBtn(k)`
+- `6875` `_bfInvHTML(k)`
+- `6900` `_bfPlainSheet(k)`
+- `6954` `_bfObjSheet(id)`
+- `7082` `_rcContext(id)`
+- `7083` `_rcTitle(r,x)`
+- `7084` `_rcLabel(id,x)`
+- `7085` `_rcRefresh()`
+- `7091` `_rcResume(id)`
+- `7095` `_rcStart(kind,rid)`
+- `7103` `recordURL(value)`
+- `7108` `recordCopy(value)`
+- `7112` `_rcActions(kind,it)`
+- `7124` `_rcCard(id,kind,it)`
+- `7136` `_rcOptions(id,cur,allowNew)`
+- `7140` `_rcIdPane(id)`
+- `7149` `_rcRender(id)`
+- `7178` `_rcFormHTML(kind,it,rid)`
+- `7197` `_rcFit()`
+- `7206` `_rcReadForm()`
+- `7213` `_rcCommit()`
+- `7232` `_rcDelete(rid)`
+- `7239` `_rcUndoDelete()`
+- `7248` `_rcOpen(id,rid,xid)`
+- `7277` `_odStageClearSync(on)`
+- `7762` `initDossier()`
+- `7776` `_odInjectCSS()`
 
-### 7817 · s7-records
+### 7856 · s7-records
 
-- `7827` **RECORDS**
-- `7830` `_recBlank(id)`
-- `7831` `_recFingerprint(value)`
-- `7834` `_recNormalize(r)`
-- `7858` `recordOf(id)`
-- `7859` `recAll()`
-- `7860` `_recIndex(r,kind,index)`
-- `7861` `_recRid()`
-- `7862` `recCount(id)`
-- `7869` `_recPersist(r)`
-- `7880` `_recSave(id)`
-- `7887` `_recStatusText(id)`
-- `7897` `recordSaveStatus(id)`
-- `7900` `_recStatusPaint()`
-- `7903` `_recCloudAck(records)`
-- `7907` `_recLoaded(r)`
-- `7910` `recAdd(id, kind, item)`
-- `7917` `recUpdate(id, kind, idx, item)`
-- `7923` `recRemove(id, kind, idx)`
-- `7932` `recIds(id)`
-- `7933` `_recNextId(id)`
-- `7938` `recAddId(id, label)`
-- `7948` `recTitleId(id,label,title)`
-- `7952` `recDelId(id, label)`
-- `7961` `recIdCount(id, label)`
-- `7967` `_rdbOpen()`
-- `8115` **BRIEF**
-- `8117` `_bfSync()`
-- `8122` `_bfSave()`
-- `8135` `_bfInvClean(a)`
-- `8141` `bfNode(k)`
-- `8142` `bfKids(k)`
-- `8145` `_bfOrgId(id)`
-- `8151` `bfHas(id)`
-- `8153` `_bfStateKey(name)`
-- `8154` `bfStateName(k)`
-- `8159` `_bfFrame()`
-- `8183` `_xpPulse()`
-- `8195` `_bfPush(node)`
-- `8206` `bfAdd(id, parent)`
-- `8220` `bfAddState(name, parent)`
-- `8229` `bfAddCustom(name, parent)`
-- `8236` `bfRename(k, name)`
-- `8243` `bfRemove(id)`
-- `8259` `bfMove(k, newParent)`
-- `8272` `bfReorder(k, dir)`
-- `8285` `bfColor(k, hex)`
-- `8293` `bfStripe(k)`
-- `8299` `bfNote(id, text)`
-- `8314` `_bfStackPopHide()`
-- `8315` `_bfStackPop(lvl)`
-- `8351` `bfStack(n)`
-- `8360` `bfEye(rootId)`
-- `8368` `bfDepth(n)`
-- `8389` `_ssTick()`
-- `8409` **ORGS**
-- `8410` `_orgSave()`
-- `8411` `orgById(id)`
-- `8412` `orgKidsOf(pid)`
-- `8413` `orgAdd(name, parent, base)`
-- `8429` `orgRemove(id)`
-- `8445` **SAVEDV**
-- `8447` `_svSave()`
-- `8461` `_shId(r, save)`
-- `8465` `_shList(kind)`
-- `8466` `_shFind(kind,id)`
-- `8473` `_shTrim(A)`
-- `8483` `_shScope(v)`
-- `8494` `_shGlyph(kind,r)`
-- `8510` `_shRow(kind,r,P,i)`
-- `8539` `_shPaneShelf(kind,P)`
-- `8587` `_shOpen(tab)`
-- `8622` `_svOpenSheet()`
-- `8623` `svCapture(name)`
-- `8634` `svUpdate()`
-- `8642` `svRename(id,n)`
-- `8646` `svPin(id)`
-- `8647` `svRecall(id)`
-- `8657` `svRemove(id)`
-- `8672` **SAVEDB**
-- `8674` `_sbSave()`
-- `8679` `sbCapture(name)`
-- `8698` `sbUpdate()`
-- `8708` `sbLoad(i)`
-- `8724` `sbRename(id,n)`
-- `8728` `sbPin(id)`
-- `8729` `sbRemove(i)`
-- `8741` `_sbOpenSheet()`
-- `8754` `_lgSiteName(id)`
-- `8759` `_ldCounts(c)`
-- `8767` `_ldItem(kind,it,id)`
-- `8779` `_ldSet(t)`
-- `8781` `_ldTabs()`
-- `8788` `_ledgerHTML()`
-- `8832` `_ledgerEl()`
-- `8844` `_ledgerRender()`
-- `8848` `_ledgerOpen()`
-- `8853` `_ledgerClose()`
-- `8854` `_repoDoorSync(open)`
-- `8857` `_ledgerTap(e)`
-- `8869` `_ledgerPaint()`
-- `8875` `recBackup()`
-- `8879` `recRestore(obj)`
-- `8912` **DB_TABLE**
-- `8913` `_dbSetState(st, msg)`
-- `8923` `_dbCfgSave(cfg)`
-- `8927` `_dbIsNet(e)`
-- `8934` `_dbWhy(what, e)`
-- `8940` `ensureSupabase()`
-- `8967` `_dbFetch(input, init)`
-- `8973` `_dbSnapshot()`
-- `8982` `_dbApply(data)`
-- `9031` `_dbChipShow()`
-- `9057` `dbPush()`
-- `9064` `_dbFlush()`
-- `9089` `_dbRetryArm()`
-- `9096` `dbPullOnce()`
-- `9115` `_dbConnectRun()`
-- `9155` `dbConnect()`
-- `9167` `_dbAutoBoot()`
-- `9177` `dbDisconnect(silent)`
-- `9191` `_dbNetUp(why)`
-- `9203` `_dbHideFlush()`
-- `9211` `_netUp(why)`
-- `9228` `_dbSheet()`
+- `7866` **RECORDS**
+- `7869` `_recBlank(id)`
+- `7870` `_recFingerprint(value)`
+- `7873` `_recNormalize(r)`
+- `7897` `recordOf(id)`
+- `7898` `recAll()`
+- `7899` `_recIndex(r,kind,index)`
+- `7900` `_recRid()`
+- `7901` `recCount(id)`
+- `7908` `_recPersist(r)`
+- `7919` `_recSave(id)`
+- `7926` `_recStatusText(id)`
+- `7936` `recordSaveStatus(id)`
+- `7939` `_recStatusPaint()`
+- `7942` `_recCloudAck(records)`
+- `7946` `_recLoaded(r)`
+- `7949` `recAdd(id, kind, item)`
+- `7956` `recUpdate(id, kind, idx, item)`
+- `7962` `recRemove(id, kind, idx)`
+- `7971` `recIds(id)`
+- `7972` `_recNextId(id)`
+- `7977` `recAddId(id, label)`
+- `7987` `recTitleId(id,label,title)`
+- `7991` `recDelId(id, label)`
+- `8000` `recIdCount(id, label)`
+- `8006` `_rdbOpen()`
+- `8154` **BRIEF**
+- `8156` `_bfSync()`
+- `8161` `_bfSave()`
+- `8174` `_bfInvClean(a)`
+- `8180` `bfNode(k)`
+- `8181` `bfKids(k)`
+- `8184` `_bfOrgId(id)`
+- `8190` `bfHas(id)`
+- `8192` `_bfStateKey(name)`
+- `8193` `bfStateName(k)`
+- `8198` `_bfFrame()`
+- `8222` `_xpPulse()`
+- `8234` `_bfPush(node)`
+- `8245` `bfAdd(id, parent)`
+- `8259` `bfAddState(name, parent)`
+- `8268` `bfAddCustom(name, parent)`
+- `8275` `bfRename(k, name)`
+- `8282` `bfRemove(id)`
+- `8298` `bfMove(k, newParent)`
+- `8311` `bfReorder(k, dir)`
+- `8324` `bfColor(k, hex)`
+- `8334` `bfColorTree(k, hex)`
+- `8346` `bfStripe(k)`
+- `8352` `bfNote(id, text)`
+- `8367` `_bfStackPopHide()`
+- `8368` `_bfStackPop(lvl)`
+- `8404` `bfStack(n)`
+- `8413` `bfEye(rootId)`
+- `8421` `bfDepth(n)`
+- `8442` `_ssTick()`
+- `8462` **ORGS**
+- `8463` `_orgSave()`
+- `8464` `orgById(id)`
+- `8465` `orgKidsOf(pid)`
+- `8466` `orgAdd(name, parent, base)`
+- `8482` `orgRemove(id)`
+- `8498` **SAVEDV**
+- `8500` `_svSave()`
+- `8514` `_shId(r, save)`
+- `8518` `_shList(kind)`
+- `8519` `_shFind(kind,id)`
+- `8526` `_shTrim(A)`
+- `8536` `_shScope(v)`
+- `8547` `_shGlyph(kind,r)`
+- `8563` `_shRow(kind,r,P,i)`
+- `8592` `_shPaneShelf(kind,P)`
+- `8640` `_shOpen(tab)`
+- `8675` `_svOpenSheet()`
+- `8676` `svCapture(name)`
+- `8687` `svUpdate()`
+- `8695` `svRename(id,n)`
+- `8699` `svPin(id)`
+- `8700` `svRecall(id)`
+- `8710` `svRemove(id)`
+- `8725` **SAVEDB**
+- `8727` `_sbSave()`
+- `8732` `sbCapture(name)`
+- `8751` `sbUpdate()`
+- `8761` `sbLoad(i)`
+- `8777` `sbRename(id,n)`
+- `8781` `sbPin(id)`
+- `8782` `sbRemove(i)`
+- `8794` `_sbOpenSheet()`
+- `8807` `_lgSiteName(id)`
+- `8812` `_ldCounts(c)`
+- `8820` `_ldItem(kind,it,id)`
+- `8832` `_ldSet(t)`
+- `8834` `_ldTabs()`
+- `8841` `_ledgerHTML()`
+- `8885` `_ledgerEl()`
+- `8897` `_ledgerRender()`
+- `8901` `_ledgerOpen()`
+- `8906` `_ledgerClose()`
+- `8907` `_repoDoorSync(open)`
+- `8910` `_ledgerTap(e)`
+- `8922` `_ledgerPaint()`
+- `8928` `recBackup()`
+- `8932` `recRestore(obj)`
+- `8965` **DB_TABLE**
+- `8966` `_dbSetState(st, msg)`
+- `8976` `_dbCfgSave(cfg)`
+- `8980` `_dbIsNet(e)`
+- `8987` `_dbWhy(what, e)`
+- `8993` `ensureSupabase()`
+- `9020` `_dbFetch(input, init)`
+- `9026` `_dbSnapshot()`
+- `9035` `_dbApply(data)`
+- `9084` `_dbChipShow()`
+- `9110` `dbPush()`
+- `9117` `_dbFlush()`
+- `9142` `_dbRetryArm()`
+- `9149` `dbPullOnce()`
+- `9168` `_dbConnectRun()`
+- `9208` `dbConnect()`
+- `9220` `_dbAutoBoot()`
+- `9230` `dbDisconnect(silent)`
+- `9244` `_dbNetUp(why)`
+- `9256` `_dbHideFlush()`
+- `9264` `_netUp(why)`
+- `9281` `_dbSheet()`
 
-### 9266 · s6-export
+### 9319 · s6-export
 
-- `9278` `buildSnapshot(scope, recordFilter)`
-- `9339` `_xpRecordSnapshot(rows,filter)`
-- `9356` `_xpRecordChoices()`
-- `9375` `_xpRecordIds()`
-- `9384` `_xpReadFilter()`
-- `9391` `_xpRecordBody(sn)`
-- `9422` `_xpDownload(name, mime, data)`
-- `9431` `_xpStamp()`
-- `9433` `_xpSlug(sn)`
-- `9436` `exportPNG()`
-- `9456` `_xpDossierBody(sn)`
-- `9511` `exportPDF(recordFilter)`
-- `9521` `exportHTML(recordFilter)`
-- `9532` `exportJSON(recordFilter)`
+- `9331` `buildSnapshot(scope, recordFilter)`
+- `9392` `_xpRecordSnapshot(rows,filter)`
+- `9409` `_xpRecordChoices()`
+- `9428` `_xpRecordIds()`
+- `9437` `_xpReadFilter()`
+- `9444` `_xpRecordBody(sn)`
+- `9475` `_xpDownload(name, mime, data)`
+- `9484` `_xpStamp()`
+- `9486` `_xpSlug(sn)`
+- `9489` `exportPNG()`
+- `9509` `_xpDossierBody(sn)`
+- `9564` `exportPDF(recordFilter)`
+- `9574` `exportHTML(recordFilter)`
+- `9585` `exportJSON(recordFilter)`
 
-### 9559 · s5-clocks
+### 9612 · s5-clocks
 
-- `9611` `_tzAbbr(tz, d)`
-- `9619` `_ledTime(tz, d, secs)`
-- `9629` `civilianTime(tz, d)`
-- `9640` `_ckEsc(v)`
-- `9643` **CLOCK_REGIONS**
-- `9661` `_selSave()`
-- `9681` `nearRegion(lat, lon)`
-- `9730` `_tzForSite(site)`
-- `9739` `autoFillSelect(site)`
-- `9748` `pickZone(tz, label)`
-- `9757` `tickClocks()`
-- `9779` `_ckBeat()`
-- `9790` `_ckArm()`
-- `9796` `_ckWake()`
-- `9804` `_tzOpenSheet()`
-- `9832` `initClocks()`
-- `9864` `bootShell()`
-- `10231` `_bootPaint(ctx, m)`
-- `10313` `_introSkip(value)`
+- `9664` `_tzAbbr(tz, d)`
+- `9672` `_ledTime(tz, d, secs)`
+- `9682` `civilianTime(tz, d)`
+- `9693` `_ckEsc(v)`
+- `9696` **CLOCK_REGIONS**
+- `9714` `_selSave()`
+- `9734` `nearRegion(lat, lon)`
+- `9783` `_tzForSite(site)`
+- `9792` `autoFillSelect(site)`
+- `9801` `pickZone(tz, label)`
+- `9810` `tickClocks()`
+- `9832` `_ckBeat()`
+- `9843` `_ckArm()`
+- `9849` `_ckWake()`
+- `9857` `_tzOpenSheet()`
+- `9885` `initClocks()`
+- `9917` `bootShell()`
+- `10284` `_bootPaint(ctx, m)`
+- `10366` `_introSkip(value)`
 
 ## Globals on `window`
 
 The headless-drive surface: what a probe or a browser console can call.
 
-`__SANDBOX` · `origin` · `__errLog` · `__swAsk` · `__swVer` · `__swVerCheck` · `__swHeal` · `__updKick` · `__updCheck` · `__swReg` · `__updReloading` · `GlobeState` · `SITES` · `A1ORGS` · `_OG` · `US_STATES` · `clsOf` · `__discWired` · `lyRing` · `renderLegend` · `Layers` · `Basemap` · `__coSearchFold` · `__sbKbWired` · `tpZoom` · `tpUndo` · `tpClear` · `tpSync` · `_coSec` · `setMode` · `_bfLeaderTrack` · `bfBack` · `_bfHist` · `bfPresent` · `__bfKeysWired` · `renderBrief` · `_bfGrpForm` · `_bfPick` · `clearAll` · `selectSite` · `_bfSubFor` · `_bfSubQ` · `_odUI` · `_odSetTab` · `_coDrillFor` · `_coDrillQ` · `__bfToastT` · `__bfPickWired` · `_bfPickQ` · `__bfMoveWired` · `_bfPickKind` · `__dzDragWired` · `__coDrillWired` · `_coTrack` · `Callout` · `_bfPickParent` · `__bfSubWired` · `_rcLastXid` · `recordURL` · `recordCopy` · `RecordUI` · `_odWired` · `recordSaveStatus` · `recordSaveText` · `_selZone` · `__bfLpWired` · `Brief` · `Orgs` · `Views` · `_shOpen` · `lyFam` · `lyView` · `lySync` · `Briefs` · `_ldSet` · `_ledgerPaint` · `Repo` · `Records` · `DB` · `buildSnapshot` · `_xpDossierBody` · `_xpRecordSnapshot` · `_xpRecordBody` · `onload` · `__xpWired` · `_setSelZone` · `__ckT` · `__tzLbl` · `__visT` · `_nvSet` · `_renderAppMenu` · `_errToast` · `__errT` · `_diagDump` · `_updCheckUI`
+`__SANDBOX` · `origin` · `__errLog` · `__swAsk` · `__swVer` · `__swVerCheck` · `__swHeal` · `__updKick` · `__updCheck` · `__swReg` · `__updReloading` · `GlobeState` · `SITES` · `A1ORGS` · `_OG` · `US_STATES` · `clsOf` · `__discWired` · `lyRing` · `renderLegend` · `Layers` · `Basemap` · `__coSearchFold` · `__sbKbWired` · `tpZoom` · `tpUndo` · `tpClear` · `tpSync` · `_coSec` · `setMode` · `_bfLeaderTrack` · `bfBack` · `_bfHist` · `bfPresent` · `__bfKeysWired` · `renderBrief` · `_bfGrpForm` · `_bfPick` · `clearAll` · `selectSite` · `_bfSubFor` · `_bfSubQ` · `_odUI` · `_odSetTab` · `_coDrillFor` · `_coDrillQ` · `__bfToastT` · `__bfPickWired` · `_bfPickQ` · `__bfMoveWired` · `_bfPickKind` · `__dzDragWired` · `__coDrillWired` · `_coTrack` · `Callout` · `_bfPickParent` · `__bfSubWired` · `_rcLastXid` · `recordURL` · `recordCopy` · `RecordUI` · `_odWired` · `_bfClrCascade` · `recordSaveStatus` · `recordSaveText` · `_selZone` · `__bfLpWired` · `Brief` · `Orgs` · `Views` · `_shOpen` · `lyFam` · `lyView` · `lySync` · `Briefs` · `_ldSet` · `_ledgerPaint` · `Repo` · `Records` · `DB` · `buildSnapshot` · `_xpDossierBody` · `_xpRecordSnapshot` · `_xpRecordBody` · `onload` · `__xpWired` · `_setSelZone` · `__ckT` · `__tzLbl` · `__visT` · `_nvSet` · `_renderAppMenu` · `_errToast` · `__errT` · `_diagDump` · `_updCheckUI`
 
 ## Element IDs
 

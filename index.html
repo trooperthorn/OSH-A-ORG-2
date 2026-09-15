@@ -1742,6 +1742,18 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v1.30.0 • THE BRANCH TOOLS (owner: "enable adding multiple subordinates at
+//            a time. Also, enable option when selecting a color, apply to that
+//            object and all subordinates"). SELECT ALL: the add sheet grows a
+//            one-tap "✓ Select all N direct subordinates" door when the parent
+//            is an org with roster still off the diagram — it ticks the whole
+//            roster (candidates already de-dupe against the brief, so N
+//            shrinks as boxes land and the door retires at zero); Add stays
+//            the explicit second tap. THE CASCADE: the Appearance row grows a
+//            session-sticky arm, "Apply color to N subordinates too", counted
+//            live from the DIAGRAM subtree; while armed, every swatch — and
+//            Reset — walks the node plus its brief descendants (bfColorTree,
+//            BRIEF parent pointers, never the Army tree) and toasts the count.
 //   v1.29.0 • THE PODIUM & PRESENT (owner: presenting to a large audience of
 //            senior Army personnel — "clunky, doesn't always display the best,
 //            missing back button, navigational controls embedded in other
@@ -1864,7 +1876,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v1.29.0';
+const APP_VERSION = 'v1.30.0';
 const APP_UPDATED = '15 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -6696,6 +6708,13 @@ function _bfAddSheet(pk){
     }).join('')+'</select>'
     +'<input class="rc-in bf-pickq" id="bfPickQ" type="search" aria-label="Search brief objects" placeholder="Search organizations, states, RSN or ECCSP" value="'+escA(q)+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
   h+='<button type="button" class="bf-act bf-addsub" data-bfgrpnew="'+escA(pk||'')+'">⊞ New group…</button>';
+  // v1.30.0 — one tap ticks the whole roster of direct subordinates (kind and
+  // search filters do not narrow this: it always means THE UNIT'S OWN, which
+  // _bfPickCandidates surfaces first and de-dupes against the brief).
+  if(par && par.t==='org'){
+    const ownN=_bfPickCandidates(pk,'','org').own;
+    if(ownN) h+='<button type="button" class="bf-act bf-addsub" data-bfpickall="'+escA(pk)+'">\u2713 Select all '+ownN+' direct subordinate'+(ownN===1?'':'s')+'</button>';
+  }
   h+='<div class="bf-subhead">'+(found.own&&!q&&!kind?'Direct subordinates first · ':'')+found.rows.length+' available'
     +(found.rows.length>60?' · First 60 shown; search to narrow':'')+'</div><div class="bf-picklist">';
   if(!found.rows.length) h+='<div class="rc-note">No available matches. Try another category or search.</div>';
@@ -6805,6 +6824,14 @@ function _bfSelections(k){
     return '<button type="button" class="bf-sw'+((cur===c)?' on':'')+'" data-bfclr="'+escA(k)+'" data-bfc="'+c+'" style="background:'+c+'" aria-label="'+c+'"></button>';
   }).join('')+'</div>';
   if(cur) apr+='<button type="button" class="bf-act" data-bfclr="'+escA(k)+'" data-bfc="">Reset to level color</button>';
+  // v1.30.0 — the cascade arm. Session-sticky; shown only when the node has
+  // subordinates on the diagram, counted live so the label never lies.
+  (function(){
+    let dn=0; const kk={}; (BRIEF.nodes||[]).forEach(function(x){ (kk[x.p]||(kk[x.p]=[])).push(x.k); });
+    const q=[].concat(kk[k]||[]); while(q.length){ const x=q.pop(); dn++; (kk[x]||[]).forEach(function(y){ q.push(y); }); }
+    if(dn) apr+='<button type="button" class="bf-act'+(window._bfClrCascade?' in':'')+'" data-bfclrall="'+escA(k)+'" aria-pressed="'+!!window._bfClrCascade+'">'
+      +(window._bfClrCascade?'\u2713 ':'')+'Apply color to '+dn+' subordinate'+(dn===1?'':'s')+' too</button>';
+  })();
   if(isState) apr+='<button type="button" class="bf-act'+(nd.sh?' in':'')+'" data-bfstripe="'+escA(k)+'">'
     +(nd.sh?'\u25a8 Striped fill ON':'\u25a8 Striped fill \u2014 stripe the state for attention')+'</button>';
   // v1.9.0 UI GRAMMAR (owner: "categories/information needs to be together"):
@@ -7505,6 +7532,13 @@ if(!window._odWired){
       const ck=bpk.querySelector('.bf-pickck'); if(ck) ck.textContent=s2.has(id)?'\u2713':'';
       try{ _bfPickFoot(); }catch(_){}
       return; }
+    // v1.30.0 — tick every direct subordinate at once; commit stays explicit
+    const bpall=e.target.closest('[data-bfpickall]');
+    if(bpall){ const pk2=bpall.getAttribute('data-bfpickall')||null;
+      const f2=_bfPickCandidates(pk2,'','org');
+      const s3=window._bfPick||(window._bfPick=new Set());
+      f2.rows.slice(0,f2.own).forEach(function(r){ s3.add(r.id); });
+      try{ _bfAddSheet(pk2); }catch(_){} return; }
     const bpc=e.target.closest('[data-bfpickclear]');
     if(bpc){ window._bfPick=new Set();
       document.querySelectorAll('#dossier .bf-pickrow.on').forEach(function(r){
@@ -7651,9 +7685,14 @@ if(!window._odWired){
       const made=orgAdd(nm, pid, baseId);
       if(made) _bfObjSheet(pid); return; }
     // v0.24.0 THE SELECTIONS — recolor, stripe, reorder a node of the diagram
+    const bca=e.target.closest('[data-bfclrall]');
+    if(bca){ window._bfClrCascade=!window._bfClrCascade;
+      try{ _bfObjSheet(bca.getAttribute('data-bfclrall')); }catch(_){} return; }
     const bcl=e.target.closest('[data-bfclr]');
-    if(bcl){ bfColor(bcl.getAttribute('data-bfclr'), bcl.getAttribute('data-bfc')||'');
-      try{ _bfObjSheet(bcl.getAttribute('data-bfclr')); }catch(_){} return; }
+    if(bcl){ const kk=bcl.getAttribute('data-bfclr'), hx=bcl.getAttribute('data-bfc')||'';
+      if(window._bfClrCascade){ const m=bfColorTree(kk,hx); try{ if(m>1) _bfToast(m+' boxes '+(hx?'colored':'reset')); }catch(_){} }
+      else bfColor(kk,hx);
+      try{ _bfObjSheet(kk); }catch(_){} return; }
     const bst=e.target.closest('[data-bfstripe]');
     if(bst){ const k=bst.getAttribute('data-bfstripe'); bfStripe(k);
       try{ _bfObjSheet(k); }catch(_){} return; }
@@ -8289,6 +8328,20 @@ function bfColor(k, hex){
   try{ renderBrief(); }catch(_){}
   try{ globeMark(); }catch(_){}
 }
+// v1.30.0 — one swatch, the whole branch: color a node and every descendant
+// ON THE DIAGRAM ('' resets the branch to level colors). Returns the count so
+// the caller can toast honestly.
+function bfColorTree(k, hex){
+  const n=bfNode(k); if(!n) return 0;
+  const c=(/^#[0-9a-fA-F]{6}$/.test(String(hex||'')))?String(hex).toLowerCase():'';
+  const kids={}; (BRIEF.nodes||[]).forEach(function(x){ (kids[x.p]||(kids[x.p]=[])).push(x); });
+  const q=[n]; let m=0;
+  while(q.length){ const x=q.pop(); x.c=c; m++; (kids[x.k]||[]).forEach(function(y){ q.push(y); }); }
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  return m;
+}
 // ▨ STRIPED FILL — diagonal attention lines across a highlighted state
 function bfStripe(k){
   const n=bfNode(k); if(!n) return;
@@ -8377,7 +8430,7 @@ try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, addGr
   addPlace:function(k,parent){ return bfAddMany([k], parent||null); },
   places:function(){ return BF_PLACES.slice(); },
   remove:bfRemove, rename:bfRename,
-  move:bfMove, reorder:bfReorder, color:bfColor, stripe:bfStripe,
+  move:bfMove, reorder:bfReorder, color:bfColor, colorTree:bfColorTree, stripe:bfStripe,
   note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth, stack:bfStack,
   node:bfNode, kids:bfKids, list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}
 

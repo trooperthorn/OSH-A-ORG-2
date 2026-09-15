@@ -1119,6 +1119,43 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     fails++; console.log('\u2717 the build stamp drifted back under the mode pill (v1.24.0 seated it at 32px)'); }
   else console.log('  \u2713 build stamp seated clear of the mode pill');
 
+  // ── PROBE: THE BRANCH TOOLS (v1.30.0) — one tap selects a unit's whole
+  //    roster of direct subordinates (candidates de-dupe against the brief so
+  //    the count shrinks as boxes land), and one swatch can paint a node plus
+  //    every DIAGRAM descendant, '' resetting the same branch. ──
+  { let bok=true;
+    try{
+      global.setMode('brief');
+      global.Brief.add('usawhc');
+      const f1=global._bfPickCandidates('usawhc','','org');
+      if(!(f1.own>=20)){ bok=false; fails++; console.log('✗ BRANCH: expected USAWHC to offer 20+ direct subordinates, got '+f1.own); }
+      const got=global.bfAddMany(f1.rows.slice(0,f1.own).map(function(r){return r.id;}),'usawhc');
+      if(got!==f1.own){ bok=false; fails++; console.log('✗ BRANCH: select-all added '+got+' of '+f1.own); }
+      const f2=global._bfPickCandidates('usawhc','','org');
+      if(f2.own!==0){ bok=false; fails++; console.log('✗ BRANCH: candidates must de-dupe against the brief (still offering '+f2.own+')'); }
+      // the sheet offers the door only while there is a roster to tick
+      global._bfAddSheet('usawhc');
+      if(IDS['dossier'] && IDS['dossier'].innerHTML.indexOf('data-bfpickall')>=0){
+        bok=false; fails++; console.log('✗ BRANCH: select-all door must vanish once every subordinate is placed'); }
+      // cascade: paint the branch, spare the stranger, reset the branch.
+      // (The stranger must be OUTSIDE the USAWHC subtree — First Army would
+      // already be on the diagram as a painted subordinate.)
+      global.Brief.add('amc');
+      const m=global.Brief.colorTree('usawhc','#aa3355');
+      if(m<21){ bok=false; fails++; console.log('✗ BRANCH: colorTree painted only '+m); }
+      if(global.Brief.node('xviii-airborne-corps').c!=='#aa3355'){ bok=false; fails++; console.log('✗ BRANCH: a subordinate escaped the cascade'); }
+      if(global.Brief.node('amc').c!==''){ bok=false; fails++; console.log('✗ BRANCH: cascade leaked onto a non-descendant'); }
+      const m2=global.Brief.colorTree('usawhc','');
+      if(m2!==m || global.Brief.node('xviii-airborne-corps').c!==''){ bok=false; fails++; console.log('✗ BRANCH: branch reset must clear the same '+m+' boxes'); }
+      global.Brief.list().slice().forEach(function(k){ try{ global.Brief.remove(k); }catch(_){} });   // leave the room as found
+      global.setMode('map');
+    }catch(e){ bok=false; fails++; console.log('✗ BRANCH probe: '+e.message); }
+    if(html.indexOf('data-bfclrall')<0){ bok=false; fails++; console.log('✗ BRANCH: the cascade arm is missing from the Appearance row'); }
+    if(pokAll_bfclr_guard(html)){ bok=false; fails++; console.log('✗ BRANCH: swatch handler must route through the cascade arm'); }
+    if(bok) console.log('  \u2713 BRANCH TOOLS: select-all roster \u00b7 de-dupe \u00b7 door retires when done \u00b7 cascade paints+resets the branch, spares strangers');
+  }
+  function pokAll_bfclr_guard(h){ return h.indexOf('window._bfClrCascade){ const m=bfColorTree(')<0; }
+
   // ── PROBE: THE PODIUM & PRESENT (v1.29.0) — a real back history for the
   //    brief (explore pushes the state it leaves; back restores it; a dry back
   //    with focus clears to overview WITHOUT pushing, so back never

@@ -1970,3 +1970,29 @@ It lives here now.
   module's real dependency set or it fails on code that runs fine live.
 - Byte delta: +11,745 over v1.28.1 (883,408 · 95.9% of the gate). Paid from
   the v1.28.0 prune's 50.7 KB; 38.2 KB of headroom remains.
+
+## v1.30.0 — the branch tools (owner: multi-add subordinates · color the branch)
+- THE PICKER ALREADY MULTI-SELECTED; the cost was TICKING. "Add multiple
+  subordinates" meant one tap for the whole roster, so that is the shape:
+  "✓ Select all N direct subordinates" fills _bfPick from the same candidate
+  list the sheet shows (first `own` rows of _bfPickCandidates(pk,'','org') —
+  they are pushed first and de-duped against the brief), and the explicit
+  Add N stays, so nothing lands unreviewed. The door counts live and retires
+  itself when the roster is fully placed.
+- THE CASCADE IS AN ARM, NOT A MODE-LESS SURPRISE: a session-sticky toggle in
+  the Appearance row, labeled with the live subtree count, pressed-state
+  visible; while armed every swatch AND Reset walk the branch. bfColorTree
+  paints the DIAGRAM subtree — BRIEF parent pointers, never the Army tree —
+  because the chart is the thing being painted, and a brief may parent a unit
+  under a group or a state that the Army does not.
+- PROBE HONESTY, twice in one release: (1) the "stranger" in the cascade
+  probe was First Army — which is a USAWHC subordinate, so it was already on
+  the diagram and correctly painted; the probe accused the code of leaking
+  when the probe's fixture was wrong. Pick strangers OUTSIDE the subtree
+  (amc). (2) the de-dupe defect injection was caught by brief-support-check
+  before smoke's own assert could see it — a defect class guarded at two
+  layers is fine; record which layer fires first so a future red suite reads
+  correctly.
+- Byte delta: +3,549 (886,957 · 96.2% of the gate). ~34 KB of headroom left —
+  the A1ORGS-to-fetched-asset question (§ v1.28.0) is the next real lever and
+  needs an owner ruling on the boot law.
