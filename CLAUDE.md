@@ -1996,3 +1996,31 @@ It lives here now.
 - Byte delta: +3,549 (886,957 · 96.2% of the gate). ~34 KB of headroom left —
   the A1ORGS-to-fetched-asset question (§ v1.28.0) is the next real lever and
   needs an owner ruling on the boot law.
+
+## v1.31.0 — the fetched spine (owner ruling: "Move the org data and push update")
+- THE OWNER RULED THE OPEN QUESTION from v1.28.0/v1.30.0: the org tree leaves
+  index.html. `data/orgs.json` is now the runtime source — fetched same-origin
+  at boot through `_fetchRetry`, precached by the SW inside the versioned
+  shell (`'./data/orgs.json'` in ASSETS, so offline parity and the update
+  ritual both hold), and applied IN PLACE into the same `A1ORGS` array every
+  consumer closes over. `apply()` nulls `_OG`, calls `buildSearchIndex()`,
+  `renderLegend()`, `lySync()`, `globeMark()` — a late arrival lands
+  everywhere without a reload. Failure is LOUD: `_errToast` announces
+  map-only mode, never a silent empty tree.
+- BOOT LAW CLARIFIED, not bent: "zero foreign code at boot" bans third-party
+  SCRIPT. Same-origin DATA fetched at boot is the basemap pattern the app has
+  shipped since land-110m — orgs.json now rides the identical rails.
+- THE HARNESS CONTRACT MOVED WITH THE DATA: sync-inline is SITES-only (the
+  49 KB SITES literal stays inline — first-paint critical); data-lint §8 bans
+  the org literal from returning (code-scoped shapes, proven by injection)
+  and pins the SW precache line; smoke's fetch stub serves the REAL repo
+  file and drains promises, so the fetched spine is genuinely exercised;
+  harness_globe evals with a 404 stub and probes synchronously, so it seeds
+  the fetched rows itself post-eval exactly as `apply()` would (site:null
+  default, `_OG` wipe). Defect injections proven: loader aimed at a missing
+  file (suite fails loud), literal creeping back, SW forgetting the precache.
+- NEVER let an inline org literal return without an owner ruling — data-lint
+  §8 is the fence. Org edits are now data-only commits: edit
+  `data/orgs.json`, run the suite; no regeneration step exists anymore.
+- Byte delta: −186,908 (886,957 → ~700,069 · 76.0% of the gate). The lever
+  flagged since v1.28.0, cashed. ~216 KB of headroom regained.

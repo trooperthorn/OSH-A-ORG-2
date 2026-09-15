@@ -1196,38 +1196,24 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(pok) console.log('  \u2713 PODIUM & PRESENT: spine push/pop/dry-clear/false \u00b7 stage classes on+off \u00b7 chrome stripped \u00b7 six controls \u00b7 dock door');
   }
 
-  // ── PROBE: THE DERIVED SPINE (v1.28.0) — the inline A1ORGS literal ships
-  //    {id,name,parent,site?} and a boot shim rebuilds lvl/root from the parent
-  //    chain; explicit values ride only on rows whose stored source disagrees
-  //    with its own chain. Assert the RUNTIME state (post-shim) matches the
-  //    blessed file for every row, and assert the LITERAL itself stays slim —
-  //    scoped to the literal substring, never the whole source (comments and
-  //    the changelog speak of lvl/root in prose). ──
+  // ── PROBE: THE FETCHED SPINE (v1.31.0, supersedes the v1.28.0 derived
+  //    spine) — the org tree rides data/orgs.json now; this stub's fetch()
+  //    serves the REAL repo file, so a green here means the actual boot path
+  //    (fetch → apply-in-place → memo invalidation) delivered the blessed
+  //    rows before the probes that consume them. ──
   { let dok=true;
     try{
       const srcOrgs=JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'..','data','orgs.json'),'utf8')).orgs;
       const run=global.A1ORGS;
-      if(!run || run.length!==srcOrgs.length){ dok=false; fails++; console.log('✗ DERIVED SPINE: runtime org count '+(run&&run.length)+' != source '+srcOrgs.length); }
+      if(!global.__orgsReady){ dok=false; fails++; console.log('✗ FETCHED SPINE: __orgsReady is false — the boot fetch never resolved in the harness'); }
+      if(!run || run.length!==srcOrgs.length){ dok=false; fails++; console.log('✗ FETCHED SPINE: runtime org count '+(run&&run.length)+' != source '+srcOrgs.length); }
       else { let bad=0;
-        for(let i=0;i<srcOrgs.length;i++){ const a=srcOrgs[i], b=run[i];
-          if(a.id!==b.id || a.lvl!==b.lvl || String(a.root)!==String(b.root) || String(a.site)!==String(b.site)){ bad++; if(bad===1) console.log('    first mismatch: '+a.id+' src lvl/root '+a.lvl+'/'+a.root+' vs run '+b.lvl+'/'+b.root); } }
-        if(bad){ dok=false; fails++; console.log('✗ DERIVED SPINE: '+bad+' runtime row(s) disagree with data/orgs.json after derivation'); } }
-      const lit=html.match(/var A1ORGS=window\.A1ORGS=(\[.*?\]);/s);
-      if(!lit){ dok=false; fails++; console.log('✗ DERIVED SPINE: literal not found'); }
-      else {
-        const nLvl=(lit[1].match(/"lvl":/g)||[]).length, nRoot=(lit[1].match(/"root":/g)||[]).length;
-        // exception counts come from the SOURCE, so this probe never goes stale
-        // when the audit resolves (or adds) an exception row
-        const sb={}; srcOrgs.forEach(o=>sb[o.id]=o);
-        const chainRoot=(o)=>{ const seen=new Set([o.id]); const ch=[o]; let c=o;
-          while(c.parent!=null){ const p=sb[c.parent]; if(!p||seen.has(p.id)) break; seen.add(p.id); ch.push(p); c=p; }
-          return { lvl:ch.length, root: ch.length===1?null:ch[ch.length-2].id }; };
-        const expLvl=srcOrgs.filter(o=>chainRoot(o).lvl!==o.lvl).length;
-        const expRoot=srcOrgs.filter(o=>String(chainRoot(o).root)!==String(o.root)).length;
-        if(nLvl!==expLvl || nRoot!==expRoot){ dok=false; fails++; console.log('✗ DERIVED SPINE: literal carries lvl×'+nLvl+'/root×'+nRoot+', expected exceptions lvl×'+expLvl+'/root×'+expRoot+' — the shipped copy is regrowing derived fields'); }
-      }
-    }catch(e){ dok=false; fails++; console.log('✗ DERIVED SPINE probe: '+e.message); }
-    if(dok) console.log('  \u2713 DERIVED SPINE: slim literal + boot derivation \u2261 data/orgs.json, all rows, exceptions counted from source');
+        for(let i2=0;i2<srcOrgs.length;i2++){ const a=srcOrgs[i2], b=run[i2];
+          if(a.id!==b.id || a.lvl!==b.lvl || String(a.root)!==String(b.root) || String(a.site)!==String(b.site)){ bad++; } }
+        if(bad){ dok=false; fails++; console.log('✗ FETCHED SPINE: '+bad+' runtime row(s) disagree with data/orgs.json'); } }
+      if(html.indexOf('{"id":"hqda"')>=0){ dok=false; fails++; console.log('✗ FETCHED SPINE: an org literal is back in the page'); }
+    }catch(e){ dok=false; fails++; console.log('✗ FETCHED SPINE probe: '+e.message); }
+    if(dok) console.log('  \u2713 FETCHED SPINE: boot fetch delivered every blessed row \u00b7 no literal in the page');
   }
 
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung

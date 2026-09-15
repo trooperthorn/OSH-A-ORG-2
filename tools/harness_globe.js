@@ -106,6 +106,19 @@ while(tries<25){
 }
 if(evalOK) console.log('✓ source loaded: '+mode+' (provisioned '+(tries-1)+' stub globals)');
 
+// ── v1.31.0 THE FETCHED SPINE: the app no longer ships an inline org literal —
+// A1ORGS boots empty and __orgsLoad() fills it from data/orgs.json. This harness
+// probes synchronously after eval with a 404 fetch stub, so it seeds the fetched
+// rows itself, exactly as the loader's apply() would (site:null default, _OG wipe).
+{
+  const _orgRows=JSON.parse(fs.readFileSync(path.join(ROOT,'data','orgs.json'),'utf8')).orgs;
+  const _arr=global.window.A1ORGS||global.A1ORGS;
+  if(_arr && _arr.length===0){
+    for(const o of _orgRows){ if(o.site===undefined) o.site=null; _arr.push(o); }
+    global.window._OG=null;
+  }
+}
+
 const G=global, GS=global.GlobeState;
 const NEED=['_setGlobeRot','_projectLonLat','_projectVec','lonLatToVec','_qNorm','_qFromAxisAngle',
             'globeMetrics','_syncSelArcs','drawGlobeLinks','drawGlobeMarkers','drawMarkersHook','siteHitTest'];

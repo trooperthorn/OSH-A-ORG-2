@@ -43,33 +43,36 @@ The owner is solo, reviews on a phone, and gives short directives.
 
 ## ⚠ The byte budget is the binding constraint
 
-`index.html` is at **~911,854 bytes — 98.9% of the 900 KB gate, under 10 KB of
-headroom.** `tools/dead-lint.js` fails the build past it.
+`index.html` is at **~700 KB — 76% of the 900 KB gate** after v1.31.0 moved the
+org tree out to `data/orgs.json` (fetched at boot, SW-precached). `tools/dead-lint.js`
+fails the build past the gate. Headroom is real again, but the history stands as
+a warning: v1.25.1 pruned to 874 KB and two feature releases spent it all back.
+**State the byte cost of every change you make.**
 
-v1.25.1 pruned the file to 874,590 bytes; v1.26.0 and v1.27.0 spent all of that
-back within two releases. **Do not propose a feature of any size without a prune
-in the same release or immediately before it.** State the byte cost of every
-change you make.
-
-Where the weight is (see `docs/CODEMAP.md` for the live ledger): the inline
-`A1ORGS` literal ~226 KB, the in-file `CHANGELOG` ~62 KB, `s4-dossier` ~174 KB.
-The changelog is the cheapest lever — the retention law keeps only the current
-era in-file, because older entries live in `git log` and `CLAUDE.md`.
+Where the remaining weight is (see `docs/CODEMAP.md` for the live ledger): the
+inline `SITES` literal ~49 KB (stays — first-paint critical), `s4-dossier`
+~174 KB, the in-file `CHANGELOG` (retention law keeps only the current era
+in-file; older entries live in `git log` and `CLAUDE.md`).
 
 ## Before you commit — run the tools
 
 ```bash
-node tools/data-lint.js        # sites+orgs invariants, inline-copy parity, currency
+node tools/data-lint.js        # sites+orgs invariants, fetched-spine contract, currency
 node tools/harness_globe.js    # real projection + marker math over the real data
 node tools/smoke_runtime.js    # boots the app under a stub DOM, ~40 probes
 node tools/ship-lint.js        # APP_VERSION ↔ CACHE ↔ changelog
 node tools/dead-lint.js        # unreachable CSS/JS + the byte budget
+node tools/brief-scale-check.js
+node tools/brief-support-check.js
+node tools/ux-navigation-check.js
+node tools/ux-persistence-check.js
+node tools/ux-records-check.js
+node tools/ux-search-check.js
 ```
 
-Those five are the CI gate (`.github/workflows/checks.yml`). Six more exist and
-are **not yet wired into CI** — run the ones your change touches:
-`brief-scale-check.js`, `brief-support-check.js`, `ux-navigation-check.js`,
-`ux-persistence-check.js`, `ux-records-check.js`, `ux-search-check.js`.
+All eleven are the CI gate (`.github/workflows/checks.yml`, since v1.28.0).
+Run the full set before every commit — `smoke_runtime` also shells into the
+other checks, but run them directly so a failure names itself.
 
 **The suite runs LAST**, after the version bump, the cache bump and the changelog
 entry. Those edits are themselves source, and `smoke_runtime` reads the source as
@@ -110,10 +113,16 @@ change moves code.
 
 ## Data
 
-`data/orgs.json` (1,416 orgs) and `data/sites.json` (285 sites) are the source of
-truth; `index.html` carries an **inline copy of each that must match exactly** —
-`data-lint` enforces it. Edit the source and regenerate the inline copy in the
-same script; never one by hand.
+`data/orgs.json` (1,416 orgs) and `data/sites.json` (285 sites) are the source
+of truth. Since v1.31.0 they ship differently:
+
+- **Orgs are FETCHED, never inline.** `index.html` boots `A1ORGS` empty and
+  `__orgsLoad()` fills it from `data/orgs.json` (same-origin `_fetchRetry`,
+  SW-precached in the versioned shell). Org edits are data-only commits —
+  edit the JSON, run the suite; there is no regeneration step. `data-lint` §8
+  bans an inline org literal from returning.
+- **Sites stay INLINE and must match `data/sites.json` exactly** (`data-lint`
+  enforces parity). Regenerate with `node tools/sync-inline.js`; never by hand.
 
 `lvl` is derived from the parent chain, never hand-held. `data-lint` also fails
 on any dissolved command presented as live (FORSCOM, TRADOC, AFC, ARNORTH,

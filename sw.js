@@ -21,10 +21,11 @@
 //    check, and the page's diagnostic probe must see the origin);
 //  · a message door: {t:'version'} answers the CACHE name; {t:'refresh-shell'}
 //    re-fetches the shell from the origin — the page's stale-build self-heal.
-const CACHE = 'a-org-2-v1-30-0';
+const CACHE = 'a-org-2-v1-31-0';
 const SHELL = './';
 const ASSETS = [
   SHELL, './manifest.webmanifest', './logo.svg',
+  './data/orgs.json',            /* v1.31.0 THE FETCHED SPINE — the org tree rides the versioned cache */
   './data/land-110m.json', './data/land-50m.json',
   './data/states-10m.json', './data/countries-110m.json',
   './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png'

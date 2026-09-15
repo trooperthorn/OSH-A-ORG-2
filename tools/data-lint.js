@@ -160,58 +160,48 @@ const byId = new Map();
   }
 }
 
-// ── 8. THE INLINE COPY (v1.24.0; slim contract v1.28.0) ─────────────────────
-//      data/orgs.json is the source of truth; the app renders an inline copy.
-//      Since v1.28.0 the copy is SLIM — {id,name,parent,site?} plus explicit
-//      lvl/root ONLY on rows whose stored value disagrees with their own chain
-//      — and a boot shim under the literal derives the rest. Two directions
-//      are held, both against tools/sync-inline.js's single projection:
-//        (a) the literal is EXACTLY the canonical projection of the source
-//            (so no one hand-grows the shipped copy, and no one slims a field
-//            the shim cannot rebuild);
-//        (b) projection + derivation reconstructs the source row-for-row
-//            (so the app draws exactly the tree this lint blesses).
+// ── 8. THE FETCHED SPINE (v1.31.0; supersedes the v1.28.0 slim projection) ──
+//      The org tree no longer ships inside index.html — the page fetches
+//      data/orgs.json at boot and the service worker precaches it, versioned
+//      with the build. Three clauses keep that contract honest:
+//        (a) NO org literal may creep back into the page (the prune this
+//            replaced was 190 KB — regrowth must fail loudly);
+//        (b) the loader must be present, or the app boots with an empty tree;
+//        (c) sw.js must precache data/orgs.json, or offline and the
+//            version-consistency guarantee silently die.
+//      The inline SITES literal STAYS and must match data/sites.json exactly —
+//      sites are first-paint critical and small.
 {
-  const IDXF = path.join(ROOT, 'index.html'), OFILE = path.join(ROOT, 'data', 'orgs.json');
-  if (fs.existsSync(IDXF) && fs.existsSync(OFILE)) {
+  const IDXF = path.join(ROOT, 'index.html'), SWF = path.join(ROOT, 'sw.js');
+  if (fs.existsSync(IDXF)) {
     const html = fs.readFileSync(IDXF, 'utf8');
-    const m = html.match(/var A1ORGS=window\.A1ORGS=(\[.*?\]);/s);
-    if (!m) bad('index.html carries no inline A1ORGS literal — the app has no org tree to draw');
+    // (a) scoped to the literal SHAPE, not prose: an org literal always opens
+    //     with the assignment and the hqda row
+    if (/var A1ORGS=window\.A1ORGS=\[\{/.test(html) || html.indexOf('{"id":"hqda"') >= 0)
+      bad('an inline A1ORGS literal is back in index.html — the org tree rides data/orgs.json since v1.31.0');
+    else if (html.indexOf('var A1ORGS=window.A1ORGS=[];') < 0)
+      bad('the A1ORGS placeholder is missing — closures need the array to exist at eval time');
+    else console.log('✓ no inline org literal; the placeholder array is in place');
+    // (b)
+    if (html.indexOf('THE FETCHED SPINE') < 0 || html.indexOf("_fetchRetry('data/orgs.json')") < 0)
+      bad('the FETCHED SPINE loader is missing — the app would boot with an empty org tree');
+    else console.log('✓ the fetched-spine loader is present (ladder + loud failure)');
+    // the SITES literal still mirrors its source exactly
+    const m = html.match(/var SITES=window\.SITES=(\[.*?\]);/s);
+    if (!m) bad('inline SITES literal missing — the constellation has nothing to paint on first frame');
     else {
-      let inline = null;
-      try { inline = JSON.parse(m[1]); } catch (e) { bad('the inline A1ORGS literal is not valid JSON: ' + e.message); }
-      const src = JSON.parse(fs.readFileSync(OFILE, 'utf8')).orgs;
-      if (inline) {
-        const { derived, slimProject } = require('./sync-inline.js');
-        // (a) literal === canonical projection
-        const canon = slimProject(src);
-        if (JSON.stringify(inline) !== JSON.stringify(canon)) {
-          const a = new Set(inline.map(o => o.id)), b = new Set(src.map(o => o.id));
-          const only = [...b].filter(x => !a.has(x)).slice(0, 4), extra = [...a].filter(x => !b.has(x)).slice(0, 4);
-          bad('the inline A1ORGS copy is not the canonical slim projection of data/orgs.json — regenerate with tools/sync-inline.js'
-            + (only.length ? '\n    missing from the page: ' + only.join(' · ') : '')
-            + (extra.length ? '\n    stale in the page: ' + extra.join(' · ') : ''));
-        } else {
-          // (b) projection + the boot shim's derivation reconstructs the source
-          const byId = {}; inline.forEach(o => byId[o.id] = o);
-          const rebuilt = inline.map(o => {
-            const d = derived(o, byId);
-            return { id: o.id, name: o.name, parent: o.parent,
-                     lvl: o.lvl !== undefined ? o.lvl : d.lvl,
-                     root: o.root !== undefined ? o.root : d.root,
-                     site: o.site !== undefined ? o.site : null };
-          });
-          const norm = rows => JSON.stringify(rows.map(o => [o.id, o.name, String(o.parent), o.lvl, String(o.root), String(o.site)]));
-          if (norm(rebuilt) !== norm(src)) bad('slim projection + derivation does NOT reconstruct data/orgs.json — the app would draw a different tree than the lint blesses');
-          else {
-            const exc = inline.filter(o => o.root !== undefined || o.lvl !== undefined).length;
-            console.log('✓ inline A1ORGS is the canonical slim projection and reconstructs the source exactly (' + src.length + ' orgs, ' + exc + ' exception rows)');
-          }
-        }
-        // the boot shim itself must be present, or the slim literal never regrows lvl/root
-        if (html.indexOf('THE DERIVED SPINE') < 0) bad('the DERIVED SPINE boot shim is missing — a slim literal with no derivation ships a tree without lvl/root');
-      }
+      const inline = JSON.parse(m[1]);
+      if (JSON.stringify(inline) !== JSON.stringify(sites))
+        bad('the inline SITES copy has drifted from data/sites.json — regenerate with tools/sync-inline.js');
+      else console.log('✓ inline SITES copy matches data/sites.json exactly (' + sites.length + ' sites)');
     }
+  }
+  // (c)
+  if (fs.existsSync(SWF)) {
+    const sw = fs.readFileSync(SWF, 'utf8');
+    if (sw.indexOf("'./data/orgs.json'") < 0)
+      bad("sw.js does not precache './data/orgs.json' — offline loses the org tree and versions can skew");
+    else console.log('✓ sw.js precaches data/orgs.json (offline + version-consistent)');
   }
 }
 
