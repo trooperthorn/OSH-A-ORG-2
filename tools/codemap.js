@@ -37,7 +37,7 @@ lines.forEach((L, i) => {
     sections.push({ line: i + 1, key: 'CHANGELOG (in-file release ledger)', kind: 'prose' });
   } else if (/^var A1ORGS=window\.A1ORGS=/.test(L)) {
     sections.push({ line: i + 1, key: 'DATA: A1ORGS literal (inline copy of data/orgs.json)', kind: 'data' });
-  } else if (/^window\.SITES=/.test(L)) {
+  } else if (/^var SITES=window\.SITES=/.test(L)) {
     sections.push({ line: i + 1, key: 'DATA: SITES literal (inline copy of data/sites.json)', kind: 'data' });
   } else if (/^window\.US_STATES=/.test(L)) {
     sections.push({ line: i + 1, key: 'DATA: US_STATES literal', kind: 'data' });

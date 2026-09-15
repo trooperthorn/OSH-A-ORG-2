@@ -1114,6 +1114,40 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     fails++; console.log('\u2717 the build stamp drifted back under the mode pill (v1.24.0 seated it at 32px)'); }
   else console.log('  \u2713 build stamp seated clear of the mode pill');
 
+  // ── PROBE: THE DERIVED SPINE (v1.28.0) — the inline A1ORGS literal ships
+  //    {id,name,parent,site?} and a boot shim rebuilds lvl/root from the parent
+  //    chain; explicit values ride only on rows whose stored source disagrees
+  //    with its own chain. Assert the RUNTIME state (post-shim) matches the
+  //    blessed file for every row, and assert the LITERAL itself stays slim —
+  //    scoped to the literal substring, never the whole source (comments and
+  //    the changelog speak of lvl/root in prose). ──
+  { let dok=true;
+    try{
+      const srcOrgs=JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'..','data','orgs.json'),'utf8')).orgs;
+      const run=global.A1ORGS;
+      if(!run || run.length!==srcOrgs.length){ dok=false; fails++; console.log('✗ DERIVED SPINE: runtime org count '+(run&&run.length)+' != source '+srcOrgs.length); }
+      else { let bad=0;
+        for(let i=0;i<srcOrgs.length;i++){ const a=srcOrgs[i], b=run[i];
+          if(a.id!==b.id || a.lvl!==b.lvl || String(a.root)!==String(b.root) || String(a.site)!==String(b.site)){ bad++; if(bad===1) console.log('    first mismatch: '+a.id+' src lvl/root '+a.lvl+'/'+a.root+' vs run '+b.lvl+'/'+b.root); } }
+        if(bad){ dok=false; fails++; console.log('✗ DERIVED SPINE: '+bad+' runtime row(s) disagree with data/orgs.json after derivation'); } }
+      const lit=html.match(/var A1ORGS=window\.A1ORGS=(\[.*?\]);/s);
+      if(!lit){ dok=false; fails++; console.log('✗ DERIVED SPINE: literal not found'); }
+      else {
+        const nLvl=(lit[1].match(/"lvl":/g)||[]).length, nRoot=(lit[1].match(/"root":/g)||[]).length;
+        // exception counts come from the SOURCE, so this probe never goes stale
+        // when the audit resolves (or adds) an exception row
+        const sb={}; srcOrgs.forEach(o=>sb[o.id]=o);
+        const chainRoot=(o)=>{ const seen=new Set([o.id]); const ch=[o]; let c=o;
+          while(c.parent!=null){ const p=sb[c.parent]; if(!p||seen.has(p.id)) break; seen.add(p.id); ch.push(p); c=p; }
+          return { lvl:ch.length, root: ch.length===1?null:ch[ch.length-2].id }; };
+        const expLvl=srcOrgs.filter(o=>chainRoot(o).lvl!==o.lvl).length;
+        const expRoot=srcOrgs.filter(o=>String(chainRoot(o).root)!==String(o.root)).length;
+        if(nLvl!==expLvl || nRoot!==expRoot){ dok=false; fails++; console.log('✗ DERIVED SPINE: literal carries lvl×'+nLvl+'/root×'+nRoot+', expected exceptions lvl×'+expLvl+'/root×'+expRoot+' — the shipped copy is regrowing derived fields'); }
+      }
+    }catch(e){ dok=false; fails++; console.log('✗ DERIVED SPINE probe: '+e.message); }
+    if(dok) console.log('  \u2713 DERIVED SPINE: slim literal + boot derivation \u2261 data/orgs.json, all rows, exceptions counted from source');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name

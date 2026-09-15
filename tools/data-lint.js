@@ -160,11 +160,17 @@ const byId = new Map();
   }
 }
 
-// ── 8. THE INLINE COPY (v1.24.0) ─────────────────────────────────────────────
-//      data/orgs.json is the source of truth, but the app renders an inline copy
-//      of the same array in index.html. NOTHING checked that the two agreed, so a
-//      hand-edit to either side could ship a chart that disagreed with the file
-//      the lint blesses — the lint would pass while the app drew stale structure.
+// ── 8. THE INLINE COPY (v1.24.0; slim contract v1.28.0) ─────────────────────
+//      data/orgs.json is the source of truth; the app renders an inline copy.
+//      Since v1.28.0 the copy is SLIM — {id,name,parent,site?} plus explicit
+//      lvl/root ONLY on rows whose stored value disagrees with their own chain
+//      — and a boot shim under the literal derives the rest. Two directions
+//      are held, both against tools/sync-inline.js's single projection:
+//        (a) the literal is EXACTLY the canonical projection of the source
+//            (so no one hand-grows the shipped copy, and no one slims a field
+//            the shim cannot rebuild);
+//        (b) projection + derivation reconstructs the source row-for-row
+//            (so the app draws exactly the tree this lint blesses).
 {
   const IDXF = path.join(ROOT, 'index.html'), OFILE = path.join(ROOT, 'data', 'orgs.json');
   if (fs.existsSync(IDXF) && fs.existsSync(OFILE)) {
@@ -176,16 +182,34 @@ const byId = new Map();
       try { inline = JSON.parse(m[1]); } catch (e) { bad('the inline A1ORGS literal is not valid JSON: ' + e.message); }
       const src = JSON.parse(fs.readFileSync(OFILE, 'utf8')).orgs;
       if (inline) {
-        if (JSON.stringify(inline) !== JSON.stringify(src)) {
+        const { derived, slimProject } = require('./sync-inline.js');
+        // (a) literal === canonical projection
+        const canon = slimProject(src);
+        if (JSON.stringify(inline) !== JSON.stringify(canon)) {
           const a = new Set(inline.map(o => o.id)), b = new Set(src.map(o => o.id));
           const only = [...b].filter(x => !a.has(x)).slice(0, 4), extra = [...a].filter(x => !b.has(x)).slice(0, 4);
-          const sb = {}; src.forEach(o => sb[o.id] = o);
-          const fld = inline.filter(o => sb[o.id] && JSON.stringify(sb[o.id]) !== JSON.stringify(o)).slice(0, 4).map(o => o.id);
-          bad('the inline A1ORGS copy has drifted from data/orgs.json — the app would draw a different tree than the lint blesses'
+          bad('the inline A1ORGS copy is not the canonical slim projection of data/orgs.json — regenerate with tools/sync-inline.js'
             + (only.length ? '\n    missing from the page: ' + only.join(' · ') : '')
-            + (extra.length ? '\n    stale in the page: ' + extra.join(' · ') : '')
-            + (fld.length ? '\n    field mismatch: ' + fld.join(' · ') : ''));
-        } else console.log('✓ inline A1ORGS copy matches data/orgs.json exactly (' + src.length + ' orgs)');
+            + (extra.length ? '\n    stale in the page: ' + extra.join(' · ') : ''));
+        } else {
+          // (b) projection + the boot shim's derivation reconstructs the source
+          const byId = {}; inline.forEach(o => byId[o.id] = o);
+          const rebuilt = inline.map(o => {
+            const d = derived(o, byId);
+            return { id: o.id, name: o.name, parent: o.parent,
+                     lvl: o.lvl !== undefined ? o.lvl : d.lvl,
+                     root: o.root !== undefined ? o.root : d.root,
+                     site: o.site !== undefined ? o.site : null };
+          });
+          const norm = rows => JSON.stringify(rows.map(o => [o.id, o.name, String(o.parent), o.lvl, String(o.root), String(o.site)]));
+          if (norm(rebuilt) !== norm(src)) bad('slim projection + derivation does NOT reconstruct data/orgs.json — the app would draw a different tree than the lint blesses');
+          else {
+            const exc = inline.filter(o => o.root !== undefined || o.lvl !== undefined).length;
+            console.log('✓ inline A1ORGS is the canonical slim projection and reconstructs the source exactly (' + src.length + ' orgs, ' + exc + ' exception rows)');
+          }
+        }
+        // the boot shim itself must be present, or the slim literal never regrows lvl/root
+        if (html.indexOf('THE DERIVED SPINE') < 0) bad('the DERIVED SPINE boot shim is missing — a slim literal with no derivation ships a tree without lvl/root');
       }
     }
   }

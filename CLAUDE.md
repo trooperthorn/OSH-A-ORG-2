@@ -1884,3 +1884,37 @@ It lives here now.
   browser rendering. The cloud browser URL policy blocked the local preview;
   desktop/iOS rendering and touch/keyboard checks remain the manual release gate
   in docs/BRIEF-UX-v1.27.md. Submit as a draft until that gate is reviewed.
+
+## v1.28.0 — the slim spine (prune release; owner: "prune and slim down the application")
+- THE PRUNE LEVER CHANGED. The changelog was already trimmed (v1.25.1), so the
+  weight was in DATA: the inline A1ORGS copy shipped lvl and root on all 1,416
+  rows — two fields fully derivable from the parent chain, 41 KB of a 900 KB
+  budget. The literal now ships {id,name,parent,site?} and the DERIVED SPINE
+  shim directly under it rebuilds lvl/root at boot with the same walk data-lint
+  verifies. Consumers were checked first: every .lvl/.root read is inside a
+  function body that runs after boot; nothing touches A1ORGS between the
+  literal and the shim.
+- EXCEPTIONS CARRY THEMSELVES. Three rows' stored root disagrees with their own
+  parent chain (11th-cyber-battalion, 12th-cyber-battalion-forming,
+  center-for-strategic-leadership-csl — stale values from before their branches
+  moved). The slim projection keeps an explicit root on exactly those rows, so
+  runtime state stays byte-for-byte faithful to the blessed file. They are
+  AUDIT WORK, not prune work — resolving them changes behaviour.
+- ONE DOOR: tools/sync-inline.js regenerates both inline literals from data/
+  and exports the projection data-lint checks against. Never rewrite a literal
+  by hand or in a release-local script again.
+- data-lint §8 now holds BOTH directions — literal === canonical projection,
+  and projection+derivation === source, row for row — plus the shim's presence.
+  All proven by re-injecting each defect: a hand-grown literal, a page-only
+  parent edit, a deleted shim, a broken derivation, a stray lvl on one row.
+- THE CODEMAP LIED about the changelog (62 KB): its section boundary missed the
+  SITES literal (declared as `var SITES=window.SITES=`, which the `^window\.`
+  regex never matched) and swallowed ~49 KB of sites into the "changelog"
+  span. Real changelog was 11.8 KB. Boundary fixed. Lesson: a generated map is
+  itself code — check its section sums against the file size.
+- CI RUNS ALL ELEVEN TOOLS NOW. The six ux-*/brief-* checks born in v1.26–v1.27
+  were never added to checks.yml, so they ran once and never again. Wired in.
+  Standing rule (AGENTS.md): a new check lands in checks.yml in the same change.
+- Changelog era: v1.24.0+ in-file; v1.22.0–v1.23.1 join git log and this file.
+- 911,854 → 870,652 bytes expected (~94.5%). The next briefing-mode release
+  spends from this headroom and states its own byte delta.

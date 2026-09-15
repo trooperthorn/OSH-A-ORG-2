@@ -21,3 +21,18 @@ jobs:
         run: node tools/ship-lint.js
       - name: Dead lint (unreachable CSS/JS + size budget)
         run: node tools/dead-lint.js
+      # v1.28.0 — the six checks below were added in v1.26–v1.27 but never wired
+      # in, so they ran once at birth and never again. A check outside CI is a
+      # one-shot script, not a guard.
+      - name: Brief scale check
+        run: node tools/brief-scale-check.js
+      - name: Brief support check
+        run: node tools/brief-support-check.js
+      - name: UX navigation check
+        run: node tools/ux-navigation-check.js
+      - name: UX persistence check
+        run: node tools/ux-persistence-check.js
+      - name: UX records check
+        run: node tools/ux-records-check.js
+      - name: UX search check
+        run: node tools/ux-search-check.js
