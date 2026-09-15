@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "updated": "2026-09-08",
+  "updated": "2026-09-15",
   "src": "A-ORG-1 ARMY_DATA verbatim (owner directive 21 Aug: organizations + reporting structure EXACTLY as A-ORG-1). 1403 orgs, structure = parent nesting; site = the app's own _directInstallation match joined to sites.json; null site inherits the nearest located ancestor (<=8 hops), the A-ORG-1 installationForNode law. || v1.0.0 research build-out (25 Aug 2026): +96 orgs from public sources (DVIDS, army.mil, service pages) via 7-agent verified research; dedupe of 2025-26 redesignation variants; high-confidence rows only, sources logged in scratchpad/research/*.json",
   "orgs": [
     {
@@ -4622,7 +4622,7 @@
     {
       "id": "iii-armored-corps",
       "name": "III Armored Corps",
-      "parent": "usareur-af",
+      "parent": "usawhc",
       "lvl": 4,
       "root": "asccs",
       "site": "fort-hood"
@@ -7056,7 +7056,7 @@
       "name": "11th Cyber Battalion",
       "parent": "780th-mi-brigade-cyber",
       "lvl": 6,
-      "root": "asccs",
+      "root": "drus",
       "site": null
     },
     {
@@ -7064,7 +7064,7 @@
       "name": "12th Cyber Battalion {forming}",
       "parent": "780th-mi-brigade-cyber",
       "lvl": 6,
-      "root": "asccs",
+      "root": "drus",
       "site": null
     },
     {
@@ -8960,7 +8960,7 @@
       "name": "Center for Strategic Leadership (CSL)",
       "parent": "u-s-army-war-college-awc",
       "lvl": 6,
-      "root": "drus",
+      "root": "acoms",
       "site": null
     },
     {

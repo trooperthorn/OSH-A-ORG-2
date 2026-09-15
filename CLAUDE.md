@@ -1918,3 +1918,20 @@ It lives here now.
 - Changelog era: v1.24.0+ in-file; v1.22.0–v1.23.1 join git log and this file.
 - 911,854 → 870,652 bytes expected (~94.5%). The next briefing-mode release
   spends from this headroom and states its own byte delta.
+
+## v1.28.1 — the August realignment (owner: "III Corps reports to USAWHC currently but app shows USAREUR")
+- THE OWNER WAS RIGHT AND SO WAS THE HISTORY. III Armored Corps went to
+  USAREUR-AF by the Dec 2025 general order (v1.24.0 recorded it correctly),
+  then SecArmy ordered it to Western Hemisphere Command in July 2026 — after
+  this model's knowledge cutoff. A tree of live commands goes stale in months,
+  not years; when the owner contradicts the data, research CURRENT, not the
+  order you remember.
+- Sweep result: III AC → usawhc (24 USAWHC subordinates) is the ONLY
+  structural change since the v1.24.0 audit. I Corps/USARPAC, V Corps/
+  USAREUR-AF, First Army + XVIII AC/USAWHC all hold. Divisions ride their
+  corps; no child edits.
+- The three v1.28.0 exception roots were stale values from before their
+  branches moved, and resolve to their own chains: 11th/12th Cyber Battalion
+  root asccs→drus (the 780th MI branch sits under INSCOM here), CSL root
+  drus→acoms (a relic of the War College's DRU era). ZERO exception rows
+  remain — the slim literal is pure {id,name,parent,site?} again.
