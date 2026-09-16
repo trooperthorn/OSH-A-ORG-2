@@ -2024,3 +2024,31 @@ It lives here now.
   `data/orgs.json`, run the suite; no regeneration step exists anymore.
 - Byte delta: −186,908 (886,957 → ~700,069 · 76.0% of the gate). The lever
   flagged since v1.28.0, cashed. ~216 KB of headroom regained.
+
+## v2.0.0 — the selection contract (V2 program opens; owner: "professional application… for multiple users")
+- V2's standard is PREDICTABILITY: the same action always answers the same
+  way, no behavior riding invisible state. docs/V2-CHARTER.md is the program
+  map (four pillars, sequence table, owner rulings owed); CLAUDE.md stays the
+  law of record.
+- THE FLIP WAS NEVER RANDOM: v0.18.0's drill-down silently remapped a dot tap
+  to the CHILD ORG whenever the dot sat inside the active selection's painted
+  web (_selKidOrg). Identical taps answered differently. The contract now: a
+  dot tap ALWAYS selects the installation; descending into a command is
+  always an EXPLICIT, labeled act (Units picker, Connect stepper, rail chips,
+  and the CHAIN DOOR — "<parent> chain › <child>" on the base card, one
+  labeled tap, data-codrill contract, cleared by the next ordinary selection
+  via the _keepChainCtx flag in selectSite).
+- The base card's subtitle answers "what is here" at a glance: state · senior
+  unit (s.unit). An ORG card still says WHERE it sits — the two directions
+  stay distinguishable at the header.
+- TESTS: harness_globe SEL CONTRACT drives the REAL tapAtScreen over a
+  subordinate dot of an armed selection (installation selected, selOrg null,
+  door context exact); smoke SELECTION CONTRACT pins the source shape
+  (code-scoped ban on the remap), renders the door armed, and proves it dies
+  with the next selection. Both proven by defect re-injection (remap
+  restored; clearing line removed).
+- LESSON, cleanup discipline: after a defect injection, restore with the
+  anchored python inverse — NEVER `git checkout <file>`, which discards every
+  other uncommitted edit in the file (it ate all four v2.0.0 edits once this
+  release; they were re-applied from the same script).
+- Byte delta: +2,842 (702,911 · 76.3% of the gate).

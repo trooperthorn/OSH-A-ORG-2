@@ -21,7 +21,7 @@
 //    check, and the page's diagnostic probe must see the origin);
 //  · a message door: {t:'version'} answers the CACHE name; {t:'refresh-shell'}
 //    re-fetches the shell from the origin — the page's stale-build self-heal.
-const CACHE = 'a-org-2-v1-31-0';
+const CACHE = 'a-org-2-v2-0-0';
 const SHELL = './';
 const ASSETS = [
   SHELL, './manifest.webmanifest', './logo.svg',

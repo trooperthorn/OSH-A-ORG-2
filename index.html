@@ -1742,6 +1742,24 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.0.0  • THE SELECTION CONTRACT (V2 program, pillar 1 — owner: "when in
+//            map view and selecting a base... sometimes it will randomly
+//            switch from base to a specific command"). The flip was never
+//            random: v0.18.0's drill-down silently remapped a dot tap to the
+//            CHILD ORG whenever the dot sat inside the active selection's
+//            painted web (_selKidOrg), so identical taps answered differently
+//            depending on invisible prior state. The contract now: a dot tap
+//            ALWAYS selects the installation; descending into a command is
+//            always an EXPLICIT, labeled act (Units picker, Connect stepper,
+//            rail chips — and the new CHAIN DOOR: arriving from a painted web,
+//            the base card offers "<parent> chain › <child org>" as one
+//            labeled tap, same data-codrill contract, living exactly one
+//            selection). The base card's subtitle now answers "what is here"
+//            at a glance: state · senior unit. Tests: harness_globe drives the
+//            real tapAtScreen over a subordinate dot (installation selected,
+//            selOrg null, door armed); smoke pins the source shape, renders
+//            the door armed, and proves it dies with the next selection —
+//            both proven by defect re-injection.
 //   v1.31.0 • THE FETCHED SPINE (owner: "Move the org data and push update").
 //            The ~187 KB inline A1ORGS literal and its DERIVED SPINE shim leave
 //            index.html: the org tree now boots from data/orgs.json — fetched
@@ -1893,8 +1911,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v1.31.0';
-const APP_UPDATED = '15 September 2026';
+const APP_VERSION = 'v2.0.0';
+const APP_UPDATED = '16 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
 // on every controller change). If the worker is NEWER than this page, the
@@ -5325,6 +5343,7 @@ function _tpWire(){
 try{ window.tpZoom=tpZoom; window.tpUndo=tpUndo; window.tpClear=tpClear; window.tpSync=tpSync; }catch(_){}
 
 function selectSite(id, o){
+  if(!(o&&o._keepChainCtx)) window._coChainCtx=null;   // v2.0.0: the chain door lives exactly one selection
   if(!(o&&o.noUndo)) _undoPush();
   if(id==null){
     GlobeState.sel=null;
@@ -6068,10 +6087,18 @@ function tapAtScreen(x, y){
   // zoom a tap lands on the nearest constellation dot via siteHitTest below.)
   const s=(typeof siteHitTest==='function') ? siteHitTest(x, y) : null;
   if(s && s.id!=null){
-    // DRILL DOWN (v0.18.0): tapping a direct-subordinate dot focuses THAT org and
-    // its own children — you descend the tree one level per tap, never all at once.
+    // v2.0.0 THE SELECTION CONTRACT (owner: "sometimes it will randomly switch
+    // from base to a specific command"). A dot tap ALWAYS selects the
+    // installation — the same tap always answers the same way. v0.18.0's silent
+    // remap (a subordinate dot of the active selection selected the CHILD ORG
+    // instead of the base) is retired: identical taps answered differently
+    // depending on invisible prior-selection state. Descending into a command
+    // is always an EXPLICIT, labeled act — the Units picker, the Connect
+    // stepper, the rail chips, and the chain door below all descend by name.
     const kid=GlobeState._selKidOrg && GlobeState._selKidOrg[s.id];
-    selectSite(s.id, kid ? {orgId:kid} : undefined);
+    const fromOg=(kid && GlobeState.selOrg && typeof orgOf==='function')?orgOf(GlobeState.selOrg):null;
+    window._coChainCtx=(kid&&fromOg)?{site:s.id, org:kid, from:fromOg.name}:null;
+    selectSite(s.id, {_keepChainCtx:true});
     return;                     // v0.25.1: a HIT is done here. Without this return the
                                 // tap-away below saw the callout selectSite just opened
                                 // and cleared the selection in the same tap — the map
@@ -6309,7 +6336,7 @@ function _coRender(){
   const sub=o?('Custom org'+(o.base&&siteById(o.base)?(' · '+siteById(o.base).base):''))
             :(ag?((agHost?agHost.base:'')+((agHost&&agHost.st)?(' · '+agHost.st):''))
                  :(sOg?(s.base+(s.st?(' \u00b7 '+s.st):''))    // an ORG card says WHERE it sits (audit #18)
-                      :(s.st||'')));               // the base card's title IS the base — the sub adds only the state
+                      :((s.st||'')+(s.unit?(((s.st)?' \u00b7 ':'')+s.unit):''))));   // v2.0.0: the base sub answers "what is here" — state · senior unit
   const nrec=(s&&typeof recCount==='function')?recCount(_coId):0;
   const brief=document.body.classList.contains('brief-mode');
   const briefSubj = ag ? ag.id : (sOg ? sOg.id : null);   // the ORG the card speaks for (null = the base itself)
@@ -6375,6 +6402,15 @@ function _coRender(){
             return '<button type="button" class="co-pilechip" data-odsel="'+escA(o2.id)+'" title="'+escA(o2.base)+'">'+esc(lbl)+'</button>'; }).join('')
           +'</div>';
       }
+      // v2.0.0 THE SELECTION CONTRACT — the chain door. Arriving here by tapping
+      // a dot inside a painted command web, the drill-down that used to happen
+      // silently is now one labeled tap (same data-codrill contract as the rail).
+      try{ const cc=window._coChainCtx;
+        if(cc && cc.site===s.id && typeof orgOf==='function'){
+          const ko=orgOf(cc.org);
+          if(ko) h+='<div class="co-pile"><span class="co-pilelbl">'+esc(_bfAbbr(cc.from))+' chain</span>'
+            +'<button type="button" class="co-pilechip" data-codrill="'+escA(cc.org)+'" title="Open '+escA(ko.name)+' — continue the chain here">'+esc(ko.name)+' \u203a</button></div>';
+        } }catch(_){}
     }
     let unitsN=0, kids=[];
     if(isBase){ try{ unitsN=(ogAtSite(s.id)||[]).length; }catch(_){} }

@@ -1216,6 +1216,42 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(dok) console.log('  \u2713 FETCHED SPINE: boot fetch delivered every blessed row \u00b7 no literal in the page');
   }
 
+  // \u2500\u2500 PROBE: THE SELECTION CONTRACT (v2.0.0; owner: "sometimes it will
+  //    randomly switch from base to a specific command"). A map dot tap must
+  //    ALWAYS select the installation; descending into a command is always an
+  //    explicit, labeled act. Three laws: (a) the v0.18.0 silent child-org
+  //    remap stays retired in the SOURCE (code-scoped shape); (b) the chain
+  //    door renders on the base card while _coChainCtx points at it, and dies
+  //    with the next ordinary selection (it lives exactly one selection);
+  //    (c) the base card's subtitle answers "what is here" \u2014 state \u00b7 senior
+  //    unit. harness_globe drives the real tapAtScreen end-to-end. \u2500\u2500
+  { let sok=true;
+    try{
+      // (a) source: the old remap shape must not return
+      if(/selectSite\(s\.id,\s*kid\s*\?/.test(html)){ sok=false; fails++; console.log('\u2717 SEL CONTRACT: the silent child-org dot remap is back in tapAtScreen'); }
+      if(html.indexOf('_keepChainCtx')<0 || html.indexOf('window._coChainCtx=')<0){ sok=false; fails++; console.log('\u2717 SEL CONTRACT: the chain-door spine (_coChainCtx/_keepChainCtx) is missing'); }
+      // (b) runtime: the door renders while armed, dies with the next selection
+      const kidOrg=(global.A1ORGS||[]).find(function(o2){ return o2.site==='fort-stewart'; });
+      if(!kidOrg){ sok=false; fails++; console.log('\u2717 SEL CONTRACT: fixture broke \u2014 no org sits at fort-stewart'); }
+      else{
+        global._coChainCtx={ site:'fort-stewart', org:kidOrg.id, from:'US Army Western Hemisphere Command' };
+        global.GlobeState.sel='fort-stewart'; global.GlobeState.selOrg=null;
+        global.calloutShow('fort-stewart');
+        const card=IDS['calloutCard']?IDS['calloutCard'].innerHTML:'';
+        if(card.indexOf('data-codrill="'+kidOrg.id+'"')<0){ sok=false; fails++; console.log('\u2717 SEL CONTRACT: chain door chip missing from the base card while context is armed'); }
+        // (c) the base subtitle carries the senior unit
+        if(!/<span class="co-subin">[^<]*3rd Infantry Division/.test(card)){ sok=false; fails++; console.log('\u2717 SEL CONTRACT: base subtitle does not answer "what is here" (state \u00b7 senior unit)'); }
+        // an ordinary selection retires the door
+        global.selectSite('fort-stewart');
+        if(global._coChainCtx!=null){ sok=false; fails++; console.log('\u2717 SEL CONTRACT: _coChainCtx survived an ordinary selection \u2014 the door must live exactly one selection'); }
+        const card2=IDS['calloutCard']?IDS['calloutCard'].innerHTML:'';
+        if(card2.indexOf('data-codrill="'+kidOrg.id+'"')>=0){ sok=false; fails++; console.log('\u2717 SEL CONTRACT: the chain door chip is still rendered after the context cleared'); }
+        global.selectSite(null);
+      }
+    }catch(e){ sok=false; fails++; console.log('\u2717 SEL CONTRACT probe: '+e.message); }
+    if(sok) console.log('  \u2713 SELECTION CONTRACT: remap stays retired \u00b7 chain door renders armed, dies with the next selection \u00b7 base sub says state \u00b7 senior unit');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name

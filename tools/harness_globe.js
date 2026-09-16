@@ -278,6 +278,30 @@ if(!fails){
           GS.sel=sel.id; GS.selOrg=null; G._syncSelArcs(sel.id);
         }
       }catch(e){ fails++; console.log('✗ TAP probe crashed: '+e.message); }
+      // ── v2.0.0 THE SELECTION CONTRACT (owner: "sometimes it will randomly
+      // switch from base to a specific command"). A dot tap ALWAYS selects the
+      // installation, even when that dot sits inside the active selection's
+      // painted web — the v0.18.0 silent child-org remap is retired. The drill
+      // context must survive as the labeled chain door (window._coChainCtx),
+      // so descending stays one EXPLICIT tap away.
+      try{
+        const og0=(typeof G.ogPrimary==='function')?G.ogPrimary(sel.id):null;
+        GS.sel=sel.id; GS.selOrg=og0?og0.id:null; G._syncSelArcs(sel.id);
+        const kmap=GS._selKidOrg||{};
+        const kidSite=Object.keys(kmap).find(id=>id!==sel.id && (GS._screen||[]).some(e=>e.inst&&e.inst.id===id));
+        if(!og0 || !kidSite){ fails++; console.log('✗ SEL CONTRACT: no on-screen subordinate dot to probe (org '+(og0&&og0.id)+', '+Object.keys(kmap).length+' kid sites) — fixture broke'); }
+        else{
+          const ent=(GS._screen||[]).find(e=>e.inst&&e.inst.id===kidSite);
+          GS._navSwallow=false;
+          G.tapAtScreen(ent.sx, ent.sy);
+          const ctx=G._coChainCtx;
+          if(GS.sel!==kidSite){ fails++; console.log('✗ SEL CONTRACT: tapping subordinate dot '+kidSite+' selected '+GS.sel+' — a dot tap must select the installation'); }
+          else if(GS.selOrg!=null){ fails++; console.log('✗ SEL CONTRACT: dot tap set selOrg='+GS.selOrg+' — the silent child-org remap is back'); }
+          else if(!ctx || ctx.site!==kidSite || ctx.org!==kmap[kidSite]){ fails++; console.log('✗ SEL CONTRACT: chain door context missing or wrong ('+JSON.stringify(ctx)+') — the drill-down lost its labeled door'); }
+          else console.log('✓ SEL CONTRACT: subordinate dot tap → installation selected ('+kidSite+'), selOrg null, chain door armed for '+ctx.org);
+        }
+      }catch(e){ fails++; console.log('✗ SEL CONTRACT probe crashed: '+e.message); }
+      GS.sel=sel.id; GS.selOrg=null; try{ G._coChainCtx=null; }catch(_){} try{ G._syncSelArcs(sel.id); }catch(_){}
     }
     // ── THE CONSTELLATION (v1.17.0, replaces the CLUSTER GATE): below zoom 1.6
     // the numbered badges are RETIRED — every ordinary site paints as an
