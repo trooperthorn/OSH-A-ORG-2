@@ -112,7 +112,16 @@ if (deadFns.length) {
   // v1.1.0 THE ONE EXCEPTION — the database door. ensureSupabase() lazy-injects
   // exactly this library on MANUAL Connect only; smoke enforces that no #sbLib
   // script and no window.supabase global exist at boot. Anything else stays banned.
-  const ALLOW = [/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/];
+  // v2.4.0 THE SECOND CLASS — XML NAMESPACE IDENTIFIERS. The deck exporter
+  // (_pptxParts) hand-writes OOXML, and OOXML's namespace names are http://
+  // URIs by spec: they are opaque identifiers inside generated markup, never
+  // fetched, never loaded, never reachable by the network layer. Scoped to
+  // exactly the OPC/OOXML schema hosts the exporter emits — any other origin
+  // still fails the build.
+  const ALLOW = [/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,
+                 /^http:\/\/schemas\.openxmlformats\.org\//,
+                 /^http:\/\/purl\.org\/dc\//,
+                 /^http:\/\/www\.w3\.org\/2001\/XMLSchema-instance/];
   const hits = [...noCmt.matchAll(/https?:\/\/[^\s'"`)]+/g)].map(m => m[0])
     .filter(h => !ALLOW.some(a => a.test(h)));
   if (hits.length) {

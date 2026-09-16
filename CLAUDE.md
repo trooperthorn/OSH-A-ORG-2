@@ -2135,3 +2135,35 @@ It lives here now.
   now reports to III Armored Corps", half-side reorder toast, cycle
   refusal, drag state fully cleaned, zero page errors.
 - Byte delta: +7,580 (721,337 · 78.3% of the gate).
+
+## v2.4.0 — the deck (V2 pillar 4 opens; owner: professional document structures — PPTX first)
+- THE BRIEF LEAVES THE APP AS A REAL DECK: title slide, the formation as one
+  chart slide, one slide per top branch (biggest first, ≥3 units, cap 12)
+  when the tree outgrows twelve boxes. Every unit is a native EDITABLE
+  shape — roundRect, the node's own tier/custom color as fill (tier law
+  rides into the file), luminance-picked ink, one straightConnector1 per
+  edge, leaf-slot layout. The recipient reworks it in their own deck; that
+  is the whole point (owner: "don't need to map it identically").
+- ZERO-LIBRARY OOXML: _zipStore is a store-only ZIP writer with a real
+  CRC-32 (check vector "123456789" → 0xCBF43926, pinned in smoke — an
+  off-by-one polynomial corrupts every entry silently and WAS proven to);
+  _pptxParts hand-writes the 9 required package parts + per-slide XML.
+  Boot law untouched — no library, no load, works offline.
+- EXPORTS SEE EVERYTHING (the v0.13.0 rule): _briefChainMap({all:true}) —
+  view filters and depth belong to the globe, never to a document.
+- ESCAPE OR CORRUPT: every user-authored string crosses _pkx. The probe
+  feeds "Task Force H&K" and demands &amp; — removing the escape fired.
+- VALIDATION LADDER for a binary format the stub can't eyeball: smoke pins
+  the contract shapes; python's zipfile CRC-checks every entry; ElementTree
+  parses all parts; python-pptx (a real OOXML consumer) opens the deck and
+  counts shapes/connectors. A 61-unit formation: 7 slides, 122 shapes on
+  the chart slide, 60 connectors = 60 edges, custom color present. The UI
+  row itself downloads (Playwright download event) and an empty brief
+  toasts instead of shipping an empty file.
+- DEAD-LINT LEARNED A SECOND SANCTIONED CLASS: OOXML namespace names are
+  http:// URIs by spec — opaque identifiers inside generated markup, never
+  fetched. The allowlist admits exactly the OPC/OOXML schema hosts the
+  exporter emits (schemas.openxmlformats.org, purl.org/dc,
+  w3.org/2001/XMLSchema-instance); a stray origin still fails (proven by
+  injecting one). The law is unchanged: no foreign CODE, ever.
+- Byte delta: +19,923 (741,260 · 80.4% of the gate).

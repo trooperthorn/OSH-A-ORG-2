@@ -1735,6 +1735,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <button class="xp-row" type="button" data-xp="pdf"><b>PDF dossier</b><span>print one-pager: map + command line + roster</span></button>
   <button class="xp-row" type="button" data-xp="html"><b>HTML dossier</b><span>self-contained file — shareable, offline, data embedded</span></button>
   <button class="xp-row" type="button" data-xp="json"><b>JSON snapshot</b><span>camera · selection · every site in scope</span></button>
+  <!-- v2.4.0 THE DECK — the brief as native, editable PowerPoint shapes -->
+  <button class="xp-row" type="button" data-xp="pptx"><b>PowerPoint deck</b><span>the brief as an editable org chart — native shapes, tier colors</span></button>
 </section>
 
 <!-- dossier: THE drawer (single-brain law — one drawer) -->
@@ -1762,6 +1764,28 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.4.0  • THE DECK (V2 pillar 4 opens — owner: "export options that can
+//            share this organization in professional organized document
+//            structures, charts, overview briefs"; charter order: PPTX
+//            first, the Army's lingua franca). The export sheet grows a
+//            "PowerPoint deck" row: the brief exports as a REAL .pptx —
+//            title slide, the whole formation as one chart slide, and one
+//            slide per top branch (biggest first, ≥3 units, cap 12) when
+//            the tree outgrows twelve boxes. Every unit is a native,
+//            EDITABLE shape: roundRect + text, the node's own tier/custom
+//            color as fill (tier law rides into the file), luminance-picked
+//            ink, one straightConnector1 per edge, leaf-slot layout (leaves
+//            take columns, parents center over their span — the chart's own
+//            top-down shape). Hand-rolled minimal OOXML over a store-only
+//            ZIP writer (_zipStore + real CRC-32): zero libraries, zero
+//            foreign code, offline. Exports see EVERYTHING (view filters
+//            are the globe's). Empty brief → toast, never an empty file.
+//            Validated hard: python-pptx opens a 61-unit deck (7 slides, 60
+//            connectors = 60 edges), zipfile CRC-checks every entry, all 24
+//            parts parse as XML; smoke's DECK probe pins the CRC check
+//            vector, required parts, ZIP end-record count, per-edge
+//            connectors, color ride-in and ampersand escaping — CRC and
+//            escaping defects proven to fire. API: _pptxParts/_pptxBuild.
 //   v2.3.0  • THE HAND (V2 pillar 3 — owner: "Dynamic objects with ability to
 //            drag to different spots on command"). Hold a chart box ~.35s and
 //            it LIFTS (dimmed box, gold name tag riding the pointer — the
@@ -1993,7 +2017,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.3.0';
+const APP_VERSION = 'v2.4.0';
 const APP_UPDATED = '16 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -9853,6 +9877,197 @@ function _xpStamp(){ const d=new Date(); const p=function(n){return (n<10?'0':''
   return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes()); }
 function _xpSlug(sn){ return (sn.selection?sn.selection.id:'laydown'); }
 
+// ═══ v2.4.0 THE DECK (V2 pillar 4 — owner: "professional organized document
+// structures, charts, overview briefs"; charter order: PPTX first — the
+// Army's lingua franca). The brief exports as a REAL PowerPoint deck: a title
+// slide, the whole formation as one chart slide, and one slide per top branch
+// when the tree is big. Every box is a native, EDITABLE shape (roundRect +
+// text, the node's own tier/custom color as fill, real connectors) — the
+// recipient reworks it in their own deck instead of screenshotting ours.
+// Hand-rolled minimal OOXML over a store-only ZIP writer: zero libraries,
+// zero foreign code, offline like everything else. Tier-color law rides into
+// the file untouched (L1 white · L2 cools · L3 warms · L4 roses).
+const _zipCRC=(function(){ const t=new Int32Array(256);
+  for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[n]=c; }
+  return function(u){ let c=-1; for(let i=0;i<u.length;i++) c=t[(c^u[i])&255]^(c>>>8); return (c^-1)>>>0; };
+})();
+function _zipStore(parts){            // [{path,text}] → Uint8Array; STORED entries (no compression, no dates)
+  const enc=new TextEncoder(); const chunks=[]; const cd=[]; let off=0;
+  const U16=function(v){ return [v&255,(v>>>8)&255]; };
+  const U32=function(v){ return [v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255]; };
+  parts.forEach(function(p){
+    const name=enc.encode(p.path), data=enc.encode(p.text), crc=_zipCRC(data);
+    const head=new Uint8Array([].concat([0x50,0x4B,3,4],[20,0],[0,0],[0,0],[0,0,0,0],U32(crc),U32(data.length),U32(data.length),U16(name.length),[0,0]));
+    chunks.push(head,name,data);
+    cd.push({name:name, crc:crc, size:data.length, off:off});
+    off+=head.length+name.length+data.length;
+  });
+  const cdStart=off; let cdLen=0;
+  cd.forEach(function(e){
+    const rec=new Uint8Array([].concat([0x50,0x4B,1,2],[20,0],[20,0],[0,0],[0,0],[0,0,0,0],U32(e.crc),U32(e.size),U32(e.size),U16(e.name.length),[0,0],[0,0],[0,0],[0,0],[0,0,0,0],U32(e.off)));
+    chunks.push(rec,e.name); cdLen+=rec.length+e.name.length;
+  });
+  chunks.push(new Uint8Array([].concat([0x50,0x4B,5,6],[0,0],[0,0],U16(cd.length),U16(cd.length),U32(cdLen),U32(cdStart),[0,0])));
+  let total=0; chunks.forEach(function(c){ total+=c.length; });
+  const out=new Uint8Array(total); let o=0; chunks.forEach(function(c){ out.set(c,o); o+=c.length; });
+  return out;
+}
+function _pkx(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function _pkHex(c){ const m=/^#?([0-9a-fA-F]{6})$/.exec(String(c||'')); return m?m[1].toUpperCase():'F5D76E'; }
+function _pkInk(hex){ const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  return (0.299*r+0.587*g+0.114*b)>150?'1A1408':'FFFFFF'; }
+// leaf-slot layout: leaves take integer slots left→right, parents center over
+// their span, y = depth — the same top-down shape the chart itself draws.
+function _deckLayout(C, roots){
+  const kids={}; C.order.forEach(function(k){ const p=C.nodes[k].parent||''; (kids[p]=kids[p]||[]).push(k); });
+  const pos={}; let slot=0, maxD=0, maxX=0;
+  const walk=function(k,d){
+    if(d>maxD) maxD=d;
+    const ch=kids[k]||[];
+    if(!ch.length){ pos[k]={x:slot,y:d}; maxX=Math.max(maxX,slot); return slot++; }
+    let first=null,last=null;
+    ch.forEach(function(c){ const x=walk(c,d+1); if(first==null) first=x; last=x; });
+    pos[k]={x:(first+last)/2,y:d}; maxX=Math.max(maxX,pos[k].x);
+    return pos[k].x;
+  };
+  roots.forEach(function(r,i){ if(i) slot+=1; walk(r,0); });
+  return {pos:pos, cols:maxX+1, rows:maxD+1};
+}
+function _deckChartXML(C, roots, title, ids){
+  const L=_deckLayout(C, roots);
+  const X0=304800, Y0=990600, AW=11582400, AH=5638800;         // 16:9 slide, .33in gutters, title band
+  const colW=AW/Math.max(1,L.cols), rowH=AH/Math.max(1,L.rows);
+  const bw=Math.round(Math.min(1828800, colW*0.92)), bh=Math.round(Math.min(457200, rowH*0.52));
+  const sz=(L.cols>9||bw<1000000)?800:(L.cols>5?1000:1200);
+  let sp='', id=10;
+  const at=function(k){ const p=L.pos[k]; return {x:Math.round(X0+(p.x+0.5)*colW-bw/2), y:Math.round(Y0+p.y*rowH)}; };
+  Object.keys(L.pos).forEach(function(k){
+    const n=C.nodes[k], p=n.parent;
+    if(!p||!L.pos[p]) return;
+    const a=at(p), b=at(k);
+    const x1=a.x+bw/2, y1=a.y+bh, x2=b.x+bw/2, y2=b.y;
+    const fx=Math.min(x1,x2), fy=Math.min(y1,y2);
+    sp+='<p:cxnSp><p:nvCxnSpPr><p:cNvPr id="'+(id++)+'" name="ln"/><p:cNvCxnSpPr/><p:nvPr/></p:nvCxnSpPr>'
+      +'<p:spPr><a:xfrm'+(x2<x1?' flipH="1"':'')+'><a:off x="'+fx+'" y="'+fy+'"/><a:ext cx="'+Math.max(1,Math.abs(x2-x1))+'" cy="'+Math.max(1,Math.abs(y2-y1))+'"/></a:xfrm>'
+      +'<a:prstGeom prst="straightConnector1"><a:avLst/></a:prstGeom>'
+      +'<a:ln w="12700"><a:solidFill><a:srgbClr val="8A8378"/></a:solidFill></a:ln></p:spPr></p:cxnSp>';
+  });
+  Object.keys(L.pos).forEach(function(k){
+    const n=C.nodes[k], o=at(k);
+    const fill=_pkHex(n.color||n.shade), ink=_pkInk(fill);
+    sp+='<p:sp><p:nvSpPr><p:cNvPr id="'+(id++)+'" name="'+_pkx(n.name)+'"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+      +'<p:spPr><a:xfrm><a:off x="'+o.x+'" y="'+o.y+'"/><a:ext cx="'+bw+'" cy="'+bh+'"/></a:xfrm>'
+      +'<a:prstGeom prst="roundRect"><a:avLst/></a:prstGeom>'
+      +'<a:solidFill><a:srgbClr val="'+fill+'"/></a:solidFill>'
+      +'<a:ln w="12700"><a:solidFill><a:srgbClr val="6B655B"/></a:solidFill></a:ln></p:spPr>'
+      +'<p:txBody><a:bodyPr anchor="ctr" lIns="36576" rIns="36576" tIns="18288" bIns="18288"><a:normAutofit/></a:bodyPr><a:lstStyle/>'
+      +'<a:p><a:pPr algn="ctr"/><a:r><a:rPr lang="en-US" sz="'+sz+'" b="1"><a:solidFill><a:srgbClr val="'+ink+'"/></a:solidFill></a:rPr><a:t>'+_pkx(n.name)+'</a:t></a:r></a:p></p:txBody></p:sp>';
+  });
+  return _deckSlideXML('<p:sp><p:nvSpPr><p:cNvPr id="2" name="title"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+    +'<p:spPr><a:xfrm><a:off x="304800" y="228600"/><a:ext cx="11582400" cy="609600"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>'
+    +'<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="2000" b="1"><a:solidFill><a:srgbClr val="1A1408"/></a:solidFill></a:rPr><a:t>'+_pkx(title)+'</a:t></a:r></a:p></p:txBody></p:sp>'+sp);
+}
+function _deckSlideXML(inner){
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    +'<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">'
+    +'<p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
+    +'<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'
+    +inner+'</p:spTree></p:cSld><p:clrMapOvr><a:overrideClrMapping bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/></p:clrMapOvr></p:sld>';
+}
+function _pptxParts(){
+  const C=_briefChainMap({all:true});                        // exports see EVERYTHING (view filters are the globe's)
+  const roots=C.order.filter(function(k){ return !C.nodes[k].parent; });
+  const when=new Date();
+  const stamp=when.getFullYear()+'-'+(when.getMonth()<9?'0':'')+(when.getMonth()+1)+'-'+(when.getDate()<10?'0':'')+when.getDate();
+  const slides=[];
+  slides.push(_deckSlideXML(
+    '<p:sp><p:nvSpPr><p:cNvPr id="2" name="t"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+    +'<p:spPr><a:xfrm><a:off x="914400" y="2286000"/><a:ext cx="10363200" cy="1143000"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>'
+    +'<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="4000" b="1"><a:solidFill><a:srgbClr val="1A1408"/></a:solidFill></a:rPr><a:t>A-ORG-2 — Command Brief</a:t></a:r></a:p></p:txBody></p:sp>'
+    +'<p:sp><p:nvSpPr><p:cNvPr id="3" name="s"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+    +'<p:spPr><a:xfrm><a:off x="914400" y="3505200"/><a:ext cx="10363200" cy="609600"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>'
+    +'<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="1600"><a:solidFill><a:srgbClr val="6B655B"/></a:solidFill></a:rPr><a:t>'+_pkx(stamp+' · '+C.order.length+' units · generated by A-ORG-2 '+APP_VERSION)+'</a:t></a:r></a:p></p:txBody></p:sp>'));
+  slides.push(_deckChartXML(C, roots, 'The formation — '+C.order.length+' units'));
+  if(C.order.length>12){                                     // one slide per top branch, biggest first, cap 12
+    const branches=[];
+    roots.forEach(function(r){ C.order.forEach(function(k){ if(C.nodes[k].parent===r) branches.push(k); }); });
+    const sizeOf=function(b){ let n=0; const q=[b]; while(q.length){ const cur=q.shift(); n++; C.order.forEach(function(k){ if(C.nodes[k].parent===cur) q.push(k); }); } return n; };
+    branches.map(function(b){ return {k:b, n:sizeOf(b)}; }).filter(function(x){ return x.n>=3; })
+      .sort(function(a,b){ return b.n-a.n; }).slice(0,12)
+      .forEach(function(x){ slides.push(_deckChartXML(C, [x.k], C.nodes[x.k].name+' — '+x.n+' units')); });
+  }
+  const P=[]; const NS_R='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  let ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+    +'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+    +'<Default Extension="xml" ContentType="application/xml"/>'
+    +'<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>'
+    +'<Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>'
+    +'<Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>'
+    +'<Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>'
+    +'<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>';
+  slides.forEach(function(_,i){ ct+='<Override PartName="/ppt/slides/slide'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>'; });
+  ct+='</Types>';
+  P.push({path:'[Content_Types].xml', text:ct});
+  P.push({path:'_rels/.rels', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    +'<Relationship Id="rId1" Type="'+NS_R+'/officeDocument" Target="ppt/presentation.xml"/>'
+    +'<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>'});
+  P.push({path:'docProps/core.xml', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>A-ORG-2 Command Brief</dc:title><dcterms:created xsi:type="dcterms:W3CDTF">'+when.toISOString()+'</dcterms:created></cp:coreProperties>'});
+  let pr='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="'+NS_R+'" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">'
+    +'<p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:sldIdLst>';
+  slides.forEach(function(_,i){ pr+='<p:sldId id="'+(256+i)+'" r:id="rId'+(i+2)+'"/>'; });
+  pr+='</p:sldIdLst><p:sldSz cx="12192000" cy="6858000"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>';
+  P.push({path:'ppt/presentation.xml', text:pr});
+  let prr='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    +'<Relationship Id="rId1" Type="'+NS_R+'/slideMaster" Target="slideMasters/slideMaster1.xml"/>';
+  slides.forEach(function(_,i){ prr+='<Relationship Id="rId'+(i+2)+'" Type="'+NS_R+'/slide" Target="slides/slide'+(i+1)+'.xml"/>'; });
+  prr+='</Relationships>';
+  P.push({path:'ppt/_rels/presentation.xml.rels', text:prr});
+  P.push({path:'ppt/slideMasters/slideMaster1.xml', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    +'<p:sldMaster xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="'+NS_R+'" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">'
+    +'<p:cSld><p:bg><p:bgPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:effectLst/></p:bgPr></p:bg><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
+    +'<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>'
+    +'<p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>'
+    +'<p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst></p:sldMaster>'});
+  P.push({path:'ppt/slideMasters/_rels/slideMaster1.xml.rels', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    +'<Relationship Id="rId1" Type="'+NS_R+'/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>'
+    +'<Relationship Id="rId2" Type="'+NS_R+'/theme" Target="../theme/theme1.xml"/></Relationships>'});
+  P.push({path:'ppt/slideLayouts/slideLayout1.xml', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    +'<p:sldLayout xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="'+NS_R+'" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" type="blank">'
+    +'<p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
+    +'<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr></p:spTree></p:cSld>'
+    +'<p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>'});
+  P.push({path:'ppt/slideLayouts/_rels/slideLayout1.xml.rels', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    +'<Relationship Id="rId1" Type="'+NS_R+'/slideMaster" Target="../slideMasters/slideMaster1.xml"/></Relationships>'});
+  P.push({path:'ppt/theme/theme1.xml', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    +'<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Lumen"><a:themeElements>'
+    +'<a:clrScheme name="Lumen"><a:dk1><a:srgbClr val="1A1408"/></a:dk1><a:lt1><a:srgbClr val="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="44403A"/></a:dk2><a:lt2><a:srgbClr val="F4F1EA"/></a:lt2>'
+    +'<a:accent1><a:srgbClr val="F5D76E"/></a:accent1><a:accent2><a:srgbClr val="7FB2D9"/></a:accent2><a:accent3><a:srgbClr val="E8A87C"/></a:accent3><a:accent4><a:srgbClr val="D98BA6"/></a:accent4><a:accent5><a:srgbClr val="9AA7B8"/></a:accent5><a:accent6><a:srgbClr val="8A8378"/></a:accent6>'
+    +'<a:hlink><a:srgbClr val="7FB2D9"/></a:hlink><a:folHlink><a:srgbClr val="9AA7B8"/></a:folHlink></a:clrScheme>'
+    +'<a:fontScheme name="Lumen"><a:majorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme>'
+    +'<a:fmtScheme name="Lumen"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst>'
+    +'<a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="19050"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="28575"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst>'
+    +'<a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst>'
+    +'<a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst></a:fmtScheme>'
+    +'</a:themeElements></a:theme>'});
+  slides.forEach(function(xml,i){
+    P.push({path:'ppt/slides/slide'+(i+1)+'.xml', text:xml});
+    P.push({path:'ppt/slides/_rels/slide'+(i+1)+'.xml.rels', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      +'<Relationship Id="rId1" Type="'+NS_R+'/slideLayout" Target="../slideLayouts/slideLayout1.xml"/></Relationships>'});
+  });
+  return P;
+}
+function _pptxBuild(){ return _zipStore(_pptxParts()); }
+function xpPptx(){
+  if(typeof BRIEF==='undefined' || !BRIEF.nodes || !BRIEF.nodes.length){
+    try{ _bfToast('Nothing on the brief yet — build the diagram first'); }catch(_){}
+    return;
+  }
+  _xpDownload('a-org-2-brief-'+_xpStamp()+'.pptx',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation', _pptxBuild());
+}
+try{ window._pptxParts=_pptxParts; window._pptxBuild=_pptxBuild; window.xpPptx=xpPptx; window._zipCRC=_zipCRC; window._zipStore=_zipStore; }catch(_){}
+
+
 // ---- ① PNG — the stage as shown, title + legend burned in ---------------------
 function exportPNG(){
   const sn=buildSnapshot();
@@ -9970,6 +10185,7 @@ if(!window.__xpWired){ window.__xpWired=true;
         const filter=_xpReadFilter();
         if(k==='png') exportPNG(); else if(k==='pdf') exportPDF(filter);
         else if(k==='html') exportHTML(filter); else if(k==='json') exportJSON(filter);
+        else if(k==='pptx') xpPptx();                       /* v2.4.0 THE DECK */
       }catch(err){ try{ _errToast('export failed: '+err.message); }catch(_){} }
       return; }
     const p=document.getElementById('exportSheet');

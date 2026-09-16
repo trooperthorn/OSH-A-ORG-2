@@ -1358,6 +1358,48 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(hok) console.log('  ✓ HAND: gesture wire + guards in source · place lands exact sibling order, refuses cross-parent · cycle guard holds');
   }
 
+  // ── PROBE: THE DECK (v2.4.0; owner: professional document structures —
+  //    charter order: PPTX first). The brief exports as a real PowerPoint
+  //    package built from hand-rolled OOXML over a store-only ZIP. Laws:
+  //    (a) the CRC table is the real CRC-32 (check vector "123456789" →
+  //    0xCBF43926 — a wrong polynomial corrupts every entry silently);
+  //    (b) the package carries its required parts and the ZIP end record
+  //    agrees with the part count; (c) the chart slide carries every node as
+  //    a NAMED shape, one connector per edge, and the node's own color;
+  //    (d) names are XML-escaped — an ampersand in a unit name must never
+  //    reach the XML raw. python-pptx + zipfile CRC validation ran live; the
+  //    export row and dispatch are pinned in source. ──
+  { let dek=true;
+    try{
+      if(html.indexOf('data-xp="pptx"')<0 || html.indexOf("k==='pptx'")<0){ dek=false; fails++; console.log('✗ DECK: the export row or its dispatch is gone'); }
+      const crc=global._zipCRC(new TextEncoder().encode('123456789'));
+      if(crc!==0xCBF43926){ dek=false; fails++; console.log('✗ DECK: CRC-32 check vector failed (got 0x'+crc.toString(16)+') — every ZIP entry would be silently corrupt'); }
+      global.Brief.add('usawhc');
+      global.Brief.add('iii-armored-corps');
+      global.Brief.addCustom('Task Force H&K', 'iii-armored-corps');
+      global.Brief.color('iii-armored-corps', '#aa3355');
+      const parts=global._pptxParts();
+      const paths=parts.map(function(p){ return p.path; });
+      ['[Content_Types].xml','_rels/.rels','ppt/presentation.xml','ppt/_rels/presentation.xml.rels',
+       'ppt/slideMasters/slideMaster1.xml','ppt/slideLayouts/slideLayout1.xml','ppt/theme/theme1.xml',
+       'ppt/slides/slide1.xml','ppt/slides/slide2.xml'].forEach(function(req){
+        if(paths.indexOf(req)<0){ dek=false; fails++; console.log('✗ DECK: required part missing: '+req); } });
+      const s2=(parts.find(function(p){ return p.path==='ppt/slides/slide2.xml'; })||{text:''}).text;
+      if(s2.indexOf('AA3355')<0){ dek=false; fails++; console.log('✗ DECK: the node’s own color did not ride into the chart slide'); }
+      if(s2.indexOf('Task Force H&amp;K')<0 || /Task Force H&K/.test(s2)){ dek=false; fails++; console.log('✗ DECK: XML escaping broke — a raw ampersand in a unit name corrupts the file'); }
+      const conns=(s2.match(/straightConnector1/g)||[]).length;
+      const boxes=(s2.match(/roundRect/g)||[]).length;
+      if(!(boxes===3 && conns===2)){ dek=false; fails++; console.log('✗ DECK: chart slide has '+boxes+' boxes / '+conns+' connectors — expected 3 / 2 (one per node, one per edge)'); }
+      const u=global._pptxBuild();
+      if(!(u[0]===0x50&&u[1]===0x4B&&u[2]===3&&u[3]===4)){ dek=false; fails++; console.log('✗ DECK: the build does not start with a ZIP local header'); }
+      let eocd=-1; for(let i2=u.length-22;i2>=0;i2--){ if(u[i2]===0x50&&u[i2+1]===0x4B&&u[i2+2]===5&&u[i2+3]===6){ eocd=i2; break; } }
+      const n=eocd>=0?(u[eocd+10]|(u[eocd+11]<<8)):-1;
+      if(n!==parts.length){ dek=false; fails++; console.log('✗ DECK: ZIP end record counts '+n+' entries, package has '+parts.length); }
+      global.Brief.list().slice().forEach(function(k){ try{ global.Brief.remove(k); }catch(_){} });
+    }catch(e){ dek=false; fails++; console.log('✗ DECK probe: '+e.message); }
+    if(dek) console.log('  ✓ DECK: CRC vector · required parts + ZIP end record · named shapes, one connector per edge, colors ride · ampersands escaped');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name
