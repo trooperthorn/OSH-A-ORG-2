@@ -2052,3 +2052,31 @@ It lives here now.
   other uncommitted edit in the file (it ate all four v2.0.0 edits once this
   release; they were re-applied from the same script).
 - Byte delta: +2,842 (702,911 · 76.3% of the gate).
+
+## v2.1.0 — the stage mirror (V2 pillar 3; owner: full-screen globe + corner hierarchy + dynamic globe display)
+- THE MINIMIZED BRIEF IS A STAGE, NOT A PILL. chart-min keeps a LIVE miniature
+  of the chart in the corner card: the hide rule exempts .bf-wrap, _bfFit
+  routes to _bfMirrorFit while minimized (whole tree scaled in, floor .08 —
+  a silhouette locator with tier colors, centered on the focus, zoom
+  restored to the builder clamp on expand). Display-only: the wrap is
+  pointer-events:none and the STAGE ITSELF carries data-chmin while
+  minimized (synced by renderBrief and the toggle), so one tap anywhere on
+  the mirror expands — one surface, one contract, zero new handlers.
+- THE GLOBE FOLLOWS THE HIERARCHY. _bfFlyFocus reframes the camera on
+  exactly the web the brief shows — _briefChainMap is already
+  focus-filtered and the brief arcs already ride it, so the "dynamic
+  linking" was one camera call away. Math is _flyFitChain's earned recipe
+  (unit-vector centroid + max separation, _bandAim clear-window, zoom
+  ladder). SIX wires, all load-bearing: _bfExplore, both bfBack paths, the
+  brief globe-dot tap, chart-min entry, brief-room entry. smoke counts
+  def+6=7 code shapes — the count regex also matches the definition, which
+  bit once (threshold 6 let a removed wire pass; fixed to 7 and proven).
+- Present is unaffected: the opaque stage covers the globe, and a fly under
+  it parks the camera on the focus for the moment the presenter drops back.
+- TESTS: smoke STAGE MIRROR (CSS contract incl. pointer-events pin,
+  mirror-fit route shape, wire count, seeded-brief flies on room entry and
+  on focused follow — proven by unwiring explore and by no-op'ing the fly);
+  the mirror's GEOMETRY is browser-only (stub has no layout): proven live
+  at 414×896 — tree zoom .125 in a 190×215 card, tap-through expand, zero
+  page errors.
+- Byte delta: +6,023 (708,934 · 76.9% of the gate).

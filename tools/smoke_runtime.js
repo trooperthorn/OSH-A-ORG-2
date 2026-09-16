@@ -1252,6 +1252,44 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(sok) console.log('  \u2713 SELECTION CONTRACT: remap stays retired \u00b7 chain door renders armed, dies with the next selection \u00b7 base sub says state \u00b7 senior unit');
   }
 
+  // \u2500\u2500 PROBE: THE STAGE MIRROR (v2.1.0; owner: "Full screen globe mode with a
+  //    small hierarchy pictured in corner" + "dynamic display view when
+  //    navigating the hierarchy to show on globe"). Four laws: (a) minimized,
+  //    the brief keeps a LIVE miniature \u2014 the hide rule exempts .bf-wrap, the
+  //    mirror CSS exists, and _bfMirrorFit scales with a .08 floor (no .85
+  //    builder floor in the mirror); (b) the mirror is one tap-through surface
+  //    \u2014 pointer-events:none wrap + the stage's own data-chmin attr, synced by
+  //    renderBrief and the toggle; (c) the globe FOLLOWS the hierarchy:
+  //    _bfFlyFocus exists and is wired into _bfExplore, bfBack (both paths),
+  //    the brief globe tap, the chart-min entry and the room entry; (d) it
+  //    actually flies: driven over a seeded brief it starts a camera tween
+  //    (GlobeState._fly). Stub layout has no clientWidth, so the mirror FIT is
+  //    proven geometrically in the live browser; the source contract here. \u2500\u2500
+  { let mok=true;
+    try{
+      if(!/body\.chart-min #briefStage > :not\(\.ch-head\):not\(\.bf-wrap\)\{display:none\}/.test(html)){ mok=false; fails++; console.log('\u2717 STAGE MIRROR: the hide rule no longer exempts .bf-wrap \u2014 the miniature is gone'); }
+      if(html.indexOf('body.brief-mode.chart-min #briefStage .bf-wrap')<0 || !/chart-min #briefStage \.bf-wrap\{[^}]*pointer-events:none/.test(html)){ mok=false; fails++; console.log('\u2717 STAGE MIRROR: mirror card CSS missing or the wrap became interactive'); }
+      if(typeof global._bfMirrorFit!=='function'){ mok=false; fails++; console.log('\u2717 STAGE MIRROR: _bfMirrorFit is gone'); }
+      if(!/_bfMirrorFit\(w,t,L\); return; \}/.test(html)){ mok=false; fails++; console.log('\u2717 STAGE MIRROR: _bfFit no longer routes to the mirror fit while minimized'); }
+      const wired=(html.match(/_bfFlyFocus\(\)/g)||[]).length;
+      if(typeof global._bfFlyFocus!=='function' || wired<7){ mok=false; fails++; console.log('\u2717 STAGE MIRROR: the follow is unwired ('+wired+' _bfFlyFocus() sites; need explore/back\u00d72/tap/chmin/room)'); }
+      // (d) runtime: seed a two-node brief; ENTERING the room must already fly
+      // (the room-entry wire), and a focused follow must fly again.
+      global.Brief.add('usawhc'); global.Brief.add('iii-armored-corps');
+      global.GlobeState._fly=false; global.GlobeState._bfFocus=null;
+      global.setMode('brief');
+      if(global.GlobeState._fly!==true){ mok=false; fails++; console.log('\u2717 STAGE MIRROR: entering the brief room over a 2-site brief did not start a camera tween'); }
+      global.GlobeState._fly=false;
+      global.GlobeState._bfFocus='iii-armored-corps';
+      global._bfFlyFocus();
+      if(global.GlobeState._fly!==true){ mok=false; fails++; console.log('\u2717 STAGE MIRROR: focused follow did not fly'); }
+      global.GlobeState._bfFocus=null; global.GlobeState._fly=false;
+      global.Brief.list().slice().forEach(function(k){ try{ global.Brief.remove(k); }catch(_){} });
+      global.setMode('map');
+    }catch(e){ mok=false; fails++; console.log('\u2717 STAGE MIRROR probe: '+e.message); }
+    if(mok) console.log('  \u2713 STAGE MIRROR: miniature CSS + tap-through contract \u00b7 mirror fit routed \u00b7 follow wired at 6 sites and flies over a seeded brief');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name

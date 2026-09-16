@@ -726,7 +726,15 @@ body.brief-mode #briefStage{
 body.brief-mode.chart-min #briefStage{
   width:auto; max-height:none; overflow:visible; padding:0; background:none; box-shadow:none;
 }
-body.chart-min #briefStage > :not(.ch-head){display:none}
+/* v2.1.0 THE STAGE MIRROR — minimized, the brief keeps a LIVE miniature of the
+   hierarchy under the pill: silhouette + tier colors as a locator while the
+   globe is the stage. Display-only (pointer-events:none) — a tap anywhere on
+   the mirror falls through to the stage's own data-chmin and expands. */
+body.chart-min #briefStage > :not(.ch-head):not(.bf-wrap){display:none}
+body.brief-mode.chart-min #briefStage .bf-wrap{display:block; width:min(46vw,300px); height:min(24vh,220px);
+  overflow:hidden; margin-top:6px; padding:6px; pointer-events:none; border-radius:14px;
+  background:rgba(8,6,4,.55); box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
+body.brief-mode.chart-min #briefStage{cursor:pointer}
 body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
@@ -1742,6 +1750,27 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.1.0  • THE STAGE MIRROR (V2 pillar 3 — owner: "Full screen globe mode
+//            with a small hierarchy pictured in corner to reference" +
+//            "dynamic display view when navigating the hierarchy to show on
+//            globe" + "dynamic linking of these organizations to show on the
+//            globe"). The minimized brief (⌗) is now a real second stage
+//            instead of a bare pill: the chart lives on as a LIVE miniature
+//            in the corner — whole tree scaled into the card (floor .08, a
+//            silhouette locator with tier colors), centered on the focus,
+//            display-only, one tap anywhere expands (the stage itself carries
+//            data-chmin while minimized; the wrap is pointer-events:none).
+//            And the globe FOLLOWS the hierarchy: _bfFlyFocus reframes the
+//            camera on exactly the web the brief shows (_briefChainMap is
+//            already focus-filtered; brief links/arcs already ride it) using
+//            _flyFitChain's centroid + max-separation math aimed at the clear
+//            window. Wired at six sites: _bfExplore, both bfBack paths, the
+//            brief globe-dot tap, chart-min entry, and brief-room entry — so
+//            arriving, drilling, backing out and tapping dots all keep the
+//            globe framed on the formation. smoke's STAGE MIRROR probe pins
+//            the CSS contract, the mirror-fit route, the six wires (def+6
+//            counted) and flies a seeded brief; the mirror's geometry is
+//            proven live (tree zoom .125 in a 190×215 card at 414×896).
 //   v2.0.0  • THE SELECTION CONTRACT (V2 program, pillar 1 — owner: "when in
 //            map view and selecting a base... sometimes it will randomly
 //            switch from base to a specific command"). The flip was never
@@ -1911,7 +1940,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.0.0';
+const APP_VERSION = 'v2.1.0';
 const APP_UPDATED = '16 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -5404,6 +5433,7 @@ function setMode(m){
   try{ if(brief){ _bfHist=[]; _bfHistArm(); } else if(typeof bfPresent==='function') bfPresent(false); }catch(_){}   // v1.29.0
   try{ GlobeState.__bfC=null; GlobeState._bfFocus=null; }catch(_){}
   if(brief) renderBrief();
+  if(brief){ try{ _bfFlyFocus(); }catch(_){} }   // v2.1.0: arrive with the web framed
   // v1.15.0 (design 2b): the search pill speaks the room's language, the brief
   // dock mirrors the view flags, and the leader clears when the room changes.
   try{ const si=document.getElementById('searchInput');
@@ -5440,6 +5470,7 @@ function renderBrief(view){
   // data-* contract (bfobj/bfaddkids/bfedit/bffold/bfdepth/bfzoom/chmin/
   // bffocusclear/bfsearch/bfgrpnew) is unchanged.
   const el=document.getElementById('briefStage'); if(!el) return;
+  try{ if(document.body.classList.contains('chart-min')) el.setAttribute('data-chmin','1'); else el.removeAttribute('data-chmin'); }catch(_){}   // v2.1.0 mirror tap-through
   view=view||_bfViewCapture();
   const _flip=_bfFlipCapture(el);                  // v1.10.0 FLUID CHART: remember where every box IS
   const esc=_odEsc, escA=_odEscA;
@@ -5752,9 +5783,22 @@ function _bfViewCapture(point){
   Object.keys(L.nodes).forEach(function(k){const p=L.nodes[k],d=Math.hypot(p.cx*z-w.scrollLeft-x,(p.y+L.bh/2)*z-w.scrollTop-y);if(d<best){best=d;key=k;}});
   const p=L.nodes[key];return {focus:L.focus,key:key,x:x,y:y,dx:p?(w.scrollLeft+x)/z-p.cx:0,dy:p?(w.scrollTop+y)/z-p.y-L.bh/2:0,left:w.scrollLeft,top:w.scrollTop};
 }
+// v2.1.0 THE STAGE MIRROR fit: the whole tree scaled into the corner card —
+// no floor beyond legible-silhouette (.08): it is a locator, not a reading
+// surface. Centers on the focused node so the mirror always shows WHERE you are.
+function _bfMirrorFit(w,t,L){
+  const tw=parseFloat(t.style.width)||t.scrollWidth||1, th=parseFloat(t.style.height)||t.scrollHeight||1;
+  const z=Math.max(.08, Math.min(1, (w.clientWidth-12)/tw, (w.clientHeight-12)/th));
+  t.style.zoom=z; GlobeState.__bfFitPct=z;
+  const f=L.focus&&L.nodes[L.focus];
+  w.scrollLeft=f?Math.max(0,f.cx*z-w.clientWidth/2):Math.max(0,(tw*z-w.clientWidth)/2);
+  w.scrollTop=0;
+  const pct=document.querySelector('#briefStage .bf-zpct');if(pct)pct.textContent=Math.round(z*100)+'%';
+}
 function _bfFit(view){
   const w=document.querySelector('#briefStage .bf-wrap'),t=w&&w.querySelector('.bf-tree'),L=GlobeState.__bfLayout;
-  if(!w||!t||!L||!w.clientWidth||document.body.classList.contains('chart-min'))return;
+  if(!w||!t||!L||!w.clientWidth)return;
+  if(document.body.classList.contains('chart-min')){ _bfMirrorFit(w,t,L); return; }   // v2.1.0 the mirror
   const pres=document.body.classList.contains('present');
   const tw=parseFloat(t.style.width)||t.scrollWidth||1, th=parseFloat(t.style.height)||t.scrollHeight||1;
   let z;
@@ -5807,13 +5851,13 @@ function bfBack(){
     GlobeState._bfFocus=(st.foc&&bfNode(st.foc))?st.foc:null;
     GlobeState._bfManualDepth=!!st.dep; if(st.dep)GlobeState._bfDepth=st.dep;
     GlobeState._bfZoom=st.z||1;
-    try{renderBrief();globeMark();}catch(_){} return true;
+    try{renderBrief();globeMark();}catch(_){} try{ _bfFlyFocus(); }catch(_){} return true;
   }
   if(GlobeState._bfFocus){                 // spine dry but focused: back = the
     GlobeState._bfFocus=null;              // whole chart, WITHOUT a push (or
     GlobeState._bfManualDepth=false;       // back/back would ping-pong)
     GlobeState._bfZoom=1;
-    try{renderBrief();globeMark();}catch(_){} return true;
+    try{renderBrief();globeMark();}catch(_){} try{ _bfFlyFocus(); }catch(_){} return true;
   }
   return false;
 }
@@ -5874,6 +5918,40 @@ try{
     },true);
   }
 }catch(_){}
+// ═══ v2.1.0 THE STAGE MIRROR — the globe FOLLOWS the hierarchy (owner:
+// "dynamic display view when navigating the hierarchy to show on globe").
+// Every focus move reframes the globe on exactly the web the brief now shows
+// (_briefChainMap is already focus-filtered): centroid + max-separation on
+// unit vectors, aimed at the clear window — the same math the map room's
+// _flyFitChain earned. Runs in the brief room only; under the opaque Present
+// stage a fly is harmless and leaves the camera parked on the focus for the
+// moment the presenter drops back to the globe.
+function _bfFlyFocus(){
+  try{
+    if(!document.body.classList.contains('brief-mode')) return;
+    const C=GlobeState.__bfC=_briefChainMap();
+    const pts=[];
+    (C.order||[]).forEach(function(k){ const n=C.nodes[k];
+      if(n && n.lat!=null && n.lon!=null) pts.push({lat:n.lat, lon:n.lon}); });
+    if(!pts.length) return;
+    if(pts.length===1){ flyToLatLon(pts[0].lat, pts[0].lon, Math.max(GlobeState.zoom||1, 2.4)); return; }
+    const d=Math.PI/180; let x=0,y=0,z=0;
+    const vs=pts.map(function(pt){ const v=[Math.cos(pt.lat*d)*Math.cos(pt.lon*d), Math.cos(pt.lat*d)*Math.sin(pt.lon*d), Math.sin(pt.lat*d)];
+      x+=v[0]; y+=v[1]; z+=v[2]; return v; });
+    const L2=Math.hypot(x,y,z)||1;
+    const cLat=Math.asin(Math.max(-1,Math.min(1,z/L2)))/d, cLon=Math.atan2(y,x)/d;
+    const cv=[x/L2,y/L2,z/L2];
+    let maxSep=0;
+    vs.forEach(function(v){ let dot=cv[0]*v[0]+cv[1]*v[1]+cv[2]*v[2]; dot=Math.max(-1,Math.min(1,dot));
+      maxSep=Math.max(maxSep, Math.acos(dot)/d); });
+    const aim=(typeof _bandAim==='function')?_bandAim(cLat, cLon, maxSep*2, 1.0, 4.8):null;
+    if(aim){ flyToLatLon(aim.lat, aim.lon, aim.zoom); return; }
+    const span=maxSep*2*1.15;
+    const zm = span>150?1.0 : span>110?1.15 : span>75?1.5 : span>45?2.0 : span>22?2.6 : span>10?3.4 : 4.4;
+    flyToLatLon(cLat, cLon, zm);
+  }catch(_){}
+}
+try{ window._bfFlyFocus=_bfFlyFocus; }catch(_){}
 function _bfExplore(k){
   if(k&&!bfNode(k))return;
   if((GlobeState._bfFocus||null)!==(k||null)) _bfNavPush();   // v1.29.0: the spine remembers where you were
@@ -5883,6 +5961,7 @@ function _bfExplore(k){
   try{calloutHide();hideDossier();renderBrief();globeMark();
     const buttons=document.querySelectorAll('#briefStage .bf-box');const b=Array.from(buttons).find(function(b){return b.getAttribute('data-bfobj')===k;});if(b)b.focus({preventScroll:true});
   }catch(_){}
+  try{ _bfFlyFocus(); }catch(_){}   // v2.1.0: the globe follows the hierarchy
 }
 function _bfChartWire(el){
   if(el.__briefWired)return;el.__briefWired=true;
@@ -6073,6 +6152,7 @@ function tapAtScreen(x, y){
     if(bs && bs.id!=null){ _bfAnnEdit=null; _bfRnEdit=null; _bfInvEdit=null; window._bfGrpForm=null; _orgForm=null; try{ calloutShow(bs.id); }catch(_){}
       GlobeState._bfFocus=bs.id;                     // v0.20.0: a globe chain-node tap focuses its branch too
       try{ renderBrief(); }catch(_){} try{ globeMark(); }catch(_){}
+      try{ _bfFlyFocus(); }catch(_){}                // v2.1.0: and the camera frames it
       return; }
     // v0.22.0 — TAP-AWAY (owner: "pop ups get stuck"): an empty-sphere tap clears
     // any open popup and the branch focus, so a stray card is one tap from gone.
@@ -7716,9 +7796,15 @@ if(!window._odWired){
     const cm=e.target.closest('[data-chmin]');
     if(cm){ if(!e.target.closest('[data-xpbtn],[data-bfzoom],[data-bfdepth],[data-bffocusclear]')){   // v1.13.0: tracks live IN the head — their taps never minimize
         document.body.classList.toggle('chart-min');
-        if(document.body.classList.contains('chart-min'))document.body.classList.remove('brief-wide');
-        cm.setAttribute('aria-expanded',String(!document.body.classList.contains('chart-min')));
+        const _min=document.body.classList.contains('chart-min');
+        if(_min)document.body.classList.remove('brief-wide');
+        cm.setAttribute('aria-expanded',String(!_min));
+        // v2.1.0 THE STAGE MIRROR: while minimized the stage itself carries
+        // data-chmin, so a tap anywhere on the mirror (its wrap is
+        // pointer-events:none) expands — one surface, one contract.
+        try{ const st=document.getElementById('briefStage'); if(st){ if(_min) st.setAttribute('data-chmin','1'); else st.removeAttribute('data-chmin'); } }catch(_){}
         _bfFit();
+        try{ if(_min) _bfFlyFocus(); }catch(_){}           // entering the globe stage frames the web
         try{ if(_coAt) calloutHide(); }catch(_){}          // chip anchors die with their chips
       } return; }
     // v0.23.0 — "Add another organization" focuses the org search (owner: build the
