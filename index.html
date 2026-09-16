@@ -1737,6 +1737,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
   <button class="xp-row" type="button" data-xp="json"><b>JSON snapshot</b><span>camera · selection · every site in scope</span></button>
   <!-- v2.4.0 THE DECK — the brief as native, editable PowerPoint shapes -->
   <button class="xp-row" type="button" data-xp="pptx"><b>PowerPoint deck</b><span>the brief as an editable org chart — native shapes, tier colors</span></button>
+  <!-- v2.5.0 THE ROSTER — the data estate as plain, filterable tables -->
+  <button class="xp-row" type="button" data-xp="xlsx"><b>Excel roster</b><span>organizations · installations · brief · records — as tables</span></button>
 </section>
 
 <!-- dossier: THE drawer (single-brain law — one drawer) -->
@@ -1764,6 +1766,25 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.5.0  • THE ROSTER (V2 pillar 4, second format — owner's approved
+//            order: XLSX after PPTX). The export sheet grows an "Excel
+//            roster" row: the whole data estate as plain, filterable tables
+//            — Organizations (ALL 1,416: echelon, reports-to, level,
+//            installation, state), Installations (all 285 with real numeric
+//            lat/lon and senior unit), the Brief as built (level, parent,
+//            kind, color, note), and every Record (kind, name, flattened
+//            detail, tag). The shape staff systems and mail merges actually
+//            ingest. Rides the deck's _zipStore/_pkx spine: inline strings,
+//            real A1 cell refs, bold header row, Normal cellStyle (openpyxl
+//            warns without it), zero libraries, offline. EXPORTS SEE
+//            EVERYTHING — the probe counts Organizations rows against
+//            A1ORGS and a silent truncation fired it in proof. Validated
+//            live: zipfile CRC-checks all 10 parts, ElementTree parses
+//            them, openpyxl opens the workbook (1,417 + 286 + brief +
+//            records rows, ampersand names intact), and the row itself
+//            downloads. smoke's ROSTER probe pins row/dispatch, the
+//            workbook↔rels↔package sheet-count agreement (a forgotten rel
+//            fired it), full row counts, refs + header style, escaping.
 //   v2.4.0  • THE DECK (V2 pillar 4 opens — owner: "export options that can
 //            share this organization in professional organized document
 //            structures, charts, overview briefs"; charter order: PPTX
@@ -2017,7 +2038,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.4.0';
+const APP_VERSION = 'v2.5.0';
 const APP_UPDATED = '16 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -10067,6 +10088,108 @@ function xpPptx(){
 }
 try{ window._pptxParts=_pptxParts; window._pptxBuild=_pptxBuild; window.xpPptx=xpPptx; window._zipCRC=_zipCRC; window._zipStore=_zipStore; }catch(_){}
 
+// ═══ v2.5.0 THE ROSTER (V2 pillar 4, second format — owner ruling: XLSX after
+// PPTX). The whole data estate leaves as plain, filterable tables — the shape
+// staff systems and mail merges actually ingest: Organizations (all of them),
+// Installations, the Brief as built, and every Record. Rides the same
+// _zipStore/_pkx spine as the deck; inline strings, real cell refs, a bold
+// header row. Exports see EVERYTHING.
+function _xlCol(i){ let sfx=''; i++; while(i>0){ const m=(i-1)%26; sfx=String.fromCharCode(65+m)+sfx; i=(i-m-1)/26; } return sfx; }
+function _xlSheet(rows, widths){
+  let x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    +'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">';
+  if(widths&&widths.length){ x+='<cols>'; widths.forEach(function(w,i){ x+='<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>'; }); x+='</cols>'; }
+  x+='<sheetData>';
+  rows.forEach(function(r,ri){
+    x+='<row r="'+(ri+1)+'">';
+    r.forEach(function(v,ci){
+      const ref=_xlCol(ci)+(ri+1);
+      if(typeof v==='number' && isFinite(v)) x+='<c r="'+ref+'"'+(ri===0?' s="1"':'')+'><v>'+v+'</v></c>';
+      else x+='<c r="'+ref+'"'+(ri===0?' s="1"':'')+' t="inlineStr"><is><t xml:space="preserve">'+_pkx(v)+'</t></is></c>';
+    });
+    x+='</row>';
+  });
+  return x+'</sheetData></worksheet>';
+}
+function _xlsxParts(){
+  const NS_R='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const sheets=[];
+  { const rows=[['Organization','Echelon','Reports to','Level','Installation','State']];
+    (A1ORGS||[]).forEach(function(o){
+      const par=(o.parent&&typeof orgOf==='function')?orgOf(o.parent):null;
+      let ech=''; try{ if(typeof _ECHELON!=='undefined'){ const up=[]; for(const a of ogChainUp(o.id)) up.push(a);
+        const rung=up.length>=2?up[up.length-2]:(up.length===1?{id:o.id}:null); if(rung) ech=_ECHELON[rung.id]||''; if(o.id==='hqda') ech='HQDA'; } }catch(_){}
+      const hs=siteById((typeof ogEffSite==='function'?ogEffSite(o.id):null)||'');
+      rows.push([o.name, ech, par?par.name:'', o.lvl||'', hs?hs.base:'', hs?(hs.st||''):'']);
+    });
+    sheets.push({name:'Organizations', rows:rows, w:[46,9,42,7,24,7]}); }
+  { const rows=[['Installation','State','Latitude','Longitude','Senior unit','Reports to (site)']];
+    _sitesArr().forEach(function(st){
+      const ps=st.parent?siteById(st.parent):null;
+      rows.push([st.base, st.st||'', (st.lat==null?'':st.lat), (st.lon==null?'':st.lon), st.unit||'', ps?ps.base:'']);
+    });
+    sheets.push({name:'Installations', rows:rows, w:[34,7,10,11,42,26]}); }
+  { const rows=[['Unit','Level','Reports to','Kind','Installation','Color','Note']];
+    const C=_briefChainMap({all:true});
+    C.order.forEach(function(k){ const n=C.nodes[k];
+      const par=n.parent?C.nodes[n.parent]:null;
+      const hs=(n.kind==='org')?siteById((typeof ogEffSite==='function'?ogEffSite(n.ref||k):null)||''):null;
+      rows.push([n.name, n.lvl, par?par.name:'', n.kind, hs?hs.base:(n.bs||''), n.color||'', n.note||'']);
+    });
+    sheets.push({name:'Brief', rows:rows, w:[42,7,42,9,24,10,40]}); }
+  { const rows=[['Installation','Kind','Name','Detail','Tag']];
+    try{ Object.keys(RECORDS||{}).forEach(function(id){
+      if(!recCount(id)) return;
+      const st=siteById(id); const r=recordOf(id)||{};
+      [['people','person'],['specs','spec'],['notes','note'],['links','link']].forEach(function(kk){
+        (r[kk[0]]||[]).forEach(function(it){
+          const name=it.n||it.t||it.name||it.u||'';
+          const detail=Object.keys(it).filter(function(f){ return ['n','t','name','xid'].indexOf(f)<0 && typeof it[f]!=='object'; })
+            .map(function(f){ return f+': '+it[f]; }).join(' · ');
+          rows.push([st?st.base:id, kk[1], String(name), detail, it.xid||'']);
+        });
+      });
+    }); }catch(_){}
+    sheets.push({name:'Records', rows:rows, w:[24,8,34,60,14]}); }
+  const P=[];
+  let ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+    +'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+    +'<Default Extension="xml" ContentType="application/xml"/>'
+    +'<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+    +'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+    +'<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>';
+  sheets.forEach(function(_,i){ ct+='<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'; });
+  ct+='</Types>';
+  P.push({path:'[Content_Types].xml', text:ct});
+  P.push({path:'_rels/.rels', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    +'<Relationship Id="rId1" Type="'+NS_R+'/officeDocument" Target="xl/workbook.xml"/>'
+    +'<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>'});
+  P.push({path:'docProps/core.xml', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>A-ORG-2 Roster</dc:title><dcterms:created xsi:type="dcterms:W3CDTF">'+new Date().toISOString()+'</dcterms:created></cp:coreProperties>'});
+  let wb='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="'+NS_R+'"><sheets>';
+  sheets.forEach(function(sh,i){ wb+='<sheet name="'+_pkx(sh.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>'; });
+  wb+='</sheets></workbook>';
+  P.push({path:'xl/workbook.xml', text:wb});
+  let wbr='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
+  sheets.forEach(function(_,i){ wbr+='<Relationship Id="rId'+(i+1)+'" Type="'+NS_R+'/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>'; });
+  wbr+='<Relationship Id="rId'+(sheets.length+1)+'" Type="'+NS_R+'/styles" Target="styles.xml"/></Relationships>';
+  P.push({path:'xl/_rels/workbook.xml.rels', text:wbr});
+  P.push({path:'xl/styles.xml', text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    +'<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>'
+    +'<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>'
+    +'<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
+    +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    +'<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'});
+  sheets.forEach(function(sh,i){ P.push({path:'xl/worksheets/sheet'+(i+1)+'.xml', text:_xlSheet(sh.rows, sh.w)}); });
+  return P;
+}
+function _xlsxBuild(){ return _zipStore(_xlsxParts()); }
+function xpXlsx(){
+  _xpDownload('a-org-2-roster-'+_xpStamp()+'.xlsx',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', _xlsxBuild());
+}
+try{ window._xlsxParts=_xlsxParts; window._xlsxBuild=_xlsxBuild; window.xpXlsx=xpXlsx; }catch(_){}
+
+
 
 // ---- ① PNG — the stage as shown, title + legend burned in ---------------------
 function exportPNG(){
@@ -10186,6 +10309,7 @@ if(!window.__xpWired){ window.__xpWired=true;
         if(k==='png') exportPNG(); else if(k==='pdf') exportPDF(filter);
         else if(k==='html') exportHTML(filter); else if(k==='json') exportJSON(filter);
         else if(k==='pptx') xpPptx();                       /* v2.4.0 THE DECK */
+        else if(k==='xlsx') xpXlsx();                       /* v2.5.0 THE ROSTER */
       }catch(err){ try{ _errToast('export failed: '+err.message); }catch(_){} }
       return; }
     const p=document.getElementById('exportSheet');

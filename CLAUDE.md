@@ -2167,3 +2167,24 @@ It lives here now.
   w3.org/2001/XMLSchema-instance); a stray origin still fails (proven by
   injecting one). The law is unchanged: no foreign CODE, ever.
 - Byte delta: +19,923 (741,260 · 80.4% of the gate).
+
+## v2.5.0 — the roster (V2 pillar 4, second format; owner's approved order: XLSX after PPTX)
+- THE DATA ESTATE AS TABLES: Organizations (all 1,416 — echelon via the
+  _ECHELON rung walk, reports-to, level, effective installation),
+  Installations (all 285, numeric lat/lon, senior unit, site parent), the
+  Brief as built, every Record flattened (kind, name, remaining primitive
+  fields joined as detail). Plain header-row tables — the shape staff
+  systems and mail merges ingest; no formatting cleverness on purpose.
+- ONE SPINE, TWO FORMATS: the roster rides the deck's _zipStore/_pkx
+  exactly; the only new machinery is _xlCol/_xlSheet (A1 refs, inline
+  strings, s="1" bold header) and the four-part workbook skeleton. Include
+  the Normal cellStyle — openpyxl warns without it and Excel is stricter
+  than it looks about styles.xml.
+- EXPORTS SEE EVERYTHING stays enforced BY COUNT: the probe demands
+  Organizations rows === A1ORGS.length+1 — a silent .slice(0,100) fired it.
+  The workbook, its rels and the package must agree on the sheet count — a
+  forgotten worksheet rel fired that too.
+- API: _xlsxParts/_xlsxBuild/xpXlsx. Validated live: zipfile CRCs, all 10
+  parts parse, openpyxl opens the workbook with full row counts and
+  ampersand names intact; the export row itself fires the download.
+- Byte delta: +9,750 (751,010 · 81.5% of the gate).

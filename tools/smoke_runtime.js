@@ -1400,6 +1400,38 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(dek) console.log('  ✓ DECK: CRC vector · required parts + ZIP end record · named shapes, one connector per edge, colors ride · ampersands escaped');
   }
 
+  // ── PROBE: THE ROSTER (v2.5.0; owner ruling: XLSX after PPTX). The data
+  //    estate as tables. Laws: (a) row + dispatch pinned; (b) the workbook,
+  //    its rels and the package agree on the sheet count; (c) Organizations
+  //    carries EVERY org (rows = A1ORGS + header) and Installations every
+  //    site; (d) user-authored text is escaped on the Brief sheet; (e) cell
+  //    refs are real (A1 shape). openpyxl + zipfile validation ran live. ──
+  { let xok=true;
+    try{
+      if(html.indexOf('data-xp="xlsx"')<0 || html.indexOf("k==='xlsx'")<0){ xok=false; fails++; console.log('✗ ROSTER: the export row or its dispatch is gone'); }
+      global.Brief.add('usawhc');
+      global.Brief.addCustom('Task Force H&K', 'usawhc');
+      const parts=global._xlsxParts();
+      const paths=parts.map(function(p){ return p.path; });
+      const wb=(parts.find(function(p){ return p.path==='xl/workbook.xml'; })||{text:''}).text;
+      const wbr=(parts.find(function(p){ return p.path==='xl/_rels/workbook.xml.rels'; })||{text:''}).text;
+      const nSheets=(wb.match(/<sheet /g)||[]).length;
+      const nRel=(wbr.match(/\/worksheet"/g)||[]).length;
+      const nPart=paths.filter(function(p){ return /^xl\/worksheets\/sheet\d+\.xml$/.test(p); }).length;
+      if(!(nSheets===4 && nRel===4 && nPart===4)){ xok=false; fails++; console.log('✗ ROSTER: workbook/rels/package disagree on sheets ('+nSheets+'/'+nRel+'/'+nPart+')'); }
+      const s1=(parts.find(function(p){ return p.path==='xl/worksheets/sheet1.xml'; })||{text:''}).text;
+      const orgRows=(s1.match(/<row /g)||[]).length;
+      if(orgRows!==global.A1ORGS.length+1){ xok=false; fails++; console.log('✗ ROSTER: Organizations has '+orgRows+' rows, expected '+(global.A1ORGS.length+1)+' — exports see EVERYTHING'); }
+      if(s1.indexOf('<c r="A1" s="1"')<0){ xok=false; fails++; console.log('✗ ROSTER: cell refs or the bold header style are gone'); }
+      const s2i=(parts.find(function(p){ return p.path==='xl/worksheets/sheet2.xml'; })||{text:''}).text;
+      if(((s2i.match(/<row /g)||[]).length)!==global._sitesArr().length+1){ xok=false; fails++; console.log('✗ ROSTER: Installations row count wrong'); }
+      const s3=(parts.find(function(p){ return p.path==='xl/worksheets/sheet3.xml'; })||{text:''}).text;
+      if(s3.indexOf('Task Force H&amp;K')<0 || /Task Force H&K</.test(s3)){ xok=false; fails++; console.log('✗ ROSTER: XML escaping broke on the Brief sheet'); }
+      global.Brief.list().slice().forEach(function(k){ try{ global.Brief.remove(k); }catch(_){} });
+    }catch(e){ xok=false; fails++; console.log('✗ ROSTER probe: '+e.message); }
+    if(xok) console.log('  ✓ ROSTER: row + dispatch · workbook/rels/package agree · every org and site rides · refs + header style · escaping holds');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name
