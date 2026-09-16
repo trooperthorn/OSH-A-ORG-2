@@ -31,11 +31,12 @@ the editing discipline.
 instruction file at all. Two consequences are visible in the history:
 
 - The v1.25.1 prune took `index.html` to 874,590 bytes. v1.26.0 and v1.27.0 spent
-  all 47 KB of that headroom back inside two releases; the file is at 98.9% of
-  the gate again with under 10 KB left.
+  all 47 KB of that headroom back inside two releases, returning the file to
+  98.9% of the gate. (Since resolved: v1.31.0 moved the org tree out to
+  `data/orgs.json`; the file now sits at 76%.)
 - Six new check tools were added (`ux-*`, `brief-*`) but never wired into
-  `.github/workflows/checks.yml`, so CI still runs only the original five and the
-  new ones never run again after the release that added them.
+  `.github/workflows/checks.yml`, so for two releases CI ran only the original
+  five. (Since resolved: v1.28.0 wired all eleven into the workflow.)
 
 Neither is a criticism of the work — both are what happens when an agent cannot
 see the rules. `AGENTS.md` should stop the recurrence.

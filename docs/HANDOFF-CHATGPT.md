@@ -1,20 +1,20 @@
 # A-ORG-2 — Engineering Handoff
 
 **For an assistant picking this project up cold (written for ChatGPT).**
-Prepared 9 September 2026, refreshed 12 September against **`v1.27.0`** (`077aafc`).
+Prepared 9 September 2026, refreshed 16 September against **`v1.31.0`** (`16082e9`).
 
 **Companion files, read them first:** `AGENTS.md` (the operating rules, which
 ChatGPT/Codex reads automatically from the repo root) and `docs/CODEMAP.md` (a
 generated index of `index.html` — every section, function, line number, and a
 byte ledger). Use the codemap to navigate instead of loading the whole file.
 
-**Budget alert.** v1.25.1 pruned `index.html` to 874,590 bytes. v1.26.0 and
-v1.27.0 spent all 47 KB of that headroom back within two releases: the file is
-**911,854 bytes, 98.9% of the gate, under 10 KB left.** Read §10 before
-proposing anything that adds weight.
+**Budget update.** v1.31.0 (owner ruling) moved the org tree out of the file to
+`data/orgs.json`, fetched at boot: `index.html` is **700,069 bytes, 76.0% of the
+900 KB gate — ~216 KB of headroom.** The pressure is off, but the ledger
+discipline stands: every release states its byte delta (§10).
 
-You are inheriting a mature, opinionated single-file web app. It has shipped 116
-commits and ~65 releases. Almost every rule below exists because breaking it
+You are inheriting a mature, opinionated single-file web app. It has shipped 122
+commits and ~70 releases. Almost every rule below exists because breaking it
 already cost a release. Read §1 and §11 before you write a line of code.
 
 ---
@@ -24,7 +24,8 @@ already cost a release. Read §1 and §11 before you write a line of code.
 **A-ORG-2** is a phone-first PWA: a gold-on-black globe of the U.S. Army's
 installations and organizations, plus a diagram builder for briefs.
 
-- **The whole app is one file**: `index.html`, 911,854 bytes, 10,201 lines. No
+- **The whole app is one file**: `index.html`, 700,069 bytes, 10,504 lines
+  (the org tree rides `data/orgs.json`, fetched same-origin at boot — v1.31.0). No
   build step, no framework, no bundler, no npm dependencies at runtime.
 - **Owner**: philcase4@gmail.com (GitHub `PC444413`). Solo owner, reviews on a
   phone, iterates fast and in short directives.
@@ -94,9 +95,9 @@ written say-so.
 6. **Brief tier colours are semantics**, not decoration: L1 white · L2 cool ·
    L3 warm · L4 rose. **Never green on brief data** (green is status only).
 7. **Size budget**: `index.html` < 900 KB, enforced in CI. Currently
-   **911,854 bytes — 98.9% of the gate, 9,746 bytes of headroom.** This is the
-   binding constraint on the project: the next feature of any size needs a prune
-   in the same release or immediately before it (see §10).
+   **700,069 bytes — 76.0% of the gate** after v1.31.0 moved the org tree out
+   to `data/orgs.json`. Headroom is real again, but the discipline stands:
+   every release states its byte delta (see §10).
 8. **Never push to `/home/user/A-ORG` or the `PC444413/A-ORG` repo.** That is
    A-ORG-1, the predecessor, archive-only.
 
@@ -118,23 +119,23 @@ The file is ordered and sign-posted. Search for these exact banners:
 
 | Banner | Line | What lives there |
 |---|---|---|
-| `<style>` — all CSS | 173 | tokens, then every surface (68.9 KB) |
-| `<body>` — markup | 1545 | the stage and every floating surface |
-| `CHANGELOG` | 1690 | newest entry goes **above** the previous `//   vPREV` marker (62.4 KB) |
-| `GlobeState` | 1866 | the shared camera/selection spine |
-| `SITES` literal | 1892 | inline copy of `data/sites.json` |
-| `A1ORGS` literal | 1899 | inline copy of `data/orgs.json` (**226.3 KB** — the single heaviest block) |
-| `module: m1-geom` | 1933 | quaternion camera math, projection |
-| `module: m2-render` | 2077 | the draw loop, basemap painting |
-| `module: m3-input` | 2361 | pointer/touch/wheel, drag, pinch, tap routing |
-| `module: m4-camera` | 2628 | fly-to, tweens, zoom clamps |
-| `module: m5-markers` | 2776 | dots, labels, arcs, layers/modes, hit testing (65.2 KB) |
-| `module: m6-mapdata` | 3978 | basemap data loading, state shapes |
-| `module: s3-search` | 4365 | the search index and results |
-| `module: s4-dossier` | 4913 | the drawer, the org card/callout, the brief (**174.2 KB**) |
-| `module: s7-records` | 7606 | the datastore (IndexedDB) (78.7 KB) |
-| `module: s6-export` | 9053 | snapshot/export |
-| `module: s5-clocks` | 9346 | the time ledger |
+| `<style>` — all CSS | 173 | tokens, then every surface (71.2 KB) |
+| `<body>` — markup | 1582 | the stage and every floating surface |
+| `CHANGELOG` | 1744 | newest entry goes **above** the previous `//   vPREV` marker (16.6 KB after the v1.28.0 retention trim) |
+| `GlobeState` | 1970 | the shared camera/selection spine |
+| `SITES` literal | 1989 | inline copy of `data/sites.json` (49.0 KB, first-paint critical — stays) |
+| `A1ORGS` + loader | 1996 | boots `[]`; `__orgsLoad()` fills it from `data/orgs.json` (**v1.31.0** — the 226 KB literal is gone) |
+| `module: m1-geom` | 2071 | quaternion camera math, projection |
+| `module: m2-render` | 2215 | the draw loop, basemap painting |
+| `module: m3-input` | 2499 | pointer/touch/wheel, drag, pinch, tap routing |
+| `module: m4-camera` | 2766 | fly-to, tweens, zoom clamps |
+| `module: m5-markers` | 2914 | dots, labels, arcs, layers/modes, hit testing (65.2 KB) |
+| `module: m6-mapdata` | 4116 | basemap data loading, state shapes |
+| `module: s3-search` | 4503 | the search index and results |
+| `module: s4-dossier` | 5051 | the drawer, the org card/callout, the brief (**182.2 KB** — now the heaviest block) |
+| `module: s7-records` | 7893 | the datastore (IndexedDB) (79.5 KB) |
+| `module: s6-export` | 9356 | snapshot/export |
+| `module: s5-clocks` | 9649 | the time ledger |
 
 Line numbers move every release — treat them as a starting point and confirm by
 searching for the banner text. **`docs/CODEMAP.md` is the live version of this
@@ -160,9 +161,16 @@ sandbox): `__updKick` (check now) · `__updCheck` → `{ok,found,why}` ·
 
 ## 5. The data model
 
-Two JSON files are the source of truth. **`index.html` carries an inline copy of
-each, and the copies must match the files exactly** — `data-lint` enforces this
-(added v1.24.0, after the drift went unguarded for a year).
+Two JSON files are the source of truth. Since **v1.31.0** they ship differently:
+
+- **Orgs are FETCHED, never inline.** `index.html` boots `A1ORGS` empty and
+  `__orgsLoad()` fills it from `data/orgs.json` (same-origin `_fetchRetry`,
+  precached by the service worker in the versioned shell). Org edits are
+  data-only commits — edit the JSON, run the suite; there is no regeneration
+  step. `data-lint` §8 bans an inline org literal from returning.
+- **Sites stay INLINE** and the copy must match `data/sites.json` exactly —
+  `data-lint` enforces parity (added v1.24.0, after the drift went unguarded
+  for a year). Regenerate with `node tools/sync-inline.js`; never by hand.
 
 ### `data/sites.json` — 285 installations, schema v2
 
@@ -232,26 +240,25 @@ sits under ASCCs. Do not regroup it without the owner's decision.
 
 ## 7. The test suite and the ship ritual
 
-### The five CI tools — all must pass before any commit
+### The core five — all must pass before any commit
 
 ```bash
-node tools/data-lint.js      # sites+orgs invariants, inline-copy parity, currency
+node tools/data-lint.js      # sites+orgs invariants, fetched-spine contract, currency
 node tools/harness_globe.js  # real m1 math + m5 markers over the real data
 node tools/smoke_runtime.js  # boots the whole app under a stub DOM, runs ~40 probes
 node tools/ship-lint.js      # APP_VERSION ↔ CACHE ↔ changelog
 node tools/dead-lint.js      # unreachable CSS/JS + the 900 KB byte budget
 ```
 
-CI (`.github/workflows/checks.yml`) runs exactly these five on every push and PR.
-
-### Six more tools exist and are NOT in CI
+### Six more — and ALL ELEVEN are the CI gate (since v1.28.0)
 
 v1.26.0 and v1.27.0 added `brief-scale-check.js`, `brief-support-check.js`,
 `ux-navigation-check.js`, `ux-persistence-check.js`, `ux-records-check.js` and
-`ux-search-check.js`. All eleven pass today, but the six are not wired into the
-workflow, so they never run again after the release that added them. Run the ones
-your change touches, and **if you add a check, add it to `checks.yml` in the same
-change** — otherwise it is a one-shot script, not a guard.
+`ux-search-check.js`; v1.28.0 wired them into the workflow. CI
+(`.github/workflows/checks.yml`) runs all eleven on every push and PR — run the
+full set locally before committing, and **if you add a check, add it to
+`checks.yml` in the same change** — otherwise it is a one-shot script, not a
+guard.
 
 There is also `node tools/codemap.js`, which regenerates `docs/CODEMAP.md`. Run
 it after anything that moves code.
@@ -358,48 +365,42 @@ unprompted:
 
 ## 10. Current state and open items
 
-**v1.27.0**, all eleven tools green (verified 12 September 2026).
+**v1.31.0**, all eleven tools green (verified 16 September 2026).
 
 | | |
 |---|---|
-| index.html | 911,854 bytes (**98.9%** of the 900 KB gate — 9,746 left) |
-| sw.js | 4,477 bytes |
+| index.html | 700,069 bytes (**76.0%** of the 900 KB gate) |
+| sw.js | 4,585 bytes |
 | organizations | 1,416 (data updated 2026-09-08) |
 | installations | 285 (data updated 2026-08-25) |
-| commits | 116 |
+| commits | 122 |
 
-Recent releases: **v1.24.0** refreshed the org tree to the 2026 force structure
-and added the echelon tag; **v1.25.0** hardened the service-worker update path
-and Supabase connectivity (§8); **v1.25.1** pruned the file to 874,590 bytes;
-**v1.26.0** reworked navigation and record workflows; **v1.27.0** made the brief
-readable and restored RSN/ECCSP discovery. The last two spent the whole prune.
+Recent releases: **v1.28.0** pruned to a slim org spine and wired all eleven
+checks into CI; **v1.28.1** applied the August 2026 realignment (III Armored
+Corps → USAWHC); **v1.29.0** shipped Podium & Present — a presentation stage
+with a real back spine; **v1.30.0** added the brief branch tools (select-all
+subordinates, cascade color); **v1.31.0** moved the org tree out of the file
+to `data/orgs.json`, fetched at boot (owner ruling).
 
 ### Open items, most pressing first
 
-1. **THE BUDGET IS THE PROJECT'S BINDING CONSTRAINT — 98.9%, 9,746 bytes left.**
-   This has now happened twice: v1.16.1 freed 66 KB, v1.25.1 freed 47 KB, and
-   both were spent within a few releases. Treat it as a standing rule rather than
-   a recurring emergency: **every release states its byte delta, and a release
-   that adds weight pays for it in the same change.** The live ledger is the
-   weight table in `docs/CODEMAP.md`. Today the three heaviest blocks are the
-   inline `A1ORGS` literal (226.3 KB), `s4-dossier` (174.2 KB) and the in-file
-   `CHANGELOG` (62.4 KB). The changelog is the cheapest lever and the retention
-   law already sanctions trimming it, since older entries live in `git log` and
-   `CLAUDE.md`. The org literal is the structural one: it is a verbatim copy of
-   `data/orgs.json`, and moving it to a fetched asset would free ~226 KB at the
-   cost of the boot law — worth *asking* the owner about, not doing unasked.
-2. **Six checks are not in CI** (see §7). Wiring them into `checks.yml` is a
-   small change and stops the next regression in brief layout or UX flows going
-   unnoticed.
-3. **USAWHC ACOM-vs-ASCC** (see §5) — awaiting an owner decision.
-4. **ASCC parent convention split** (long-standing, SME hold):
+1. **The byte ledger is a standing rule, not an emergency.** v1.31.0 cashed
+   the big lever — the org tree moved to `data/orgs.json` on the owner's
+   ruling, freeing ~187 KB; the file sits at **76.0% of the gate**. History
+   says headroom gets spent (v1.16.1's 66 KB and v1.25.1's 47 KB both went
+   within a few releases), so the discipline stands: **every release states
+   its byte delta.** The live ledger is the weight table in `docs/CODEMAP.md`.
+   Today the heaviest blocks are `s4-dossier` (182.2 KB), `s7-records`
+   (79.5 KB) and the CSS (71.2 KB).
+2. **USAWHC ACOM-vs-ASCC** (see §5) — awaiting an owner decision.
+3. **ASCC parent convention split** (long-standing, SME hold):
    USARPAC/USARCENT/ARCYBER chain to COCOM sites while USAREUR-AF/USAWHC chain to
    HQDA. Pick one rule in a data pass.
-5. **Supabase Connect**: hardened in v1.25.0 (single in-flight load, dead-tag
+4. **Supabase Connect**: hardened in v1.25.0 (single in-flight load, dead-tag
    removal, 20 s timeout, one connect at a time, dirty-flag flush ladder, network
    watch). The owner has still never confirmed an end-to-end connect on a real
    device — treat it as unproven in the field, not as broken.
-6. **Open architectural option, offered and undecided**: a single-family basemap
+5. **Open architectural option, offered and undecided**: a single-family basemap
    (one Natural Earth 50m family for land + lakes + countries + states) to
    replace today's mixed `land-50m` / `countries-110m` / `states-10m` stack.
    Consistent by construction; restores Canadian lakeshores; permanently retires
@@ -412,7 +413,7 @@ readable and restored RSN/ECCSP discovery. The last two spent the whole prune.
 You will almost certainly be working from pasted excerpts, not a checkout. Adapt
 like this.
 
-**Ask for the region you need.** The file is 10,201 lines; nobody will paste it
+**Ask for the region you need.** The file is 10,504 lines; nobody will paste it
 all. Use the map in §4 to name the banner or line range you want. Ask for the
 current text of a function before rewriting it — this codebase is heavily
 commented and the comments carry the reasoning.
@@ -481,6 +482,7 @@ The project has its own words. Using them correctly signals you have read this.
 
 ---
 
-*Generated from the repository at commit `a1d496e` (v1.25.0). Where this document and
+*Generated from the repository at commit `a1d496e` (v1.25.0); last refreshed at
+`16082e9` (v1.31.0). Where this document and
 `CLAUDE.md` disagree, `CLAUDE.md` wins — it is the living law and is appended to
 every release.*

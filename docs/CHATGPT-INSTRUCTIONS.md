@@ -34,9 +34,9 @@ else is data, docs, and Node test tools.
    map⇄brief toggle. Nothing ships that bypasses that spine.
 6. **Brief tier colours are semantics:** L1 white · L2 cool · L3 warm · L4 rose.
    **Never green on brief data** (green is status only). No blue chrome.
-7. **Byte budget: `index.html` < 900 KB, hard CI gate.** It is at ~98.9% with
-   under 10 KB of headroom. Any addition of size fails the build. Say what your
-   change costs; if it is more than ~2 KB, propose a prune first.
+7. **Byte budget: `index.html` < 900 KB, hard CI gate.** At ~76% since v1.31.0
+   moved the org tree to `data/orgs.json` (fetched at boot; orgs never inline —
+   data-lint enforces it). Always say what your change costs in bytes.
 8. **Never touch the A-ORG (A-ORG-1) repo.** It is archive-only.
 9. Do not remove the diagnostics stack (`__errLog`, error toast, sandbox
    detection, the wordmark long-press dump) or the service worker's
