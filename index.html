@@ -1750,6 +1750,26 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.2.0  • THE BRANCH ADD (V2 pillar 3 — owner: "Bulk add and bulk color
+//            assignments for organizations and subordinates"; color shipped
+//            v1.30.0, this is the add half at full depth). The add sheet
+//            grows a second door under Select-all: "⇊ Add entire branch —
+//            N units · L levels" — one explicit act lands the org's whole
+//            Army subtree, level by level, every child keyed by its org id
+//            and parented to its REAL chain parent (never flattened). The
+//            door IS the act: the label already said the count, so it lands
+//            immediately, closes the sheet, toasts the tally, and the
+//            v2.1.0 follow frames the new formation. CAPPED at 60: the
+//            direct roster always rides, deeper levels join only while the
+//            total stays inside the cap, and the cut is declared on the
+//            door ("deeper units stay one tap away"). v0.13.0's law stands
+//            SHARPENED, not broken: IMPLICIT subtrees stay banned forever —
+//            Brief.add alone never drags children (probed); this door is
+//            explicit, previewed, counted, capped. Offered only when the
+//            branch runs deeper than the direct roster (Select-all owns the
+//            one-level case). smoke's BRANCH ADD probe pins all four laws;
+//            flatten and cap-removal defects proven to fire (the cap defect
+//            planned 1,415 units — the exact flood the law prevents).
 //   v2.1.0  • THE STAGE MIRROR (V2 pillar 3 — owner: "Full screen globe mode
 //            with a small hierarchy pictured in corner to reference" +
 //            "dynamic display view when navigating the hierarchy to show on
@@ -1940,7 +1960,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.1.0';
+const APP_VERSION = 'v2.2.0';
 const APP_UPDATED = '16 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -6867,6 +6887,14 @@ function _bfAddSheet(pk){
   if(par && par.t==='org'){
     const ownN=_bfPickCandidates(pk,'','org').own;
     if(ownN) h+='<button type="button" class="bf-act bf-addsub" data-bfpickall="'+escA(pk)+'">\u2713 Select all '+ownN+' direct subordinate'+(ownN===1?'':'s')+'</button>';
+    // v2.2.0 THE BRANCH ADD — the whole subtree as one previewed, capped act.
+    // Offered only when the branch runs DEEPER than the direct roster (the
+    // select-all door already owns the one-level case).
+    try{ const bp=_bfBranchPlan(pk, 60);
+      if(bp.total>0 && bp.depth>=2){
+        h+='<button type="button" class="bf-act bf-addsub" data-bfaddbranch="'+escA(pk)+'">\u21ca Add entire branch \u2014 '+bp.total+' units \u00b7 '+bp.depth+' levels'
+          +(bp.truncated?' (capped at 60 \u2014 deeper units stay one tap away)':'')+'</button>';
+      } }catch(_){}
   }
   h+='<div class="bf-subhead">'+(found.own&&!q&&!kind?'Direct subordinates first · ':'')+found.rows.length+' available'
     +(found.rows.length>60?' · First 60 shown; search to narrow':'')+'</div><div class="bf-picklist">';
@@ -6935,6 +6963,49 @@ const BF_PLACES=[
 function bfPlaceOf(k){ for(const p of BF_PLACES) if(p.k===k) return p; return null; }
 // batch add — push every pick, then save/render ONCE (adding twenty one-at-a-time
 // would re-render and re-frame the globe twenty times)
+// ═══ v2.2.0 THE BRANCH ADD (V2 pillar 3 — owner: "Bulk add ... for
+// organizations and subordinates"). One explicit act adds an org's whole Army
+// subtree under its diagram node, level by level, each child keyed by its org
+// id and parented to its REAL chain parent. v0.13.0's law stands and is
+// sharpened, not broken: IMPLICIT subtrees stay banned forever (adding an org
+// never silently drags its children) — this is an explicit, previewed,
+// counted, CAPPED door. The cap (60) takes the direct roster always, then
+// whole deeper levels only while the running total stays inside it, so a
+// fat-finger on USAWHC cannot flood the chart; what was cut is said out loud.
+function _bfBranchPlan(rootId, cap){
+  cap=cap||60;
+  const levels=[]; let frontier=[rootId]; let total=0; let truncated=false;
+  while(frontier.length){
+    const next=[];
+    for(const p of frontier){
+      const kids=(typeof ogKids==='function')?(ogKids(p)||[]):[];
+      for(const c of kids){ if(bfNode(c.id)) continue; next.push({id:c.id, p:p}); }
+    }
+    if(!next.length) break;
+    if(levels.length>0 && total+next.length>cap){ truncated=true; break; }   // direct roster always rides; deeper levels only inside the cap
+    levels.push(next); total+=next.length;
+    frontier=next.map(function(e){ return e.id; });
+  }
+  return {levels:levels, total:total, depth:levels.length, truncated:truncated};
+}
+function bfAddBranch(rootId){
+  if(!bfNode(rootId)) return 0;
+  const plan=_bfBranchPlan(rootId, 60);
+  let n=0;
+  plan.levels.forEach(function(level){ level.forEach(function(e){
+    if(bfNode(e.id)) return;
+    const o=(typeof orgOf==='function')?orgOf(e.id):null; if(!o) return;
+    BRIEF.nodes.push({k:e.id, n:o.name, p:e.p, t:'org', r:e.id, c:'', sh:0, tx:''}); n++;
+  }); });
+  if(!n) return 0;
+  GlobeState._bfFocus=rootId; GlobeState._bfManualDepth=false; GlobeState._bfZoom=1;
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  try{ _bfFlyFocus(); }catch(_){}          // v2.1.0 follow: frame the new formation
+  try{ _bfFrame(); _xpPulse(); }catch(_){}
+  return n;
+}
 function bfAddMany(ids, parent){
   if(!ids || !ids.length || (parent && !bfNode(parent))) return 0;
   let n=0;
@@ -7692,6 +7763,15 @@ if(!window._odWired){
       const s3=window._bfPick||(window._bfPick=new Set());
       f2.rows.slice(0,f2.own).forEach(function(r){ s3.add(r.id); });
       try{ _bfAddSheet(pk2); }catch(_){} return; }
+    // v2.2.0 THE BRANCH ADD — the door IS the act: the label already said the
+    // count and depth, so it lands immediately, closes the sheet, and the
+    // stage-mirror follow frames the new formation.
+    const bbr=e.target.closest('[data-bfaddbranch]');
+    if(bbr){ const pk3=bbr.getAttribute('data-bfaddbranch')||null;
+      const nd3=bfNode(pk3); const got3=bfAddBranch(pk3);
+      try{ hideDossier(); }catch(_){}
+      try{ if(got3) _bfToast(got3+' units added under '+((nd3&&nd3.n)||'the branch')); }catch(_){}
+      return; }
     const bpc=e.target.closest('[data-bfpickclear]');
     if(bpc){ window._bfPick=new Set();
       document.querySelectorAll('#dossier .bf-pickrow.on').forEach(function(r){
@@ -8586,6 +8666,7 @@ function bfDepth(n){
   try{ globeMark(); }catch(_){}
 }
 try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, addGroup:bfAddCustom,
+  addBranch:bfAddBranch, branchPlan:_bfBranchPlan,   /* v2.2.0 THE BRANCH ADD */
   addPlace:function(k,parent){ return bfAddMany([k], parent||null); },
   places:function(){ return BF_PLACES.slice(); },
   remove:bfRemove, rename:bfRename,

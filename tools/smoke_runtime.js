@@ -1290,6 +1290,41 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(mok) console.log('  \u2713 STAGE MIRROR: miniature CSS + tap-through contract \u00b7 mirror fit routed \u00b7 follow wired at 6 sites and flies over a seeded brief');
   }
 
+  // ── PROBE: THE BRANCH ADD (v2.2.0; owner: "Bulk add ... for organizations
+  //    and subordinates"). Laws: (a) the act is EXPLICIT — the door renders
+  //    with count + depth and lands the whole plan; v0.13.0's ban on IMPLICIT
+  //    subtrees stands (Brief.add alone never drags children); (b) every added
+  //    node is parented to its REAL chain parent, not flattened under the
+  //    root; (c) the plan de-dupes against the diagram and a second act adds
+  //    zero; (d) the cap holds: direct roster always rides, deeper levels only
+  //    while the total stays inside 60, and the truncation is declared. ──
+  { let brk=true;
+    try{
+      if(html.indexOf('data-bfaddbranch')<0){ brk=false; fails++; console.log('✗ BRANCH ADD: the door is missing from the add sheet'); }
+      global.Brief.add('usawhc');
+      if(global.Brief.list().length!==1){ brk=false; fails++; console.log('✗ BRANCH ADD: Brief.add dragged children — the implicit-subtree ban broke'); }
+      const plan=global.Brief.branchPlan('usawhc', 60);
+      if(!(plan.total>=25 && plan.depth>=2)){ brk=false; fails++; console.log('✗ BRANCH ADD: USAWHC plan too shallow ('+plan.total+' units, '+plan.depth+' levels)'); }
+      const got=global.Brief.addBranch('usawhc');
+      if(got!==plan.total){ brk=false; fails++; console.log('✗ BRANCH ADD: planned '+plan.total+' but landed '+got); }
+      // (b) real chain parenting: a level-2 entry hangs off its plan parent
+      const l2=(plan.levels[1]||[])[0];
+      if(!l2){ brk=false; fails++; console.log('✗ BRANCH ADD: no level-2 entry to verify parenting'); }
+      else { const nd=global.Brief.node(l2.id);
+        if(!nd || nd.p!==l2.p){ brk=false; fails++; console.log('✗ BRANCH ADD: '+l2.id+' parented to '+(nd&&nd.p)+' — expected its chain parent '+l2.p); } }
+      // (c) idempotent
+      if(global.Brief.addBranch('usawhc')!==0){ brk=false; fails++; console.log('✗ BRANCH ADD: a second act must add zero (de-dupe against the diagram)'); }
+      // (d) the cap: HQDA's tree dwarfs 60 — the plan must stop and say so
+      global.Brief.list().slice().forEach(function(k){ try{ global.Brief.remove(k); }catch(_){} });
+      global.Brief.add('hqda');
+      const big=global.Brief.branchPlan('hqda', 60);
+      const direct=(big.levels[0]||[]).length;
+      if(!(big.total<=Math.max(60,direct) && big.truncated)){ brk=false; fails++; console.log('✗ BRANCH ADD: cap failed — '+big.total+' planned (direct '+direct+'), truncated='+big.truncated); }
+      global.Brief.list().slice().forEach(function(k){ try{ global.Brief.remove(k); }catch(_){} });
+    }catch(e){ brk=false; fails++; console.log('✗ BRANCH ADD probe: '+e.message); }
+    if(brk) console.log('  ✓ BRANCH ADD: explicit door · real chain parenting · plan lands whole and de-dupes · cap declares its cut');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name

@@ -2080,3 +2080,29 @@ It lives here now.
   at 414×896 — tree zoom .125 in a 190×215 card, tap-through expand, zero
   page errors.
 - Byte delta: +6,023 (708,934 · 76.9% of the gate).
+
+## v2.2.0 — the branch add (V2 pillar 3; owner: bulk add for organizations and subordinates)
+- ONE EXPLICIT ACT, WHOLE SUBTREE: _bfBranchPlan walks ogKids breadth-first
+  (skipping anything already on the diagram) and bfAddBranch lands the plan
+  level by level — each node keyed by its org id, parented to its REAL chain
+  parent via the plan's per-entry p, never flattened under the root. The
+  door renders count + depth BEFORE the tap and is offered only when the
+  branch runs deeper than the direct roster (v1.30's Select-all owns the
+  one-level case). The act closes the sheet, toasts the tally, and the
+  v2.1.0 follow frames the formation.
+- THE CAP IS LAW: direct roster always rides; each deeper level joins only
+  while the running total stays ≤60; truncation is DECLARED on the door.
+  The defect injection that removed the cap planned 1,415 units off HQDA —
+  the exact v0.11.0 flood the hand-built-brief law was written against.
+- v0.13.0 SHARPENED, NOT BROKEN: "no auto-subtrees, EVER" banned IMPLICIT
+  walking — Brief.add alone still never drags children (probed). The
+  owner's V2 directive adds the EXPLICIT, previewed, capped door. Both
+  halves are now probed together; do not let either regress in the other's
+  name.
+- API: Brief.addBranch / Brief.branchPlan. Tests: smoke BRANCH ADD (door
+  markup, implicit-ban, chain parenting via a level-2 entry, idempotence,
+  cap+truncation on HQDA) — flatten and cap defects proven to fire. Live at
+  414×896: door reads "60 units · 2 levels (capped…)", 61 nodes land, 82nd
+  Airborne under XVIII Airborne Corps under USAWHC, toast + fly, zero page
+  errors.
+- Byte delta: +4,823 (713,757 · 77.4% of the gate).
