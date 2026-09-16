@@ -147,7 +147,7 @@ on the export tap only — the Supabase pattern — with the owner's sanction.
 | v2.0.0 | 1 | THE SELECTION CONTRACT | **shipped** |
 | v2.1.0 | 3 | THE STAGE MIRROR (globe-first brief + live links) | **shipped** |
 | v2.2.0 | 3 | THE BRANCH ADD (whole-subtree, previewed) | **shipped** |
-| v2.3.0 | 3 | THE HAND (drag to reorder / re-chain) | next build |
+| v2.3.0 | 3 | THE HAND (drag to reorder / re-chain) | **shipped** |
 | v2.4.0 | 4 | PPTX deck export | after ruling on format order |
 | v2.5.0 | 4 | XLSX roster | queued |
 | v2.6.0 | 2 | Intake surface + bulk paste | queued |

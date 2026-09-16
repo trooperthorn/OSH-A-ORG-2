@@ -1325,6 +1325,39 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(brk) console.log('  ✓ BRANCH ADD: explicit door · real chain parenting · plan lands whole and de-dupes · cap declares its cut');
   }
 
+  // ── PROBE: THE HAND (v2.3.0; owner: "Dynamic objects with ability to drag
+  //    to different spots on command"). The gesture geometry is browser-only;
+  //    the source contract and the DATA acts are pinned here. Laws: (a) the
+  //    wire exists — hold timer, lift class, drop marks, the touch guard door
+  //    (__bfHandLive) and the post-drop click eater; (b) bfPlace puts a node
+  //    exactly before/after a SIBLING and refuses cross-parent placement;
+  //    (c) bfMove's cycle guard still refuses a unit landing under its own
+  //    subordinate (the drop path leans on it). ──
+  { let hok=true;
+    try{
+      if(html.indexOf('.bf-box.bf-lift')<0 || html.indexOf('bfDragTag')<0){ hok=false; fails++; console.log('✗ HAND: lift/tag CSS contract missing'); }
+      if(!/handHold=setTimeout\(function\(\)\{/.test(html) || html.indexOf(',350);')<0){ hok=false; fails++; console.log('✗ HAND: the hold timer is gone or re-tuned without a probe update'); }
+      if(!/window\.__bfHandLive=function\(\)\{ return !!hand; \}/.test(html) || html.indexOf('window.__bfHandLive&&window.__bfHandLive()')<0){ hok=false; fails++; console.log('✗ HAND: the touch guard door is unwired — a lifted box would scroll the chart'); }
+      if(!/if\(handDid\)\{ handDid=false; e\.preventDefault\(\); e\.stopPropagation\(\); \}/.test(html)){ hok=false; fails++; console.log('✗ HAND: the post-drop click eater is gone — a drop would double as a drill'); }
+      // data acts over a real branch
+      global.Brief.add('usawhc'); global.Brief.addBranch('usawhc');
+      const kids=global.BRIEFKIDS?null:null;
+      const sibs=['xviii-airborne-corps','iii-armored-corps'].filter(function(k){ return global.Brief.node(k); });
+      if(sibs.length<2){ hok=false; fails++; console.log('✗ HAND: fixture broke — need two corps siblings under USAWHC'); }
+      else{
+        if(!global.Brief.place(sibs[0], sibs[1], true)){ hok=false; fails++; console.log('✗ HAND: place(after) refused a legal sibling drop'); }
+        else{
+          const order=global.Brief.list().filter(function(k){ return sibs.indexOf(k)>=0; });
+          if(!(order[0]===sibs[1] && order[1]===sibs[0])){ hok=false; fails++; console.log('✗ HAND: place(after) landed the wrong order ('+order.join(' → ')+')'); }
+        }
+        if(global.Brief.place(sibs[0], '82nd-airborne-division', false)!==false){ hok=false; fails++; console.log('✗ HAND: place must refuse cross-parent placement — that is a MOVE'); }
+      }
+      if(global.Brief.move('usawhc','82nd-airborne-division')!==false){ hok=false; fails++; console.log('✗ HAND: the cycle guard broke — a unit landed under its own subordinate'); }
+      global.Brief.list().slice().forEach(function(k){ try{ global.Brief.remove(k); }catch(_){} });
+    }catch(e){ hok=false; fails++; console.log('✗ HAND probe: '+e.message); }
+    if(hok) console.log('  ✓ HAND: gesture wire + guards in source · place lands exact sibling order, refuses cross-parent · cycle guard holds');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name

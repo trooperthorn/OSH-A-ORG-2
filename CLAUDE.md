@@ -2106,3 +2106,32 @@ It lives here now.
   Airborne under XVIII Airborne Corps under USAWHC, toast + fly, zero page
   errors.
 - Byte delta: +4,823 (713,757 · 77.4% of the gate).
+
+## v2.3.0 — the hand (V2 pillar 3; owner: drag objects to different spots on command)
+- HOLD ~.35s LIFTS, DRAG TARGETS, RELEASE ACTS: onto a box = re-chain under
+  it (bfMove — its cycle guard rules and its refusal is toasted); onto a
+  SIBLING's left/right half = reorder before/after (new bfPlace: exact
+  splice, same-parent only — cross-parent placement is a MOVE and bfMove
+  owns it); onto empty space = cancel, never a surprise. Every landing
+  toasts what happened. The gold name tag rides the pointer because the
+  finger covers the box.
+- COEXISTENCE LAW: the gesture lives INSIDE _bfChartWire's closure with the
+  mouse pan and the pinch, because three gestures on one surface must share
+  state — 8px slop before the hold cancels the arm (a scroll is a scroll);
+  once lifted, drag=null yields the pan and the touchmove guard
+  (window.__bfHandLive door) owns native touch scroll; the post-drop click
+  is eaten in capture so a drop never doubles as a drill; Present and the
+  stage mirror never lift.
+- ASSERT-SCOPING LESSON (the v1.23.1 class, new face): the touch-guard
+  assert first checked indexOf('__bfHandLive') — but the door's NAME
+  survives in its consumer when the assignment is deleted, so the assert
+  could not fire. Scope presence asserts to the DEFINING shape
+  (window.__bfHandLive=function(){ return !!hand; }) AND the consumer,
+  never a bare name. Proven both ways after the fix.
+- API: Brief.place. Tests: smoke HAND (wire shapes: hold timer 350, lift
+  CSS, drag tag, click eater, touch door; data acts: place(after) exact
+  order — proven by dropping the half; cross-parent refusal; cycle-guard
+  regression pin). Live at 414×896: lift + ring, "82nd Airborne Division
+  now reports to III Armored Corps", half-side reorder toast, cycle
+  refusal, drag state fully cleaned, zero page errors.
+- Byte delta: +7,580 (721,337 · 78.3% of the gate).

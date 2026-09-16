@@ -735,6 +735,18 @@ body.brief-mode.chart-min #briefStage .bf-wrap{display:block; width:min(46vw,300
   overflow:hidden; margin-top:6px; padding:6px; pointer-events:none; border-radius:14px;
   background:rgba(8,6,4,.55); box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
 body.brief-mode.chart-min #briefStage{cursor:pointer}
+/* v2.3.0 THE HAND — drag states: the lift is unmistakable, the drop target is
+   a gold ring, sibling reorder shows the receiving edge. The tag rides the
+   finger because the finger covers the box. */
+.bf-box.bf-lift{opacity:.45; filter:saturate(.6)}
+.bf-box.bf-dropt{box-shadow:0 0 0 2px var(--accent), 0 0 18px rgba(245,215,110,.35) !important}
+.bf-box.bf-dropl{box-shadow:-4px 0 0 0 var(--accent) !important}
+.bf-box.bf-dropr{box-shadow:4px 0 0 0 var(--accent) !important}
+body.bf-dragging{cursor:grabbing; -webkit-user-select:none; user-select:none}
+#bfDragTag{position:fixed; z-index:60; transform:translate(-50%,-140%); pointer-events:none;
+  padding:6px 10px; border-radius:9px; background:var(--accent); color:#141006;
+  font:700 11px/1 var(--body); box-shadow:var(--drop); white-space:nowrap; max-width:220px;
+  overflow:hidden; text-overflow:ellipsis}
 body.chart-min .ch-head{padding:8px 13px; border-radius:var(--r-pill);
   background:linear-gradient(180deg,var(--glass-hi),var(--glass-lo));
   box-shadow:0 0 0 1px var(--line), inset 0 1px 0 var(--spec)}
@@ -1750,6 +1762,27 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.3.0  • THE HAND (V2 pillar 3 — owner: "Dynamic objects with ability to
+//            drag to different spots on command"). Hold a chart box ~.35s and
+//            it LIFTS (dimmed box, gold name tag riding the pointer — the
+//            finger covers the box); drag onto another box to RE-CHAIN under
+//            it, onto a SIBLING's left/right half to reorder before/after
+//            (new bfPlace: exact splice, same-parent only), release on empty
+//            space to cancel — a drop is never a surprise. Every landing
+//            toasts what happened; bfMove's cycle guard rules, so a unit can
+//            never land under its own subordinate ("Cannot move a unit under
+//            its own subordinate"). COEXISTENCE, not conquest: a pan/scroll
+//            moves before the hold timer (8px slop cancels the arm); once
+//            lifted the mouse pan yields and native touch scroll is owned by
+//            the touchmove guard (__bfHandLive door); the post-drop click is
+//            eaten so a drop never doubles as a drill; Present and the
+//            stage mirror never lift. v1.10.0's FLIP carries the landing.
+//            API: Brief.place. smoke's HAND probe pins the wire shapes and
+//            the data acts (place order proven by injection; the touch-guard
+//            assert was WEAK once — the door's name survived in its consumer
+//            — and is now scoped to the assignment shape, proven both ways).
+//            Live at 414×896: lift + ring + re-chain toast, half-side
+//            reorder, cycle refusal, zero page errors.
 //   v2.2.0  • THE BRANCH ADD (V2 pillar 3 — owner: "Bulk add and bulk color
 //            assignments for organizations and subordinates"; color shipped
 //            v1.30.0, this is the add half at full depth). The add sheet
@@ -1960,7 +1993,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.2.0';
+const APP_VERSION = 'v2.3.0';
 const APP_UPDATED = '16 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -5994,7 +6027,9 @@ function _bfChartWire(el){
   el.addEventListener('touchstart',function(e){if(!wrap(e)||e.touches.length!==2)return;e.preventDefault();
     pinch={distance:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),zoom:GlobeState._bfZoom||1};
   },{passive:false});
-  el.addEventListener('touchmove',function(e){if(!pinch||e.touches.length!==2)return;e.preventDefault();
+  el.addEventListener('touchmove',function(e){
+    if(window.__bfHandLive&&window.__bfHandLive()){e.preventDefault();return;}   // v2.3.0: a lifted box owns the touch
+    if(!pinch||e.touches.length!==2)return;e.preventDefault();
     const a=e.touches[0],b=e.touches[1];_bfZoomTo(pinch.zoom*Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)/Math.max(1,pinch.distance),{x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2},false);
   },{passive:false});
   const end=function(){if(pinch){pinch=null;renderBrief();globeMark();}};el.addEventListener('touchend',end);el.addEventListener('touchcancel',end);
@@ -6002,6 +6037,83 @@ function _bfChartWire(el){
   el.addEventListener('pointerdown',function(e){const w=wrap(e);if(!w||e.pointerType!=='mouse'||e.button!==0||e.target.closest('button,input,select'))return;
     drag={w:w,x:e.clientX,y:e.clientY,left:w.scrollLeft,top:w.scrollTop};moved=false;
   });
+  // ═══ v2.3.0 THE HAND (owner: "Dynamic objects with ability to drag to
+  // different spots on command"). Hold a box ~.35s and it LIFTS; drag onto
+  // another box to re-chain under it, onto a SIBLING's left/right half to
+  // reorder before/after it, release on empty space to cancel. Coexistence:
+  // a pan or scroll moves before the hold timer fires (8px slop cancels the
+  // arm); once lifted, the pan yields (drag=null), native touch scroll is
+  // suppressed by the touchmove guard above, and the post-drop click is
+  // eaten so the drop never doubles as a drill. bfMove's cycle guard rules —
+  // a unit can never land under its own subordinate.
+  let hand=null, handHold=null, handAt=null, handDid=false;
+  const _handMark=function(box,half){
+    document.querySelectorAll('#briefStage .bf-dropt,#briefStage .bf-dropl,#briefStage .bf-dropr')
+      .forEach(function(b){ b.classList.remove('bf-dropt','bf-dropl','bf-dropr'); });
+    if(box) box.classList.add(half==='l'?'bf-dropl':half==='r'?'bf-dropr':'bf-dropt');
+  };
+  const _handTargetAt=function(x,y,srcK){
+    const elx=document.elementFromPoint(x,y);
+    const bx=elx&&elx.closest&&elx.closest('#briefStage .bf-box[data-bfobj]');
+    if(!bx) return null;
+    const k=bx.getAttribute('data-bfobj'); if(k===srcK) return null;
+    const sn=bfNode(srcK), tn=bfNode(k);
+    let half=null;
+    if(sn&&tn&&sn.p===tn.p){ const r=bx.getBoundingClientRect(); half=(x<r.left+r.width/2)?'l':'r'; }
+    return {k:k, box:bx, half:half};
+  };
+  const handCancel=function(){
+    if(handHold){ clearTimeout(handHold); handHold=null; }
+    if(hand){
+      try{ hand.box.classList.remove('bf-lift'); }catch(_){}
+      try{ document.body.classList.remove('bf-dragging'); }catch(_){}
+      _handMark(null);
+      const tg=document.getElementById('bfDragTag'); if(tg) tg.remove();
+      hand=null;
+    }
+  };
+  el.addEventListener('pointerdown',function(e){
+    if(document.body.classList.contains('present')||document.body.classList.contains('chart-min'))return;
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    const bx=e.target.closest&&e.target.closest('.bf-box[data-bfobj]'); if(!bx||!wrap(e))return;
+    handAt={x:e.clientX, y:e.clientY};
+    handHold=setTimeout(function(){
+      handHold=null; drag=null;                          // the pan yields to the lift
+      hand={k:bx.getAttribute('data-bfobj'), box:bx};
+      bx.classList.add('bf-lift'); document.body.classList.add('bf-dragging');
+      const tg=document.createElement('div'); tg.id='bfDragTag';
+      const nd=bfNode(hand.k); tg.textContent=(nd&&nd.n)||'';
+      tg.style.left=handAt.x+'px'; tg.style.top=handAt.y+'px';
+      document.body.appendChild(tg);
+    },350);
+  });
+  window.addEventListener('pointermove',function(e){
+    if(handHold&&handAt&&Math.hypot(e.clientX-handAt.x,e.clientY-handAt.y)>8){ clearTimeout(handHold); handHold=null; }   // it moved: a scroll, not a hold
+    if(!hand)return;
+    if(e.cancelable)e.preventDefault();
+    const tg=document.getElementById('bfDragTag'); if(tg){ tg.style.left=e.clientX+'px'; tg.style.top=e.clientY+'px'; }
+    const t=_handTargetAt(e.clientX,e.clientY,hand.k);
+    _handMark(t&&t.box, t&&t.half);
+  });
+  window.addEventListener('pointerup',function(e){
+    if(handHold){ clearTimeout(handHold); handHold=null; }
+    if(!hand)return;
+    const src=hand.k;
+    const t=_handTargetAt(e.clientX,e.clientY,src);
+    handCancel(); handDid=true;
+    if(!t)return;                                        // empty space: a cancel, never a surprise
+    const sn=bfNode(src), tn=bfNode(t.k);
+    try{
+      if(sn&&tn&&sn.p===tn.p&&t.half){ if(bfPlace(src,t.k,t.half==='r')) _bfToast((sn.n||'Moved')+' — '+(t.half==='r'?'after':'before')+' '+(tn.n||'its sister')); }
+      else if(bfMove(src,t.k)) _bfToast((sn&&sn.n||'Moved')+' now reports to '+(tn&&tn.n||'its new parent'));
+      else _bfToast('Cannot move a unit under its own subordinate');
+    }catch(_){}
+  });
+  window.addEventListener('pointercancel',function(){ if(handHold){clearTimeout(handHold);handHold=null;} handCancel(); });
+
+  try{ window.__bfHandLive=function(){ return !!hand; }; }catch(_){}
+  el.addEventListener('contextmenu',function(e){ if(hand||handHold) e.preventDefault(); });
+  el.addEventListener('click',function(e){ if(handDid){ handDid=false; e.preventDefault(); e.stopPropagation(); } },true);
   window.addEventListener('pointermove',function(e){if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>5)moved=true;if(moved){e.preventDefault();drag.w.scrollLeft=drag.left-dx;drag.w.scrollTop=drag.top-dy;}});
   window.addEventListener('pointerup',function(){drag=null;setTimeout(function(){moved=false;},0);});window.addEventListener('pointercancel',function(){drag=null;moved=false;});
   el.addEventListener('click',function(e){if(moved&&wrap(e)){moved=false;e.preventDefault();e.stopPropagation();}},true);
@@ -8546,6 +8658,21 @@ function bfMove(k, newParent){
   try{ globeMark(); }catch(_){}
   return true;
 }
+// v2.3.0 THE HAND — place k immediately before/after a SIBLING t (drag drop).
+// Same-parent only: cross-parent placement is a MOVE and bfMove owns it.
+function bfPlace(k, targetK, after){
+  const n=bfNode(k), t=bfNode(targetK);
+  if(!n||!t||n===t||n.p!==t.p) return false;
+  const i=BRIEF.nodes.indexOf(n); if(i<0) return false;
+  BRIEF.nodes.splice(i,1);
+  let j=BRIEF.nodes.indexOf(t); if(j<0){ BRIEF.nodes.splice(i,0,n); return false; }
+  if(after) j++;
+  BRIEF.nodes.splice(j,0,n);
+  _bfSave();
+  try{ renderBrief(); }catch(_){}
+  try{ globeMark(); }catch(_){}
+  return true;
+}
 // ◀▶ REORDER among same-parent sisters (chart order = array order)
 function bfReorder(k, dir){
   const n=bfNode(k); if(!n) return false;
@@ -8670,7 +8797,8 @@ try{ window.Brief={ add:bfAdd, addState:bfAddState, addCustom:bfAddCustom, addGr
   addPlace:function(k,parent){ return bfAddMany([k], parent||null); },
   places:function(){ return BF_PLACES.slice(); },
   remove:bfRemove, rename:bfRename,
-  move:bfMove, reorder:bfReorder, color:bfColor, colorTree:bfColorTree, stripe:bfStripe,
+  move:bfMove, reorder:bfReorder, place:bfPlace,   /* v2.3.0 THE HAND */
+  color:bfColor, colorTree:bfColorTree, stripe:bfStripe,
   note:bfNote, has:bfHas, eye:bfEye, depth:bfDepth, stack:bfStack,
   node:bfNode, kids:bfKids, list:function(){ return BRIEF.mem.slice(); } }; }catch(_){}
 
