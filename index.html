@@ -1362,9 +1362,6 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
   border-radius:6px; box-shadow:inset 0 0 0 1px var(--line); color:var(--faint)}
 .am-dbchip.am-db-live{color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
 .am-dbchip.am-db-error{color:#ff5f50; box-shadow:inset 0 0 0 1px #ff5f50}
-.db-sql{display:block; margin:6px 0; padding:8px 10px; border-radius:8px; background:rgba(0,0,0,.25);
-  box-shadow:inset 0 0 0 1px var(--line); font:600 10px/1.6 var(--mono); color:var(--text);
-  user-select:text; -webkit-user-select:text; overflow-x:auto; white-space:nowrap}
 /* v1.2.0 — the boot reconnect chip: settings exist, session is offline, one tap */
 #dbChip{position:fixed; left:50%; transform:translateX(-50%) translateY(-6px); z-index:40;
   top:calc(env(safe-area-inset-top,0px) + 96px);
@@ -1768,6 +1765,30 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.7.0  • THE WORKSPACE (V2 pillar 2 closes — THE V2 PROGRAM IS COMPLETE;
+//            owner ruling: "Go with supabase"). The board graduates from
+//            backup to SHARED TEAM WORKSPACE with roles enforced in the
+//            database, not in this app: anyone with the project URL +
+//            publishable key + board name READS the board live (viewer);
+//            only holders of the board's WRITE CODE publish to it. Every
+//            write now rides the a2_save() RPC (SECURITY DEFINER, sha-256
+//            code check server-side); the direct-upsert path is dead — RLS
+//            refuses the publishable key outright (proven live on the
+//            project as the anon role: create+lock, wrong-code refusal,
+//            direct-write refusal, viewer read; migration
+//            a2_workspace_write_codes applied; docs/workspace.sql is the
+//            reproducible setup). A board with no code stays OPEN (both of
+//            the owner's existing boards are untouched); the first save
+//            carrying a code locks it. The client learns the role: a
+//            refused code turns the session into a quiet VIEWER — the chip
+//            reads VIEW, edits stay in the local cache, and the retry
+//            ladder never arms against an answer that will not change; the
+//            role is re-earned on every Connect. The connect sheet grows
+//            the write-code field and the setup note points at
+//            docs/workspace.sql. Boot law untouched — nothing foreign
+//            loads until manual Connect, as ever. NOTE: older app builds
+//            (≤v2.6.0) still call the dead upsert path — their saves fail
+//            safely (local cache keeps everything) until they update.
 //   v2.6.0  • THE INTAKE (V2 pillar 2 opens — owner: "Need to figure out how
 //            we want to move at scale when creating records... Fluidity of
 //            data entry"). The Repository head grows an ⚡ Intake door (it
@@ -2060,8 +2081,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.6.0';
-const APP_UPDATED = '16 September 2026';
+const APP_VERSION = 'v2.7.0';
+const APP_UPDATED = '17 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
 // on every controller change). If the worker is NEWER than this page, the
@@ -9572,6 +9593,7 @@ let _dbPushT=null;
 // save; the retry ladder; the resync clock; whether the last failure was the
 // NETWORK's (retried by itself on return) or the configuration's (never).
 let _dbConnP=null, _sbLoadP=null, _dbDirty=false, _dbPushBusy=false, _dbRetryT=null, _dbRetryN=0;
+let _dbViewer=false;   // v2.7.0 THE WORKSPACE: this session reads the board but holds no write code
 let _dbSyncT=0, _dbSubN=0, _dbFailNet=false, _dbUnloading=false;
 const _dbClientId=Math.random().toString(36).slice(2)+Date.now().toString(36);
 const DB_TABLE='a2_records';
@@ -9582,7 +9604,7 @@ function _dbSetState(st, msg){
     if(el){ el.textContent=_dbMsg;
       el.className='db-status '+(st==='live'?'db-live':(st==='error'?'db-error':(st==='connecting'?'db-connecting':'db-off'))); } }catch(_){}
   try{ const ch=document.querySelector('.am-dbchip');
-    if(ch){ ch.textContent=(st==='live')?'LIVE':(st==='connecting'?'…':(st==='error'?'ERR':'OFF'));
+    if(ch){ ch.textContent=(st==='live')?(_dbViewer?'VIEW':'LIVE'):(st==='connecting'?'…':(st==='error'?'ERR':'OFF'));
       ch.className='am-dbchip '+(st==='live'?'am-db-live':(st==='error'?'am-db-error':'am-db-off')); } }catch(_){}
 }
 function _dbCfgSave(cfg){
@@ -9721,6 +9743,7 @@ function _dbChipShow(){
 // flush is in flight ride the next one. IndexedDB holds everything meanwhile.
 function dbPush(){
   if(!_db || !_dbCfg) return;                     // not connected: IndexedDB cache only
+  if(_dbViewer) return;                           // v2.7.0: a viewer's edits stay on this device
   _dbDirty=true;
   _recStatusPaint();
   clearTimeout(_dbPushT);
@@ -9733,12 +9756,22 @@ async function _dbFlush(){
   let ok=false, stale=false;
   const snapshot=JSON.parse(JSON.stringify(_dbSnapshot())), client=_db, board=_dbCfg.board;
   try{
-    const { error }=await _db.from(DB_TABLE).upsert({ id:_dbCfg.board, data:snapshot,
-      updated_at:new Date().toISOString(), updated_by:_dbClientId });
+    // v2.7.0 THE WORKSPACE: every write goes through a2_save(), which checks
+    // the board's write code SERVER-SIDE — the publishable key alone can no
+    // longer modify a board (proven: direct upserts fail RLS on the project).
+    const { error }=await _db.rpc('a2_save', { p_board:_dbCfg.board, p_code:_dbCfg.code||'',
+      p_data:snapshot, p_client:_dbClientId });
     if(_db!==client || !_dbCfg || _dbCfg.board!==board) stale=true;
     else { if(error) throw error; _recCloudAck(snapshot.records); ok=true; }
   }catch(e){
     if(_db!==client || !_dbCfg || _dbCfg.board!==board) stale=true;
+    else if(/write code required/i.test(String((e&&e.message)||e||''))){
+      // this board is LOCKED and this session's code does not open it: the
+      // session becomes a VIEWER — reads keep mirroring, edits stay in the
+      // local cache, and NO retry ladder arms (the answer will not change).
+      _dbViewer=true; _dbDirty=false;
+      _dbSetState('live','Viewer — reading the shared board. Edits stay on this device; enter the write code in Database settings to publish them.');
+    }
     else { _dbDirty=true;                         // failed work stays queued
       _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Save', e)); }
   }
@@ -9769,8 +9802,8 @@ async function dbPullOnce(){
     _dbSyncT=Date.now();
     if(data && data.data) return _dbApply(data.data)||{took:0, localNewer:false};
     const initial=JSON.parse(JSON.stringify(_dbSnapshot()));
-    const seed=await client.from(DB_TABLE).upsert({ id:board, data:initial,
-      updated_at:new Date().toISOString(), updated_by:_dbClientId });
+    const seed=await client.rpc('a2_save', { p_board:board, p_code:(_dbCfg.code||''),
+      p_data:initial, p_client:_dbClientId });   // v2.7.0: seeding IS a write — same door, and a carried code locks the new board from birth
     if(!current()) return false;
     if(seed.error) throw seed.error;
     _recCloudAck(initial.records);   // first-device seeding must acknowledge errors too
@@ -9778,6 +9811,7 @@ async function dbPullOnce(){
   }catch(e){ if(current()){ _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Load', e)); } return false; }
 }
 async function _dbConnectRun(){
+  _dbViewer=false;                                // v2.7.0: the role is re-earned on every connect
   const cfg=_dbCfg;
   if(!cfg || !cfg.url || !cfg.key){ _dbSetState('off','Not configured — enter the project URL and key.'); return false; }
   try{ if(typeof navigator!=='undefined' && navigator.onLine===false){
@@ -9885,6 +9919,7 @@ try{ window.addEventListener('pagehide', function(){ _dbHideFlush(); }); }catch(
 try{ document.addEventListener('visibilitychange', function(){
   if(document.visibilityState==='visible') _netUp('visible'); else _dbHideFlush(); }); }catch(_){}
 try{ window.DB={ connect:dbConnect, disconnect:dbDisconnect, push:dbPush, flush:_dbFlush, state:function(){ return _dbState; },
+  viewer:function(){ return _dbViewer; },   /* v2.7.0 THE WORKSPACE */
   dirty:function(){ return _dbDirty; }, netUp:_netUp, hide:_dbHideFlush, lib:function(){ return _sbLoadP; }, conn:function(){ return _dbConnP; },
   retry:function(){ return {n:_dbRetryN, armed:!!_dbRetryT}; },
   chip:_dbChipShow, _setCfg:function(c){ _dbCfg=c; }, _setDb:function(d){ _db=d; } }; }catch(_){}   // chip/_setCfg/_setDb: harness hooks (smoke drives the boot chip + the save ladder)
@@ -9899,11 +9934,12 @@ function _dbSheet(){
   let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
   h+='<div class="od-head od-head-slim"><div class="od-name">Database</div><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
-    +'<div class="od-sub">Your working set — records with their IDs, the brief diagram, saved briefs and views — lives in YOUR database, off this device, mirrored to every device on this board. Nothing foreign loads until your first Connect; after that, auto-connect below brings the board live at every open.</div>'
+    +'<div class="od-sub">The board is a SHARED WORKSPACE (v2.7.0): everyone with the URL + key + board name reads it live; only holders of the board\u2019s WRITE CODE publish to it — checked in the database itself, not in this app. A board with no code is open; the first save that carries a code locks it. Nothing foreign loads until your first Connect.</div>'
     +'<div class="rc-form">'
     +'<input class="rc-in" id="dbUrl" type="text" placeholder="Project URL — xxxxx.supabase.co" value="'+escA(cfg.url||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
     +'<input class="rc-in" id="dbKey" type="text" placeholder="Publishable / anon key" value="'+escA(cfg.key||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
     +'<input class="rc-in" id="dbBoard" type="text" maxlength="40" placeholder="Board name (default: a-org-2)" value="'+escA(cfg.board||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
+    +'<input class="rc-in" id="dbCode" type="text" maxlength="80" placeholder="Write code — editors only; blank reads a locked board" value="'+escA(cfg.code||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
     +'<div class="rc-btns">'
     +(_db?'<button class="rc-del" type="button" data-dbdisconnect="1">Disconnect</button>':'')
     +'<span class="od-sp"></span>'
@@ -9915,11 +9951,10 @@ function _dbSheet(){
   h+='<button class="bf-act'+(cfg.auto?'':' in')+'" type="button" data-dbauto="1">'
     +(cfg.auto?'⚡ Connects automatically at every open — ON':'⚡ Auto-connect at open — off')+'</button>';
   h+=_disc('db-setup','First-time setup (once, in your Supabase project)',
-    '<div class="rc-note">1. Create a free project at supabase.com.<br>2. SQL editor → run:<br>'
-    +'<code class="db-sql">create table '+DB_TABLE+' (id text primary key, data jsonb, updated_at timestamptz, updated_by text);<br>'
-    +'alter publication supabase_realtime add table '+DB_TABLE+';</code><br>'
-    +'3. Project Settings → API: copy the URL and the anon key into the boxes above.<br>'
-    +'4. Keep the project private (RLS off on this table is fine for a personal board; add policies if you ever share the key).</div>', {def:false});
+    '<div class="rc-note">1. Create a free project at supabase.com.<br>'
+    +'2. SQL editor → run the workspace setup from <b>docs/workspace.sql</b> in the repository (table + realtime + the a2_save write-code door + read-only policies).<br>'
+    +'3. Project Settings → API: copy the URL and the publishable key into the boxes above.<br>'
+    +'4. Share URL + key + board name with the team (viewers); share the write code with editors only.</div>', {def:false});
   h+='<div class="rc-note">Connect is manual each session. The device keeps an offline cache so the app opens anywhere; the database is the source of truth whenever you are connected.</div>';
   host.innerHTML=h;
   host.classList.remove('dz-peek','dz-half','dz-full');
@@ -11063,9 +11098,9 @@ function bootShell(){
       var dbc=e.target.closest('[data-dbconnect]');
       if(dbc){
         try{
-          var u=(document.getElementById('dbUrl')||{}).value||'', k2=(document.getElementById('dbKey')||{}).value||'', b2=(document.getElementById('dbBoard')||{}).value||'';
+          var u=(document.getElementById('dbUrl')||{}).value||'', k2=(document.getElementById('dbKey')||{}).value||'', b2=(document.getElementById('dbBoard')||{}).value||'', c2=(document.getElementById('dbCode')||{}).value||'';
           u=String(u).trim(); if(u && u.indexOf('://')<0) u='https://'+u;
-          _dbCfgSave({url:u, key:String(k2).trim(), board:(String(b2).trim()||'a-org-2')});
+          _dbCfgSave({url:u, key:String(k2).trim(), board:(String(b2).trim()||'a-org-2'), code:String(c2).trim()});
           dbConnect().then(function(){ try{ _dbSheet(); }catch(_){} });
           _dbSetState('connecting','Connecting…');
         }catch(_){}

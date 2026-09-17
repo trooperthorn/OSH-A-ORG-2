@@ -35,6 +35,7 @@ function fixture(source) {
     _rdb: null, _db: null, _dbCfg: null, _dbState: 'off', _dbMsg: '',
     _dbPushT: null, _dbDirty: false, _dbPushBusy: false, _dbRetryT: null,
     _dbRetryN: 0, _dbSyncT: 0, _dbFailNet: false, _dbClientId: 'test-device',
+    _dbViewer: false,   /* v2.7.0 THE WORKSPACE: the sandbox mirrors the module's real dependency set */
     DB_TABLE: 'a2_records', SAVEDV: [], _svMod: 0, SAVEDB: [], _sbMod: 0,
     navigator: { onLine: true },
     document: {
@@ -95,10 +96,16 @@ function fixture(source) {
         assert.equal(table, 'a2_records');
         return {
           select() { return { eq() { return { maybeSingle() { return Promise.resolve({ data: null, error: null }); } }; } }; },
-          upsert(payload) {
-            return new Promise((resolve, reject) => writes.push({ payload, resolve, reject }));
-          },
         };
+      },
+      // v2.7.0 THE WORKSPACE: every write rides the a2_save RPC (the write-code
+      // door). The fixture captures the RPC and normalizes its args to the old
+      // payload shape so every downstream assertion still reads the truth.
+      rpc(name, args) {
+        assert.equal(name, 'a2_save');
+        assert.equal(args.p_board, 'probe-board');
+        const payload = { id: args.p_board, data: args.p_data, updated_by: args.p_client };
+        return new Promise((resolve, reject) => writes.push({ payload, resolve, reject }));
       },
     };
     return writes;

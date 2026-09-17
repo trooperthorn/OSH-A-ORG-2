@@ -408,8 +408,8 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     global.DB.push();                                   // disconnected → must be a silent no-op
     if(typeof global._dbSheet==='function'){ global._dbSheet();
       const dzq=IDS['dossier'].innerHTML;
-      if(dzq.indexOf('dbUrl')<0 || dzq.indexOf('dbStatus')<0 || dzq.indexOf('a2_records')<0){
-        ok=false; fails++; console.log('✗ database sheet missing url/status/setup'); }
+      if(dzq.indexOf('dbUrl')<0 || dzq.indexOf('dbStatus')<0 || dzq.indexOf('workspace.sql')<0 || dzq.indexOf('dbCode')<0){
+        ok=false; fails++; console.log('✗ database sheet missing url/status/setup/write-code (v2.7.0 workspace contract)'); }
     } else { ok=false; fails++; console.log('✗ _dbSheet missing'); }
     try{ global.hideDossier(); }catch(_){}
     // v1.2.0 board / v1.12.0 BLANK-SLATE AMENDMENT: the board carries
@@ -1478,6 +1478,41 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(iok) console.log('  ✓ INTAKE: never-guess resolution · roster columns round-trip · header skipped, unknowns flagged · commits land + tape + tags');
   }
 
+  // ── PROBE: THE WORKSPACE (v2.7.0; owner ruling: "Go with supabase"). The
+  //    board is a shared team workspace: writes ride the a2_save RPC whose
+  //    write code is checked IN THE DATABASE (SQL-as-anon proof ran against
+  //    the live project: create+lock, wrong-code refusal, direct-write RLS
+  //    refusal, viewer read, open-board back-compat). Client laws here:
+  //    (a) the direct upsert save path is GONE from the source; (b) a
+  //    refused code turns the session into a VIEWER — dirty clears, the
+  //    retry ladder never arms, and dbPush becomes a no-op — instead of a
+  //    retry storm against an answer that will not change; (c) the role is
+  //    re-earned on every connect. ──
+  { let wok=true;
+    try{
+      if(/_db\.from\(DB_TABLE\)\.upsert/.test(html)){ wok=false; fails++; console.log('✗ WORKSPACE: a direct board upsert is back in the save path — the write-code door is bypassed'); }
+      if(html.indexOf("rpc('a2_save'")<0){ wok=false; fails++; console.log('✗ WORKSPACE: the a2_save door is gone from the save path'); }
+      if(html.indexOf('_dbViewer=false;                                // v2.7.0: the role is re-earned on every connect')<0){ wok=false; fails++; console.log('✗ WORKSPACE: connect no longer re-earns the role'); }
+      // (b) live: a locked board refuses this session's code → viewer, quiet
+      let vcalls=0;
+      const locked={ removeChannel(){}, channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
+        rpc(){ vcalls++; return Promise.resolve({error:{message:'write code required'}}); },
+        from(){ return { select(){ return { eq(){ return { maybeSingle(){ return Promise.resolve({data:{data:{v:3,records:{}}}, error:null}); } }; } }; } }; } };
+      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'locked', code:'wrong'});
+      global.DB._setDb(locked);
+      global.DB.push();                                  // marks dirty (not yet a viewer)
+      await global.DB.flush();                           // the refusal lands here
+      if(global.DB.viewer()!==true){ wok=false; fails++; console.log('✗ WORKSPACE: a refused write code must turn the session into a viewer'); }
+      if(global.DB.dirty()!==false){ wok=false; fails++; console.log('✗ WORKSPACE: viewer dirty flag must clear (edits stay in the local cache, not a queue)'); }
+      if(global.DB.retry().armed){ wok=false; fails++; console.log('✗ WORKSPACE: the retry ladder armed against a refusal that will not change'); }
+      global.DB.push();                                  // a viewer's push is a no-op
+      if(global.DB.dirty()!==false){ wok=false; fails++; console.log('✗ WORKSPACE: a viewer’s dbPush still queues work'); }
+      if(vcalls!==1){ wok=false; fails++; console.log('✗ WORKSPACE: expected exactly one refused call, saw '+vcalls); }
+      global.DB._setDb(null); global.DB._setCfg(null);
+    }catch(e){ wok=false; fails++; console.log('✗ WORKSPACE probe: '+e.message); }
+    if(wok) console.log('  ✓ WORKSPACE: upsert path dead · a2_save door pinned · refused code → quiet viewer (no dirty, no ladder, no pushes) · role re-earned per connect');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name
@@ -1644,8 +1679,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // D4 — the save ladder on a fake client: a failed save keeps its work and retries; a return flushes + re-pulls
       let calls=0, fails2=2, pulls=0;
       const fake={ removeChannel(){}, channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
+        rpc(name){ if(name!=='a2_save'){ bad('save must ride the a2_save workspace door, not '+name); }
+          calls++; return Promise.resolve(fails2-->0 ? {error:{message:'TypeError: Failed to fetch'}} : {error:null}); },   /* v2.7.0 THE WORKSPACE */
         from(){ return {
-          upsert(){ calls++; return Promise.resolve(fails2-->0 ? {error:{message:'TypeError: Failed to fetch'}} : {error:null}); },
           select(){ return { eq(){ return { maybeSingle(){ pulls++; return Promise.resolve({data:{data:{v:3,records:{},views:{list:[],mod:0},briefs:{list:[],mod:0}}}, error:null}); } }; } }; } }; } };
       global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b'}); global.DB._setDb(fake);
       let t1=timers.length; global.DB.push();

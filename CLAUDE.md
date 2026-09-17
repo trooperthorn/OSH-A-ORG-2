@@ -2208,3 +2208,33 @@ It lives here now.
   the v2.7.0 workspace all see intake entries as ordinary edits. API:
   window.Intake (open/resolve/kind/parse/commit/bulk/state).
 - Byte delta: +13,019 (764,029 · 82.9% of the gate).
+
+## v2.7.0 — the workspace (V2 pillar 2 closes; owner ruling: "Go with supabase") — THE V2 PROGRAM IS COMPLETE
+- ROLES LIVE IN THE DATABASE, NOT THE APP: every board write rides
+  a2_save() (SECURITY DEFINER, sha-256 write-code check, search_path
+  pinned to public+extensions — pgcrypto lives in "extensions" on
+  Supabase and the first migration missed that); direct INSERT/UPDATE
+  policies are DROPPED, so the publishable key alone cannot modify a
+  board. SELECT stays open: viewer = URL + key + board name. A board with
+  no code is OPEN (pre-v2.7.0 behavior, both existing boards untouched);
+  the first save that carries a code locks it. Applied to the owner's
+  project as migration a2_workspace_write_codes (+ fix);
+  docs/workspace.sql is the reproducible setup for a fresh project.
+- PROVEN AS THE ANON ROLE against the live project (the container's
+  egress blocks supabase.co, so SQL `set local role anon` stood in for
+  PostgREST): create+lock true · wrong code "write code required" ·
+  direct insert RLS-refused · right code saves · viewer reads · selftest
+  row deleted after.
+- THE CLIENT LEARNS ITS ROLE: a refused code → quiet VIEWER (chip VIEW,
+  _dbDirty cleared, retry ladder never arms — a refusal is not a network
+  fault and will not change; edits stay in the local cache) and the role
+  is re-earned on every Connect. dbPush is a viewer no-op. All four
+  viewer asserts proven by killing the branch.
+- FIXTURES MIRROR DEPENDENCIES (the v1.29 law, twice more): smoke's fake
+  client and ux-persistence-check's fixture both learned rpc('a2_save')
+  and the sandbox learned _dbViewer — the old upsert-shaped stubs made
+  the suite fail honestly the moment the save path moved.
+- BACK-COMPAT HONESTY: builds ≤v2.6.0 still call the dead upsert path;
+  their saves fail SAFELY (dirty stays, local cache holds everything)
+  until the SW rolls them forward.
+- Byte delta: +2,942 (766,971 · 83.2% of the gate; the orphaned .db-sql rule left with its block).

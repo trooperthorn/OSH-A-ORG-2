@@ -151,7 +151,7 @@ on the export tap only — the Supabase pattern — with the owner's sanction.
 | v2.4.0 | 4 | PPTX deck export | **shipped** |
 | v2.5.0 | 4 | XLSX roster | **shipped** |
 | v2.6.0 | 2 | Intake surface + bulk paste | **shipped** |
-| v2.7.0 | 2 | Shared workspace (Supabase) | next build — RULING A: approved (shared) |
+| v2.7.0 | 2 | Shared workspace (Supabase) | **shipped** — program complete |
 
 ## Rulings owed by the owner
 
