@@ -1432,6 +1432,52 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(xok) console.log('  ✓ ROSTER: row + dispatch · workbook/rels/package agree · every org and site rides · refs + header style · escaping holds');
   }
 
+  // ── PROBE: THE INTAKE (v2.6.0; owner: fluid data entry at scale). Laws:
+  //    (a) the door lives in the Repository head and the Enter ladder + sheet
+  //    acts are wired; (b) resolution NEVER GUESSES — an exact base name or a
+  //    unique unit resolves, an ambiguous fragment returns null; (c) bulk
+  //    parse speaks the roster's own columns, skips the header row, flags
+  //    unknown rows; (d) commits land through recAdd (count grows, the tape
+  //    remembers, undo removes), and a bulk commit lands only the ready rows
+  //    with their tags. ──
+  { let iok=true;
+    try{
+      if(html.indexOf('data-inopen')<0 || html.indexOf("e.target.id==='inF2'")<0 || html.indexOf('data-inbulkgo')<0){ iok=false; fails++; console.log('✗ INTAKE: door, Enter ladder or bulk act unwired'); }
+      if(global.Intake.resolve('Fort Bragg')!=='fort-bragg'){ iok=false; fails++; console.log('✗ INTAKE: exact base name failed to resolve'); }
+      const via=global.Intake.resolve('XVIII Airborne Corps');
+      if(via!=='fort-bragg'){ iok=false; fails++; console.log('✗ INTAKE: a unique unit must resolve to its post (got '+via+')'); }
+      if(global.Intake.resolve('Fort')!==null){ iok=false; fails++; console.log('✗ INTAKE: an ambiguous fragment resolved — resolution must never guess'); }
+      if(global.Intake.kind('Contact')!=='people' || global.Intake.kind('TECH')!=='specs'){ iok=false; fails++; console.log('✗ INTAKE: kind synonyms broke'); }
+      const tsv='Installation\tKind\tName\tDetail\tTag\n'
+        +'Fort Bragg\tContact\tCOL Rivera\tG-3\tops\n'
+        +'Fort Nowhere\tContact\tMAJ Lost\t\t\n'
+        +'Fort Stewart\tLink\tPortal\thttps://example.mil/x\t';
+      const rows=global.Intake.parse(tsv);
+      if(rows.length!==3){ iok=false; fails++; console.log('✗ INTAKE: parse returned '+rows.length+' rows — the header row must be skipped, data rows kept'); }
+      if(!(rows[0].ok && !rows[1].ok && rows[2].ok)){ iok=false; fails++; console.log('✗ INTAKE: row flags wrong ('+rows.map(function(r){return r.ok?'1':'0';}).join('')+') — unknown installations stay out'); }
+      const before=global.recCount('fort-bragg'), beforeSw=global.recCount('fort-stewart');
+      const n=global.Intake.bulk(rows);
+      if(n!==2){ iok=false; fails++; console.log('✗ INTAKE: bulk landed '+n+' rows, expected exactly the 2 ready ones'); }
+      if(global.recCount('fort-bragg')!==before+1 || global.recCount('fort-stewart')!==beforeSw+1){ iok=false; fails++; console.log('✗ INTAKE: bulk rows did not land through recAdd'); }
+      const rb=global.recordOf('fort-bragg');
+      const added=rb.people.find(function(p){ return p.name==='COL Rivera'; });
+      if(!added || added.xid!=='ops' || added.role!=='G-3'){ iok=false; fails++; console.log('✗ INTAKE: a bulk row lost its fields or its tag'); }
+      // the quick path: sticky site + tape + undo
+      global.Intake.state().site='fort-bragg'; global.Intake.state().kind='people';
+      const rid=global.Intake.commit('people','LTC Chen','G-6');
+      if(!rid || global.Intake.state().tape[0].rid!==rid){ iok=false; fails++; console.log('✗ INTAKE: quick commit missed the tape'); }
+      // leave the room as found
+      [['fort-bragg', added&&added.rid], ['fort-bragg', rid]].forEach(function(x){
+        if(!x[1]) return; const r2=global.recordOf(x[0]); const ix=r2.people.findIndex(function(p){ return p.rid===x[1]; });
+        if(ix>=0) global.recRemove(x[0],'people',ix); });
+      const rs=global.recordOf('fort-stewart');
+      const lk=rs.links.find(function(l){ return l.label==='Portal'; });
+      if(lk){ const ix2=rs.links.findIndex(function(l){ return l.rid===lk.rid; }); if(ix2>=0) global.recRemove('fort-stewart','links',ix2); }
+      global.Intake.state().tape.length=0; global.Intake.state().site=null;
+    }catch(e){ iok=false; fails++; console.log('✗ INTAKE probe: '+e.message); }
+    if(iok) console.log('  ✓ INTAKE: never-guess resolution · roster columns round-trip · header skipped, unknowns flagged · commits land + tape + tags');
+  }
+
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
   //    slot used to read the literal word HERE, which said nothing the name

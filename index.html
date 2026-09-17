@@ -743,6 +743,8 @@ body.brief-mode.chart-min #briefStage{cursor:pointer}
 .bf-box.bf-dropl{box-shadow:-4px 0 0 0 var(--accent) !important}
 .bf-box.bf-dropr{box-shadow:4px 0 0 0 var(--accent) !important}
 body.bf-dragging{cursor:grabbing; -webkit-user-select:none; user-select:none}
+/* v2.6.0 THE INTAKE — a flagged bulk row reads as set-aside, not failed-red */
+.ld-org.in-bad{opacity:.55}
 #bfDragTag{position:fixed; z-index:60; transform:translate(-50%,-140%); pointer-events:none;
   padding:6px 10px; border-radius:9px; background:var(--accent); color:#141006;
   font:700 11px/1 var(--body); box-shadow:var(--drop); white-space:nowrap; max-width:220px;
@@ -1766,6 +1768,26 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.6.0  • THE INTAKE (V2 pillar 2 opens — owner: "Need to figure out how
+//            we want to move at scale when creating records... Fluidity of
+//            data entry"). The Repository head grows an ⚡ Intake door (it
+//            closes the Repository first — one surface at a time): a
+//            keyboard-first rapid-entry sheet where the installation and
+//            kind are STICKY — pick once (type-ahead over bases AND units; a
+//            unit resolves to its post), then name → detail → Enter, again
+//            and again; focus returns to the first field after every save.
+//            A tape of the session's last ten sits under the form: tap
+//            reopens the entry in the real record editor, ✕ undoes it. BULK
+//            PASTE closes the loop with the roster: the SAME columns the
+//            Excel roster exports (Installation ⇥ Kind ⇥ Name ⇥ Detail ⇥
+//            Tag) paste back in — previewed row by row, the header row
+//            skipped, unknown installations/kinds FLAGGED AND LEFT OUT
+//            (resolution NEVER GUESSES: exact base, unique unit, or unique
+//            fragment only). Everything lands through recAdd, so the cloud
+//            board carries it like any other edit. API: window.Intake.
+//            smoke's INTAKE probe pins never-guess resolution, the roster
+//            round-trip, header skip, flags, tape and tags — the guess and
+//            header-skip defects proven to fire.
 //   v2.5.0  • THE ROSTER (V2 pillar 4, second format — owner's approved
 //            order: XLSX after PPTX). The export sheet grows an "Excel
 //            roster" row: the whole data estate as plain, filterable tables
@@ -2038,7 +2060,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.5.0';
+const APP_VERSION = 'v2.6.0';
 const APP_UPDATED = '16 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -8098,6 +8120,22 @@ if(!window._odWired){
       try{ _bfObjSheet(k); }catch(_){} return; }
     const od0=e.target.closest('[data-orgrm]');
     if(od0){ orgRemove(od0.getAttribute('data-orgrm')); try{ calloutHide(); }catch(_){} hideDossier(); return; }
+    // v2.6.0 THE INTAKE — the sheet's acts
+    const ins=e.target.closest('[data-insite]');
+    if(ins){ _inS.site=ins.getAttribute('data-insite'); _inS.q=''; _inSheet(); return; }
+    if(e.target.closest('[data-insiteclear]')){ _inS.site=null; _inSheet(); return; }
+    const ink=e.target.closest('[data-inkind]');
+    if(ink){ _inS.kind=ink.getAttribute('data-inkind'); _inSheet(); return; }
+    if(e.target.closest('[data-incommit]')){ _inGo(); return; }
+    const itp=e.target.closest('[data-intape]');
+    if(itp){ const t2=_inS.tape[+itp.getAttribute('data-intape')]; if(t2) _rcOpen(t2.site, t2.rid); return; }
+    const itx=e.target.closest('[data-intapex]');
+    if(itx){ const i2=+itx.getAttribute('data-intapex'), t2=_inS.tape[i2];
+      if(t2){ const r=recordOf(t2.site); const ix=r?r[t2.kind].findIndex(function(it){ return it.rid===t2.rid; }):-1;
+        if(ix>=0) recRemove(t2.site, t2.kind, ix); _inS.tape.splice(i2,1); _inSheet(); } return; }
+    if(e.target.closest('[data-inparse]')){ const ta=document.getElementById('inBulk'); _inS.bulk=_inBulkParse(ta?ta.value:''); _inSheet(); return; }
+    if(e.target.closest('[data-inbulkgo]')){ const n2=_inBulkCommit(_inS.bulk||[]);
+      try{ _bfToast(n2+' record'+(n2===1?'':'s')+' added'); }catch(_){} _inS.bulk=null; _inSheet(); return; }
     const t=e.target.closest('[data-odsel]');
     if(t){ selectSite(t.getAttribute('data-odsel')); return; }
     const gsw=e.target.closest('[data-ogsel]');           // re-aim the chain at another org HERE
@@ -9253,7 +9291,8 @@ function _ldTabs(){
 }
 function _ledgerHTML(){
   const esc=_odEsc, escA=_odEscA;
-  let h='<div class="ld-head"><div class="ld-title">▤ Repository</div><span class="od-sp"></span>'
+  let h='<div class="ld-head"><div class="ld-title">▤ Repository</div>'
+    +'<button class="rc-action" type="button" data-inopen="1" title="Rapid entry and bulk paste">⚡ Intake</button><span class="od-sp"></span>'
     +'<button class="od-ico od-ico-x" type="button" data-ldclose="1" aria-label="Close">✕</button></div>';
   h+=_ldTabs();
   if(_ldTab==='views') return h+'<div class="ld-pane">'+_shPaneShelf('sv','sv')+'</div>';
@@ -9307,6 +9346,165 @@ function _ledgerEl(){
   }
   return el;
 }
+
+// ═══ v2.6.0 THE INTAKE (V2 pillar 2 — owner: "Need to figure out how we want
+// to move at scale when creating records... Fluidity of data entry"). One
+// keyboard-first surface: pick the installation once (type-ahead over bases
+// AND units — a unit resolves to its post), pick the kind once, then
+// name → detail → Enter, again and again — the site and kind are STICKY
+// across entries. A tape of this session's last ten sits under the form: one
+// tap reopens any entry in the real record editor, ✕ undoes it. BULK PASTE
+// closes the loop with the roster: the SAME columns the XLSX Records sheet
+// exports (Installation ⇥ Kind ⇥ Name ⇥ Detail ⇥ Tag) paste back in — TSV
+// from a spreadsheet, previewed row by row, unresolved rows flagged and left
+// out, never guessed. Everything lands through recAdd, so the cloud board
+// (and the v2.7.0 shared workspace) carries it like any other edit.
+let _inS={ site:null, kind:'people', q:'', tape:[], bulk:null };
+function _inResolve(q){
+  const f=_srFold(q); if(!f) return [];
+  const out=[];
+  _sitesArr().forEach(function(s2){
+    if(out.length<8 && _srFold(s2.base+' '+(s2.st||'')).indexOf(f)>=0) out.push({id:s2.id, n:s2.base, sub:s2.st||'', via:null});
+  });
+  (A1ORGS||[]).forEach(function(o){
+    if(out.length>=8) return;
+    if(_srFold(o.name).indexOf(f)<0) return;
+    const sid=(typeof ogEffSite==='function')?ogEffSite(o.id):null; if(!sid) return;
+    const s2=siteById(sid); if(!s2) return;
+    out.push({id:s2.id, n:s2.base, sub:s2.st||'', via:o.name});
+  });
+  return out;
+}
+function _inResolveExact(txt){
+  const f=_srFold(txt); if(!f) return null;
+  const hit=_sitesArr().find(function(s2){ return _srFold(s2.base)===f; });
+  if(hit) return hit.id;
+  const orgs=(A1ORGS||[]).filter(function(o){ return _srFold(o.name)===f; });
+  if(orgs.length===1){ const sid=ogEffSite(orgs[0].id); if(sid) return sid; }
+  const subs=_sitesArr().filter(function(s2){ return _srFold(s2.base).indexOf(f)>=0; });
+  if(subs.length===1) return subs[0].id;
+  return null;                                   // ambiguous or unknown: flagged, never guessed
+}
+const IN_KINDMAP={ people:'people', person:'people', contact:'people', contacts:'people', poc:'people',
+  specs:'specs', spec:'specs', technical:'specs', tech:'specs', detail:'specs',
+  notes:'notes', note:'notes', links:'links', link:'links', url:'links', web:'links' };
+function _inKind(txt){ return IN_KINDMAP[_srFold(txt).replace(/[^a-z]/g,'')]||null; }
+function _inItem(kind, name, detail){
+  if(kind==='people') return {name:name, role:detail||''};
+  if(kind==='specs') return {label:name, value:detail||''};
+  if(kind==='links'){ const u=recordURL(detail||name); return u?{label:name, url:u}:null; }
+  return {text: detail?(name+' — '+detail):name};
+}
+function _inCommit(kind, name, detail){
+  if(!_inS.site) return null;
+  const item=_inItem(kind, name, detail); if(!item) return null;
+  const rid=recAdd(_inS.site, kind, item);
+  if(rid){ _inS.tape.unshift({site:_inS.site, kind:kind, rid:rid, label:name}); _inS.tape=_inS.tape.slice(0,10); }
+  return rid;
+}
+function _inBulkParse(text){
+  const rows=[];
+  String(text||'').split(/\r?\n/).forEach(function(line){
+    if(!line.trim() || rows.length>=200) return;
+    const cells=line.indexOf('\t')>=0 ? line.split('\t') : line.split(',');
+    const c=cells.map(function(x){ return String(x||'').trim().replace(/^"|"$/g,''); });
+    if(/^installation$/i.test(c[0]||'') && /^kind$/i.test(c[1]||'')) return;   // the roster's own header row
+    const sid=_inResolveExact(c[0]||''), k=_inKind(c[1]||'');
+    rows.push({ site:c[0]||'', kind:c[1]||'', name:c[2]||'', detail:c[3]||'', tag:c[4]||'',
+      sid:sid, k:k, ok:!!(sid && k && (c[2]||'').length) });
+  });
+  return rows;
+}
+function _inBulkCommit(rows){
+  let n=0;
+  (rows||[]).forEach(function(r){
+    if(!r.ok) return;
+    const item=_inItem(r.k, r.name, r.detail);
+    if(!item){ r.ok=false; return; }
+    if(r.tag) item.xid=r.tag;
+    if(recAdd(r.sid, r.k, item)) n++;
+  });
+  return n;
+}
+function _inGo(){
+  const f1=document.getElementById('inF1'), f2=document.getElementById('inF2');
+  const name=(f1&&f1.value||'').trim(), det=(f2&&f2.value||'').trim();
+  if(!_inS.site){ try{ _bfToast('Pick the installation first'); }catch(_){} return; }
+  if(!name){ if(f1) f1.focus(); return; }
+  if(_inS.kind==='links' && !recordURL(det||name)){ try{ _bfToast('Links need a valid http(s) address'); }catch(_){} if(f2) f2.focus(); return; }
+  if(!_inCommit(_inS.kind, name, det)){ try{ _bfToast('Could not save that entry'); }catch(_){} return; }
+  _inSheet();                                    // re-render: fields clear, tape grows, focus returns
+}
+function _inSheet(){
+  const host=document.getElementById('dossier'); if(!host) return;
+  try{ calloutHide(); }catch(_){}
+  _odInjectCSS();
+  const esc=_odEsc, escA=_odEscA;
+  const st=_inS.site?siteById(_inS.site):null;
+  const K=RC_KINDS[_inS.kind];
+  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
+  h+='<div class="od-head od-head-slim"><div class="od-name">⚡ Intake</div><span class="od-sp"></span>'
+    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>';
+  h+='<div class="od-sub">Rapid entry — the installation and kind stay put; Enter saves and readies the next.</div>';
+  if(st){ h+='<div class="co-pile"><span class="co-pilelbl">Filing to</span>'
+    +'<button type="button" class="co-pilechip" data-insiteclear="1" title="Change installation">'+esc(st.base)+(st.st?(' · '+st.st):'')+' ✕</button></div>'; }
+  else{
+    h+='<input class="rc-in" id="inSiteQ" type="search" placeholder="Installation or unit — type to find" value="'+escA(_inS.q)+'" autocomplete="off" autocapitalize="off" spellcheck="false">';
+    const hits=_inS.q?_inResolve(_inS.q):[];
+    if(hits.length) h+='<div class="bf-picklist">'+hits.map(function(x){
+      return '<button class="bf-pickrow" type="button" data-insite="'+escA(x.id)+'">'+esc(x.n)+(x.sub?(' · '+x.sub):'')+(x.via?(' — via '+esc(x.via)):'')+'</button>'; }).join('')+'</div>';
+    else if(_inS.q) h+='<div class="rc-note">No installation or unit matches.</div>';
+  }
+  h+='<div class="rc-filters">'+Object.keys(RC_KINDS).map(function(k){
+    return '<button class="rc-action'+(k===_inS.kind?' on':'')+'" type="button" data-inkind="'+k+'">'+RC_KINDS[k].n+'</button>'; }).join('')+'</div>';
+  h+='<input class="rc-in" id="inF1" type="text" placeholder="'+escA(K.f1)+'" autocomplete="off">'
+    +(K.f2?('<input class="rc-in" id="inF2" type="text" placeholder="'+escA(K.f2)+' — Enter saves" autocomplete="off">'):'')
+    +'<button class="bf-act bf-addsub" type="button" data-incommit="1">Save · next</button>';
+  if(_inS.tape.length){
+    h+='<div class="bf-subhead">Just added · tap to edit · ✕ undoes</div>';
+    h+=_inS.tape.map(function(t2,i){ const s2=siteById(t2.site);
+      return '<div class="ld-org"><button class="ld-orgbtn" type="button" data-intape="'+i+'">'+esc(t2.label)+' — '+esc((s2?s2.base:'')+' · '+RC_KINDS[t2.kind].n)+'</button>'
+        +'<button class="od-ico" type="button" data-intapex="'+i+'" aria-label="Undo this entry">✕</button></div>'; }).join('');
+  }
+  h+='<details class="bf-layout"'+(_inS.bulk?' open':'')+'><summary>⇥ Bulk paste — rows from a spreadsheet</summary>'
+    +'<div class="rc-note">Columns: Installation ⇥ Kind ⇥ Name ⇥ Detail ⇥ Tag — the same table the Excel roster exports.</div>'
+    +'<textarea class="rc-in" id="inBulk" rows="4" placeholder="Paste rows, then Preview"></textarea>'
+    +'<button class="bf-act" type="button" data-inparse="1">Preview</button>';
+  if(_inS.bulk){
+    const ok=_inS.bulk.filter(function(r){ return r.ok; }).length, bad=_inS.bulk.length-ok;
+    h+='<div class="bf-subhead">'+ok+' ready'+(bad?(' · '+bad+' flagged — unknown installation or kind; they stay out'):'')+'</div>';
+    h+='<div class="bf-picklist">'+_inS.bulk.slice(0,30).map(function(r){
+      return '<div class="ld-org'+(r.ok?'':' in-bad')+'"><span class="ld-orgbtn">'+(r.ok?'✓':'✗')+' '+esc((r.name||'?')+' — '+(r.site||'?')+' · '+(r.kind||'?'))+'</span></div>'; }).join('')
+      +(_inS.bulk.length>30?('<div class="rc-note">… '+(_inS.bulk.length-30)+' more</div>'):'');
+    h+='</div>';
+    if(ok) h+='<button class="bf-act bf-addsub" type="button" data-inbulkgo="1">Add '+ok+' record'+(ok===1?'':'s')+'</button>';
+  }
+  h+='</details>';
+  const _kept=(host.className.match(/dz-(peek|half|full)/)||[])[1];
+  host.innerHTML=h;
+  host.classList.remove('dz-peek'); host.classList.add(_kept==='full'?'dz-full':'dz-half');
+  host.hidden=false;
+  _sheetFlag();
+  try{ const q0=document.getElementById('inSiteQ'), f1=document.getElementById('inF1');
+    if(!_inS.site && q0) q0.focus(); else if(f1) f1.focus(); }catch(_){}
+}
+try{ window.Intake={ open:_inSheet, resolve:_inResolveExact, kind:_inKind, parse:_inBulkParse,
+  commit:_inCommit, bulk:_inBulkCommit, state:function(){ return _inS; } }; }catch(_){}
+// the intake's live wires: type-ahead input (debounced re-render) and the
+// Enter ladder (first field advances, last field saves)
+try{
+  document.addEventListener('input', function(e){
+    if(e.target && e.target.id==='inSiteQ'){ _inS.q=e.target.value;
+      clearTimeout(window._inQT); window._inQT=setTimeout(function(){ _inSheet(); }, 140); }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key!=='Enter' || !e.target) return;
+    if(e.target.id==='inF1'){ e.preventDefault(); const f2=document.getElementById('inF2'); if(f2) f2.focus(); else _inGo(); }
+    else if(e.target.id==='inF2'){ e.preventDefault(); _inGo(); }
+    else if(e.target.id==='inSiteQ'){ const first=document.querySelector('#dossier [data-insite]'); if(first){ e.preventDefault(); first.click(); } }
+  });
+}catch(_){}
+
 function _ledgerRender(){
   const el=_ledgerEl(); const p=el.querySelector?el.querySelector('.ld-panel'):null;
   if(p) p.innerHTML=_ledgerHTML();
@@ -9323,6 +9521,7 @@ function _repoDoorSync(open){
 function _ledgerTap(e){
   const t=e.target; if(!t||!t.closest) return;
   if(t.closest('[data-ldclose]')){ _ledgerClose(); return; }
+  if(t.closest('[data-inopen]')){ _ledgerClose(); _inSheet(); return; }   // v2.6.0 THE INTAKE — one surface at a time
   const sl=t.closest('[data-ldsel]');
   if(sl){ const k=sl.getAttribute('data-ldsel'); _ldSel=(_ldSel===k)?null:k; _ledgerRender(); return; }
   const ed=t.closest('[data-ldedit]');

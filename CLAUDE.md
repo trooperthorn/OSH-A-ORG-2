@@ -2188,3 +2188,23 @@ It lives here now.
   parts parse, openpyxl opens the workbook with full row counts and
   ampersand names intact; the export row itself fires the download.
 - Byte delta: +9,750 (751,010 · 81.5% of the gate).
+
+## v2.6.0 — the intake (V2 pillar 2 opens; owner: fluid data entry at scale)
+- ONE KEYBOARD-FIRST SURFACE: sticky installation (type-ahead over bases AND
+  units — a unit resolves to its post via ogEffSite) + sticky kind, then
+  name → detail → Enter in a loop; focus returns to the first field after
+  every save. The tape (session's last ten) makes corrections one tap
+  (reopen in the real editor) or one ✕ (undo via recRemove). The ⚡ door
+  lives in the Repository head and CLOSES the Repository first — the ledger
+  covered the sheet's picklist on a phone (caught live, not in the stub).
+- THE ROSTER ROUND-TRIP: bulk paste speaks exactly the columns the XLSX
+  Records sheet exports (Installation ⇥ Kind ⇥ Name ⇥ Detail ⇥ Tag) — out
+  and in are the same table. TSV first (spreadsheet paste), naive CSV
+  fallback, 200-row cap, the roster's own header row skipped.
+- RESOLUTION NEVER GUESSES: exact base fold-match, then unique unit name,
+  then unique base fragment — anything ambiguous returns null and the row
+  is FLAGGED AND LEFT OUT, visibly. Loosening ===1 to >=1 fired the probe.
+- Everything lands through recAdd — normalization, persistence, dbPush and
+  the v2.7.0 workspace all see intake entries as ordinary edits. API:
+  window.Intake (open/resolve/kind/parse/commit/bulk/state).
+- Byte delta: +13,019 (764,029 · 82.9% of the gate).

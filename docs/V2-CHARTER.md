@@ -150,8 +150,8 @@ on the export tap only — the Supabase pattern — with the owner's sanction.
 | v2.3.0 | 3 | THE HAND (drag to reorder / re-chain) | **shipped** |
 | v2.4.0 | 4 | PPTX deck export | **shipped** |
 | v2.5.0 | 4 | XLSX roster | **shipped** |
-| v2.6.0 | 2 | Intake surface + bulk paste | next build |
-| v2.7.0 | 2 | Shared workspace (Supabase) | **blocked on RULING A** |
+| v2.6.0 | 2 | Intake surface + bulk paste | **shipped** |
+| v2.7.0 | 2 | Shared workspace (Supabase) | next build — RULING A: approved (shared) |
 
 ## Rulings owed by the owner
 
