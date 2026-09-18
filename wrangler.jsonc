@@ -5,9 +5,26 @@
   "observability": {
     "enabled": true
   },
+  // v2.8.0: "main" + the "binding" below turn this from a static-assets-only
+  // Worker into one with its own fetch handler (worker.js), which defers to
+  // the ASSETS binding for every request it does not own (index.html, sw.js,
+  // data/*.json — unchanged). Needed for the two /api/live-* routes; see
+  // worker.js's header comment for why this could not be a Pages Function.
+  "main": "worker.js",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "binding": "ASSETS"
   },
+  // v2.8.0: KV namespace for the live-assets snapshot (see worker.js). "id" is
+  // a placeholder — Sean must run `wrangler kv namespace create LIVE_ASSETS`
+  // and paste the real id here before this deploys; see the final report /
+  // commit message for the exact command list.
+  "kv_namespaces": [
+    {
+      "binding": "LIVE_ASSETS",
+      "id": "REPLACE_WITH_REAL_KV_NAMESPACE_ID"
+    }
+  ],
   "compatibility_flags": [
     "nodejs_compat"
   ]

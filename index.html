@@ -1765,6 +1765,29 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.8.0  • LIVE ASSETS (manual toggle in the Layers pop-out, beside
+//            Labels): polls same-origin GET /api/live.json every ~18s for
+//            a JSON snapshot pushed by an external poller (swis-live-poller,
+//            a separate LAN-side repo bridging an internal-only SolarWinds
+//            SWIS server — never reachable from this public PWA directly)
+//            and plots each returned {lat,lon} as a small pulsing violet
+//            dot, visually distinct from both the gold/tan site markers and
+//            every brief tier color (never green — green stays status-only,
+//            per law). A city-geocoded asset (source starting "city:") gets
+//            a dimmer, larger halo instead of a sharp dot — it is a city
+//            centroid, not the asset's real position, and the treatment
+//            says so without needing a popup. Off by default, same as every
+//            other foreign/network surface in this app; toggling it on is
+//            the only thing that starts the poll, and toggling off clears
+//            both the timer and the drawn layer so nothing stale lingers.
+//            No endpoint yet (poller not running) draws nothing and logs
+//            nothing — the same "quiet until data exists" contract the org
+//            fetch already keeps. Reuses _fetchRetry (drops retrying on a
+//            4xx, so a missing endpoint is one quiet attempt, not a storm),
+//            the existing _projectLonLat/_visibleLonLat/globeMetrics
+//            projection math (m1-geom, unmodified), and the Layers pop-out's
+//            existing ly-cb checkbox markup (m5-markers) — no new UI system.
+//            Byte cost stated in the v2.8.0 commit.
 //   v2.7.0  • THE WORKSPACE (V2 pillar 2 closes — THE V2 PROGRAM IS COMPLETE;
 //            owner ruling: "Go with supabase"). The board graduates from
 //            backup to SHARED TEAM WORKSPACE with roles enforced in the
@@ -2081,8 +2104,8 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.7.0';
-const APP_UPDATED = '17 September 2026';
+const APP_VERSION = 'v2.8.0';
+const APP_UPDATED = '18 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
 // on every controller change). If the worker is NEWER than this page, the
@@ -2520,6 +2543,11 @@ function startGlobeLoop(cv){
     if(GlobeState.sel!=null){
       if(!GlobeState._lp || performance.now()-GlobeState._lp>70){ GlobeState.dirty=true; GlobeState._lp=performance.now(); }
     }
+    // v2.8.0 LIVE ASSETS pulse — same throttle idea as the selection pulse
+    // above, slower (~7fps) since it is a background layer, not a focus.
+    if(GlobeState._liveOn){
+      if(!GlobeState._lpLive || performance.now()-GlobeState._lpLive>140){ GlobeState.dirty=true; GlobeState._lpLive=performance.now(); }
+    }
     if(GlobeState.dirty){ drawGlobe(cv, ctx); GlobeState.dirty=false;
       try{ if(window._coTrack) _coTrack(); }catch(_){}   // the callout rides its dot
       try{ if(window._bfLeaderTrack) _bfLeaderTrack(); }catch(_){}   // v1.15.0: the chart leader rides too
@@ -2600,6 +2628,9 @@ function drawGlobe(cv, ctx){
   }
   // m5 owns every marker/label/link/brief overlay (A-ORG-1: drawGlobeMarkers et al).
   if(typeof drawMarkersHook==='function') drawMarkersHook(ctx, m);
+  // v2.8.0 LIVE ASSETS — manual-toggle layer, drawn last so it rides above
+  // every static marker; off (GlobeState._liveOn false) draws nothing.
+  if(GlobeState._liveOn && typeof _drawLiveAssets==='function'){ try{ _drawLiveAssets(ctx, m); }catch(_){} }
   ctx.restore();
 }
 
@@ -3354,6 +3385,14 @@ function _lyRingPaint(){
     h+='<button type="button" class="ly-cb'+(nmOn?' on':'')+'" data-lyvw="names" role="checkbox"'
       +' aria-checked="'+(nmOn?'true':'false')+'"><span class="ly-bx"></span>'
       +'<span class="ly-nm">Labels</span></button>';
+    // v2.8.0 LIVE ASSETS — same ly-cb pattern as Labels above, not a new control
+    // type. n is the live count when the layer is on and has polled at least
+    // once; 0/blank otherwise, matching how the family checkboxes read before
+    // their first count is known.
+    const lvOn=!!GlobeState._liveOn, lvN=(GlobeState._liveAssets||[]).length;
+    h+='<button type="button" class="ly-cb'+(lvOn?' on':'')+'" data-lyvw="live" role="checkbox"'
+      +' aria-checked="'+(lvOn?'true':'false')+'"><span class="ly-bx"></span>'
+      +'<span class="ly-nm">Live Assets</span>'+(lvOn?('<span class="ly-n">'+lvN+'</span>'):'')+'</button>';
     host.innerHTML=h;
     host.hidden=false;
   }catch(_){}
@@ -3378,9 +3417,82 @@ function lyFam(k){
   renderLegend(); lySync(); try{ globeMark(); }catch(_){}
 }
 function lyView(v){
+  if(v==='live'){ liveAssetsToggle(); renderLegend(); lySync(); return; }
   const f={names:'_namesOff'}[v]; if(!f) return;
   GlobeState[f]=!GlobeState[f];
   renderLegend(); lySync(); try{ globeMark(); }catch(_){}
+}
+// ═══ v2.8.0 LIVE ASSETS ═══ a manual-toggle layer (Layers pop-out, beside
+// Labels) that polls a same-origin endpoint for live vehicle/train GPS
+// positions and plots them on the globe. The endpoint is filled by a separate
+// LAN-side poller (swis-live-poller) bridging an internal-only SolarWinds
+// SWIS server; this app never talks to SWIS, only to its own Cloudflare
+// Pages Function (functions/api/live.js), so nothing here needs a SWIS
+// credential or reaches past this origin. Off by default — the same "zero
+// foreign/network surface until a manual act" law Connect follows — and
+// toggling off tears the timer down so nothing polls in the background.
+const LIVE_POLL_MS=18000;
+const LIVE_ENDPOINT='api/live.json';
+let _liveTimer=null;
+function liveAssetsToggle(){
+  GlobeState._liveOn=!GlobeState._liveOn;
+  if(GlobeState._liveOn) _liveStart(); else _liveStop();
+}
+function _liveStart(){
+  _liveFetch();
+  if(_liveTimer) clearInterval(_liveTimer);
+  _liveTimer=setInterval(_liveFetch, LIVE_POLL_MS);
+}
+function _liveStop(){
+  if(_liveTimer){ clearInterval(_liveTimer); _liveTimer=null; }
+  GlobeState._liveAssets=[];
+  try{ globeMark(); }catch(_){}
+}
+async function _liveFetch(){
+  if(!GlobeState._liveOn) return;   // toggled off while a fetch was in flight
+  try{
+    const r=await _fetchRetry(LIVE_ENDPOINT, 1);   // one try: a missing poller is not a network blip to hammer
+    if(!r || !r.ok) return;
+    const body=await r.json();
+    GlobeState._liveAssets=(body && Array.isArray(body.assets))?body.assets:[];
+  }catch(_){
+    // No endpoint yet (poller not deployed or not running), or a transient
+    // network hiccup — quiet either way, same contract as the org fetch
+    // having nothing to show. The layer just stays at its last-known set.
+  }
+  try{ globeMark(); }catch(_){}
+}
+// Drawn from drawGlobe() right after drawMarkersHook, inside the same sphere
+// clip. Reuses m1-geom's projection untouched — no parallel math. A pulsing
+// violet dot (207,168,255) is the "live/moving" visual: distinct from the
+// warm gold/tan site-marker family (base/hq/depot/usace/guard, all warm),
+// distinct from every locked brief-tier color (t1 white, t2 cool #6FC7E8,
+// t3 warm #FFC95C, t4 rose #FF8FC0), and never green (--ok is status-only,
+// law). A city-geocoded asset (source starts "city:" — see swis-live-poller's
+// README) gets a larger, dimmer, non-pulsing halo instead of a sharp dot:
+// cheap enough to be worth doing, and it reads as "approximate" without a tap.
+function _drawLiveAssets(ctx, m){
+  const assets=GlobeState._liveAssets; if(!assets || !assets.length) return;
+  const t=(typeof performance!=='undefined')?performance.now():0;
+  const pulse=0.55+0.45*Math.sin(t/420);
+  for(let i=0;i<assets.length;i++){
+    const a=assets[i];
+    const lat=+a.lat, lon=+a.lon;
+    if(!isFinite(lat) || !isFinite(lon)) continue;
+    if(!_visibleLonLat(lon, lat, 0)) continue;
+    const p=_projectLonLat(lon, lat, m);
+    const approx=typeof a.source==='string' && a.source.indexOf('city:')===0;
+    if(approx){
+      ctx.beginPath(); ctx.arc(p[0], p[1], 7.5, 0, Math.PI*2);
+      ctx.fillStyle='rgba(207,168,255,.16)'; ctx.fill();
+      ctx.lineWidth=1; ctx.strokeStyle='rgba(207,168,255,.45)'; ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(p[0], p[1], 5.5*pulse, 0, Math.PI*2);
+      ctx.fillStyle='rgba(207,168,255,'+(0.10+0.10*pulse)+')'; ctx.fill();
+      ctx.beginPath(); ctx.arc(p[0], p[1], 3, 0, Math.PI*2);
+      ctx.fillStyle='rgba(207,168,255,.95)'; ctx.fill();
+    }
+  }
 }
 // A search hit for a hidden family used to draw only while selected and then
 // vanish with no explanation — across 166 of 285 sites at first run. Gated on

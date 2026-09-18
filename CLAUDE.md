@@ -2238,3 +2238,55 @@ It lives here now.
   their saves fail SAFELY (dirty stays, local cache holds everything)
   until the SW rolls them forward.
 - Byte delta: +2,942 (766,971 · 83.2% of the gate; the orphaned .db-sql rule left with its block).
+
+## v2.8.0 — live assets (a manual-toggle layer fed by an external LAN poller)
+- SWIS never touches this app. A separate repo, swis-live-poller, runs on the
+  owner's LAN where his SolarWinds SWIS server is reachable (SWIS is not and
+  will never be internet-facing) and pushes a JSON snapshot outbound over
+  HTTPS with a bearer token. This app only ever talks to its own origin's
+  `/api/live.json`; no SWIS host, credential, or protocol detail exists
+  anywhere in this repo.
+- WORKERS, NOT PAGES: this repo deploys as a Cloudflare Worker with a static-
+  assets binding (Workers Builds, auto-deploy on push to main — docs/
+  HANDOFF-CHATGPT.md §8), not classic Cloudflare Pages. The "Pages Functions"
+  `functions/api/*.js` convention this feature was first scoped against does
+  not run here at all — there is no Pages project. The real backend is
+  `worker.js`, wired through `wrangler.jsonc`'s new `"main"` field, which
+  handles `/api/live-ingest` (POST, bearer-token-checked, writes KV) and
+  `/api/live.json` (GET, public, `Cache-Control: public, max-age=5`) and
+  defers everything else to the `ASSETS` binding unchanged. Anyone reusing
+  this pattern: check the actual deploy shape (`wrangler.jsonc`'s `assets`
+  block, and whether a `functions/` convention is even wired up) before
+  assuming Pages Functions — the two are not interchangeable here.
+- OFF BY DEFAULT, SAME LAW AS CONNECT: `GlobeState._liveOn` starts false.
+  Nothing polls, nothing draws, until the owner taps Live Assets in the
+  Layers pop-out (same `ly-cb` markup as every family checkbox and Labels —
+  no new UI system, single-brain law held). Toggling off clears the poll
+  timer AND the drawn set; nothing lingers stale.
+- NO NEW PROJECTION MATH: `_drawLiveAssets` reuses `_projectLonLat`,
+  `_visibleLonLat` and `globeMetrics` from m1-geom untouched, called from
+  `drawGlobe` right after `drawMarkersHook` inside the same sphere clip.
+- THE VISUAL IS DELIBERATELY NOT A TIER COLOR: a pulsing violet dot
+  (`rgba(207,168,255,…)`) — distinct from the warm gold/tan site-marker
+  family, distinct from all four locked brief-tier colors (t1 white, t2
+  `#6FC7E8`, t3 `#FFC95C`, t4 `#FF8FC0`), and never green (`--ok` stays
+  status-only, law untouched). A `"city:"`-sourced asset (geocoded from a
+  place name, not real coordinates — see swis-live-poller's README) gets a
+  larger, dimmer, non-pulsing halo instead, so the approximation reads
+  without a tap.
+- NO DATA YET IS QUIET, NOT AN ERROR: `_liveFetch` calls `_fetchRetry` with a
+  single try (a missing poller is a config fact, not a network blip to
+  retry), and a fetch failure of any kind just leaves the layer at its last
+  known set — same contract the org fetch already keeps toward the user.
+- KV NAMESPACE ID IS A PLACEHOLDER: `wrangler.jsonc`'s `kv_namespaces[0].id`
+  is `REPLACE_WITH_REAL_KV_NAMESPACE_ID` until the owner runs `wrangler kv
+  namespace create LIVE_ASSETS` himself (wrangler was not authenticated in
+  the environment that shipped this). Deploying before that edit lands will
+  fail at the KV binding, loudly, not silently.
+- Byte delta: +18,090 (785,061 · 85.2% of the gate). Verified: all eleven CI
+  tools green locally (data-lint, harness_globe, smoke_runtime, ship-lint,
+  dead-lint, brief-scale-check, brief-support-check, ux-navigation-check,
+  ux-persistence-check, ux-records-check, ux-search-check). NOT verified:
+  the live poll against a real deployed Worker + KV + a real swis-live-poller
+  push — the owner does not yet have the KV namespace created or the
+  `LIVE_PUSH_TOKEN` secret set, so this has never round-tripped end to end.
