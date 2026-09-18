@@ -2369,3 +2369,29 @@ It lives here now.
   the IIS/ARR steps in the README (no Windows IIS host available either) —
   both are documented from IIS/ARR's standard, well-established pattern, not
   from an actual run against the owner's infrastructure.
+- A FOLLOW-UP VERIFICATION PASS (same v2.9.0, no code change) went further
+  on `local-server/server.js` directly, since neither Docker nor IIS exists
+  in this environment: `docker`/`docker compose` are not on PATH here, and
+  IIS's `W3SVC` service does not exist on this machine even though a leftover
+  `inetsrv` folder does (the role was never actually installed), so the
+  Docker build and the IIS/ARR reverse-proxy setup remain unverified against
+  real Docker or real IIS. What running `node local-server/server.js`
+  directly with a real Node did confirm: `data/sites.json` also serves
+  correctly (not just `index.html`/`sw.js`), a malformed ingest body (missing
+  the `{"assets": [...]}` wrapper) is rejected with 400 rather than silently
+  accepted, a wrong bearer token is rejected the same as no token (401,
+  not a different code that could leak whether a token was close), the
+  pushed snapshot is written to `LIVE_DATA_DIR` and survives a server
+  restart (confirms the Dockerfile's `VOLUME ["/data"]` has something real
+  to persist, not just an empty mount point), and a `../../../Windows/win.ini`
+  path-traversal probe against the static handler returns 404, not the file.
+  Also confirmed `swis-live-poller`'s `poller.py` posts `{"assets": [...]}`
+  (grepped its `requests.post` call), matching what the ingest route expects
+  — the two repos agree on the wire format as shipped. `LIVE_PUSH_TOKEN` is
+  not issued by anything: it is an arbitrary shared secret the owner
+  generates once (e.g. `openssl rand -base64 32`) and sets identically on
+  both sides — the local server (or Cloudflare, if still used) as
+  `LIVE_PUSH_TOKEN`, and the poller as `PUSH_TOKEN` — the README's env-var
+  table names this but did not spell out that it is self-chosen rather than
+  assigned, which is worth remembering if a future pass tightens that
+  wording.

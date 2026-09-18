@@ -136,6 +136,16 @@ reach the local Node process on port 8080. Point `swis-live-poller` at
 | `LIVE_PUSH_TOKEN` | `local-server/server.js`, `worker.js` (as a Cloudflare secret) | unset | bearer token `swis-live-poller` must send; unset = ingest always refused (500), read/static still work |
 | `LIVE_DATA_DIR` | `local-server/server.js` | `local-server/.data` (Docker: `/data`) | where the last-pushed live-assets snapshot is stored |
 
+`LIVE_PUSH_TOKEN` is not issued by anything and there is no registration step.
+It is an arbitrary shared secret you generate yourself once (`openssl rand
+-base64 32`, or equivalent) and set identically in two places: as
+`LIVE_PUSH_TOKEN` here (or as the Cloudflare secret if still deploying
+there), and as `PUSH_TOKEN` in `swis-live-poller`'s environment. Anyone who
+has both the URL and this value can push a live-assets snapshot, so treat it
+like a password — keep it out of any committed file, which is already the
+case here since every example above reads it from the environment rather
+than hardcoding it.
+
 ### What did NOT change
 
 `index.html`'s `_liveFetch()`/`liveAssetsToggle()` and the whole Live Assets
