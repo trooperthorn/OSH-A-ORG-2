@@ -1,0 +1,3 @@
+# local-server runtime state — never commit a pushed live-assets snapshot
+local-server/.data/
+node_modules/

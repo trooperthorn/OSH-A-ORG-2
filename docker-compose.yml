@@ -1,0 +1,25 @@
+# A-ORG-2 local hosting — see local-server/README section in the repo README
+# for the full Docker + IIS write-up. Build context is the repo root (this
+# file's directory) so the image can copy the whole static site + server.
+services:
+  a-org-2:
+    build:
+      context: .
+      dockerfile: local-server/Dockerfile
+    image: a-org-2-local:latest
+    container_name: a-org-2
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # REQUIRED for the swis-live-poller push to work — pick your own value
+      # and give the same one to the poller's config. Leaving this unset is
+      # safe (the app still serves and boots; /api/live-ingest just refuses
+      # every push with a 500 until a token is set).
+      - LIVE_PUSH_TOKEN=${LIVE_PUSH_TOKEN:-}
+    volumes:
+      # persists the last-pushed live-assets snapshot across container restarts
+      - a-org-2-live-data:/data
+
+volumes:
+  a-org-2-live-data:

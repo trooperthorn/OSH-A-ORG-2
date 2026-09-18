@@ -31,12 +31,11 @@ function fixture(source) {
   const statusNode = { textContent: '', getAttribute() { return 'probe'; } };
   const context = {
     Date: class extends Date { static now() { return clock; } },
-    RECORDS: Object.create(null), _recReceipts: Object.create(null), _recCloud: Object.create(null),
-    _rdb: null, _db: null, _dbCfg: null, _dbState: 'off', _dbMsg: '',
-    _dbPushT: null, _dbDirty: false, _dbPushBusy: false, _dbRetryT: null,
-    _dbRetryN: 0, _dbSyncT: 0, _dbFailNet: false, _dbClientId: 'test-device',
-    _dbViewer: false,   /* v2.7.0 THE WORKSPACE: the sandbox mirrors the module's real dependency set */
-    DB_TABLE: 'a2_records', SAVEDV: [], _svMod: 0, SAVEDB: [], _sbMod: 0,
+    // v2.9.0 — the Supabase cloud-sync layer (_db*, _recCloud, DB_TABLE, the
+    // upload/retry/seed machinery) is gone entirely; RECORDS persists to
+    // IndexedDB only now, so the fixture only needs that dependency set.
+    RECORDS: Object.create(null), _recReceipts: Object.create(null),
+    _rdb: null, SAVEDV: [], _svMod: 0, SAVEDB: [], _sbMod: 0,
     navigator: { onLine: true },
     document: {
       querySelectorAll() { return [statusNode]; },
@@ -44,9 +43,6 @@ function fixture(source) {
     },
     setTimeout(callback, delay) { timers.set(++timerId, { callback, delay }); return timerId; },
     clearTimeout(id) { timers.delete(id); },
-    // This probe exercises first-device seeding. An unexpected remote-record
-    // merge must fail loudly instead of silently taking a stubbed success path.
-    _dbApply() { throw new Error('Unexpected remote-record merge in seed probe'); },
     // Export fixtures are complete records; storage migration is covered by
     // the records suite. These adapters expose only the prepared fixture data.
     recordOf(id) { return context.RECORDS[id] || null; },
@@ -59,8 +55,7 @@ function fixture(source) {
   vm.createContext(context);
   const names = [
     '_odEsc', '_odEscA', '_recPersist', '_recSave', '_recStatusText',
-    'recordSaveStatus', '_recStatusPaint', '_recCloudAck', '_recLoaded', '_dbSetState',
-    '_dbIsNet', '_dbWhy', '_dbSnapshot', 'dbPush', '_dbFlush', '_dbRetryArm', 'dbPullOnce',
+    'recordSaveStatus', '_recStatusPaint', '_recLoaded',
     '_xpRecordSnapshot', '_xpRecordBody',
   ];
   vm.runInContext(names.map(name => sourceFunction(source, name)).join('\n'), context);
@@ -88,29 +83,7 @@ function fixture(source) {
       },
     };
   }
-  function connect() {
-    const writes = [];
-    context._dbCfg = { board: 'probe-board' };
-    context._db = {
-      from(table) {
-        assert.equal(table, 'a2_records');
-        return {
-          select() { return { eq() { return { maybeSingle() { return Promise.resolve({ data: null, error: null }); } }; } }; },
-        };
-      },
-      // v2.7.0 THE WORKSPACE: every write rides the a2_save RPC (the write-code
-      // door). The fixture captures the RPC and normalizes its args to the old
-      // payload shape so every downstream assertion still reads the truth.
-      rpc(name, args) {
-        assert.equal(name, 'a2_save');
-        assert.equal(args.p_board, 'probe-board');
-        const payload = { id: args.p_board, data: args.p_data, updated_by: args.p_client };
-        return new Promise((resolve, reject) => writes.push({ payload, resolve, reject }));
-      },
-    };
-    return writes;
-  }
-  return { c: context, transactions, timers, statusNode, record, storage, connect,
+  return { c: context, transactions, timers, statusNode, record, storage,
     advance(ms = 1) { clock += ms; } };
 }
 
@@ -156,7 +129,7 @@ async function run(options = {}) {
     const f = fixture(source), r = f.record();
     f.c._recSave(r.id);
     assert.match(f.c._recStatusText(r.id), /^Session only/);
-    assert.match(f.c._recStatusText(r.id), /Not synced this session/);
+    assert.match(f.c._recStatusText(r.id), /device storage unavailable/);
     pass('unavailable IndexedDB reports session-only storage');
   }
 
@@ -176,86 +149,13 @@ async function run(options = {}) {
     pass('stale completion and error callbacks cannot certify or invalidate a newer revision');
   }
 
-  {
-    const f = fixture(source), r = f.record();
-    f.storage(); const writes = f.connect();
-    f.c._recSave(r.id); f.transactions[0].oncomplete();
-    const firstMod = r.mod, firstFlight = f.c._dbFlush();
-    assert.equal(writes.length, 1);
-    assert.equal(f.c._dbPushBusy, true);
-    assert.match(f.c._recStatusText(r.id), /Sync pending/);
-    assert.doesNotMatch(f.c._recStatusText(r.id), / · Synced /);
-    r.notes[0].text = 'Edited during upload'; f.c._recSave(r.id);
-    f.transactions[1].oncomplete();
-    assert.equal(writes[0].payload.data.records.probe.mod, firstMod);
-    assert.equal(writes[0].payload.data.records.probe.notes[0].text, 'First revision');
-    writes[0].resolve({ error: null });
-    assert.equal(await firstFlight, true);
-    assert.equal(f.c._recCloud.probe.mod, firstMod);
-    assert.match(f.c._recStatusText(r.id), /Sync pending/);
-    assert.doesNotMatch(f.c._recStatusText(r.id), / · Synced /);
-    assert.equal(f.c._dbDirty, true);
-    const secondFlight = f.c._dbFlush();
-    assert.equal(writes.length, 2);
-    assert.equal(writes[1].payload.data.records.probe.notes[0].text, 'Edited during upload');
-    writes[1].resolve({ error: null });
-    assert.equal(await secondFlight, true);
-    assert.equal(f.c._recCloud.probe.mod, r.mod);
-    assert.match(f.c._recStatusText(r.id), / · Synced /);
-    assert.equal(f.c._dbDirty, false);
-    pass('an old upload acknowledges its immutable snapshot; the newest edit needs its own successful upload');
-  }
-
-  {
-    const f = fixture(source), r = f.record();
-    const writes = f.connect(); f.c._recSave(r.id);
-    const flight = f.c._dbFlush();
-    writes[0].resolve({ error: { message: 'Failed to fetch' } });
-    assert.equal(await flight, false);
-    assert.equal(f.c._dbDirty, true);
-    assert.equal(f.c._dbPushBusy, false);
-    assert.equal(f.c._recCloud.probe, undefined);
-    assert.match(f.c._recStatusText(r.id), /Sync pending/);
-    assert.ok([...f.timers.values()].some(timer => timer.delay === 4000));
-    pass('failed upload keeps unsynced work queued for retry');
-  }
-
-  for (const changed of ['disconnect', 'board', 'client']) {
-    const f = fixture(source), r = f.record();
-    const writes = f.connect(); f.c._recSave(r.id);
-    const flight = f.c._dbFlush();
-    if (changed === 'disconnect') { f.c._db = null; f.c._dbCfg = null; }
-    else if (changed === 'board') f.c._dbCfg.board = 'other-board';
-    else f.connect();
-    writes[0].resolve({ error: null });
-    await flight;
-    assert.equal(f.c._recCloud.probe, undefined);
-    assert.doesNotMatch(f.c._recStatusText(r.id), / · Synced /);
-    pass('an upload completed after a ' + changed + ' change cannot certify the current connection');
-  }
-
-  {
-    const f = fixture(source), r = f.record();
-    r.mod = 3; f.c._recCloudAck({ probe: { mod: 3 } });
-    f.c._recCloudAck({ probe: { mod: 2 } });
-    assert.equal(f.c._recCloud.probe.mod, 3);
-    pass('out-of-order acknowledgements do not replace a newer cloud receipt');
-  }
-
-  {
-    const f = fixture(source), r = f.record();
-    const writes = f.connect();
-    const pull = f.c.dbPullOnce();
-    await new Promise(resolve => setImmediate(resolve));
-    assert.equal(writes.length, 1);
-    assert.equal(writes[0].payload.id, 'probe-board');
-    writes[0].resolve({ error: { message: 'Row-level security denied insert' } });
-    assert.equal(await pull, false);
-    assert.equal(f.c._recCloud[r.id], undefined);
-    assert.equal(f.c._dbState, 'error');
-    assert.match(f.c._dbMsg, /Row-level security denied insert/);
-    pass('first-device seed error returns false and never claims cloud acknowledgement');
-  }
+  // v2.9.0 — the cloud-upload probes that lived here (an old upload
+  // acknowledging its snapshot, failed-upload retry queuing, a stale
+  // connection never certifying a sync, out-of-order cloud acks, first-device
+  // seed error handling) are gone along with the Supabase layer they tested:
+  // dbPush/_dbFlush/dbPullOnce/_recCloudAck/_recCloud no longer exist. Local
+  // save/receipt correctness (above) and export correctness (below) are the
+  // whole surface now.
 
   {
     const f = fixture(source), r = f.record();

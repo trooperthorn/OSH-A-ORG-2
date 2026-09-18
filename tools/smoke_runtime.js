@@ -375,7 +375,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     }
   }catch(e){ fails++; console.log('✗ RECORDS probe: '+e.message); }
 
-  // ── PROBE: v1.1.0 THE ID REGISTRY + THE DATABASE DOOR ──
+  // ── PROBE: v1.1.0 THE ID REGISTRY (the database-door half of this probe was
+  //    removed in v2.9.0 — Supabase cloud sync is gone entirely, not just its
+  //    UI; see the CHANGELOG entry for what replaced it: nothing, by owner
+  //    ruling, since Records already worked fully offline via IndexedDB) ──
   try{
     let ok=true;
     // NEW auto-generates, entering an existing ID associates (never duplicates)
@@ -401,46 +404,16 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     global.Records.delId('fort-bragg','TF-EAGLE');
     const r0=global.Records.of('fort-bragg');
     if(global.Records.ids('fort-bragg').length!==1 || r0.notes[0].xid!==''){ ok=false; fails++; console.log('✗ ID delete must untag, not delete'); }
-    // the database door: boot-inert (zero foreign code), API present, sheet renders
-    if(typeof global.ensureSupabase!=='function' || !global.DB){ ok=false; fails++; console.log('✗ database door missing'); }
+    try{ global.hideDossier(); }catch(_){}
+    // v2.9.0 — zero foreign code, unconditionally now (there is no longer a
+    // manual-tap exception to prove): no Supabase surface of any kind exists.
+    if(typeof global.ensureSupabase!=='function' && typeof global.DB==='undefined'){ /* expected: both gone */ }
+    else { ok=false; fails++; console.log('✗ SUPABASE REMOVAL REGRESSED: ensureSupabase/DB reappeared'); }
     if(global.document.getElementById('sbLib') || typeof global.supabase!=='undefined'){
       ok=false; fails++; console.log('✗ ZERO-FOREIGN-CODE VIOLATION: database library present at boot'); }
-    global.DB.push();                                   // disconnected → must be a silent no-op
-    if(typeof global._dbSheet==='function'){ global._dbSheet();
-      const dzq=IDS['dossier'].innerHTML;
-      if(dzq.indexOf('dbUrl')<0 || dzq.indexOf('dbStatus')<0 || dzq.indexOf('workspace.sql')<0 || dzq.indexOf('dbCode')<0){
-        ok=false; fails++; console.log('✗ database sheet missing url/status/setup/write-code (v2.7.0 workspace contract)'); }
-    } else { ok=false; fails++; console.log('✗ _dbSheet missing'); }
-    try{ global.hideDossier(); }catch(_){}
-    // v1.2.0 board / v1.12.0 BLANK-SLATE AMENDMENT: the board carries
-    // records + views + saved briefs; the WORKING diagram left the board —
-    // an incoming brief blob (older app) must be IGNORED, and the snapshot
-    // must not carry one. Views stay newest-wins. Chip gating unchanged.
-    const snap=global._dbSnapshot();
-    if(snap.brief){ ok=false; fails++; console.log('✗ snapshot must NOT carry the working brief (blank-slate law)'); }
-    if(!snap.views || !Array.isArray(snap.views.list) || !snap.briefs || !Array.isArray(snap.briefs.list)){
-      ok=false; fails++; console.log('✗ board snapshot missing views/briefs'); }
-    const far=Date.now()+9e9;
-    global._dbApply({brief:{nodes:[{k:'cx:remote1',n:'Remote Group',p:null,t:'custom',r:null,c:'',sh:0,tx:''}],hide:[],mod:far},
-                     views:{list:[{n:'Remote view'}],mod:far}});
-    if(global.Brief.node('cx:remote1')){ ok=false; fails++; console.log('✗ remote WORKING-brief blob must be ignored (blank-slate law)'); }
-    const s2=global._dbSnapshot();
-    if(!s2.views.list.length || s2.views.list[0].n!=='Remote view'){ ok=false; fails++; console.log('✗ newer remote views did not apply'); }
-    global._dbApply({views:{list:[],mod:1}});                                   // OLDER — must be ignored
-    if(!global._dbSnapshot().views.list.length){
-      ok=false; fails++; console.log('✗ older remote views clobbered newer local state'); }
-    global._dbApply({views:{list:[],mod:far+1}});                               // clean the test view (newest wins)
-    if(typeof global.DB.chip!=='function'){ ok=false; fails++; console.log('✗ reconnect chip missing'); }
-    global.DB.chip();                                                            // no cfg → must not render
-    if(global.document.getElementById('dbChip')){ ok=false; fails++; console.log('✗ chip rendered without stored settings'); }
-    global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'a-org-2'});
-    global.DB.chip();
-    const chipEl=global.document.getElementById('dbChip');
-    if(!chipEl){ ok=false; fails++; console.log('✗ chip did not render with stored settings'); }
-    else { try{ chipEl.remove(); }catch(_){} }
-    global.DB._setCfg(null);
-    if(ok) console.log('  ✓ board carries views+briefs (working brief OFF the board — blank-slate law) · reconnect chip gated on stored settings');
-  }catch(e){ fails++; console.log('✗ ID/DB probe: '+e.message); }
+    if(typeof global._dbSheet!=='undefined'){ ok=false; fails++; console.log('✗ SUPABASE REMOVAL REGRESSED: _dbSheet reappeared'); }
+    if(ok) console.log('  ✓ NEW/associate/dedupe · items tag+count by ID · records nest under Overview/Records · delete untags not deletes · no database-door surface remains');
+  }catch(e){ fails++; console.log('✗ ID probe: '+e.message); }
 
   // ── PROBE: v0.13.0 the HAND-BUILT brief — members only, derived L1-L4,
   //           group eyes + depth filter, picker, snapshot rows, export ──
@@ -742,24 +715,25 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       const recNode=(global.Briefs.list()[0].nodes||[]).find(function(n){ return n.k===ih.k; });
       if(!recNode || !recNode.inv || recNode.inv.length!==2){ wok=false; fails++; console.log('✗ INV must ride the saved brief record on its node'); }
       if(nm!=='Test Shelf Brief' || global.Briefs.list().length<1 || global.Briefs.list()[0].n!=='Test Shelf Brief'){ wok=false; fails++; console.log('✗ SAVED BRIEF capture failed'); }
-      if(!(global._dbSnapshot().briefs && global._dbSnapshot().briefs.list.length>=1)){ wok=false; fails++; console.log('✗ SAVED BRIEFS must ride the board snapshot'); }
       global.Brief.remove(ih.k);
       if(global.bfNode(ih.k)){ wok=false; fails++; console.log('✗ probe setup: group did not remove'); }
       if(!global.Briefs.load(0)){ wok=false; fails++; console.log('✗ SAVED BRIEF load refused'); }
       const back=global.bfNode(ih.k);
       if(!back || !back.inv || back.inv.length!==2){ wok=false; fails++; console.log('✗ SAVED BRIEF load must restore the node WITH its inventory'); }
-      // board merge: a NEWER remote shelf replaces, an older one is ignored
-      global._dbApply({briefs:{list:[{n:'Remote Shelf', ts:1, nodes:[], hide:[], vert:[]}], mod:Date.now()+50}});
-      if(global.Briefs.list().length!==1 || global.Briefs.list()[0].n!=='Remote Shelf'){ wok=false; fails++; console.log('✗ SAVED BRIEFS newest-wins merge failed'); }
-      global._dbApply({briefs:{list:[], mod:1}});
-      if(global.Briefs.list().length!==1){ wok=false; fails++; console.log('✗ SAVED BRIEFS: an OLDER remote shelf must not clobber'); }
+      // v2.9.0 — the board-merge probe here (_dbApply newest/oldest-wins on a
+      // remote shelf) is gone: Supabase's board merge no longer exists.
       // v1.22.0 (owner): briefs live in THE REPOSITORY's Briefs section now —
       // one app-wide panel consolidating views, briefs and records. This
       // deliberately supersedes the v1.8.0 "no brief ledger" law, which the
       // owner replaced with "consolidate … to keep as a full repository".
       global.Briefs.open();
       const sh=global.Repo.html();
-      if(sh.indexOf('Save current brief')<0 || sh.indexOf('Remote Shelf')<0 || sh.indexOf('data-sbload')<0){ wok=false; fails++; console.log('✗ REPOSITORY Briefs section must carry save + the shelf'); }
+      // the save action reads "Save current brief" with no active shelf record,
+      // or "Save changes to …"/"Save as a new brief" once one is active (Briefs
+      // .load(0) above just made 'Test Shelf Brief' the active record) — either
+      // is correct; the shelf entry and its load door are what this asserts.
+      const hasSaveAction=/data-sbupdate="1"|data-sbsave="1"/.test(sh);
+      if(!hasSaveAction || sh.indexOf('Test Shelf Brief')<0 || sh.indexOf('data-sbload')<0){ wok=false; fails++; console.log('✗ REPOSITORY Briefs section must carry save + the shelf'); }
       // v1.8.0 — the repository: map data only, IDs unfold to their actual items
       global.recAddId('fort-bragg','ID-900');
       global.recAdd('fort-bragg','people',{name:'Ledger Probe', role:'S3', xid:'ID-900'});
@@ -767,7 +741,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       let rh=global.Repo.html();
       if(rh.indexOf('Repository')<0 || rh.indexOf('Fort Bragg')<0 || rh.indexOf('ID-900')<0 || rh.indexOf('P1')<0){ wok=false; fails++; console.log('✗ REPOSITORY Records section must show the org, the ID and its P count'); }
       // the sections stay SEPARATE — Records never mixes the shelves in
-      if(rh.indexOf('Save current brief')>=0 || rh.indexOf('Remote Shelf')>=0){ wok=false; fails++; console.log('✗ the Records section must not carry the briefs shelf'); }
+      if(rh.indexOf('Save current brief')>=0 || rh.indexOf('Test Shelf Brief')>=0){ wok=false; fails++; console.log('✗ the Records section must not carry the briefs shelf'); }
       // all three sections are reachable from one panel
       ['views','briefs','records'].forEach(function(t){
         if(rh.indexOf('data-ldtab="'+t+'"')<0){ wok=false; fails++; console.log('✗ REPOSITORY section missing: '+t); } });
@@ -888,21 +862,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       if(nh.indexOf('data-bfadd')<0){ gok=false; fails++; console.log('✗ NON-member sheet must lead with Add to brief'); }
       if(gok) console.log('  ✓ ui grammar: console head carries L1-L4 + ZOOM (LEVELS/STACK/CHART text gone) · labeled head tools + divider · filled primary · quiet edits · hide in Arrange · danger rail last · non-member note gated');
     }
-    // v1.11.0 — AUTO-RECONNECT: no config → inert; auto:0 → inert (chip
-    // path); auto:1 → dbConnect engages; the Database sheet carries the toggle
-    {
-      let auk=true;
-      if(global._dbAutoBoot()){ auk=false; fails++; console.log('✗ AUTO must be a no-op with no config'); }
-      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:0});
-      if(global._dbAutoBoot()){ auk=false; fails++; console.log('✗ AUTO must respect the explicit OFF'); }
-      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:1});
-      if(!global._dbAutoBoot()){ auk=false; fails++; console.log('✗ AUTO with auto:1 must fire the connect'); }
-      if(global.DB.state()!=='connecting'){ auk=false; fails++; console.log('✗ AUTO did not engage dbConnect (state '+global.DB.state()+')'); }
-      global.dbDisconnect(true); global.DB._setCfg(null);
-      global._dbSheet();
-      if((IDS['dossier']?IDS['dossier'].innerHTML:'').indexOf('data-dbauto')<0){ auk=false; fails++; console.log('✗ AUTO toggle missing from the Database sheet'); }
-      if(auk) console.log('  ✓ auto-reconnect: inert without config · respects OFF · fires with ON · sheet toggle present');
-    }
+    // v2.9.0 — the AUTO-RECONNECT probe (dbAutoBoot/DB._setCfg/dbDisconnect)
+    // is gone: it tested the Supabase auto-connect toggle, which no longer
+    // exists (Supabase cloud sync was removed entirely, not just narrowed).
     // v1.12.0 — THE WORKING COPY: save once → record is active; later saves
     // update IN PLACE (no new record); save-as-new mints a sibling and takes
     // over; removing the active record clears the pointer; the sheet leads
@@ -1478,40 +1440,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(iok) console.log('  ✓ INTAKE: never-guess resolution · roster columns round-trip · header skipped, unknowns flagged · commits land + tape + tags');
   }
 
-  // ── PROBE: THE WORKSPACE (v2.7.0; owner ruling: "Go with supabase"). The
-  //    board is a shared team workspace: writes ride the a2_save RPC whose
-  //    write code is checked IN THE DATABASE (SQL-as-anon proof ran against
-  //    the live project: create+lock, wrong-code refusal, direct-write RLS
-  //    refusal, viewer read, open-board back-compat). Client laws here:
-  //    (a) the direct upsert save path is GONE from the source; (b) a
-  //    refused code turns the session into a VIEWER — dirty clears, the
-  //    retry ladder never arms, and dbPush becomes a no-op — instead of a
-  //    retry storm against an answer that will not change; (c) the role is
-  //    re-earned on every connect. ──
-  { let wok=true;
-    try{
-      if(/_db\.from\(DB_TABLE\)\.upsert/.test(html)){ wok=false; fails++; console.log('✗ WORKSPACE: a direct board upsert is back in the save path — the write-code door is bypassed'); }
-      if(html.indexOf("rpc('a2_save'")<0){ wok=false; fails++; console.log('✗ WORKSPACE: the a2_save door is gone from the save path'); }
-      if(html.indexOf('_dbViewer=false;                                // v2.7.0: the role is re-earned on every connect')<0){ wok=false; fails++; console.log('✗ WORKSPACE: connect no longer re-earns the role'); }
-      // (b) live: a locked board refuses this session's code → viewer, quiet
-      let vcalls=0;
-      const locked={ removeChannel(){}, channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
-        rpc(){ vcalls++; return Promise.resolve({error:{message:'write code required'}}); },
-        from(){ return { select(){ return { eq(){ return { maybeSingle(){ return Promise.resolve({data:{data:{v:3,records:{}}}, error:null}); } }; } }; } }; } };
-      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'locked', code:'wrong'});
-      global.DB._setDb(locked);
-      global.DB.push();                                  // marks dirty (not yet a viewer)
-      await global.DB.flush();                           // the refusal lands here
-      if(global.DB.viewer()!==true){ wok=false; fails++; console.log('✗ WORKSPACE: a refused write code must turn the session into a viewer'); }
-      if(global.DB.dirty()!==false){ wok=false; fails++; console.log('✗ WORKSPACE: viewer dirty flag must clear (edits stay in the local cache, not a queue)'); }
-      if(global.DB.retry().armed){ wok=false; fails++; console.log('✗ WORKSPACE: the retry ladder armed against a refusal that will not change'); }
-      global.DB.push();                                  // a viewer's push is a no-op
-      if(global.DB.dirty()!==false){ wok=false; fails++; console.log('✗ WORKSPACE: a viewer’s dbPush still queues work'); }
-      if(vcalls!==1){ wok=false; fails++; console.log('✗ WORKSPACE: expected exactly one refused call, saw '+vcalls); }
-      global.DB._setDb(null); global.DB._setCfg(null);
-    }catch(e){ wok=false; fails++; console.log('✗ WORKSPACE probe: '+e.message); }
-    if(wok) console.log('  ✓ WORKSPACE: upsert path dead · a2_save door pinned · refused code → quiet viewer (no dirty, no ladder, no pushes) · role re-earned per connect');
-  }
+  // v2.9.0 — THE WORKSPACE probe (Supabase board writes, write-code viewer
+  // gating) is gone: the whole Supabase cloud-sync layer was removed by
+  // owner ruling, not just narrowed. Nothing here to prove any more.
 
   // ── PROBE: THE ECHELON TAG (v1.24.0) — the card's rail leads with the rung
   //    the command hangs off under HQDA (ACOM · ASCC · DRU · ACQ · NGB). That
@@ -1544,8 +1475,10 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
     if(eok) console.log('  \u2713 ECHELON: ACOM/ASCC/DRU/HQDA lead the rail \u00b7 a deep unit still names its rung \u00b7 no HERE');
   }
 
-  // ── PROBE: v1.25.0 THE CONNECTED APP — the update path and the database door
-  //    under stress. Every fix ships its test (v0.33.1 law); every negative
+  // ── PROBE: v1.25.0 THE CONNECTED APP — the update path under stress (the
+  //    database-door half of this probe was removed in v2.9.0 along with
+  //    Supabase cloud sync itself; see the CHANGELOG entry). Every fix ships
+  //    its test (v0.33.1 law); every negative
   //    source assert is scoped to CODE SHAPE and proven to fire on the shape it
   //    bans (TESTING LAW 1) — a ban that has never fired is not known to work. ──
   { let cok=true;
@@ -1578,8 +1511,6 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         ['a network return kicks the update check', /window\.addEventListener\('online', kick\)/],
         ['a network return re-registers a stranded worker', /window\.addEventListener\('online', function\(\)\{ if\(!navigator\.serviceWorker\.controller && _swTries>0\) _swGo\(\); \}\)/],
         ['the network watch is wired', /window\.addEventListener\('online', function\(\)\{ _netUp\('online'\); \}\)/],
-        ['leaving flushes', /window\.addEventListener\('pagehide', function\(\)\{ _dbHideFlush\(\); \}\)/],
-        ['the client uses the keepalive-aware fetch', /global:\{ fetch:_dbFetch \}/],
         ['the ⋯ menu offers Check for updates', /data-am="upd">Check for updates</],
         ['diagnostics lead with page/worker builds', /'A-ORG-2 '\+APP_VERSION\+' · worker '/],
       ];
@@ -1587,8 +1518,6 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       // banned shapes (scoped to code, proven to fire)
       const bans=[
         ['single-try basemap fetch', /const r=await fetch\(SRC\); if\(!r\.ok\) continue;/, "const r=await fetch(SRC); if(!r.ok) continue;"],
-        ['waiting on a dead #sbLib tag (the Connect hang)', /ex\.addEventListener\('load'/, "ex.addEventListener('load', f)"],
-        ['a push with no dirty flag', /_dbPushT=setTimeout\(async function\(\)\{/, "_dbPushT=setTimeout(async function(){"],
       ];
       bans.forEach(function(b){ if(b[1].test(html)) bad('regression shape is back: '+b[0]); if(!b[1].test(html+'\n'+b[2])) bad('ban is blind: '+b[0]); });
 
@@ -1633,92 +1562,9 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
         } finally { global.__SANDBOX=prevSbx; global.__swReg(null); }
       }
 
-      // ── the database door at runtime ──
-      const headTags=()=>global.document.head.children.filter(c=>c && c.id==='sbLib');
-      const lastTag=()=>headTags().slice(-1)[0]||null;
-      const settleLib=async()=>{ const t=lastTag(); if(t && t.onerror) t.onerror(); await flushAsync(); };
-      await settleLib();                                        // anything an earlier probe left in flight
-      if(global.DB.conn()) bad('a connect is still in flight after the library failed');
-      global.DB._setCfg(null);
-      // D1 — the Connect hang: a failed library load must never poison the next attempt
-      const p1=global.ensureSupabase();
-      if(global.DB.lib()!==p1) bad('ensureSupabase must expose its in-flight load');
-      if(global.ensureSupabase()!==p1) bad('two callers must share ONE in-flight library load');
-      const tag1=lastTag(); if(!tag1) bad('ensureSupabase injected no #sbLib tag');
-      let v1=null; p1.then(function(v){ v1=v; }); await settleLib();
-      if(v1!==false) bad('a failed library load must resolve false (got '+v1+')');
-      if(global.DB.lib()!==null) bad('the in-flight load must clear after failure');
-      if(global.DB.state()!=='error') bad('a failed library load must say so (state '+global.DB.state()+')');
-      const p2=global.ensureSupabase();
-      if(p2===p1) bad('THE HANG: ensureSupabase returned the dead promise after a failure');
-      const tag2=lastTag(); if(!tag2 || tag2===tag1) bad('a retry must inject a FRESH #sbLib tag, not wait on the dead one');
-      let v2=null; p2.then(function(v){ v2=v; }); await settleLib();
-      if(v2!==false) bad('the retried load must settle on its own tag (got '+v2+')');
-      // D2 — one connect at a time
-      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b'});
-      const c1=global.dbConnect(), c2=global.dbConnect();
-      if(c1!==c2) bad('concurrent dbConnect calls must share the in-flight promise');
-      if(global.DB.state()!=='connecting') bad('dbConnect must report connecting at once (state '+global.DB.state()+')');
-      if(global.DB.conn()!==c1) bad('DB.conn() must expose the in-flight connect');
-      let cv=null; c1.then(function(v){ cv=v; }); await settleLib();
-      if(cv!==false) bad('a connect whose library fails must resolve false (got '+cv+')');
-      if(global.DB.conn()!==null) bad('the in-flight connect must clear after failure');
-      const c3=global.dbConnect(); if(c3===c1) bad('after a failure the next dbConnect must be a fresh attempt');
-      let cv3=null; c3.then(function(v){ cv3=v; }); await settleLib(); if(cv3!==false) bad('the fresh attempt must settle');
-      // D3 — network-class failure + auto → a network return reconnects; explicit OFF never does
-      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:1});
-      let c4=global.dbConnect(); await settleLib();                       // fails for NETWORK reasons (the library)
-      const nu=global.DB.netUp('online');
-      if(nu!=='reconnect') bad("a network return after a network failure must reconnect an auto board (got '"+nu+"')");
-      if(!global.DB.conn()) bad('the reconnect must be in flight after netUp');
-      await settleLib();
-      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b', auto:0});
-      if(global.DB.netUp('online')!==null) bad('auto:0 must never reconnect on a network return');
-      global.DB._setCfg(null);
-      if(global.DB.netUp('visible')!==null) bad('no config → a return does nothing');
-      // D4 — the save ladder on a fake client: a failed save keeps its work and retries; a return flushes + re-pulls
-      let calls=0, fails2=2, pulls=0;
-      const fake={ removeChannel(){}, channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
-        rpc(name){ if(name!=='a2_save'){ bad('save must ride the a2_save workspace door, not '+name); }
-          calls++; return Promise.resolve(fails2-->0 ? {error:{message:'TypeError: Failed to fetch'}} : {error:null}); },   /* v2.7.0 THE WORKSPACE */
-        from(){ return {
-          select(){ return { eq(){ return { maybeSingle(){ pulls++; return Promise.resolve({data:{data:{v:3,records:{},views:{list:[],mod:0},briefs:{list:[],mod:0}}}, error:null}); } }; } }; } }; } };
-      global.DB._setCfg({url:'https://x.supabase.co', key:'k', board:'b'}); global.DB._setDb(fake);
-      let t1=timers.length; global.DB.push();
-      if(global.DB.dirty()!==true) bad('dbPush must mark the board dirty');
-      drainFrom(t1); await flushAsync();                                  // the 700 ms flush → save #1 fails
-      if(calls!==1) bad('the debounced flush must run once (calls='+calls+')');
-      if(global.DB.dirty()!==true) bad('a FAILED save must keep the dirty flag');
-      if(global.DB.state()!=='error') bad('a failed save must say so');
-      if(!global.DB.retry().armed || global.DB.retry().n!==1) bad('a failed save must arm the retry ladder ('+JSON.stringify(global.DB.retry())+')');
-      if(!/unreachable|offline/i.test(global._dbMsgFor ? global._dbMsgFor() : (IDS['dbStatus']?IDS['dbStatus'].textContent:''))){ /* message probed below via the sheet */ }
-      drainFrom(t1); await flushAsync();                                  // ladder rung 1 → save #2 fails
-      if(calls!==2 || global.DB.dirty()!==true || global.DB.retry().n!==2) bad('the ladder must retry and stay armed (calls='+calls+', '+JSON.stringify(global.DB.retry())+')');
-      drainFrom(t1); await flushAsync();                                  // rung 2 → save #3 lands
-      if(calls!==3 || global.DB.dirty()!==false || global.DB.state()!=='live' || global.DB.retry().armed) bad('a landed save must clear dirty + ladder and go live (calls='+calls+', dirty='+global.DB.dirty()+', state='+global.DB.state()+')');
-      t1=timers.length; global.DB.push();                                  // dirty again, debounce pending
-      const sy=global.DB.netUp('online');                                  // a return flushes NOW and re-pulls the board
-      await flushAsync();
-      if(sy!=='sync') bad("a return while connected must sync (got '"+sy+"')");
-      if(calls!==4 || global.DB.dirty()!==false) bad('the return must flush the pending save at once (calls='+calls+', dirty='+global.DB.dirty()+')');
-      if(pulls!==1) bad('the return must re-pull the board once (pulls='+pulls+')');
-      if(global.DB.netUp('visible')!=='sync' || pulls!==1) bad('re-pulls are rate-limited (pulls='+pulls+')');
-      if(global.DB.hide()!==false) bad('leaving with nothing dirty flushes nothing');
-      global.DB.push(); if(global.DB.hide()!==true) bad('leaving with a pending save must flush it');
-      await flushAsync(); if(calls!==5 || global.DB.dirty()!==false) bad('the leaving flush must land (calls='+calls+')');
-      // the Database sheet says offline/unreachable in words after a network-class failure
-      fails2=1; global.DB.push(); await global.DB.flush(); await flushAsync();
-      global._dbSheet(); const sh=IDS['dossier']?IDS['dossier'].innerHTML:'';
-      if(!/unreachable right now; retrying/.test(sh)) bad('a network-class save failure must be said in words on the sheet');
-      try{ global.hideDossier(); }catch(_){}
-      global.dbDisconnect(true);
-      if(global.DB.dirty()!==false || global.DB.retry().armed) bad('disconnect must drop the dirty flag and the ladder');
-      global.DB._setCfg(null);
-      // D5 — localNewer: this device holds records the board lacks → the connect path pushes once
-      const la=global._dbApply({records:{}, views:{list:[],mod:0}, briefs:{list:[],mod:0}});
-      if(!la || la.localNewer!==true) bad('_dbApply must report localNewer when the board lacks local records');
-      const lb=global._dbApply(JSON.parse(JSON.stringify(global._dbSnapshot())));
-      if(!lb || lb.localNewer!==false) bad('_dbApply must not report localNewer for an identical board');
+      // v2.9.0 — the database-door-at-runtime probe (D1-D5: the Connect hang,
+      // one-connect-at-a-time, network-return reconnect, the save ladder,
+      // localNewer) was removed here along with Supabase cloud sync itself.
       // ── the basemap ladder ──
       if(typeof global._fetchRetry!=='function' || typeof global._basemapNetUp!=='function' || typeof global._basemapLoad!=='function') bad('basemap doors missing');
       else {
@@ -1742,7 +1588,7 @@ function flushAsync(n){ let p=Promise.resolve(); for(let i=0;i<(n||4);i++) p=p.t
       const nOn=(WIN_LS['online']||[]).length; if(nOn<1) bad('the network watch must listen on window online (got '+nOn+')');   // the sandbox registers no worker, so its two online kicks are source-asserted above
       winDispatch('online', {type:'online'}); winDispatch('pagehide', {type:'pagehide'}); await flushAsync();
     }catch(e){ cok=false; fails++; console.log('✗ CONNECTED probe: '+e.message); console.log((e.stack||'').split('\n').slice(0,3).join('\n')); }
-    if(cok) console.log('  ✓ CONNECTED: sw.js seeds from the origin, shell mandatory, no redirected/twin entries, nav fallback · update doors report current/found/failed + honest copy · self-heal once per newer worker · library load recovers after failure · one connect at a time · network return reconnects (auto only) · save ladder keeps work, return flushes + re-pulls, leaving flushes · localNewer · basemap ladder');
+    if(cok) console.log('  ✓ CONNECTED: sw.js seeds from the origin, shell mandatory, no redirected/twin entries, nav fallback · update doors report current/found/failed + honest copy · self-heal once per newer worker · basemap ladder');
   }
 
   // ── PROBE: THE BOOT TOUR's light gate (v1.16.0, design 4b) — while

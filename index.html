@@ -1353,30 +1353,6 @@ button.rc-top{appearance:none; -webkit-appearance:none; border:0; background:non
 #dossier.rc-keyboard{top:var(--rc-visible-top);bottom:var(--rc-visible-bottom);max-height:none;padding-bottom:14px}
 #dossier.rc-keyboard::after{height:12px}
 .rc-keyboard .rc-entry .rc-btns{position:sticky;bottom:0;background:var(--panel-2);padding:8px 0;border-radius:10px}
-/* the database door — status line states */
-.db-status{font:600 11px/1.4 var(--body); color:var(--dim); padding:6px 2px}
-.db-status.db-live{color:var(--accent)}
-.db-status.db-error{color:#ff5f50}
-.db-status.db-connecting{color:var(--text)}
-.am-dbchip{float:right; font:800 8.5px/1 var(--mono); letter-spacing:.08em; padding:3px 6px;
-  border-radius:6px; box-shadow:inset 0 0 0 1px var(--line); color:var(--faint)}
-.am-dbchip.am-db-live{color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
-.am-dbchip.am-db-error{color:#ff5f50; box-shadow:inset 0 0 0 1px #ff5f50}
-/* v1.2.0 — the boot reconnect chip: settings exist, session is offline, one tap */
-#dbChip{position:fixed; left:50%; transform:translateX(-50%) translateY(-6px); z-index:40;
-  top:calc(env(safe-area-inset-top,0px) + 96px);
-  display:inline-flex; align-items:center; gap:8px; padding:8px 8px 8px 13px; border-radius:16px;
-  appearance:none;-webkit-appearance:none; border:0; cursor:pointer;
-  background:linear-gradient(180deg, rgba(60,46,14,.97), rgba(32,24,8,.97));
-  box-shadow:0 0 0 1.3px var(--accent), 0 8px 22px -10px rgba(0,0,0,.7);
-  color:var(--accent); font:700 11.5px/1 var(--body);
-  opacity:0; transition:opacity .25s ease, transform .25s ease}
-#dbChip.in{opacity:1; transform:translateX(-50%) translateY(0)}
-#dbChip.busy{opacity:.6}
-#dbChip .dbc-dot{width:7px; height:7px; border-radius:50%; background:var(--accent);
-  box-shadow:0 0 8px rgba(245,215,110,.8); flex:none}
-#dbChip .dbc-x{width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center;
-  justify-content:center; background:rgba(0,0,0,.35); color:var(--faint); font:800 11px/1 var(--body); flex:none}
 .rc-form{display:flex; flex-direction:column; gap:8px; padding:12px; margin:10px 0 2px;
   border-radius:12px; background:rgba(0,0,0,.4); box-shadow:0 0 0 1.5px var(--accent)}
 .rc-in{
@@ -1765,6 +1741,37 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 
 <script>
 // ═══ CHANGELOG — append new entries ABOVE the previous newest '//   vPREV' marker ═══
+//   v2.9.0  • LOCAL HOSTING + SUPABASE REMOVED (owner: stop depending on
+//            Cloudflare for anything; self-host on his own infra, Docker
+//            preferred or an existing/new IIS site; and drop the cloud
+//            database feature entirely rather than localize or leave it
+//            opt-in). Two independent changes:
+//            (1) local-server/ is a small, zero-framework Node http server
+//            that serves this repo's static files AND implements worker.js's
+//            exact GET /api/live.json + POST /api/live-ingest contract (same
+//            bearer-token check, same body validation, same response shapes)
+//            against a local JSON file instead of Cloudflare KV — index.html
+//            needs zero changes to work against it. Ships with a Dockerfile
+//            + docker-compose.yml, and README instructions for running it as
+//            a background Windows process behind IIS (ARR + URL Rewrite
+//            proxying /api/* while IIS serves the static files directly).
+//            worker.js/wrangler.jsonc stay in the repo, now explicitly
+//            optional — Cloudflare remains a valid host, just not required.
+//            (2) THE DATABASE DOOR (Supabase cloud sync — v1.1.0/v2.7.0) is
+//            removed ENTIRELY (owner: "remove the feature entirely", not
+//            localize or gate) — ensureSupabase(), the whole _db* state
+//            machine, the a2_save workspace RPC path, the CDN script
+//            injection, the Connect sheet UI and its ⋯ menu row are gone,
+//            along with the ONE dead-lint CDN allowlist entry they needed.
+//            Records (People · Specs · Notes · Links · the ID registry) are
+//            UNTOUCHED: they were always local-first via IndexedDB (_rdb) —
+//            Supabase was an optional mirror bolted on top, never a
+//            dependency of Records working at all, so nothing here lost
+//            offline function. docs/workspace.sql (the Supabase project
+//            setup script) is deleted as dead documentation. Byte cost: a
+//            net REDUCTION — removing the database door and its tests
+//            trimmed index.html by roughly 26 KB; the byte budget eases, it
+//            does not tighten.
 //   v2.8.0  • LIVE ASSETS (manual toggle in the Layers pop-out, beside
 //            Labels): polls same-origin GET /api/live.json every ~18s for
 //            a JSON snapshot pushed by an external poller (swis-live-poller,
@@ -2104,7 +2111,7 @@ body.sheet-open #navDock{opacity:0; pointer-events:none; transition:opacity .15s
 //   Earlier releases (v0.1.0–v1.23.1) remain in git log and CLAUDE.md.
 //   v1.28.0 retention: the current era begins at v1.24.0 (the 2026 refresh).
 
-const APP_VERSION = 'v2.8.0';
+const APP_VERSION = 'v2.9.0';
 const APP_UPDATED = '18 September 2026';
 // v1.25.0 — STALE-BUILD SELF-HEAL (the v0.33.1 class, cured at the client):
 // the controlling worker names its build (window.__swVer, asked at boot and
@@ -8471,7 +8478,7 @@ function recCount(id){
 }
 // v1.26.0: acknowledge storage only after its transaction commits. Each
 // revision has its own receipt; an older callback cannot certify a newer edit.
-let _recReceipts=Object.create(null), _recCloud=Object.create(null);
+let _recReceipts=Object.create(null);
 function _recPersist(r){
   const id=r.id, ticket={mod:r.mod||0,state:_rdb?'saving':'memory'};
   _recReceipts[id]=ticket;
@@ -8487,28 +8494,19 @@ function _recSave(id){
   const r=RECORDS[id]; if(!r) return;
   r.mod=Math.max(Date.now(),(r.mod||0)+1);
   _recPersist(r);
-  try{ dbPush(); }catch(_){}
   try{ _srRefresh(); }catch(_){}
 }
 function _recStatusText(id){
-  const r=RECORDS[id], receipt=_recReceipts[id], cloud=_recCloud[id];
+  const r=RECORDS[id], receipt=_recReceipts[id];
   if(!r) return 'No saved records yet';
   const local=receipt?receipt.state:(_rdb?'unknown':'memory');
-  let text=local==='saved'?'Saved on this device':local==='saving'?'Saving on this device…':local==='error'?'Device save failed — keep this page open':local==='unknown'?'Device save not yet confirmed':'Session only — device storage unavailable';
-  if(cloud && cloud.mod===(r.mod||0)) text+=' · Synced '+new Date(cloud.at).toLocaleTimeString();
-  else if(typeof _db!=='undefined' && _db) text+=' · Sync pending';
-  else text+=' · Not synced this session';
-  return text;
+  return local==='saved'?'Saved on this device':local==='saving'?'Saving on this device…':local==='error'?'Device save failed — keep this page open':local==='unknown'?'Device save not yet confirmed':'Session only — device storage unavailable';
 }
 function recordSaveStatus(id){
   return '<div class="rc-note" data-rec-status="'+_odEscA(id)+'" role="status" aria-live="polite">'+_odEsc(_recStatusText(id))+'</div>';
 }
 function _recStatusPaint(){
   try{ document.querySelectorAll('[data-rec-status]').forEach(function(el){ el.textContent=_recStatusText(el.getAttribute('data-rec-status')); }); }catch(_){}
-}
-function _recCloudAck(records){
-  const at=Date.now(); Object.keys(records||{}).forEach(function(id){ const r=records[id]; if(r && (!_recCloud[id] || (r.mod||0)>=_recCloud[id].mod)) _recCloud[id]={mod:r.mod||0,at:at}; });
-  _recStatusPaint();
 }
 function _recLoaded(r){ if(r&&r.id) _recReceipts[r.id]={mod:r.mod||0,state:'saved'}; }
 try{ window.recordSaveStatus=recordSaveStatus; window.recordSaveText=_recStatusText; }catch(_){}
@@ -8649,17 +8647,6 @@ function _rdbOpen(){
           }
           try{ if(document.body.classList.contains('brief-mode')){ renderBrief(); globeMark(); } }catch(_){}
         };
-      }catch(_){}
-      try{
-        // v1.1.0 — the database CONFIG prefills the connect sheet. Config only:
-        // no client loads, nothing connects, until the owner taps Connect.
-        const tdb=_rdb.transaction('kv','readonly');
-        const gdb=tdb.objectStore('kv').get('dbcfg');
-        gdb.onsuccess=function(){ const v=gdb.result&&gdb.result.v; if(v&&v.url){ _dbCfg=v;
-          // v1.2.0 chip waits out the boot title; v1.11.0 — with auto on it
-          // CONNECTS instead of asking (chip only as the failure fallback)
-          try{ setTimeout(function(){ if(!_dbAutoBoot()) _dbChipShow(); }, Math.max(600, 5600-performance.now())); }catch(_){}
-        } };
       }catch(_){}
       try{
         const tzx=_rdb.transaction('kv','readonly');
@@ -9085,7 +9072,6 @@ function _svSave(){
   _svMod=Date.now();                              // v1.2.0: views ride the database board
   // kv keeps the wrapped shape; the loader accepts the legacy bare array too
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'views', v:{v:1, list:SAVEDV, mod:_svMod}}); } }catch(_){}
-  try{ dbPush(); }catch(_){}
 }
 // ═══ v1.19.0 THE SHELF (owner: "a brand new plan for save …") ═══
 // A save is a small named DOCUMENT, not a slot: named at capture with a
@@ -9211,9 +9197,6 @@ function _shPaneShelf(kind,P){
       ? 'No saved briefs yet — save the current diagram and open it on any connected device. The brief room opens blank; your saves live here.'
       : 'No saved views yet — frame the globe the way you want it, then Save this view. A view remembers the camera, the selection and the layers you had on.')+'</div>';
   }
-  h+='<div class="rc-note">'+(((typeof _dbState!=='undefined')&&_dbState==='live')
-    ?'Database LIVE — saved '+(brief?'briefs':'views')+' mirror your other devices.'
-    :'Connect the database (hold the A-ORG-2 mark → Database) to open saved '+(brief?'briefs':'views')+' on other devices.')+'</div>';
   return h;
 }
 // ONE DRAWER, TWO PANES. The map room's doors open LAYERS|VIEWS; the brief
@@ -9311,7 +9294,6 @@ let _sbMod=0;
 function _sbSave(){
   _sbMod=Date.now();
   try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'briefs', v:{v:1, list:SAVEDB, mod:_sbMod}}); } }catch(_){}
-  try{ dbPush(); }catch(_){}                      // saved briefs ride the board
 }
 function sbCapture(name){
   const roots=BRIEF.nodes.filter(function(n){ return !n.p; });
@@ -9688,392 +9670,26 @@ function recRestore(obj){
 try{ window.Records={ add:recAdd, update:recUpdate, remove:recRemove, of:recordOf, count:recCount, backup:recBackup, restore:recRestore,
   ids:recIds, addId:recAddId, delId:recDelId, idCount:recIdCount, titleId:recTitleId, all:recAll }; }catch(_){}
 
-/* ═══ v1.1.0 THE DATABASE DOOR — the inception concept, finally built.
-   Records (People · Specs · Notes · Links · the ID registry) live in the
-   owner's own database (Supabase), not on the device. The A-ORG-1 contract
-   holds verbatim: ZERO foreign code at boot — the client library is injected
-   by ensureSupabase() only when the owner taps Connect; Connect is manual
-   each session. One board row carries the whole records map (jsonb), a
-   realtime channel mirrors other devices, updated_by kills echo loops.
-   IndexedDB stays as the offline cache under it (a PWA must open in a dead
-   zone); the database is the source of truth whenever connected. ═══ */
-let _db=null, _dbCh=null, _dbCfg=null, _dbState='off', _dbMsg='Not connected';
-let _dbPushT=null;
-// v1.25.0 — CONNECTIVITY STATE, the session's nervous system (nothing here
-// persists): one in-flight connect (_dbConnP) and one in-flight library load
-// (_sbLoadP) that every caller shares; a DIRTY flag that survives a failed
-// save; the retry ladder; the resync clock; whether the last failure was the
-// NETWORK's (retried by itself on return) or the configuration's (never).
-let _dbConnP=null, _sbLoadP=null, _dbDirty=false, _dbPushBusy=false, _dbRetryT=null, _dbRetryN=0;
-let _dbViewer=false;   // v2.7.0 THE WORKSPACE: this session reads the board but holds no write code
-let _dbSyncT=0, _dbSubN=0, _dbFailNet=false, _dbUnloading=false;
-const _dbClientId=Math.random().toString(36).slice(2)+Date.now().toString(36);
-const DB_TABLE='a2_records';
-function _dbSetState(st, msg){
-  _dbState=st; _dbMsg=msg||'';
-  _recStatusPaint();
-  try{ const el=document.getElementById('dbStatus');
-    if(el){ el.textContent=_dbMsg;
-      el.className='db-status '+(st==='live'?'db-live':(st==='error'?'db-error':(st==='connecting'?'db-connecting':'db-off'))); } }catch(_){}
-  try{ const ch=document.querySelector('.am-dbchip');
-    if(ch){ ch.textContent=(st==='live')?(_dbViewer?'VIEW':'LIVE'):(st==='connecting'?'…':(st==='error'?'ERR':'OFF'));
-      ch.className='am-dbchip '+(st==='live'?'am-db-live':(st==='error'?'am-db-error':'am-db-off')); } }catch(_){}
-}
-function _dbCfgSave(cfg){
-  _dbCfg=cfg;
-  try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite'); tx.objectStore('kv').put({k:'dbcfg', v:cfg}); } }catch(_){}
-}
-function _dbIsNet(e){
-  // a network-class failure (offline, unreachable, CDN blocked, timed out) — the
-  // kind a network return should retry by itself; anything else is configuration
-  try{ if(typeof navigator!=='undefined' && navigator.onLine===false) return true; }catch(_){}
-  const m=String((e&&e.message)||e||'');
-  return /failed to fetch|networkerror|load failed|network request failed|fetch failed|timed out|timeout|offline|unreachable|ECONN|ENOTFOUND/i.test(m);
-}
-function _dbWhy(what, e){
-  const m=String((e&&e.message)||e||'');
-  try{ if(typeof navigator!=='undefined' && navigator.onLine===false) return what+' paused — offline; it resumes by itself when the network returns.'; }catch(_){}
-  if(_dbIsNet(e)) return what+' failed — the database is unreachable right now; retrying by itself.';
-  return what+' failed: '+m;
-}
-function ensureSupabase(){
-  if(window.supabase && window.supabase.createClient) return Promise.resolve(true);
-  if(_sbLoadP) return _sbLoadP;                        // one load in flight — every caller shares it
-  _sbLoadP=new Promise(function(res){
-    let settled=false, tt=null;
-    const done=function(ok){
-      if(settled) return; settled=true; _sbLoadP=null;
-      try{ clearTimeout(tt); }catch(_){}
-      if(!ok){ try{ const d=document.getElementById('sbLib'); if(d){ if(d.parentNode) d.parentNode.removeChild(d); else d.remove(); } }catch(_){} }
-      res(ok);
-    };
-    // v1.25.0 — a tag left by a FAILED load is inert: its load/error events have
-    // already fired, so waiting on it hung Connect forever (the chip stayed busy,
-    // the button dead). Every attempt removes the old tag and injects a fresh one.
-    try{ const ex=document.getElementById('sbLib'); if(ex){ if(ex.parentNode) ex.parentNode.removeChild(ex); else ex.remove(); } }catch(_){}
-    tt=setTimeout(function(){ _dbSetState('error','Database library timed out — slow or filtered network; Connect retries by itself when the network returns.'); done(false); }, 20000);
-    try{
-      const sc=document.createElement('script');
-      sc.id='sbLib'; sc.crossOrigin='anonymous';
-      sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7';   // dead-lint allowlisted: injected on MANUAL Connect only
-      sc.onload=function(){ done(!!(window.supabase&&window.supabase.createClient)); };
-      sc.onerror=function(){ _dbSetState('error','Database library failed to load (offline or CDN blocked) — the app is unaffected; Connect retries by itself when the network returns.'); done(false); };
-      document.head.appendChild(sc);
-    }catch(e){ done(false); }
-  });
-  return _sbLoadP;
-}
-function _dbFetch(input, init){
-  // v1.25.0 — the one fetch the client uses: while the page is going away a
-  // small save rides keepalive, so the tab may close under it and it still lands
-  try{ if(_dbUnloading && init && typeof init.body==='string' && init.body.length<60000) init.keepalive=true; }catch(_){}
-  return fetch(input, init);
-}
-function _dbSnapshot(){
-  // v1.2.0 — the board carries the whole working set: records, the brief
-  // diagram (groups included) and saved views. Each part merges newest-wins.
-  // v1.12.0 — the WORKING diagram left the board (blank-slate law); the
-  // saved-brief records are the cross-device carrier now.
-  return {v:3, records:RECORDS,
-    views:{list:SAVEDV, mod:_svMod},
-    briefs:{list:SAVEDB, mod:_sbMod}};
-}
-function _dbApply(data){
-  if(!data) return {took:0, localNewer:false};
-  let took=0, localNewer=false;
-  const rr=data.records||{};
-  // v1.25.0 — does THIS device hold anything the board lacks or has older (edits
-  // made offline)? The connect path pushes ONCE if so, instead of waiting for the
-  // next edit to carry them — the gap that made offline work look lost.
-  try{ Object.keys(RECORDS).forEach(function(k){ const lr=RECORDS[k], r2=rr[k];
-    if(lr && lr.id && (!r2 || (lr.mod||0)>(r2.mod||0))) localNewer=true; }); }catch(_){}
-  if(data.views && (_svMod||0)>(data.views.mod||0)) localNewer=true;
-  if(data.briefs && (_sbMod||0)>(data.briefs.mod||0)) localNewer=true;
-  Object.keys(rr).forEach(function(k){
-    const r2=rr[k]; if(!r2||!r2.id) return;
-    if(!r2.ids) r2.ids=[];
-    const loc=RECORDS[k];
-    if(!loc || (r2.mod||0)>=(loc.mod||0)){       // newest record wins, per record
-      RECORDS[k]=typeof _recNormalize==='function'?_recNormalize(r2):r2; took++;
-      _recCloudAck({[k]:RECORDS[k]}); _recPersist(RECORDS[k]);
-    }
-  });
-  // v1.12.0 — an incoming WORKING-brief blob (older app versions still send
-  // one) is deliberately IGNORED: the working diagram is session-scoped, and
-  // only the saved-brief records travel.
-  // v1.2.0 — saved views: same law
-  if(data.views && Array.isArray(data.views.list) && (data.views.mod||0)>(_svMod||0)){
-    SAVEDV=data.views.list.slice(); _svMod=data.views.mod;
-    try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
-      tx.objectStore('kv').put({k:'views', v:{v:1, list:SAVEDV, mod:_svMod}}); } }catch(_){}
-    took++;
-  }
-  // v1.7.0 — saved briefs: same law (write kv directly — never via _sbSave, echo law)
-  if(data.briefs && Array.isArray(data.briefs.list) && (data.briefs.mod||0)>(_sbMod||0)){
-    SAVEDB=data.briefs.list.slice(); _sbMod=data.briefs.mod;
-    try{ if(_rdb){ const tx=_rdb.transaction('kv','readwrite');
-      tx.objectStore('kv').put({k:'briefs', v:{v:1, list:SAVEDB, mod:_sbMod}}); } }catch(_){}
-    took++;
-  }
-  if(took){
-    try{ _srRefresh(); }catch(_){}
-    try{ const dz=document.getElementById('dossier');
-      if(dz && !dz.hidden && dz.dataset.shTab) _shOpen(dz.dataset.shTab);   // v1.19.0: keep the open pane
-      else if(dz && !dz.hidden && GlobeState.sel) showDossier(GlobeState.sel); }catch(_){}
-    // v1.8.0: an open repository re-reads whatever the merge brought in
-    try{ const lp=document.getElementById('ledger'); if(lp && lp.classList.contains('on')) _ledgerRender(); }catch(_){}
-  }
-  return {took:took, localNewer:localNewer};
-}
-// ── v1.2.0 THE RECONNECT CHIP — settings exist but this session is offline:
-// one tap goes live. The law holds — NOTHING foreign loads until the tap.
-function _dbChipShow(){
-  try{
-    if(!_dbCfg || !_dbCfg.url || _db) return;
-    if(!document.body || !document.createElement) return;
-    if(document.getElementById('dbChip')) return;
-    const el=document.createElement('button');
-    el.id='dbChip'; el.type='button';
-    el.innerHTML='<span class="dbc-dot"></span>Reconnect database<span class="dbc-x" data-dbchipx="1" role="button" aria-label="Not now">✕</span>';
-    el.addEventListener('click', function(ev){
-      if(ev.target && ev.target.closest && ev.target.closest('[data-dbchipx]')){ el.remove(); return; }
-      el.classList.add('busy'); el.disabled=true;
-      dbConnect().then(function(ok){ try{ el.remove(); }catch(_){}
-        if(ok){ try{ _bfToast('Database live — records save off-device'); }catch(_){} }
-        else { try{ _dbSheet(); }catch(_){} }      // trouble → the full sheet says why
-      });
-    });
-    document.body.appendChild(el);
-    setTimeout(function(){ try{ el.classList.add('in'); }catch(_){} }, 60);
-    setTimeout(function(){ try{ if(!el.disabled) el.remove(); }catch(_){} }, 25000);   // quiet exit; it returns next boot
-  }catch(_){}
-}
-// ── v1.25.0 THE SAVE PATH: dbPush marks the board DIRTY and debounces one
-// flush (700 ms). A flush that fails keeps the dirty flag — nothing is ever
-// dropped — and arms a ladder (4 s → 8 → 16 → 32 → 60 s cap) that retries until
-// it lands; a network or app return flushes at once. Edits that arrive while a
-// flush is in flight ride the next one. IndexedDB holds everything meanwhile.
-function dbPush(){
-  if(!_db || !_dbCfg) return;                     // not connected: IndexedDB cache only
-  if(_dbViewer) return;                           // v2.7.0: a viewer's edits stay on this device
-  _dbDirty=true;
-  _recStatusPaint();
-  clearTimeout(_dbPushT);
-  _dbPushT=setTimeout(function(){ _dbFlush(); }, 700);
-}
-async function _dbFlush(){
-  clearTimeout(_dbPushT); _dbPushT=null;
-  if(!_db || !_dbCfg || !_dbDirty || _dbPushBusy) return false;
-  _dbPushBusy=true; _dbDirty=false;
-  let ok=false, stale=false;
-  const snapshot=JSON.parse(JSON.stringify(_dbSnapshot())), client=_db, board=_dbCfg.board;
-  try{
-    // v2.7.0 THE WORKSPACE: every write goes through a2_save(), which checks
-    // the board's write code SERVER-SIDE — the publishable key alone can no
-    // longer modify a board (proven: direct upserts fail RLS on the project).
-    const { error }=await _db.rpc('a2_save', { p_board:_dbCfg.board, p_code:_dbCfg.code||'',
-      p_data:snapshot, p_client:_dbClientId });
-    if(_db!==client || !_dbCfg || _dbCfg.board!==board) stale=true;
-    else { if(error) throw error; _recCloudAck(snapshot.records); ok=true; }
-  }catch(e){
-    if(_db!==client || !_dbCfg || _dbCfg.board!==board) stale=true;
-    else if(/write code required/i.test(String((e&&e.message)||e||''))){
-      // this board is LOCKED and this session's code does not open it: the
-      // session becomes a VIEWER — reads keep mirroring, edits stay in the
-      // local cache, and NO retry ladder arms (the answer will not change).
-      _dbViewer=true; _dbDirty=false;
-      _dbSetState('live','Viewer — reading the shared board. Edits stay on this device; enter the write code in Database settings to publish them.');
-    }
-    else { _dbDirty=true;                         // failed work stays queued
-      _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Save', e)); }
-  }
-  _dbPushBusy=false;
-  if(stale){ if(_dbDirty && _db) dbPush(); return false; }
-  if(ok){
-    _dbRetryN=0; clearTimeout(_dbRetryT); _dbRetryT=null;
-    if(_db) _dbSetState('live','Database live — saved '+new Date().toLocaleTimeString());
-    if(_dbDirty && _db) dbPush();                 // edits landed mid-flight → one more pass
-  } else _dbRetryArm();
-  return ok;
-}
-function _dbRetryArm(){
-  if(!_db || !_dbCfg || !_dbDirty) return 0;
-  clearTimeout(_dbRetryT);
-  const wait=Math.min(60000, 4000*Math.pow(2, Math.min(_dbRetryN++, 4)));
-  _dbRetryT=setTimeout(function(){ _dbRetryT=null; if(_dbDirty) _dbFlush(); }, wait);
-  return wait;
-}
-async function dbPullOnce(){
-  if(!_db || !_dbCfg) return false;
-  const client=_db, board=_dbCfg.board;
-  const current=function(){ return _db===client && _dbCfg && _dbCfg.board===board; };
-  try{
-    const { data, error }=await client.from(DB_TABLE).select('data,updated_by').eq('id',board).maybeSingle();
-    if(!current()) return false;
-    if(error){ _dbFailNet=false; _dbSetState('error','Load failed: '+error.message+' — is the '+DB_TABLE+' table created?'); return false; }
-    _dbSyncT=Date.now();
-    if(data && data.data) return _dbApply(data.data)||{took:0, localNewer:false};
-    const initial=JSON.parse(JSON.stringify(_dbSnapshot()));
-    const seed=await client.rpc('a2_save', { p_board:board, p_code:(_dbCfg.code||''),
-      p_data:initial, p_client:_dbClientId });   // v2.7.0: seeding IS a write — same door, and a carried code locks the new board from birth
-    if(!current()) return false;
-    if(seed.error) throw seed.error;
-    _recCloudAck(initial.records);   // first-device seeding must acknowledge errors too
-    return {took:0, localNewer:false};
-  }catch(e){ if(current()){ _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Load', e)); } return false; }
-}
-async function _dbConnectRun(){
-  _dbViewer=false;                                // v2.7.0: the role is re-earned on every connect
-  const cfg=_dbCfg;
-  if(!cfg || !cfg.url || !cfg.key){ _dbSetState('off','Not configured — enter the project URL and key.'); return false; }
-  try{ if(typeof navigator!=='undefined' && navigator.onLine===false){
-    _dbFailNet=true; _dbSetState('error','Offline — the database connects by itself when the network returns.'); return false; } }catch(_){}
-  _dbSetState('connecting','Connecting…');
-  const ok=await ensureSupabase();
-  if(!ok){ _dbFailNet=true; return false; }       // ensureSupabase already said why
-  try{
-    dbDisconnect(true);
-    _db=window.supabase.createClient(cfg.url, cfg.key, { realtime:{ params:{ eventsPerSecond:5 } }, global:{ fetch:_dbFetch } });
-    const pulled=await dbPullOnce();
-    if(!pulled){ _db=null; return false; }
-    _dbSubN=0;
-    _dbCh=_db.channel('a2-'+cfg.board)
-      .on('postgres_changes', { event:'*', schema:'public', table:DB_TABLE, filter:'id=eq.'+cfg.board }, function(payload){
-        const row=payload.new||{};
-        if(row.updated_by===_dbClientId) return;   // our own write echoing back
-        if(row.data) _dbApply(row.data);
-      })
-      .subscribe(function(status){
-        if(status==='SUBSCRIBED'){
-          _dbSetState('live','Database live — records save off-device and mirror your other devices.');
-          // v1.25.0: a REjoin (the socket died and came back) catches up on what
-          // the gap hid — realtime never replays missed changes
-          if(_dbSubN++>0){ try{ _dbSyncT=0; _dbNetUp('rejoin'); }catch(_){} }
-        }
-        else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT') _dbSetState('error','Realtime channel error — saves still reach the database; live mirroring may lag, and the channel reconnects by itself.');
-      });
-    _dbSetState('live','Connected — records now live in your database.');
-    _dbFailNet=false;
-    // v1.11.0 (owner: "don't want to connect every time") — the FIRST
-    // successful connect turns auto-reconnect on; the sheet toggle can turn
-    // it off, and that explicit choice is never overridden here.
-    if(_dbCfg && _dbCfg.auto==null){ _dbCfg.auto=1; _dbCfgSave(_dbCfg); }
-    // v1.25.0 — edits made while offline reach the board NOW, not at the next edit
-    if(pulled && pulled.localNewer){ _dbDirty=true; _dbFlush(); }
-    return true;
-  }catch(e){ _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Connect', e)); _db=null; return false; }
-}
-function dbConnect(){
-  // v1.25.0 — ONE connect at a time: the boot auto-connect, the chip, the sheet
-  // button and a network return may all ask; they share the in-flight promise
-  if(_dbConnP) return _dbConnP;
-  _dbConnP=_dbConnectRun().then(function(ok){ _dbConnP=null; return ok; },
-    function(e){ _dbConnP=null; _dbFailNet=_dbIsNet(e); _dbSetState('error', _dbWhy('Connect', e)); _db=null; return false; });
-  return _dbConnP;
-}
-// v1.11.0 AUTO-RECONNECT — the boot-inert law, amended by its owner: the app
-// still boots with zero foreign code, but once a board has connected and the
-// stored auto flag stays on, the next open brings it live by itself. Quiet
-// on success; on failure it degrades to the one-tap chip, never a boot error.
-function _dbAutoBoot(){
-  try{
-    if(_db || !_dbCfg || !_dbCfg.url || !_dbCfg.auto) return false;
-    dbConnect().then(function(ok){
-      if(ok){ try{ _bfToast('Database live — everything saves off-device'); }catch(_){} }
-      else { try{ _dbChipShow(); }catch(_){} }
-    }).catch(function(){ try{ _dbChipShow(); }catch(_){} });   // any failure degrades to the one-tap chip
-    return true;
-  }catch(_){ return false; }
-}
-function dbDisconnect(silent){
-  try{ if(_dbCh && _db) _db.removeChannel(_dbCh); }catch(_){}
-  _dbCh=null; _db=null; _recCloud=Object.create(null);
-  _recStatusPaint();
-  clearTimeout(_dbPushT); _dbPushT=null; clearTimeout(_dbRetryT); _dbRetryT=null; _dbRetryN=0;
-  _dbDirty=false; _dbSubN=0;                      // unsent edits stay in IndexedDB; the next connect's pull+push carries them
-  if(!silent) _dbSetState('off','Disconnected — new records stay on this device until you reconnect.');
-}
-// ── v1.25.0 THE NETWORK WATCH — one listener set, three consumers. A RETURN
-// (network back · app foregrounded · realtime rejoined) flushes unsent edits,
-// re-pulls the board (a dead socket replays nothing), reconnects a board that
-// failed for NETWORK reasons only, finishes a basemap that blipped, and asks
-// the worker for an update. LEAVING (hidden · pagehide) flushes a pending save
-// at once — small saves ride keepalive so the tab may close under them.
-function _dbNetUp(why){
-  try{
-    if(_db && _dbCfg){
-      if(_dbDirty) _dbFlush();                                      // offline edits go first
-      const now=Date.now();
-      if(now-_dbSyncT>15000){ _dbSyncT=now; dbPullOnce(); }         // catch up on what the gap hid (rate-limited)
-      return 'sync';
-    }
-    if(!_db && !_dbConnP && _dbCfg && _dbCfg.url && _dbCfg.auto && _dbFailNet){ _dbAutoBoot(); return 'reconnect'; }
-  }catch(_){}
-  return null;
-}
-function _dbHideFlush(){
-  try{
-    if(!_db || !_dbDirty) return false;
-    _dbUnloading=true; setTimeout(function(){ _dbUnloading=false; }, 5000);
-    _dbFlush();
-    return true;
-  }catch(_){ return false; }
-}
+/* v2.9.0 — THE DATABASE DOOR (Supabase cloud sync) was removed entirely here.
+   It was an OPTIONAL mirror bolted on top of the local-first Records system:
+   Records (People · Specs · Notes · Links · the ID registry) always lived in
+   IndexedDB on-device (_rdb, _recPersist, recAdd/recUpdate/recRemove above) and
+   worked fully offline; ensureSupabase(), the _db state machine, dbConnect(),
+   dbPush() and the Connect sheet only pushed a copy of that same data to a
+   Supabase project when the owner manually tapped Connect. Zero cloud
+   dependency now, in any code path, even a gated one — owner ruling.
+   Records themselves are untouched. */
+// v1.25.0 THE NETWORK WATCH, trimmed for v2.9.0 — Supabase's sync used to
+// ride this same dispatcher (dirty-flush + re-pull); that half is gone with
+// it. What is left still matters: a network return retries a stalled basemap
+// load and checks for an app update.
 function _netUp(why){
-  let r=null;
-  try{ r=_dbNetUp(why); }catch(_){}
   try{ if(typeof _basemapNetUp==='function') _basemapNetUp(); }catch(_){}
   try{ if(why==='online' && typeof window.__updKick==='function') window.__updKick(); }catch(_){}
-  return r;
 }
 try{ window.addEventListener('online', function(){ _netUp('online'); }); }catch(_){}
-try{ window.addEventListener('pagehide', function(){ _dbHideFlush(); }); }catch(_){}
 try{ document.addEventListener('visibilitychange', function(){
-  if(document.visibilityState==='visible') _netUp('visible'); else _dbHideFlush(); }); }catch(_){}
-try{ window.DB={ connect:dbConnect, disconnect:dbDisconnect, push:dbPush, flush:_dbFlush, state:function(){ return _dbState; },
-  viewer:function(){ return _dbViewer; },   /* v2.7.0 THE WORKSPACE */
-  dirty:function(){ return _dbDirty; }, netUp:_netUp, hide:_dbHideFlush, lib:function(){ return _sbLoadP; }, conn:function(){ return _dbConnP; },
-  retry:function(){ return {n:_dbRetryN, armed:!!_dbRetryT}; },
-  chip:_dbChipShow, _setCfg:function(c){ _dbCfg=c; }, _setDb:function(d){ _db=d; } }; }catch(_){}   // chip/_setCfg/_setDb: harness hooks (smoke drives the boot chip + the save ladder)
-// ── the connect sheet (⋯ menu → Database). URL + key + board, Connect,
-// status, and a fold-away first-time setup note with the exact SQL.
-function _dbSheet(){
-  const host=document.getElementById('dossier'); if(!host) return;
-  try{ calloutHide(); }catch(_){}
-  _odInjectCSS();
-  const esc=_odEsc, escA=_odEscA;
-  const cfg=_dbCfg||{};
-  let h='<button class="sh-grip" type="button" data-dzstep="1" aria-label="Expand or collapse"><span></span></button>';
-  h+='<div class="od-head od-head-slim"><div class="od-name">Database</div><span class="od-sp"></span>'
-    +'<button class="od-ico od-ico-x" type="button" data-objx="1" aria-label="Close">✕</button></div>'
-    +'<div class="od-sub">The board is a SHARED WORKSPACE (v2.7.0): everyone with the URL + key + board name reads it live; only holders of the board\u2019s WRITE CODE publish to it — checked in the database itself, not in this app. A board with no code is open; the first save that carries a code locks it. Nothing foreign loads until your first Connect.</div>'
-    +'<div class="rc-form">'
-    +'<input class="rc-in" id="dbUrl" type="text" placeholder="Project URL — xxxxx.supabase.co" value="'+escA(cfg.url||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
-    +'<input class="rc-in" id="dbKey" type="text" placeholder="Publishable / anon key" value="'+escA(cfg.key||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
-    +'<input class="rc-in" id="dbBoard" type="text" maxlength="40" placeholder="Board name (default: a-org-2)" value="'+escA(cfg.board||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
-    +'<input class="rc-in" id="dbCode" type="text" maxlength="80" placeholder="Write code — editors only; blank reads a locked board" value="'+escA(cfg.code||'')+'" autocomplete="off" autocapitalize="off" spellcheck="false">'
-    +'<div class="rc-btns">'
-    +(_db?'<button class="rc-del" type="button" data-dbdisconnect="1">Disconnect</button>':'')
-    +'<span class="od-sp"></span>'
-    +'<button class="rc-save" type="button" data-dbconnect="1">'+(_db?'Reconnect':'Connect')+'</button>'
-    +'</div></div>'
-    +'<div id="dbStatus" class="db-status '+(_dbState==='live'?'db-live':(_dbState==='error'?'db-error':'db-off'))+'">'+esc(_dbMsg)+'</div>';
-  // v1.11.0 — auto-reconnect toggle: first successful Connect turns it on;
-  // this is the explicit off-switch (and it survives on the stored settings)
-  h+='<button class="bf-act'+(cfg.auto?'':' in')+'" type="button" data-dbauto="1">'
-    +(cfg.auto?'⚡ Connects automatically at every open — ON':'⚡ Auto-connect at open — off')+'</button>';
-  h+=_disc('db-setup','First-time setup (once, in your Supabase project)',
-    '<div class="rc-note">1. Create a free project at supabase.com.<br>'
-    +'2. SQL editor → run the workspace setup from <b>docs/workspace.sql</b> in the repository (table + realtime + the a2_save write-code door + read-only policies).<br>'
-    +'3. Project Settings → API: copy the URL and the publishable key into the boxes above.<br>'
-    +'4. Share URL + key + board name with the team (viewers); share the write code with editors only.</div>', {def:false});
-  h+='<div class="rc-note">Connect is manual each session. The device keeps an offline cache so the app opens anywhere; the database is the source of truth whenever you are connected.</div>';
-  host.innerHTML=h;
-  host.classList.remove('dz-peek','dz-half','dz-full');
-  host.classList.add('dz-full');
-  host.hidden=false; host.scrollTop=0;
-  _sheetFlag();
-}
+  if(document.visibilityState==='visible') _netUp('visible'); }); }catch(_){}
 
 /* ══════════ module: s6-export ══════════ */
 /* ============================================================================
@@ -11157,10 +10773,6 @@ function bootShell(){
       var m=document.getElementById('appMenu'); if(!m) return;
       var _rn=0; try{ for(var k in RECORDS) _rn+=recCount(k); }catch(_){}
       m.innerHTML='<div class="am-row am-ver">A-ORG-2 '+APP_VERSION+' · '+APP_UPDATED+'</div>'
-        // v1.1.0 — the database door: records live off-device once connected
-        +'<button class="am-row" type="button" data-am="db">Database — records off-device'
-          +'<span class="am-dbchip '+(_dbState==='live'?'am-db-live':(_dbState==='error'?'am-db-error':'am-db-off'))+'">'
-          +(_dbState==='live'?'LIVE':(_dbState==='connecting'?'…':(_dbState==='error'?'ERR':'OFF')))+'</span></button>'
         // v1.8.0 — the repository door (map data: IDs + everything filed under them)
         +'<button class="am-row" type="button" data-am="repo">Repository — IDs &amp; saved map data</button>'
         +'<button class="am-row" type="button" data-am="backup">Back up records ('+_rn+')</button>'
@@ -11201,35 +10813,9 @@ function bootShell(){
         return; }
       var d=e.target.closest('[data-am="diag"]');
       if(d){ try{ window._diagDump&&_diagDump(); }catch(_){} var m=document.getElementById('appMenu'); if(m) m.hidden=true; return; }
-      var dbm=e.target.closest('[data-am="db"]');
-      if(dbm){ var m0=document.getElementById('appMenu'); if(m0) m0.hidden=true;
-        try{ _dbSheet(); }catch(_){} return; }
       var lgm=e.target.closest('[data-am="repo"]');
       if(lgm){ var mL=document.getElementById('appMenu'); if(mL) mL.hidden=true;
         try{ _ledgerOpen(); }catch(_){} return; }
-      var dbc=e.target.closest('[data-dbconnect]');
-      if(dbc){
-        try{
-          var u=(document.getElementById('dbUrl')||{}).value||'', k2=(document.getElementById('dbKey')||{}).value||'', b2=(document.getElementById('dbBoard')||{}).value||'', c2=(document.getElementById('dbCode')||{}).value||'';
-          u=String(u).trim(); if(u && u.indexOf('://')<0) u='https://'+u;
-          _dbCfgSave({url:u, key:String(k2).trim(), board:(String(b2).trim()||'a-org-2'), code:String(c2).trim()});
-          dbConnect().then(function(){ try{ _dbSheet(); }catch(_){} });
-          _dbSetState('connecting','Connecting…');
-        }catch(_){}
-        return; }
-      var dbx=e.target.closest('[data-dbdisconnect]');
-      if(dbx){ dbDisconnect();
-        // v1.11.0: a deliberate disconnect also stands down auto-reconnect —
-        // otherwise the next open would immediately undo the owner's choice
-        try{ if(_dbCfg){ _dbCfg.auto=0; _dbCfgSave(_dbCfg); } }catch(_){}
-        try{ _dbSheet(); }catch(_){} return; }
-      var dba=e.target.closest('[data-dbauto]');
-      if(dba){
-        try{
-          if(_dbCfg && _dbCfg.url){ _dbCfg.auto=_dbCfg.auto?0:1; _dbCfgSave(_dbCfg); }
-          else _bfToast('Connect once first — auto-connect remembers it from there');
-        }catch(_){}
-        try{ _dbSheet(); }catch(_){} return; }
       var upd=e.target.closest('[data-am="upd"]');
       if(upd){ var mU=document.getElementById('appMenu'); if(mU) mU.hidden=true; try{ window._updCheckUI&&_updCheckUI(); }catch(_){} return; }
       var bk=e.target.closest('[data-am="backup"]');
@@ -11287,7 +10873,7 @@ function bootShell(){
     // page build · worker build · controlled? · online? · database state
     let hd='';
     try{ hd='A-ORG-2 '+APP_VERSION+' · worker '+(window.__swVer||'none')+' · '+((navigator.serviceWorker&&navigator.serviceWorker.controller)?'controlled':'uncontrolled')
-      +' · '+(navigator.onLine===false?'OFFLINE':'online')+' · db '+(typeof _dbState!=='undefined'?_dbState:'?')+'\n'; }catch(_){}
+      +' · '+(navigator.onLine===false?'OFFLINE':'online')+'\n'; }catch(_){}
     const txt=L.length? L.map(function(e){ return '['+e.k+'] '+e.m+'\n  @ '+(e.s||'inline')+':'+e.l+':'+e.c+(e.st?('\n  '+e.st.split('\n').slice(0,3).join(' | ')):''); }).join('\n\n') : 'No errors captured this session.';
     try{ prompt('Diagnostics — last '+L.length+' error(s). Copy below:', (hd+txt).slice(0,900)); }
     catch(_){ alert((hd+txt).slice(0,900)); }

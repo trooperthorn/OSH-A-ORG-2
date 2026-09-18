@@ -2290,3 +2290,82 @@ It lives here now.
   the live poll against a real deployed Worker + KV + a real swis-live-poller
   push — the owner does not yet have the KV namespace created or the
   `LIVE_PUSH_TOKEN` secret set, so this has never round-tripped end to end.
+
+## v2.9.0 — local hosting + the database door removed entirely
+- WHY: the owner wants zero required dependency on Cloudflare for anything,
+  and wants the Supabase cloud-sync feature (v1.1.0/v2.7.0) gone entirely —
+  not localized, not left opt-in behind a gate. Both are infrastructure
+  decisions, not feature work, and both cut in the direction of less: fewer
+  external services this app can be said to depend on.
+- LOCAL HOSTING IS ADDITIVE, NOT A REPLACEMENT: `worker.js`/`wrangler.jsonc`
+  are untouched and still deploy to Cloudflare exactly as before (Workers
+  Builds still auto-deploys on push to `main` — that trigger lives in
+  Cloudflare's own dashboard integration, not in `.github/workflows/`, so it
+  is unaffected by anything in this commit and still fires). `local-server/
+  server.js` is a second, independent way to serve the same contract:
+  `GET /api/live.json` + `POST /api/live-ingest`, same bearer-token check,
+  same body validation/truncation, same response shapes — verified by
+  running it and curling both routes (see the commit message). `index.html`
+  needed zero changes for this; it was already talking to same-origin
+  `/api/*`, which is the whole point of the contract-matching design.
+- NODE, NO DEPENDENCIES, BY DESIGN: the only two server-side routes this app
+  needs are small enough that Node's `http`/`fs` stdlib is the whole
+  implementation — no Express, no npm install as a build or deploy step, one
+  file. Same file runs unmodified in Docker (`local-server/Dockerfile`) and
+  as a plain `node server.js` process behind IIS (see README's ARR + URL
+  Rewrite steps) — ARR+URL-Rewrite was chosen over `httpPlatformHandler`/
+  iisnode because it is simpler to document exactly right and does not risk
+  a subtly wrong IIS-hosted-Node configuration shipping unverified.
+- SUPABASE REMOVED, RECORDS UNTOUCHED: `ensureSupabase()`, the entire `_db*`
+  state machine (`_db`, `_dbCh`, `_dbCfg`, `_dbState`, connect/push/pull/
+  realtime, `DB_TABLE`, `_dbSnapshot`/`_dbApply`, the retry ladder, the
+  Connect sheet's URL/key/board/code fields and its "First-time setup"
+  block), the `am-dbchip`/`dbStatus`/`#dbChip` UI, and the one dead-lint CDN
+  allowlist entry that existed only to permit `ensureSupabase`'s script tag
+  are ALL GONE — not hidden, not gated further, removed as source. Read
+  before cutting (AGENTS.md's "understand the layer before cutting it"):
+  Records (`recAdd`/`recUpdate`/`recRemove`/`recordOf`/`recCount`/
+  `recBackup`/`recRestore`/`RECORDS`, IndexedDB via `_rdb`) was ALREADY the
+  local-first store — it persisted to IndexedDB and rendered from RECORDS
+  regardless of `_db`'s state; Supabase only ever *additionally* mirrored a
+  copy of the same data to a project when the owner manually tapped Connect
+  (`dbPush()`/`_dbFlush()` calls in `_recSave`/`_svSave`/`_sbSave` were the
+  only coupling, and every one of them was already wrapped in
+  `try{...}catch(_){}` as a best-effort side channel, never a dependency).
+  So this was a clean cut, not an inseparable one: Records, saved views, and
+  saved briefs all work exactly as before, fully offline, with no Supabase
+  surface left anywhere in `index.html`.
+- THE NETWORK WATCH SURVIVED THE CUT, TRIMMED: the old `_netUp()` dispatcher
+  did three unrelated things behind one `online`/`visibilitychange` listener
+  — flush+re-pull the Supabase board, retry a stalled basemap load
+  (`_basemapNetUp`), and kick an app-update check (`__updKick`). Deleting the
+  whole dispatcher because two-thirds of it was Supabase would have quietly
+  broken basemap recovery and the update-check-on-reconnect behavior, which
+  have nothing to do with the cloud database. A trimmed `_netUp()` (basemap
+  + update-kick only) was reinstated in the same place in the file.
+- TESTS FOLLOW THE CUT, NOT PAPERED OVER: `tools/smoke_runtime.js` lost the
+  WORKSPACE probe, the database-door-at-runtime probe (D1-D5: connect hang,
+  one-connect-at-a-time, network-return reconnect, the save ladder,
+  localNewer), the auto-reconnect probe, and the database-door half of the
+  ID-registry probe (which now instead asserts the surface is GONE —
+  `ensureSupabase`/`DB`/`_dbSheet` all `undefined`, no `#sbLib` tag, no
+  `window.supabase`); `tools/ux-persistence-check.js` lost its Supabase
+  upload/retry/seed fixtures and `connect()` helper, keeping only the local
+  IndexedDB receipt tests and the export tests; `tools/dead-lint.js` lost the
+  one CDN allowlist entry. Every one of these is a function that no longer
+  exists in the shipped source, not a behavior quietly left untested.
+- `docs/workspace.sql` (the Supabase project setup script) is deleted — dead
+  documentation for a feature that no longer exists.
+- Byte delta: -25,943 (759,118 · 82.4% of the gate — the budget EASES, it
+  does not tighten; a rare direction for this changelog). Verified: all
+  eleven CI tools green locally (data-lint, harness_globe, smoke_runtime,
+  ship-lint, dead-lint, brief-scale-check, brief-support-check,
+  ux-navigation-check, ux-persistence-check, ux-records-check,
+  ux-search-check); `local-server/server.js` verified directly — started it,
+  curled `GET /index.html` (200), `GET /api/live.json` (empty shape),
+  `POST /api/live-ingest` without a token (401) and with one (200, snapshot
+  round-tripped back through `GET /api/live.json`). NOT verified: the Docker
+  build/run (no Docker available in the environment that shipped this), and
+  the IIS/ARR steps in the README (no Windows IIS host available either) —
+  both are documented from IIS/ARR's standard, well-established pattern, not
+  from an actual run against the owner's infrastructure.

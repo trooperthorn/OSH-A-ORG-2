@@ -1,3 +1,12 @@
+// v2.9.0 NOTE — Cloudflare is now OPTIONAL, not required. This file still
+// works exactly as before and Cloudflare hosting remains fully supported;
+// but the PRIMARY hosting path as of v2.9.0 is local-server/server.js, a
+// zero-dependency Node server (Docker or a plain Windows process behind
+// IIS) that implements this exact same /api/live-ingest + /api/live.json
+// contract against a local file instead of Cloudflare KV. Read this file's
+// route logic as the CONTRACT the local server matches, not as the only
+// place that contract lives. See README.md for how to run either.
+//
 // v2.8.0 LIVE ASSETS backend. This repo deploys as a Cloudflare Worker with a
 // static-assets binding (Workers Builds, auto-deploy on push to main — see
 // docs/HANDOFF-CHATGPT.md §8), NOT classic Cloudflare Pages. That matters here:

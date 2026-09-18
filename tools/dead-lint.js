@@ -109,17 +109,17 @@ if (deadFns.length) {
 {
   const scripts = [...src.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
   const noCmt = scripts.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').map(l => l.replace(/^\s*\/\/.*$/, '').replace(/([^:])\/\/.*$/, '$1')).join('\n');
-  // v1.1.0 THE ONE EXCEPTION — the database door. ensureSupabase() lazy-injects
-  // exactly this library on MANUAL Connect only; smoke enforces that no #sbLib
-  // script and no window.supabase global exist at boot. Anything else stays banned.
+  // v2.9.0 — the database door (ensureSupabase() + its ONE allowlisted CDN
+  // rung) was removed entirely, so the allowlist that carved out an exception
+  // for it goes too: ANY cross-origin URL literal in script code now fails
+  // the build outright, not just the ones outside a named exception.
   // v2.4.0 THE SECOND CLASS — XML NAMESPACE IDENTIFIERS. The deck exporter
   // (_pptxParts) hand-writes OOXML, and OOXML's namespace names are http://
   // URIs by spec: they are opaque identifiers inside generated markup, never
   // fetched, never loaded, never reachable by the network layer. Scoped to
   // exactly the OPC/OOXML schema hosts the exporter emits — any other origin
   // still fails the build.
-  const ALLOW = [/^https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@/,
-                 /^http:\/\/schemas\.openxmlformats\.org\//,
+  const ALLOW = [/^http:\/\/schemas\.openxmlformats\.org\//,
                  /^http:\/\/purl\.org\/dc\//,
                  /^http:\/\/www\.w3\.org\/2001\/XMLSchema-instance/];
   const hits = [...noCmt.matchAll(/https?:\/\/[^\s'"`)]+/g)].map(m => m[0])
@@ -128,7 +128,7 @@ if (deadFns.length) {
     bad(hits.length + ' cross-origin URL literal(s) in script code (zero-foreign-code law):');
     hits.slice(0, 8).forEach(h => console.log('    ' + h));
   } else {
-    console.log('✓ no cross-origin URL literals in script code (database CDN allowlisted, boot-inert)');
+    console.log('✓ no cross-origin URL literals in script code (zero foreign code, no exceptions)');
   }
 }
 
